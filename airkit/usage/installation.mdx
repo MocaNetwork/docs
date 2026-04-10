@@ -1,0 +1,142 @@
+---
+title: "SDK Installation"
+description: "npm install @mocanetwork/airkit"
+---
+
+<Tabs>
+<Tab title="Web">
+
+```bash
+npm install @mocanetwork/airkit
+```
+
+### **Bundling**
+
+This module is distributed in 3 formats
+
+- `esm` build `dist/airkit.esm.js` is es6 format
+- `commonjs` build `dist/airkit.cjs.js` in es5 format
+- `umd` build `dist/airkit.umd.min.js` In ES5 format without polyfilling corejs minified
+
+By default, the appropriate format is used for your specified use case. A different format can be used (if you know what you're doing) by referencing the correct file.
+
+</Tab>
+<Tab title="Flutter">
+
+### Installation
+
+Before you can install the AirKit Flutter package, you need to install the OnePub CLI in order to access our private package repository. We will provide you with the login credentials for OnePub.
+
+Open your terminal and use following commands:
+
+```bash
+dart pub global activate onepub
+onepub login
+
+```
+
+<Warning>
+**OnePub PATH Troubleshooting**
+
+In case the `onepub` command is not recognized, adding following to your PATH should help:\
+`export PATH=$PATH:$HOME/.pub-cache/bin`
+</Warning>
+
+
+
+To install the AirKit Flutter package, you have two options. You can either manually add the package in the `pubspec.yaml` file, or you can use the `onepub pub add` command.
+
+Add `airkit` as a dependency to your `pubspec.yaml`.
+
+```yaml
+dependencies:
+  airkit:
+    hosted: https://onepub.dev/api/sxhddavuhn/
+    version: ^1.5.0-beta.0
+```
+
+Add `airkit` using `onepub pub add` command.
+
+```bash
+onepub pub add airkit
+
+```
+
+### Android Configuration
+
+### Generate SHA256 fingerprint
+
+In order to whitelist your Android app we would need the SHA-256 fingerprint of the certificate you use to sign your Android app. You will have different fingerprints for your debug and release builds.
+
+You can get this fingerprint by using the `keytool` command:
+
+```bash
+keytool -list -v -keystore <path-to-your-keystore> -alias <your-key-alias>
+
+```
+
+In addition to above fingerprints, we would also need the package name.
+
+### Update compileSdkVersion and minSdk
+
+For Android build `compileSdkVersion` needs to be at least `34` and `minSdk` needs to be at least `26`. Check your app module gradle file in your project to change it.
+
+```json
+android {
+    namespace "com.example.appname"
+    compileSdkVersion 34
+    // ..
+
+    defaultConfig {
+        minSdk = 26
+        // ..
+    }
+}
+
+```
+
+### Configure asset links
+
+For passkey to work, you need to add the following to your `android/app/src/main/res/values/strings.xml`:
+
+```xml
+<string name="asset_statements" translatable="false">
+[
+  {"include": "https://account.air3.com/.well-known/assetlinks.json"},
+  {"include": "https://account.sandbox.air3.com/.well-known/assetlinks.json"}
+]
+</string>
+
+```
+
+### iOS Configuration
+
+### App ID whitelisting
+
+In order to whitelist your iOS app we would need one or more valid Apple App IDs that consist of:
+
+1. Your **Apple Team ID**: This is a unique, 10-character alphanumeric string assigned to your developer account by Apple (e.g., `ABCDE12345`). You can find it in your Apple Developer account under "Membership Details" or by inspecting your provisioning profiles.
+2. Your App's **Bundle Identifier**: This is the unique identifier for your app, typically in reverse domain name format (e.g., `com.example.appname`). This is set in your Xcode project.
+
+The final format would be `ABCDE12345.com.example.appname`.
+
+### Update global iOS platform
+
+For iOS build global platform needs to be 14.0. Check `Podfile` in your project to change the global platform.
+
+```json
+platform :ios, '14.0'
+```
+
+### Configure associate domains
+
+In order to enable passkey, following steps need to be done:
+
+1. Open your project in Xcode (`ios/Runner.xcworkspace`).
+2. Select the `Runner` target, go to the **Signing & Capabilities** tab.
+3. Add the **Associated Domains** capability.
+4. Add following domains:
+   - `webcredentials:account.air3.com`
+   - `webcredentials:account.sandbox.air3.com`
+</Tab>
+</Tabs>

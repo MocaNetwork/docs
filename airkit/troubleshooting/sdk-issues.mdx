@@ -1,0 +1,89 @@
+---
+title: "SDK Issues"
+description: "Common issues with AIR Kit SDK initialization, login, and session management."
+---
+
+## Initialization
+
+### SDK does not initialize
+
+- Verify you are calling `init()` with a valid `partnerId`:
+
+```ts
+const airService = new AirService();
+await airService.init({ partnerId: "your-partner-id" });
+```
+
+- Check the browser console for errors. A network failure to load the AIR Kit iframe will surface here.
+- Ensure you are using a supported browser (Chrome, Firefox, Safari, Edge — latest versions).
+
+### "Partner ID not found" error
+
+- Confirm the Partner ID in the [Developer Dashboard](https://developers.sandbox.air3.com/dashboard) matches what you pass to `init()`.
+- Check that you are using the correct environment. Sandbox and Production have different Partner IDs.
+
+## Login
+
+### Login dialog does not appear
+
+- The SDK opens an iframe for login. If it doesn't appear:
+  - Check that `Content-Security-Policy` headers allow `frame-src` from `*.air3.com`.
+  - Check for CSS `z-index` conflicts — the iframe may be behind other elements.
+  - Disable browser extensions that block iframes or popups.
+
+### Login succeeds but user data is missing
+
+- `login()` returns an `AirLoginResult` containing `token` and account information. If fields are missing, verify your Partner JWT includes the expected claims.
+- If using Custom Auth (BYO), ensure `email` is included in the Partner JWT.
+
+### "Session expired" after page refresh
+
+- By default, AIR Kit auto-restores sessions for 30 days. If sessions expire immediately:
+  - Check that `skipRehydration` is not set to `true` in your `init()` options.
+  - Verify cookies and local storage are not being cleared by your app or browser settings.
+
+### Session rehydration fails silently
+
+- Call `isLoggedIn` after `init()` to check if rehydration succeeded.
+- If the session cannot be restored (expired, corrupted), `isLoggedIn` returns `false`. Call `login()` to start a new session.
+
+## Flutter-specific
+
+### SDK not loading on iOS
+
+- Ensure your `ios/Runner/Info.plist` includes the required URL schemes and capabilities.
+- Check the [Installation guide](/airkit/usage/installation) for iOS-specific configuration.
+
+### SDK not loading on Android
+
+- Verify the minimum SDK version in `android/app/build.gradle` meets the requirement.
+- Ensure internet permission is declared in `AndroidManifest.xml`.
+
+## wagmi connector
+
+### Connector not appearing in wagmi
+
+- Ensure `@mocanetwork/airkit-connector` is installed and the connector is added to your wagmi config:
+
+```ts
+import { airConnector } from "@mocanetwork/airkit-connector";
+
+const config = createConfig({
+  connectors: [airConnector({ partnerId: "your-partner-id" })],
+  // ...
+});
+```
+
+### `isMocaNetwork` is undefined
+
+- Cast the connector to the correct type:
+
+```ts
+import type { AirConnectorProperties } from "@mocanetwork/airkit-connector";
+const isAir = (connector as Connector & AirConnectorProperties)?.isMocaNetwork;
+```
+
+## Still stuck?
+
+- Check the [AIR Kit release notes](/airkit/release-notes) for known issues in your SDK version.
+- Join our [Discord](https://discord.gg/mocaversenft) for community support.

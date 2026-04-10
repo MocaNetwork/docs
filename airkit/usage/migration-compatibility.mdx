@@ -1,0 +1,65 @@
+---
+title: "Migration & Compatibility"
+description: "This document covers essential compatibility information for AIR Kit and AIR Kit Connector packages."
+---
+
+## Browser Compatibility
+
+### Minimum Requirements
+
+Due to passkey authentication requirements, AIR Kit requires:
+
+**Minimum Supported Versions:**
+
+- **iOS**: 16+
+- **Android**: 10+
+- **Safari**: 16+
+- **Chromium**: 126+
+- **Firefox**: 97+
+
+**Required Features:**
+
+- Passkey support (WebAuthn)
+- Iframe support
+- PostMessage API
+- ES6+ JavaScript support
+
+## Package Compatibility
+
+### AIR Kit (`@mocanetwork/airkit`)
+
+**Distribution Formats:**
+
+- **ESM**: `dist/airkit.esm.js` (ES6 modules)
+- **CommonJS**: `dist/airkit.cjs.js` (ES5 format)
+- **UMD**: `dist/airkit.umd.min.js` (browser use)
+
+**Requirements:**
+
+- Node.js >=18.x
+- npm >=9.x
+
+### AIR Kit Connector (`@mocanetwork/airkit-connector`)
+
+**Peer Dependencies:**
+
+- `@wagmi/core` ^2.x
+- `viem` ^2.x
+
+**Requirements:**
+
+- Node.js >=18.x
+- npm >=9.x
+
+## Framework Support
+
+**Framework-Agnostic Design:**
+Since AIR Kit spawns iFrames to run the wallet and UI, it should work with most JavaScript frameworks. The SDK communicates and provides an EIP-1193 provider interface, making it compatible with:
+
+- React
+- Next.js
+- Vue
+- Angular
+- Svelte
+- SolidJS
+- And other modern JavaScript frameworks

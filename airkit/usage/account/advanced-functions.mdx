@@ -1,0 +1,52 @@
+---
+title: "Advanced Functions (Beta)"
+description: "AIR Kit extends the standard EIP-1193 provider with custom RPC methods for advanced functionality."
+---
+
+<Warning>
+Swap functionality, advanced DeFi operations are only supported on `Base` chain only.
+</Warning>
+
+### Swap Operations (Beta)
+
+**air_getSwapQuote**
+
+```tsx
+const quote = await provider.request({
+  method: "air_getSwapQuote",
+  params: [
+    {
+      fromToken: string,
+      toToken: string,
+      fromAmount: string
+    }
+  ]
+});
+// Returns: swap quote data
+```
+
+**air_sendSwapTransaction**
+
+```tsx
+const txHash = await provider.request({
+  method: "air_sendSwapTransaction",
+  params: [
+    {
+      fromToken: string,
+      toToken: string,
+      fromAmount: string
+    }
+  ]
+});
+// Returns: string (transaction hash)
+```
+
+**air_showSwapUI**
+
+```tsx
+const txHash = await provider.request({
+  method: "air_showSwapUI",
+  params: []
+});
+// Returns: string (transaction hash)
+```

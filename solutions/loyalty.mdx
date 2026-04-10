@@ -1,0 +1,83 @@
+---
+title: "Loyalty & Rewards"
+description: "Issue portable loyalty tier credentials that travel with your customers across partner brands — no bilateral API agreements required."
+icon: "gift"
+---
+
+## The Problem
+
+Loyalty programs today are island economies. A customer's Gold status with your brand is invisible to every partner at the other end of their journey. Cross-brand benefits require bilateral API agreements between every pair of participating companies — expensive to build, fragile to maintain, and impossible to scale beyond a handful of partners.
+
+The result: $100B in unredeemed loyalty points sitting in silos. Customers who don't bother earning because they can't use what they accumulate.
+
+## What Changes With AIR Kit
+
+- **Your customers carry their loyalty tier** — Gold earned with you is presentable at any partner in the Moca ecosystem, with no direct API between you and that partner
+- **No bilateral integrations** — Partners verify the credential, not your API. You issue it once; every verifier accepts it
+- **Zero friction for your existing pipeline** — Credentials issue automatically when your loyalty engine fires its existing events. No new user-facing flow required
+- **Tier upgrades happen instantly** — When a customer reaches Platinum, the old credential is revoked and a new one issues. Partners see the current status, always
+- **Retroactive migration** — Existing members can receive credentials in bulk. You don't start from zero users
+
+## How It Works
+
+<Steps>
+  <Step title="Your loyalty engine fires an event">
+    A customer reaches Gold. Your existing system triggers the same milestone event it always has — a database write, a webhook, an email. Nothing changes here.
+  </Step>
+  <Step title="AIR Kit issues a loyalty credential">
+    Your backend makes one API call. A verifiable "Gold Member" credential lands in that customer's AIR Account. They don't need to open an app or take any action.
+  </Step>
+  <Step title="The customer presents the credential at a partner">
+    At check-in, checkout, or app login at any partner in the ecosystem, the customer's credential is readable. No account linking. No API call to your platform.
+  </Step>
+  <Step title="The partner verifies — and gets only what they need">
+    The partner's system calls one SDK method. They receive a single answer: COMPLIANT or NON_COMPLIANT. They learn the tier level. They never see your customer's name, email, or account history.
+  </Step>
+</Steps>
+
+## What Your Users Experience
+
+Nothing changes at the point of earning. Your app, your UX, your branding. The credential issues silently in the background.
+
+At a partner: the customer authenticates with their AIR Account (the same login they use with you). The benefit unlocks automatically. No code to enter, no linking flow to complete.
+
+## What Compliance Will Ask
+
+**Do you store our customer data?**
+No. AIR Kit stores only the credential — a cryptographic attestation that your customer holds Gold status. Not their name, email, account history, or purchase data.
+
+**What happens when a customer closes their account?**
+You revoke the credential instantly via one API call. It becomes unverifiable immediately.
+
+**Can partners see who our customers are?**
+No. The verifier receives only tier status and an expiry date. The customer's identity is never exposed to the partner.
+
+**Is this GDPR compliant?**
+Yes. No personal data is stored in the credential — only derived facts (tier, status). Data subject deletion requests are handled by revoking the credential.
+
+## Integration at a Glance
+
+| | |
+|---|---|
+| **What your team builds** | One API call in your existing milestone event handler |
+| **Engineering effort** | 1 backend engineer |
+| **Timeline to live** | 2–4 weeks including testing |
+| **Frontend changes** | None required |
+| **What partners build** | 3 lines of SDK code to verify |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Developer integration guide" icon="code" href="/airkit/guides/air-for-loyalty">
+    Full implementation with schemas, code, and status polling.
+  </Card>
+  <Card title="Compliance FAQ" icon="shield-check" href="/solutions/compliance-faq">
+    Full GDPR, PII, and data residency answers.
+  </Card>
+  <Card title="Partner Economics" icon="chart-bar" href="/solutions/partner-economics">
+    How the revenue model works for issuers and verifiers.
+  </Card>
+  <Card title="Talk to our team" icon="handshake" href="https://moca.network/partners">
+    Start a partnership conversation.
+  </Card>
+</CardGroup>

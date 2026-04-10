@@ -1,0 +1,43 @@
+---
+title: "Why Moca Chain?"
+description: "Key features that differentiate Moca Chain: EVM compatibility, decentralized storage, zero-knowledge privacy, and fast finality."
+---
+
+> _Moca Chain is a Layer 1 EVM-compatible blockchain purpose-built for decentralized identity, enabling chain-agnostic identity data issuance and verifications._
+
+## EVM Compatible
+
+Moca Chain is fully EVM-compatible. Developers can deploy existing Solidity smart contracts and use familiar tooling (Hardhat, Foundry, Remix, MetaMask) without modification.
+
+## Decentralized Data Storage
+
+Moca Chain stores credentials in its decentralized storage network (MCSP) to:
+
+- Ensure data availability is consistent with chain uptime
+- Distribute storage across independent providers for resilience
+- Support geolocation-specific storage for data residency requirements
+
+## Privacy and Zero-Knowledge Focus
+
+Privacy is built into the protocol:
+
+- **Zero-Knowledge Proofs (ZKPs):** Verify claims without exposing data (e.g., prove you're 18 without sharing your birthday).
+- **zkTLS:** Enables secure onboarding from web sources while keeping information encrypted and user-authorized.
+
+Moca Chain currently uses Circom with Groth16 for ZK proofs. More information on zkTLS will be provided as it rolls out.
+
+## Performance & Availability
+
+Leveraging CometBFT consensus, Moca Chain provides:
+
+- Instant finality
+- ~1 second block time
+- 2,400 max transactions per block
+
+Most major L1s have 2+ second block times without instant finality.
+
+## Next Steps
+
+- [Technical Architecture](/mocachain/technical-details/architecture)
+- [Connect to Moca Chain](/mocachain/using-moca-chain/connect-to-mocachain)
+- [Run a Node](/mocachain/guides/run-a-node)

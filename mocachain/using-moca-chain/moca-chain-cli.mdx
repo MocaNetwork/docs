@@ -1,0 +1,63 @@
+---
+title: "Moca Chain CLI"
+description: "Learn how to use Moca Chain CLI"
+---
+
+
+Moca Chain CLI is a command line tool for you to manage your resources directly with the Cosmos and storage layer within Moca Chain.
+
+<Warning>
+⚠️ Repo not publicly available — please reach out to us if you would like to access this feature.
+</Warning>
+
+## CLI Guide
+
+This command-line tool provides **basic storage features** such as:
+
+- Creating buckets
+- Uploading and downloading files
+- Deleting resources
+
+It also supports related operations for managing **groups, policies, banks, accounts**, and more.
+
+### Command Organization
+
+- Commands are organized into **categories** and implemented as subcommands for clarity.
+- To see all command categories, use:
+  ```
+  moca-cmd -h
+  ```
+
+### Configuration File
+
+- Use the `--home` option to set the path for the config file and keystore.
+- By default, configuration is saved in the `.moca-cmd` directory under your system’s home directory.
+- If you run a command that interacts with Moca Chain and:
+  - There’s no `config/config.toml` file in the path
+  - You didn’t use the `--config` flag  
+    ...the tool will automatically generate a `config/config.toml` file with testnet settings.
+
+### Example: Testnet Configuration
+
+- The config file’s `rpcAddr` and `chainId` should match the Moca Chain network.
+
+### Intelligent Storage Provider Selection
+
+- The tool automatically picks the correct storage provider for each request.
+- To upload to a specific provider, set the storage provider’s operator address.
+- No need to change the config when working with different storage providers.
+
+### Example Usage
+
+To upload files to different buckets on different storage providers:
+
+```
+moca-cmd storage put test moca://bucket1/object1
+moca-cmd storage put test moca://bucket2/object
+```
+
+Each command uploads to a different bucket/provider, without changing any configuration.
+
+### Operations
+
+<Warning>Detailed operation reference is currently in progress. Run `moca-cmd -h` to explore available commands.</Warning>

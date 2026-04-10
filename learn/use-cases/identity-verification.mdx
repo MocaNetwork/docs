@@ -1,0 +1,70 @@
+---
+title: "Identity Verification"
+description: "How AIR Kit enables privacy-preserving identity verification — KYC, age checks, and compliance without storing PII."
+---
+
+Modern applications increasingly need to verify who their users are — for regulatory compliance, age gating, access control, and fraud prevention. Traditional identity verification requires every platform to collect, store, and protect sensitive personal data, creating liability, re-verification friction, and breach risk.
+
+AIR Kit offers a privacy-first alternative: **issue a verifiable credential once, verify it anywhere — without ever touching raw PII**.
+
+## The Problem with Traditional Verification
+
+| Traditional Approach | AIR Kit Approach |
+|---------------------|-----------------|
+| User submits passport / ID to every platform | User verifies once, carries credential |
+| Platform stores PII — becomes a breach target | Platform sees only a ZK proof result: `COMPLIANT / NON_COMPLIANT` |
+| Re-KYC at every new service | Portable credential accepted by any verifier in the ecosystem |
+| Verification takes hours to days | Credential issued instantly on KYC pass via Issue on Behalf |
+| GDPR / data breach liability for every platform | No PII stored — reduced data breach liability |
+
+## How It Works
+
+<Steps>
+  <Step title="User completes identity verification">
+    User goes through your KYC provider (Jumio, Onfido, Persona, etc.) as normal.
+  </Step>
+  <Step title="Your backend issues a KYC credential">
+    The moment the KYC provider sends a pass result, your server calls the Issue on Behalf API. No user action required.
+  </Step>
+  <Step title="Credential lands in the user's AIR Account">
+    The user now owns a verifiable, on-chain attestation of their identity — not the raw data, just the proof.
+  </Step>
+  <Step title="Any partner verifies the credential via ZK proof">
+    The verifier receives only `COMPLIANT` or `NON_COMPLIANT`. No PII is ever transmitted or stored by the verifier.
+  </Step>
+</Steps>
+
+## Common Verification Use Cases
+
+<Columns cols={2}>
+  <Card title="Age Verification" icon="cake-candles">
+    Prove a user is 18+ or 21+ without revealing their birthdate. Ideal for gaming, alcohol, adult content, and gambling platforms.
+  </Card>
+  <Card title="KYC / AML Compliance" icon="shield-check">
+    Issue a KYC attestation on verification pass. Partner platforms accept it without running KYC again.
+  </Card>
+  <Card title="Accredited Investor" icon="chart-line">
+    Issue an income or net worth attestation for financial products, DeFi pools, or private token sales.
+  </Card>
+  <Card title="Professional Credentials" icon="graduation-cap">
+    Verify licenses, certifications, and qualifications issued by recognized authorities — portable across employers and platforms.
+  </Card>
+</Columns>
+
+## Privacy Guarantee
+
+The verifier **never receives raw identity data**. The ZK proof flow ensures only a boolean result passes between the credential holder and the verifier.
+
+| What the Verifier Sees | What Stays Private |
+|-----------------------|--------------------|
+| `COMPLIANT / NON_COMPLIANT` | Full name, passport / ID number |
+| Credential expiry date | Date of birth |
+| KYC level (`basic` / `enhanced`) | Residential address |
+| Issuer DID | Income figures, nationality |
+
+## Full Implementation Guide
+
+See [AIR for Fintech & Payments](/airkit/guides/air-for-fintech) for complete code examples including:
+- Issuing a KYC credential from a KYC webhook
+- Gating financial products behind credential verification
+- Age verification without exposing birthdate

@@ -1,0 +1,141 @@
+---
+title: "Compliance & Privacy FAQ"
+description: "GDPR, CCPA, data residency, PII storage, and breach liability questions answered for enterprise legal and compliance teams evaluating AIR Kit."
+icon: "shield-check"
+---
+
+Answers to the questions legal and compliance teams ask when evaluating AIR Kit. If your question isn't covered here, reach out at [support@moca.network](mailto:support@moca.network).
+
+---
+
+## Data Storage & PII
+
+**Does AIR Kit store our customers' personal data?**
+
+No. AIR Kit stores only cryptographic credential hashes on Moca Chain — the proof that a credential exists and is valid. The underlying personal data (name, passport number, date of birth, address) never leaves your systems or your KYC provider's systems.
+
+**What does a credential actually contain?**
+
+Only the attributes you define when you create the credential schema. Best practice — and what every AIR Kit integration guide enforces — is to store only derived facts: `isOver18: true`, `kycLevel: "enhanced"`, `tier: "Gold"`. Not the raw data those facts were derived from.
+
+**Can AIR Kit or Moca Network read our customers' credential data?**
+
+The credential attributes you define are visible to issuers and authorised verifiers. Moca Network does not access credential content for commercial purposes. The cryptographic design means even if the chain data were inspected, it reveals only hashes without the signing keys.
+
+**Where is data stored geographically?**
+
+Moca Chain is an EVM-compatible L1. Credential hashes are stored on-chain. For data residency requirements (EU, Australia, etc.), the critical question is whether personal data is stored — and it is not. Credential hashes are not personal data under GDPR Recital 26 as they cannot reasonably be used to identify a natural person without the corresponding keys.
+
+---
+
+## GDPR
+
+**Is this compliant with GDPR Article 5(1)(c) — data minimisation?**
+
+Yes. The credential contains only the minimum necessary attestation. This is enforced at schema design time — our integration guides explicitly prohibit including raw PII fields in `credentialSubject`.
+
+**How do we handle Article 17 data subject deletion requests?**
+
+Revoke the credential via one API call. Revocation is instant and on-chain. The credential becomes unverifiable immediately. The hash on-chain remains (the chain is immutable) but contains no personal data and is cryptographically inert.
+
+**Does issuing credentials constitute international data transfer under GDPR Chapter V?**
+
+No personal data is transferred during credential issuance or verification. The ZK proof flow means verifiers receive only boolean results, not personal data. There are no SCCs or adequacy decision requirements.
+
+**Who is the data controller?**
+
+You are the data controller for your customers' personal data. AIR Kit acts as a data processor in the narrow sense that it processes the credential hash. The personal data underlying the credential remains within your data controller boundary.
+
+**Does consent need to be obtained to issue credentials?**
+
+You are issuing credentials based on business events within your existing relationship with the user (loyalty programme membership, KYC completion, subscription activation). This typically falls within the legitimate interest or contractual necessity lawful basis. Review with your DPO for your specific context.
+
+---
+
+## CCPA / CPRA
+
+**Does issuing AIR Kit credentials constitute "selling" personal information under CCPA?**
+
+No personal information is transferred to AIR Kit or Moca Network. Credential verification by a partner transmits only boolean results — not personal information as defined under CCPA 1798.140.
+
+**How do we handle opt-out requests?**
+
+Revoke the user's credentials. They become unverifiable across the ecosystem immediately.
+
+---
+
+## Security & Breach Liability
+
+**What is the breach liability for verifiers accepting AIR Kit credentials?**
+
+Verifiers hold no personal data — they receive only COMPLIANT / NON_COMPLIANT signals. A breach of a verifier's systems exposes nothing about the credential holder's identity.
+
+**What is the breach liability for issuers?**
+
+As issuer, you hold the credential schema and the signed credential hashes. The underlying personal data (passport, KYC documents) remains with your KYC provider. A breach of AIR Kit's credential infrastructure would expose only hashes, which are computationally infeasible to reverse without the corresponding ZK keys.
+
+**Is there an audit trail for credential issuance and verification?**
+
+Yes. Every issuance and verification event is recorded on Moca Chain with a timestamp and participant identifiers. The chain provides an immutable audit log.
+
+---
+
+## Credentials & Revocation
+
+**How quickly does credential revocation take effect?**
+
+Revocation is on-chain and propagates within one block (~1 second on Moca Chain). Any verifier calling the SDK after that point will receive a NON_COMPLIANT result.
+
+**What happens to credentials if a user closes their account?**
+
+Revoke all credentials associated with the user via the API. They become unverifiable immediately. If the user later re-onboards, new credentials are issued fresh.
+
+**Can a user hold credentials from multiple issuers in one AIR Account?**
+
+Yes. An AIR Account can hold credentials from any number of issuers. The user controls which credentials to present at any given verifier.
+
+**Can credentials expire?**
+
+Yes. You set an `expirationDate` in the credential subject. After expiry, the credential returns NON_COMPLIANT. You can re-issue with a new expiry at any time.
+
+---
+
+## Compliance Access Key (CAK)
+
+**What is the Compliance Access Key (CAK)?**
+
+CAK is an optional encryption framework within AIR Kit designed for regulated industries where verifiers need access to raw personal data (ID images, biometric photos). It adds user-consent-driven encryption at issuance and controlled decryption at verification, ensuring data sovereignty remains with the user at all times.
+
+**How does CAK differ from the standard ZK-based flow?**
+
+In the standard flow, verifiers only receive boolean results ("Compliant" / "Non-Compliant") via zero-knowledge proofs — they never see the underlying data. With CAK enabled, verifiers can access the encrypted raw data after the user explicitly grants consent. CAK is designed for cases where regulatory requirements mandate that verifiers review actual identity documents.
+
+**Do I need to enable CAK?**
+
+Not necessarily. CAK is optional. If your credentials only need ZK proof-based verification (attribute proofs without revealing raw data), the standard flow is sufficient. Enable CAK when raw PII access by verifiers is a regulatory requirement, when multiple verifiers need the same underlying data, or when you need an auditable consent trail for data access.
+
+**Who controls whether CAK is active?**
+
+Both Issuers and Verifiers make independent decisions. Issuers enable CAK on their pricing schemas and issuance programs. Verifiers choose whether to require CAK on their verification programs. The user always has the final say — they must explicitly consent before any data is decrypted.
+
+**Can the platform or Moca Network decrypt CAK-encrypted data?**
+
+No. The CAK private key is generated locally on the user's device and only shared with the Verifier after explicit user consent. The platform never holds the private key and cannot decrypt the data.
+
+For full technical details, see the [CAK overview](/airkit/usage/credential/cak-overview), [Issuer guide](/airkit/usage/credential/cak-issuer-guide), and [Verifier guide](/airkit/usage/credential/cak-verifier-guide).
+
+---
+
+## Partnerships & Commercial
+
+**Is AIR Kit SOC 2 certified?**
+
+Reach out to [support@moca.network](mailto:support@moca.network) for current security certifications and our shared responsibility documentation.
+
+**Can we run AIR Kit in a private deployment?**
+
+Moca Chain is a public L1. The SDK connects to Moca Network infrastructure. Private / on-premise deployment is not currently available. Discuss specific requirements with our team.
+
+**Who do we contact for a Data Processing Agreement (DPA)?**
+
+Contact [support@moca.network](mailto:support@moca.network). We provide a standard DPA for enterprise partners.

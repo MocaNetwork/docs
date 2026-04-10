@@ -1,0 +1,173 @@
+---
+title: "Privacy & Compliance"
+description: "How AIR Kit protects sensitive user data through encryption, user consent, and the Compliance Access Key (CAK) framework."
+---
+
+AIR Kit is built around a privacy-first architecture. Credentials use zero-knowledge proofs so verifiers receive only boolean results ("compliant" or "non-compliant") without accessing raw personal data. For regulated industries that require verifiers to access underlying identity data, AIR Kit provides an additional layer: the **Compliance Access Key (CAK)** framework.
+
+---
+
+## Compliance Access Key (CAK)
+
+CAK is an optional, consent-gated data access primitive designed for regulated data usage. It enables strong encryption of sensitive personal data during credential issuance and controlled decryption during verification — all driven by explicit user consent.
+
+### The core problem
+
+In finance, digital identity (KYC), and other regulated industries, organizations handle extremely sensitive information: ID cards, passports, facial biometric images, and other compliance data. The challenge is threefold:
+
+1. **Encrypt** raw sensitive data during credential issuance
+2. **Store** it securely so no party can read it at rest
+3. **Decrypt** it only when a specific Verifier has obtained explicit consent from the user
+
+### How CAK addresses it
+
+CAK introduces a user-consent-driven encryption and decryption process built on four principles:
+
+<CardGroup cols={2}>
+  <Card title="Data protection at rest" icon="lock">
+    Sensitive data is encrypted with a temporary CAK public key during issuance. The ciphertext cannot be read by anyone — including the Issuer, the platform, or any storage provider — until a consented Verifier receives the corresponding private key.
+  </Card>
+  <Card title="User sovereignty" icon="user-shield">
+    The user is the ultimate controller. During verification, the user must explicitly approve or deny each Verifier's access request. Without consent, no party can decrypt the data.
+  </Card>
+  <Card title="Compliance enablement" icon="scale-balanced">
+    Encrypted storage, user-controlled access, and traceable authorization records provide technical primitives that support compliance efforts — including audit trails and clear responsibility boundaries.
+  </Card>
+  <Card title="Separation of concerns" icon="arrows-split-up-and-left">
+    Encryption happens at issuance (performed by the Issuer). Decryption authorization happens at verification (executed by the Verifier with user consent). The two steps are separated in time and space, creating a clear audit trail.
+  </Card>
+</CardGroup>
+
+---
+
+## CAK in the credential lifecycle
+
+CAK spans three phases of the digital credential lifecycle.
+
+### Phase 1: Business configuration
+
+Before any credentials are issued, administrators configure rules in the Developer Dashboard.
+
+| Party | Action | CAK decision |
+|-------|--------|--------------|
+| **Issuer** | Configure Pricing Schema | Decide if credentials under this pricing model support CAK encryption |
+| **Issuer** | Create Issuance Program | Choose whether to enable CAK for this specific program |
+| **Issuer** | Configure Callback URL | Set a global HTTPS endpoint to receive authorization notifications |
+| **Verifier** | Create Verification Program | Decide if this program requires the credential to be CAK-encrypted |
+
+### Phase 2: Credential issuance
+
+When a user applies for a credential (for example, completing a KYC check), the CAK flow adds encryption steps to the standard issuance process.
+
+<Steps>
+  <Step title="Key pair generation">
+    The Issuance SDK generates a temporary CAK key pair locally by signing with the user's identity wallet.
+  </Step>
+  <Step title="Public key handoff">
+    The SDK returns the CAK public key to the Issuer's backend system.
+  </Step>
+  <Step title="Data encryption">
+    The Issuer encrypts the user's raw data (ID photo, name, biometric images) with the CAK public key.
+  </Step>
+  <Step title="Encrypted storage">
+    The encrypted data is stored in decentralized storage (dStorage on Moca Chain). No party can read it without the corresponding private key.
+  </Step>
+</Steps>
+
+### Phase 3: Verification and authorization
+
+When a user presents their credential to a Verifier, the CAK flow ensures consent-driven decryption.
+
+<Steps>
+  <Step title="Verification initialization">
+    The Verifier's backend starts the verification process via the platform API.
+  </Step>
+  <Step title="User consent">
+    The Verification SDK displays a clear authorization statement. The user explicitly grants or denies the Verifier's access to their encrypted data.
+  </Step>
+  <Step title="Private key generation">
+    Upon user consent, the SDK generates the corresponding CAK private key locally.
+  </Step>
+  <Step title="Data decryption">
+    The Verifier receives the private key and uses it to decrypt the user's data, completing the compliance workflow.
+  </Step>
+</Steps>
+
+<Note>
+  The platform's callback mechanism serves only as an authorization event notification and audit signal. It does not contain encrypted data, cryptographic keys, or any information that would enable direct data access.
+</Note>
+
+---
+
+## When to use CAK
+
+<Tabs>
+  <Tab title="CAK recommended">
+    - Raw identity data (ID images, biometric photos) may be accessed by verifiers
+    - Multiple verifiers need access to the same underlying data
+    - Regulatory auditability is a requirement
+    - Your industry requires proof that user consent was obtained before data access
+  </Tab>
+  <Tab title="CAK not necessary">
+    - The credential does not contain raw PII or biometric data
+    - No verifier ever requires access to plaintext data
+    - The credential is used purely for zero-knowledge attribute proofs (the default AIR Kit flow)
+  </Tab>
+</Tabs>
+
+---
+
+## Key decisions by party
+
+### For Issuers
+
+| Decision | Options | Impact |
+|----------|---------|--------|
+| Enable CAK for a pricing schema? | Yes / No | Top-level switch — determines whether CAK-enabled credentials can be issued under this pricing model |
+| Enable CAK for an issuance program? | Yes / No | **Yes:** SDK generates a key pair and returns the public key for encryption. **No:** Standard issuance flow |
+| Configure a callback URL? | Provide URL / Leave blank | **Provide URL:** Real-time notifications about which user authorized which verifier, critical for auditing. **Leave blank:** No notifications |
+
+### For Verifiers
+
+| Decision | Options | Impact |
+|----------|---------|--------|
+| Require CAK for a verification program? | Yes / No | **Yes:** Only CAK-encrypted credentials accepted; user consent flow is mandatory. **No:** Both CAK and non-CAK credentials accepted |
+| Which Issuers to select? | CAK-enabled only / All | If CAK is required, only Issuers with CAK enabled are available as partners |
+
+### For Users (Holders)
+
+| Decision | Options | Impact |
+|----------|---------|--------|
+| Authorize the Verifier? | Agree / Deny | **Agree:** Verifier gains one-time decryption ability. **Deny:** Verification aborted, data stays encrypted, but the user may be unable to complete their business with that Verifier |
+
+---
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **CAK** | Compliance Access Key — an optional, user-consent-driven encryption framework |
+| **Issuer** | An entity that issues credentials (e.g., a KYC provider) |
+| **Verifier** | An entity that verifies credentials to grant access to a service (e.g., a crypto exchange) |
+| **Holder** | The end-user who owns and controls their credentials and data |
+| **dStorage** | Decentralized Storage on Moca Chain, used for storing encrypted data packages |
+| **ECIES** | Elliptic Curve Integrated Encryption Scheme — a hybrid encryption scheme using ECC |
+| **SECP256R1** | The elliptic curve (P-256) used for CAK key generation |
+
+---
+
+## Next steps
+
+For technical integration details, see the AIR Kit developer documentation:
+
+<CardGroup cols={3}>
+  <Card title="CAK overview" icon="key" href="/airkit/usage/credential/cak-overview">
+    Technical architecture and lifecycle
+  </Card>
+  <Card title="Issuer guide" icon="file-certificate" href="/airkit/usage/credential/cak-issuer-guide">
+    Dashboard setup, SDK integration, callback implementation
+  </Card>
+  <Card title="Verifier guide" icon="magnifying-glass" href="/airkit/usage/credential/cak-verifier-guide">
+    Consent flow, decryption, security best practices
+  </Card>
+</CardGroup>

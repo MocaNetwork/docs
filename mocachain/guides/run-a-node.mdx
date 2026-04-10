@@ -1,0 +1,286 @@
+---
+title: "How to run a node for Moca Chain"
+description: "How to run a full node for Moca Chain using Docker or Cosmovisor."
+---
+
+<Warning>⚠️ This section may change without prior notice</Warning>
+Critical information in this section may be subject to change as the network is in early stages.
+
+<Info>
+🔓 The Moca Chain source code is publicly available on GitHub: [mocachain/moca](https://github.com/mocachain/moca).
+</Info>
+
+## Network Information
+
+| Network | Chain ID      | EVM Chain ID | RPC (Tendermint)                  |
+| ------- | ------------- | ------------ | --------------------------------- |
+| Mainnet | moca_2288-1   | 2288         | https://tm-rpc.mocachain.dev      |
+| Testnet | moca_222888-1 | 222888       | https://testnet-lcd.mocachain.org |
+
+<Tip>
+**Mainnet Access**
+
+Mainnet RPC access requires an API key. Contact the Moca Chain team to obtain your key.
+</Tip>
+
+## Node Information
+
+### Minimum System Requirements
+
+| Component    | Requirement                                                            |
+| ------------ | ---------------------------------------------------------------------- |
+| OS           | Desktop or laptop running recent versions of **Mac OS X** or **Linux** |
+| Storage      | **1 TB** free disk space, minimum read/write speed of **100 MB/s**     |
+| CPU          | **4 cores**                                                            |
+| Memory (RAM) | **12 GB**                                                              |
+| Network      | Broadband connection, upload/download at least **1 MB/s**              |
+
+### Recommended System Requirements
+
+| Component       | Recommended Specification                      |
+| --------------- | ---------------------------------------------- |
+| Processor (CPU) | **16-core CPU**                                |
+| Memory (RAM)    | **64 GB**                                      |
+| Storage         | **3 TB SSD**                                   |
+| Network         | Stable high-speed internet, minimum **5 MB/s** |
+
+## Setting Up a New Node
+
+### Prerequisites
+
+**For Docker (Option A):**
+
+- Docker
+- jq
+
+**For Manual Cosmovisor (Option B):**
+
+- Git
+- Go 1.23+
+- jq
+- macOS or Linux
+
+## 1. Clone the Repo (Option B only)
+
+<Tip>Skip this step if using the Docker image (Option A).</Tip>
+
+Clone the repository and checkout the latest stable version:
+
+```bash
+git clone https://github.com/mocachain/moca.git
+cd moca
+
+# checkout latest stable version
+git checkout tags/v1.2.1
+```
+
+## 2. Install Cosmovisor
+
+[Cosmovisor](https://docs.cosmos.network/sdk/v0.53/build/tooling/cosmovisor) is a process manager for Cosmos SDK nodes that automatically handles chain upgrades. It is the recommended way to run a Moca Chain node.
+
+### Option A: Official moca-cosmovisor Docker Image (Recommended)
+
+The official Docker image is available on [GitHub Container Registry](https://github.com/mocachain/moca/pkgs/container/mocad). This image comes with the genesis binary preinstalled and runs `mocad` with Cosmovisor.
+
+```bash
+# Pull the latest image
+docker pull ghcr.io/mocachain/mocad:v1.2.1
+
+# For specific architecture
+# linux/amd64
+docker pull ghcr.io/mocachain/mocad:v1.2.1-amd64
+
+# linux/arm64
+docker pull ghcr.io/mocachain/mocad:v1.2.1-arm64
+```
+
+### Option B: Manual Cosmovisor Setup
+
+If you prefer to run Cosmovisor manually without Docker, follow these steps.
+
+#### Install Cosmovisor
+
+```bash
+go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@latest
+```
+
+#### Build or Download the Binary
+
+You can either build from source or download pre-compiled binaries from [GitHub Releases](https://github.com/mocachain/moca/releases/tag/v1.2.1).
+
+```bash
+# Option 1: Build from source
+make build
+
+# Option 2: Download pre-compiled binary (Linux arm64)
+wget https://github.com/mocachain/moca/releases/download/v1.2.1/mocad_linux_arm64.tar.gz
+tar -xzf mocad_linux_arm64.tar.gz
+chmod +x mocad
+mv mocad ./build/mocad
+```
+
+#### Setup Cosmovisor Directory Structure
+
+```bash
+mkdir -p ~/.mocad/cosmovisor/genesis/bin
+cp ./build/mocad ~/.mocad/cosmovisor/genesis/bin/mocad
+```
+
+## 3. Initialize Node
+
+This will initialize your local moca node home directory `~/.mocad` containing chain data configuration.
+
+### Using Docker (Option A)
+
+<CodeGroup>
+
+```bash [Mainnet]
+docker run --rm -v ~/.mocad:/root/.mocad ghcr.io/mocachain/mocad:v1.2.1 \
+  mocad init mynode --chain-id moca_2288-1 --default-denom amoca
+```
+
+```bash [Testnet]
+docker run --rm -v ~/.mocad:/root/.mocad ghcr.io/mocachain/mocad:v1.2.1 \
+  mocad init mynode --chain-id moca_222888-1 --default-denom amoca
+```
+
+</CodeGroup>
+
+
+### Using Manual Cosmovisor (Option B)
+
+<CodeGroup>
+
+```bash [Mainnet]
+~/.mocad/cosmovisor/genesis/bin/mocad init mynode --chain-id moca_2288-1 --default-denom amoca
+```
+
+```bash [Testnet]
+~/.mocad/cosmovisor/genesis/bin/mocad init mynode --chain-id moca_222888-1 --default-denom amoca
+```
+
+</CodeGroup>
+
+
+## 4. Pull Live genesis file
+
+Fetch the genesis file for your target network.
+
+<CodeGroup>
+
+```bash [Mainnet]
+RPC=https://tm-rpc.mocachain.dev
+curl -s "$RPC/genesis?key=<YOUR_ACCESS_KEY>" | jq -r '.result.genesis' > ~/.mocad/config/genesis.json
+```
+
+```bash [Testnet]
+RPC=https://testnet-lcd.mocachain.org
+curl -s "$RPC/genesis" | jq -r '.result.genesis' > ~/.mocad/config/genesis.json
+```
+
+</CodeGroup>
+
+
+## 5. Add peers
+
+Fetch and configure peers from the network:
+
+```bash
+PEERS=$(curl -s "$RPC/net_info" | jq -r '.result.peers[] | select(.node_info.id and .remote_ip) | "\(.node_info.id)@\(.remote_ip):26656"' | paste -sd, -)
+
+# Update config with peers
+# Use sed -i '' on macOS, sed -i on Linux
+if [[ "$OSTYPE" == "darwin"* ]]; then SED_FLAG=(-i ''); else SED_FLAG=(-i); fi
+[ -n "$PEERS" ] && \
+  sed "${SED_FLAG[@]}" 's/seeds = ".*"/seeds = ""/' ~/.mocad/config/config.toml && \
+  sed "${SED_FLAG[@]}" "s/persistent_peers = \".*\"/persistent_peers = \"$PEERS\"/" ~/.mocad/config/config.toml && \
+  sed "${SED_FLAG[@]}" 's/addr_book_strict = true/addr_book_strict = false/' ~/.mocad/config/config.toml
+```
+
+Alternatively you can provide your own list of peers.
+
+## 6. Fast sync state
+
+State sync quickly bootstraps your node by trusting a recent block header (light client verification) and downloading a snapshot of the application state at that height, instead of replaying all historical blocks.
+
+```bash
+# Get current height
+HEIGHT=$(($(curl -s "$RPC/block" | jq -r '.result.block.header.height') - 1000))
+HASH=$(curl -s "$RPC/block?height=$HEIGHT" | jq -r '.result.block_id.hash')
+
+# Set trusted height and hash to sync from in your node configuration files
+# Use sed -i '' on macOS, sed -i on Linux
+if [[ "$OSTYPE" == "darwin"* ]]; then SED_FLAG=(-i ''); else SED_FLAG=(-i); fi
+sed "${SED_FLAG[@]}" 's/^enable *= *.*/enable = true/' ~/.mocad/config/config.toml
+sed "${SED_FLAG[@]}" "s|^rpc_servers *= *.*|rpc_servers = \"$RPC,$RPC\"|" ~/.mocad/config/config.toml
+sed "${SED_FLAG[@]}" "s/^trust_height *= *.*/trust_height = $HEIGHT/" ~/.mocad/config/config.toml
+sed "${SED_FLAG[@]}" "s/^trust_hash *= *.*/trust_hash = \"$HASH\"/" ~/.mocad/config/config.toml
+sed "${SED_FLAG[@]}" 's/^trust_period *= *.*/trust_period = "168h0m0s"/' ~/.mocad/config/config.toml
+```
+
+## 7. Run the node
+
+### Using Docker (Option A)
+
+Run the Docker container with a mounted volume for persistent data:
+
+<CodeGroup>
+
+```bash [Mainnet]
+docker run -d \
+  --name mocad \
+  -v ~/.mocad:/root/.mocad \
+  -p 26656:26656 \
+  -p 26657:26657 \
+  -p 1317:1317 \
+  -p 8545:8545 \
+  ghcr.io/mocachain/mocad:v1.2.1
+```
+
+```bash [Testnet]
+docker run -d \
+  --name mocad \
+  -v ~/.mocad:/root/.mocad \
+  -p 26656:26656 \
+  -p 26657:26657 \
+  -p 1317:1317 \
+  -p 8545:8545 \
+  ghcr.io/mocachain/mocad:v1.2.1
+```
+
+</CodeGroup>
+
+
+### Using Manual Cosmovisor (Option B)
+
+`DAEMON_ALLOW_DOWNLOAD_BINARIES=true` enables Cosmovisor to automatically download new binaries during chain upgrades. Without this, the node will halt at the upgrade height and require manual binary replacement. Alternatively, you can pre-stage binaries at `$DAEMON_HOME/cosmovisor/upgrades/<upgrade-name>/bin/mocad`.
+
+<CodeGroup>
+
+```bash [Mainnet]
+export DAEMON_NAME=mocad
+export DAEMON_HOME=$HOME/.mocad
+export DAEMON_ALLOW_DOWNLOAD_BINARIES=true
+cosmovisor run start --chain-id=moca_2288-1
+```
+
+```bash [Testnet]
+export DAEMON_NAME=mocad
+export DAEMON_HOME=$HOME/.mocad
+export DAEMON_ALLOW_DOWNLOAD_BINARIES=true
+cosmovisor run start --chain-id=moca_222888-1
+```
+
+</CodeGroup>
+
+
+The node will take some time to fully sync up to the current chain height.
+
+## Verify Syncing
+
+You can verify if state sync is done by curl localhost:26657/status several times and see whether **latest_block_height** is increasing in response.
+
+```bash
+curl -s http://127.0.0.1:26657/status | jq -r ".result.sync_info.latest_block_height"
+# Expect block height greater than 0
+```

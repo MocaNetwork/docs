@@ -1,0 +1,372 @@
+{
+  "name": "Moca Network",
+  "description": "AIR Kit — portable credentials, cross-platform loyalty, and privacy-preserving identity for enterprise partners and developers. Build on Moca Chain.",
+  "api": {
+    "playground": {
+      "proxy": false
+    }
+  },
+  "seo": {
+    "indexing": "all"
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg",
+    "href": "https://docs.moca.network"
+  },
+  "favicon": "/images/icon.png",
+  "theme": "mint",
+  "colors": {
+    "primary": "#000",
+    "light": "#000",
+    "dark": "#000"
+  },
+  "appearance": {
+    "default": "light",
+    "strict": true
+  },
+  "fonts": {
+    "heading": {
+      "family": "Adamina"
+    },
+    "body": {
+      "family": "Outfit"
+    }
+  },
+  "contextual": {
+    "options": ["copy", "chatgpt", "claude", "perplexity", "grok", "add-mcp"]
+  },
+  "social": {
+    "x": "https://twitter.com/Moca_Network",
+    "discord": "https://discord.gg/mocaversenft",
+    "github": "https://github.com/MocaNetwork"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/MocaNetwork"
+      },
+      {
+        "label": "Partner with Us",
+        "href": "https://mocanetwork.typeform.com/joinmocaeco?typeform-source=air3.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://developers.sandbox.air3.com/dashboard"
+    }
+  },
+  "navigation": {
+    "pages": ["index"],
+    "tabs": [
+      {
+        "tab": "Moca Book",
+        "pages": [
+          "learn/integrating-using-ai",
+          {
+            "group": "Introduction",
+            "pages": [
+              "learn/index",
+              "learn/moca-chain",
+              "learn/moca-coin",
+              "learn/core-problems-addressed",
+              "learn/target-users-stakeholders"
+            ]
+          },
+          {
+            "group": "Why Moca Network?",
+            "pages": [
+              "learn/vision/index",
+              "learn/vision/comparison-with-centralized-identity-systems",
+              "learn/vision/ecosystem"
+            ]
+          },
+          {
+            "group": "Why Now",
+            "pages": [
+              "learn/why-now/index",
+              "learn/why-now/digital-identity",
+              "learn/why-now/privacy-security",
+              "learn/why-now/regulatory-landscape"
+            ]
+          },
+          {
+            "group": "Build on Moca Network",
+            "pages": [
+              "learn/build-on-moca",
+              "learn/airkit/about-airkit",
+              "learn/airkit/key-features",
+              "learn/airkit/credentials",
+              "learn/airkit/integration-workflow",
+              "learn/airkit/features-developer-benefits",
+              "learn/programs-events"
+            ]
+          },
+          {
+            "group": "Use Cases",
+            "pages": [
+              "learn/use-cases/identity-verification"
+            ]
+          },
+          {
+            "group": "Advanced Topics",
+            "pages": [
+              "learn/advanced-topics/zktls",
+              "learn/advanced-topics/privacy-and-compliance"
+            ]
+          },
+          {
+            "group": "Security & Trust",
+            "icon": "shield-check",
+            "pages": [
+              "learn/security/overview",
+              "learn/security/credential-security",
+              "learn/security/data-privacy",
+              "learn/security/security-checklist"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": ["learn/help/faq"]
+          }
+        ]
+      },
+      {
+        "tab": "Solutions",
+        "groups": [
+          {
+            "group": "Start Here",
+            "pages": [
+              "solutions/index",
+              "solutions/partner-economics",
+              "solutions/compliance-faq"
+            ]
+          },
+          {
+            "group": "By Vertical",
+            "pages": [
+              "solutions/loyalty",
+              "solutions/identity",
+              "solutions/fintech",
+              "solutions/gaming",
+              "solutions/telco",
+              "solutions/advertising"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "AIR Kit",
+        "pages": [
+          "airkit/integrating-using-ai",
+          {
+            "group": "Overview",
+            "pages": [
+              "airkit/index",
+              "airkit/when-to-use-airkit",
+              "airkit/environments",
+              "airkit/platform-matrix"
+            ]
+          },
+          {
+            "group": "Quick Setup",
+            "pages": [
+              "airkit/usage/getting-started",
+              "airkit/usage/installation",
+              "airkit/usage/initialization"
+            ]
+          },
+          {
+            "group": "Authentication",
+            "icon": "lock",
+            "pages": [
+              "airkit/usage/partner-authentication",
+              "airkit/usage/user-authentication",
+              "airkit/usage/config-login",
+              "airkit/usage/user-management"
+            ]
+          },
+          {
+            "group": "Quickstart Guides",
+            "pages": [
+              "airkit/quickstart/index",
+              "airkit/quickstart/issue-credentials",
+              "airkit/quickstart/verify-credentials"
+            ]
+          },
+          {
+            "group": "Integration Guides",
+            "icon": "puzzle-piece",
+            "pages": [
+              "airkit/guides/overview",
+              "airkit/guides/air-for-loyalty",
+              "airkit/guides/air-for-fintech",
+              "airkit/guides/air-for-gaming",
+              "airkit/guides/air-for-ticketing",
+              "airkit/guides/air-for-telco",
+              "airkit/guides/air-for-advertising"
+            ]
+          },
+          {
+            "group": "Credential Services",
+            "pages": [
+              "airkit/usage/credential/credentials-flow",
+              {
+                "group": "Schema Design",
+                "pages": [
+                  "airkit/usage/credential/schema-overview",
+                  "airkit/usage/credential/schema-use-cases",
+                  "airkit/usage/credential/schema-creation",
+                  "airkit/usage/credential/schema-management"
+                ]
+              },
+              {
+                "group": "Credential Issuance",
+                "pages": [
+                  "airkit/usage/credential/issuing-credentials",
+                  "airkit/usage/credential/issue-on-behalf",
+                  "airkit/usage/credential/issue-on-behalf-api"
+                ]
+              },
+              {
+                "group": "Compliance Access Key (CAK)",
+                "pages": [
+                  "airkit/usage/credential/cak-overview",
+                  "airkit/usage/credential/cak-issuer-guide",
+                  "airkit/usage/credential/cak-verifier-guide"
+                ]
+              },
+              "airkit/usage/credential/verify"
+            ]
+          },
+          {
+            "group": "Account Services",
+            "pages": [
+              "airkit/usage/account/smart-account",
+              "airkit/usage/account/provider-functions",
+              "airkit/usage/account/wagmi",
+              "airkit/usage/account/supported-chains",
+              "airkit/usage/account/paymaster",
+              {
+                "group": "Advanced",
+                "pages": [
+                  "airkit/usage/account/builtin-ui",
+                  "airkit/usage/account/session-keys",
+                  "airkit/usage/account/advanced-functions"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Recipes",
+            "icon": "book-open",
+            "pages": [
+              "recipes/index",
+              "recipes/kyc-credential-on-event",
+              "recipes/loyalty-points-issuance",
+              "recipes/verify-credential-in-app",
+              "recipes/wagmi-integration",
+              "recipes/custom-auth-integration"
+            ]
+          },
+          {
+            "group": "Plug & Play Templates",
+            "pages": [
+              "airkit/templates/plug-and-play",
+              "airkit/templates/plug-and-play-issuer",
+              "airkit/templates/plug-and-play-verifier"
+            ]
+          },
+          {
+            "group": "Tools & Config",
+            "pages": [
+              "airkit/airkit-dashboard",
+              "airkit/usage/config-theming",
+              "airkit/usage/config-language"
+            ]
+          },
+          {
+            "group": "Troubleshooting",
+            "icon": "wrench",
+            "pages": [
+              "airkit/troubleshooting/common-errors",
+              "airkit/troubleshooting/sdk-issues",
+              "airkit/troubleshooting/credential-issues"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "airkit/usage/reference",
+              "airkit/usage/migration-compatibility",
+              "airkit/release-notes"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Moca Chain",
+        "groups": [
+          {
+            "group": "Introduction",
+            "pages": [
+              "mocachain/index",
+              "mocachain/why-mocachain"
+            ]
+          },
+          {
+            "group": "Technical Details",
+            "pages": [
+              "mocachain/technical-details/architecture",
+              "mocachain/technical-details/consensus-layer",
+              "mocachain/technical-details/evm-compatibility",
+              "mocachain/technical-details/decentralized-storage"
+            ]
+          },
+          {
+            "group": "Using Moca Chain",
+            "pages": [
+              "mocachain/using-moca-chain/connect-to-mocachain",
+              "mocachain/using-moca-chain/how-to-get-moca",
+              "mocachain/using-moca-chain/network-information",
+              "mocachain/using-moca-chain/moca-chain-cli"
+            ]
+          },
+          {
+            "group": "Node Guides",
+            "pages": [
+              "mocachain/guides/run-a-node",
+              "mocachain/guides/run-a-validator",
+              "mocachain/guides/run-a-storage-provider",
+              "mocachain/guides/run-a-local-testnet",
+              "mocachain/guides/run-a-challenger"
+            ]
+          },
+          {
+            "group": "Native dApps",
+            "pages": [
+              "mocachain/native-dapps/block-explorer",
+              "mocachain/native-dapps/airkit-dashboard"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": ["mocachain/help/faq"]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "openapi": "api-reference/openapi.json",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["api-reference/introduction"]
+          }
+        ]
+      }
+    ]
+  }
+}

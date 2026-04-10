@@ -1,0 +1,53 @@
+---
+title: "SDK Initialization"
+description: "AIR Kit creates an iframe that loads the login flow and sets up communication streams between the iframe and the DApp's JavaScript context."
+---
+
+<Tabs>
+<Tab title="Web">
+
+AIR Kit creates an iframe that loads the login flow and sets up communication streams between the iframe and the DApp's JavaScript context.
+
+```js
+import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
+
+const airService = new AirService({
+  partnerId: YOUR_PARTNER_ID // Replace with your actual Partner ID
+});
+await airService.init({
+  buildEnv: BUILD_ENV.SANDBOX,
+  credentialNetwork: "devnet", // Optional: testnet (default) or devnet
+  enableLogging: true,
+  preloadWallet: true, // Optional: Enable if wallet features will be used
+  preloadCredential: true, // Optional: Enable if credential features will be used
+  sessionConfig: {
+    locale: "en", // Optional: Language code (e.g. "en", "es", ...)
+    currency: "USD" // Optional: Display currency (e.g. "EUR", "USD", ...)
+  }
+});
+
+// Without any parameters, this will trigger the default Air login dialog which provides different login methods for the user to choose from.
+await airService.login();
+```
+
+Once the SDK is installed and `AirService` is successfully initialized, it can be used to authenticate users.
+
+</Tab>
+<Tab title="Flutter">
+
+After installation, the next step to use the AirKit SDK is to create an `AirService` instance and call the `initialize` method.
+
+The `partnerId` you will receive from us and the `redirectUrl` parameter needs to match the schema discussed in the installation section. It is different for Android and iOS.
+
+```dart
+Future<void> initialize({
+    required String partnerId,
+    required GlobalKey<NavigatorState> navigatorKey,
+    Environment env = Environment.production,
+    bool enableLogging = false,
+})
+```
+
+The `partnerId` you will receive from us and the `navigatorKey` parameter is needed to overlay dialogs necessary for specific user flows. During development we recommend using `Environment.sandbox` and enabled logging.
+</Tab>
+</Tabs>

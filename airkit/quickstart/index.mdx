@@ -1,0 +1,81 @@
+---
+title: "Quickstart 1: Account Integration & User Onboarding"
+description: "Learn how to set up user onboarding, authentication, and session management with AIR Account SDK"
+---
+
+
+# Quickstart: Login & User Onboarding
+
+Account integration and user onboarding is the foundation of any application.  
+If you're here, your primary focus is **seamless onboarding, authentication, and session management**.
+
+With the AIR Kit, you can:
+
+- Enable SSO login for your users
+- Provide wallet services similar to a decentralized identity provider
+- Establish secure user sessions
+- Manage the lifecycle of sessions within your app
+
+This guide will walk you through:
+
+- Setting up AIR Kit
+- Implementing login flows
+- Utilizing embedded wallet features
+
+<Tip>
+If your app doesn’t require credential issuance or verification yet, this Quickstart alone is enough to get you up and running.
+</Tip>
+
+## Step 1: Install the SDK
+
+```bash
+npm install @mocanetwork/airkit
+```
+
+## Step 2: Get Your Partner ID
+
+1. Go to the <a href="https://developers.sandbox.air3.com/testnet" target="_blank" rel="noreferrer">Developer Dashboard</a> and login with your EOA wallet.
+2. Connect your wallet.
+   ![Wallet connect](/images/guides/wallet_connect.png)
+3. Navigate to the Account Section on the navigation bar on the left. Then go to the General page. Copy the **Partner ID** from the partner account information and settings.
+   ![Quickstart - get partner ID](/images/guides/get_partner_id.png)
+4. If you’re looking to customise the theme, login flow, or localization, please see the [relevant sections](/airkit/usage/config-theming) for more details.
+
+## Step 3: Import, Initialize & Login
+
+**File:** `./useAirKit.ts`
+
+```ts
+import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
+
+const service = new AirService({
+  partnerId: YOUR_PARTNER_ID // Replace with your actual Partner ID
+});
+
+// Trigger the login flow
+await service.init({
+  buildEnv: BUILD_ENV.SANDBOX
+});
+const loggedInResult = await service.login();
+```
+
+☑️ This will:
+
+- Initialize the `AirService` within the [Sandbox Environment](/airkit/environments)
+- Present the SSO Login screen of AIR Kit for users to log in
+- Handle authentication and session setup
+- Enable Account Services (such as wallet functions), and Credential Services (such as credential verification) for your app after the user is logged in
+
+## What You Get After Login
+
+Once login is complete, you’ll have access to:
+
+- User UUID
+- Session token
+- User metadata
+
+## Next Steps
+
+Once you've set up account and sessions, you can optionally move on to [Issue Credentials](/airkit/quickstart/issue-credentials) and [Verify Credentials](/airkit/quickstart/verify-credentials) if your app needs credential-based access control.
+
+Otherwise, you may explore our documentation on how to utilize AIR Kit's [Account Services](/airkit/usage/account/smart-account)

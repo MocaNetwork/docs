@@ -1,0 +1,106 @@
+---
+title: "Identity & Compliance"
+description: "Issue a KYC credential once. Every partner in the ecosystem accepts it via zero-knowledge proof — no raw identity data ever transmitted."
+icon: "shield-check"
+---
+
+## The Problem
+
+Every platform that needs to verify a user's identity runs its own KYC process, stores a copy of the result, and takes on the liability for protecting it. The user goes through the same friction — passport upload, liveness check, waiting period — at every new service they join.
+
+The industry has accepted this as the cost of compliance. It isn't.
+
+## What Changes With AIR Kit
+
+- **Your customer verifies once** — KYC passed at your platform issues a portable credential. Every partner in the ecosystem accepts it without running KYC again
+- **Verifiers receive nothing sensitive** — The ZK proof flow means a verifier gets a single answer: COMPLIANT or NON_COMPLIANT. No passport image, no national ID, no date of birth crosses the network
+- **Your KYC provider doesn't change** — You keep Jumio, Onfido, Persona, or whoever you use. AIR Kit converts their pass result into a portable credential. The verification itself stays with your provider
+- **Breach liability shrinks** — Verifiers who accept AIR Kit credentials store no PII. You as the issuer store only the credential hash. The only party holding raw identity data is your KYC provider — who already has it
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="KYC Portability" icon="id-card">
+    Issue a KYC attestation on verification pass. Partner platforms accept it without re-running checks. One verification, ecosystem-wide acceptance.
+  </Card>
+  <Card title="Age Verification" icon="cake-candles">
+    Prove a user is 18+ or 21+ without revealing their birthdate. The verifier learns only the boolean result — the actual age stays private.
+  </Card>
+  <Card title="Accredited Investor" icon="chart-line">
+    Issue an income or net worth attestation for financial products, DeFi access, or private token sales. The verifier never sees the underlying figures.
+  </Card>
+  <Card title="Professional Credentials" icon="graduation-cap">
+    Verify licences, certifications, and professional qualifications. Portable across employers, platforms, and jurisdictions.
+  </Card>
+</CardGroup>
+
+## How It Works
+
+<Steps>
+  <Step title="User completes KYC with your provider">
+    Your existing flow. Your existing KYC provider. Nothing changes for the user or your team at this step.
+  </Step>
+  <Step title="Your backend issues a KYC credential">
+    The moment your KYC provider returns a pass result, your backend calls the AIR Kit Issue on Behalf API. One call. The credential issues silently — no user action needed.
+  </Step>
+  <Step title="Credential lands in the user's AIR Account">
+    The user now holds a verifiable, on-chain attestation of their identity status. Not a copy of their passport — a cryptographic proof that they passed.
+  </Step>
+  <Step title="Any partner verifies via ZK proof">
+    At any partner service, the user presents their credential. The partner calls one SDK method and receives COMPLIANT or NON_COMPLIANT. No PII is transmitted or stored.
+  </Step>
+</Steps>
+
+## What the Verifier Actually Sees
+
+| What the Verifier Receives | What Stays Private |
+|----------------------------|--------------------|
+| COMPLIANT / NON_COMPLIANT | Full name, passport number |
+| KYC level (basic / enhanced / full) | Date of birth |
+| `isOver18: true` | Residential address |
+| Credential expiry date | National ID / tax number |
+| Issuer identifier | Income, net worth, financial data |
+
+## What Compliance Will Ask
+
+**Is this GDPR Article 5(1)(c) compliant — data minimisation?**
+Yes. The credential contains only the minimum necessary attestation — the fact that KYC passed, the level, and the derived boolean `isOver18`. No underlying personal data is stored in the credential.
+
+**How do we handle data subject deletion requests?**
+Revoke the credential via one API call. Revocation is instant and on-chain. The user's attestation becomes unverifiable immediately.
+
+**Who has access to the underlying identity documents?**
+Only your KYC provider — the same as today. AIR Kit never sees raw documents. We store only the credential hash on Moca Chain.
+
+**What if a user disputes their KYC result?**
+The dispute process stays entirely with your KYC provider, as it does today. You revoke or re-issue the AIR Kit credential once the dispute resolves.
+
+**Does AIR Kit have access to our users' data?**
+No. AIR Kit never receives PII. The Issue on Behalf API call contains only the credential attributes you define — derived facts, not raw documents.
+
+## Integration at a Glance
+
+| | |
+|---|---|
+| **What your team builds** | One API call in your KYC webhook / callback handler |
+| **Engineering effort** | 1 backend engineer |
+| **Timeline to live** | 2–3 weeks |
+| **Changes to your KYC provider setup** | None |
+| **What partners build** | 3 lines of SDK code to verify |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Developer integration guide (Fintech & Identity)" icon="code" href="/airkit/guides/air-for-fintech">
+    KYC credential schemas, webhook code, and verification patterns.
+  </Card>
+  <Card title="Full Compliance FAQ" icon="shield-check" href="/solutions/compliance-faq">
+    GDPR, CCPA, data residency, and breach liability answers.
+  </Card>
+  <Card title="Architecture & Data Flow" icon="diagram-project" href="/airkit/guides/overview">
+    ZK proof flow explained end-to-end.
+  </Card>
+  <Card title="Talk to our team" icon="handshake" href="https://moca.network/partners">
+    Start a partnership conversation.
+  </Card>
+</CardGroup>

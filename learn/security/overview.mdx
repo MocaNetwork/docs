@@ -1,0 +1,57 @@
+---
+title: "Security Overview"
+description: "How the Moca Network protects user identity, credentials, and data through its layered security architecture."
+---
+
+Moca Network is an identity infrastructure platform. Security is foundational to every design decision — from how credentials are issued to how keys are managed and how data flows between parties.
+
+## Trust model
+
+Moca Network uses a **split-trust architecture** where no single party holds enough information to compromise a user's identity or access their data:
+
+| Party | What they hold | What they cannot do |
+| --- | --- | --- |
+| **User (Holder)** | Private keys, consent authority, credential wallet | Cannot forge credentials or bypass schema rules |
+| **Issuer** | Authority to issue credentials, CAK public key (if enabled) | Cannot read encrypted data after issuance, cannot impersonate users |
+| **Verifier** | Verification programs, ZK proof results | Cannot access raw data without user consent (CAK), cannot see data beyond what the proof reveals |
+| **Moca Chain** | On-chain credential proofs, state anchors | Cannot reconstruct private keys or decrypt stored data |
+| **dStorage** | Encrypted credential payloads | Cannot decrypt without the user-consented key |
+
+## Security layers
+
+### Zero-knowledge proofs
+
+Credential verification uses ZK proofs by default. When a user presents a credential, the verifier receives a boolean result ("this claim is true") without accessing the underlying personal data. No PII crosses the wire during standard verification.
+
+### MPC-based key management
+
+User accounts are backed by multi-party computation (MPC). Private keys are never held in one place — shards are distributed so that no single party (including Moca) can reconstruct the key. Keys are only assembled in a secure execution environment at the moment of signing.
+
+### On-chain anchoring
+
+Credential proofs are anchored on Moca Chain. This provides tamper evidence — if a credential is modified after issuance, the on-chain proof will not match.
+
+### Encrypted storage
+
+When the [Compliance Access Key (CAK)](/learn/advanced-topics/privacy-and-compliance) framework is enabled, raw data is encrypted with a user-controlled key and stored in decentralized storage. The data is unreadable at rest by all parties including Moca.
+
+### Account abstraction
+
+User wallets use smart accounts (ERC-4337 account abstraction) with paymaster-sponsored gas. Users interact with the chain without managing private keys or gas tokens directly.
+
+## Further reading
+
+<CardGroup cols={2}>
+  <Card title="Credential security" icon="shield-check" href="/learn/security/credential-security">
+    How credentials are issued, anchored, and verified without exposing PII.
+  </Card>
+  <Card title="Data privacy" icon="lock" href="/learn/security/data-privacy">
+    Where data lives, what is encrypted, and who can access it.
+  </Card>
+  <Card title="Security checklist" icon="list-check" href="/learn/security/security-checklist">
+    Integration best practices for partners.
+  </Card>
+  <Card title="Privacy & Compliance (CAK)" icon="key" href="/learn/advanced-topics/privacy-and-compliance">
+    The Compliance Access Key framework for regulated industries.
+  </Card>
+</CardGroup>

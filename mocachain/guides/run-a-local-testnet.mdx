@@ -1,0 +1,96 @@
+---
+title: "How to run a local testnet for Moca Chain"
+description: "How to run a local testnet for Moca Chain."
+---
+
+<Info>
+🔓 The Moca Chain source code is publicly available on GitHub: [mocachain/moca](https://github.com/mocachain/moca).
+</Info>
+
+## Validator Information
+
+### Prerequisites
+
+- Git
+- Go 1.23+ and jq (native run)
+- Docker 24+ and Docker Compose (docker run)
+- macOS or Linux
+
+## Setting up Local Testnet
+
+### Clone the Repo
+
+Clone the repository and navigate to the base directory:
+
+```bash
+git clone https://github.com/mocachain/moca.git
+
+# checkout stable version a382e3c 
+git checkout tags/v1.2.0-rc2
+```
+
+### Deploy Single Node network.
+
+#### 1. Build the binaries
+
+```bash
+make build
+
+# run ./build
+
+# Otherwise...
+# If gcc/ledger is not installed disable ledger support for build
+# LEDGER_ENABLED=false make build
+```
+
+### 2. Deploy single validator / storage provider.
+
+Start a single validator network with one Storage Provider:
+
+```bash
+bash deployment/localup/localup.sh all 1 1
+```
+
+This initializes, generates genesis, and starts the node(s). Keys and data live under:
+
+- `deployment/localup/.local/validator0`
+- `deployment/localup/.local/sp0`
+
+Ports and services:
+
+- Tendermint RPC: `http://127.0.0.1:26657/status`
+- EVM RPC: `http://127.0.0.1:8545`
+- REST API (LCD): `http://127.0.0.1:1317`
+- gRPC: `127.0.0.1:9090`
+
+<Tip>🎉 Your local testnet is now setup for your testing!</Tip>
+
+### 3. Interact with the chain
+
+Here are some examples of how you can interact with the running services above.
+
+```bash
+# Check node is producing blocks
+curl -s localhost:26657/status | jq '.result.sync_info.latest_block_height'
+
+# Show dev account (preloaded by the script)
+./build/mocad keys show devaccount -a --keyring-backend test --home deployment/localup/.local/validator0
+
+# Query bank balance of that address (replace ADDR with an address)
+./build/mocad query bank balances ADDR --node tcp://127.0.0.1:26657
+
+# Send EVM RPC requests
+curl -s -X POST localhost:8545 -H 'content-type: application/json' --data '{"jsonrpc":"2.0","id":1,"method":"eth_blockNumber","params":[]}'
+```
+
+### 4. Stop/reset
+
+If you need to stop/reset the chain here are the commands below:
+
+```bash
+# Stop all localup-started nodes
+bash deployment/localup/localup.sh stop
+
+# Recreate from scratch (init + genesis + start)
+bash deployment/localup/localup.sh all 1 1
+```

@@ -1,0 +1,113 @@
+---
+title: "Language & Currency Configuration"
+description: "AIR Kit supports multi-language interfaces and currency display configuration. You can configure which languages are available, provide custom translations for your users, and set the display currency for your application."
+---
+
+## Configuration Options
+
+```tsx
+{
+  defaultLanguage?: string; // Default language (e.g., "en", "es", "fr", ...)
+  authLocaleUrls?: Record<string, string>; // Auth interface language URLs
+  walletLocaleUrls?: Record<string, string>; // Wallet interface language URLs
+  recoveryLocaleUrls?: Record<string, string>; // Recovery interface language URLs
+  credentialLocaleUrls?: Record<string, string>; // Credential interface language URLs
+}
+```
+
+## Setting Up Multi-Language Support
+
+**1. Set Default Language:**
+
+```tsx
+defaultLanguage: "es"; // Spanish as default language
+```
+
+**2. Provide Language File URL:**
+We will upload your translated language file(s) to our server and provide the URL for configuration:
+
+```tsx
+{
+  defaultLanguage: "es",
+  authLocaleUrls: {
+    "es": "https://static.air3.com/partner/your-partner-id/i18n-auth-es.json"
+  },
+  walletLocaleUrls: {
+    "es": "https://static.air3.com/partner/your-partner-id/i18n-wallet-es.json"
+  }
+}
+```
+
+### Language File Format
+
+Language files are JSON objects with translated strings:
+
+```json
+{
+  "login": {
+    "google": {
+      "button": "Continue with Google",
+      "error": "Google login failed. Please try again or use another login method."
+    },
+    "passkey": {
+      "button": "Continue with Passkey",
+      "authenticating": "Authenticating..."
+    }
+  },
+  "wallet": {
+    "connect": "Connect Wallet",
+    "transaction": {
+      "confirm": "Confirm Transaction",
+      "pending": "Transaction Pending"
+    }
+  },
+  ...
+}
+```
+
+## Currency Configuration
+
+You can configure the display currency for your application by passing a `sessionConfig` object to the `init()` method. Both `locale` and `currency` are optional:
+
+```tsx
+await airService.init({
+  buildEnv: BUILD_ENV.SANDBOX,
+  enableLogging: true,
+  sessionConfig: {
+    locale: "en", // Optional: Language code (e.g., "en", "es", "fr")
+    currency: "USD" // Optional: Display currency: "EUR", "USD", "CNY", "KRW", "TRY"
+  }
+});
+```
+
+**Supported Currency Codes:**
+
+- `EUR` - Euro
+- `USD` - US Dollar
+- `CNY` - Chinese Yuan
+- `KRW` - South Korean Won
+- `TRY` - Turkish Lira
+
+The currency setting affects how monetary values are displayed throughout the AIR Kit interface, including wallet balances, transaction amounts, and on-ramp/swap interfaces.
+
+### Updating Session Configuration
+
+You can update the locale or currency after initialization using the `updateSessionConfig()` method:
+
+```tsx
+// Update currency, locale, or both
+const updatedConfig = await airService.updateSessionConfig({
+  currency: "EUR", // Optional
+  locale: "fr" // Optional
+});
+```
+
+The method returns the complete `AirSessionConfig` object with both `locale` and `currency` values.
+
+## How Language Selection Works
+
+1. **Default Language**: Your `defaultLanguage` setting determines the interface language
+2. **Language File**: The system loads the language file from the provided URL
+3. **English Fallback**: If a translation key is missing, it falls back to English
+4. **No Language Switching**: Currently, the language is set once during initialization and cannot be detected by the browser or changed by the user
+5. **Session Configuration**: You can set the locale and currency programmatically via `sessionConfig` when calling `init()`, or update them later using `updateSessionConfig()`. Both `locale` and `currency` are optional within `sessionConfig`

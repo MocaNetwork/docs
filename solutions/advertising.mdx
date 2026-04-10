@@ -1,0 +1,77 @@
+---
+title: "Advertising & Audiences"
+description: "Build verified, consent-based audience segments without third-party cookies. Advertisers buy access to cryptographically proven user attributes — no raw data leaves user accounts."
+icon: "megaphone"
+---
+
+## The Problem
+
+Post-cookie advertising has a trust problem that no contextual or cohort-based replacement fully solves: someone still has to hold the raw user data and claim the audience is what they say it is. Data brokers vouch for segments they assembled from sources that are increasingly unverifiable. Advertisers pay for "35-44, high income, tech-interested" and get whatever the intermediary decided that means.
+
+## What Changes With AIR Kit
+
+- **Users hold their own verified attributes** — Demographic and interest credentials are issued by your platform based on actual KYC and behaviour, not declared preferences. They're cryptographically signed
+- **Advertisers buy proof, not claims** — The DSP or SSP verifies the credential at serve time. They get COMPLIANT / NON_COMPLIANT — a ZK proof that the user is 25–34, verified, consented, and located in AU. No raw data in the bid request
+- **Consent travels cross-publisher** — A consent credential issued on your platform is verifiable by any partner publisher without a CMP re-prompt. User consented once; that consent is cryptographically provable
+- **Age-restricted serving without storing DOB** — Prove `isOver18` at ad-serve time for gambling, alcohol, or adult categories. Regulatory requirements met without creating a DOB database
+
+## How It Works
+
+<Steps>
+  <Step title="User completes profile or KYC on your platform">
+    Your existing onboarding. The user verifies their age, confirms their country, or completes interest profiling. Nothing new for the user.
+  </Step>
+  <Step title="AIR Kit issues an audience credential">
+    Your backend fires one API call. A credential encoding the user's age range, verified country, IAB interest segments, and consent record lands in their AIR Account.
+  </Step>
+  <Step title="Ad server verifies at serve time">
+    When the user visits a publisher page, the publisher's ad server calls one SDK method. It receives a verified boolean signal: age verified, consent confirmed, segment matched.
+  </Step>
+  <Step title="DSP bids on verified signals">
+    The bid request carries a verified audience flag. DSPs can bid higher on ZK-proven attributes than on unverified self-reported data. The audience segment is now worth more.
+  </Step>
+</Steps>
+
+## What the Ad Server Actually Receives
+
+| What the Verifier Gets | What Stays Private |
+|------------------------|--------------------|
+| COMPLIANT / NON_COMPLIANT | Date of birth, exact age |
+| Age range (`25-34`) | Full name, email address |
+| `isOver18: true` | IP address, device ID |
+| Country code (`AU`) | Precise location |
+| IAB segment IDs | Browsing history, clickstream |
+| Consent expiry | Declared interest details |
+
+## What Compliance Will Ask
+
+**Does user consent need to be re-obtained?**
+The consent credential records the user's existing consent. If they have already consented on your platform, the credential reflects that. Cross-publisher use of the credential is designed to avoid introducing new data processing, but consult your legal team to confirm this applies in your jurisdiction.
+
+**Can users withdraw consent?**
+Yes. Revoking the consent credential is one API call and takes effect immediately. The user's attributes become unverifiable across the ecosystem.
+
+**Does this replace our CMP?**
+No. Your CMP continues to collect and record consent. AIR Kit converts that consent record into a portable, cryptographically verifiable credential.
+
+## Integration at a Glance
+
+| | |
+|---|---|
+| **What your team builds** | One API call in profile completion + one in your CMP callback |
+| **Engineering effort** | 1 backend engineer |
+| **Timeline to live** | 2–4 weeks |
+| **Changes to ad serving** | Prebid adapter or server-side SDK call |
+| **Partner publisher integration** | 3 lines of SDK code to verify |
+
+<CardGroup cols={2}>
+  <Card title="Developer integration guide" icon="code" href="/airkit/guides/air-for-advertising">
+    Audience schemas, consent credential code, and Prebid integration.
+  </Card>
+  <Card title="Compliance FAQ" icon="shield-check" href="/solutions/compliance-faq">
+    Full GDPR, CCPA, and TCF answers.
+  </Card>
+  <Card title="Partner Economics" icon="coins" href="/solutions/partner-economics">
+    Revenue model, fee structure, and rewards.
+  </Card>
+</CardGroup>

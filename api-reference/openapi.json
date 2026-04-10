@@ -1,0 +1,342 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Moca Network API",
+    "description": "Server-to-server API for credential issuance, status tracking, and partner operations on the Moca Network.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Moca Network",
+      "url": "https://moca.network"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.sandbox.mocachain.org/v1",
+      "description": "Sandbox"
+    },
+    {
+      "url": "https://api.mocachain.org/v1",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "partnerJwt": []
+    }
+  ],
+  "paths": {
+    "/credentials/issue-on-behalf": {
+      "post": {
+        "operationId": "issueCredentialOnBehalf",
+        "summary": "Issue credential on behalf",
+        "description": "Initiates credential issuance for a user without requiring their active session. If the user does not exist, they are automatically created. Issuance is asynchronous — use the status endpoint to confirm the credential is on-chain.",
+        "tags": ["Credentials"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueOnBehalfRequest"
+              },
+              "example": {
+                "issuerDid": "did:air:id:test:5P44fsVUhPctDTWH2Nz26pZJFsg6CqyiAELTGeVQDB",
+                "credentialId": "c21s70g0i54sn0023172Cv",
+                "credentialSubject": {
+                  "age": 25,
+                  "location": "United States",
+                  "isMember": true
+                },
+                "onDuplicate": "revoke"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Credential issuance submitted. Use the `coreClaimHash` to poll for on-chain status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueOnBehalfResponse"
+                },
+                "example": {
+                  "coreClaimHash": "239704895d0c4693d33ee7ab9e37c6eb295f178d80074a32d4ace53b1a779c44",
+                  "credentialId": "c21s70g0i54sn0023172Cv",
+                  "userUuid": "7f01c42c-02cf-4325-96ed-ba034700f724"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid request fields.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": 400,
+                  "message": "Missing required field: issuerDid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired Partner JWT, or JWKS mismatch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": 401,
+                  "message": "Invalid or expired Partner JWT, or JWKS mismatch."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Feature not enabled or schema not allowed for this partner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": 403,
+                  "message": "Feature not enabled or schema not allowed for this partner."
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown issuer DID or issuance program.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": 404,
+                  "message": "Unknown issuer DID or issuance program."
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Consent rejected by user or duplicate conflict.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": 409,
+                  "message": "Consent rejected by user or duplicate conflict."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server-side failure. Retry with exponential backoff.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": 500,
+                  "message": "Server-side failure. Retry with exponential backoff."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials/status": {
+      "get": {
+        "operationId": "getCredentialStatus",
+        "summary": "Check issuance status",
+        "description": "Returns the current status of a credential issuance. Poll this endpoint after calling Issue on Behalf until `vcStatus` is `ONCHAIN`.",
+        "tags": ["Credentials"],
+        "parameters": [
+          {
+            "name": "coreClaimHash",
+            "in": "query",
+            "required": true,
+            "description": "The unique hash returned by the issue endpoint.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "239704895d0c4693d33ee7ab9e37c6eb295f178d80074a32d4ace53b1a779c44"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current issuance status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialStatus"
+                },
+                "example": {
+                  "coreClaimHash": "239704895d0c4693d33ee7ab9e37c6eb295f178d80074a32d4ace53b1a779c44",
+                  "issuanceDate": "2026-01-19 07:18:45",
+                  "issuerDid": "did:air:id:test:5P44fsVUhPctDTWH2Nz26pZJFsg6CqyiAELTGeVQDB",
+                  "vcId": "c28t30c048pe502a3713w0",
+                  "vcStatus": "ONCHAIN"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired Partner JWT.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": 401,
+                  "message": "Invalid or expired Partner JWT."
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No credential found for the given hash.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": 404,
+                  "message": "No credential found for the given hash."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "partnerJwt": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-partner-auth",
+        "description": "A signed Partner JWT containing `partnerId`, `email`, `scope`, and `exp` claims. See [Partner Authentication](/airkit/usage/partner-authentication) for setup."
+      }
+    },
+    "schemas": {
+      "IssueOnBehalfRequest": {
+        "type": "object",
+        "required": ["issuerDid", "credentialId", "credentialSubject"],
+        "properties": {
+          "issuerDid": {
+            "type": "string",
+            "description": "Your Issuer DID from the Developer Dashboard."
+          },
+          "credentialId": {
+            "type": "string",
+            "description": "The Issuance Program ID."
+          },
+          "credentialSubject": {
+            "type": "object",
+            "description": "Credential data matching your schema definition. Add your own key-value pairs.",
+            "additionalProperties": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "integer" },
+                { "type": "boolean" },
+                { "type": "object" }
+              ]
+            }
+          },
+          "onDuplicate": {
+            "type": "string",
+            "enum": ["ignore", "revoke"],
+            "default": "revoke",
+            "description": "`ignore` returns the existing credential. `revoke` revokes the old credential and issues a new one."
+          }
+        }
+      },
+      "IssueOnBehalfResponse": {
+        "type": "object",
+        "properties": {
+          "coreClaimHash": {
+            "type": "string",
+            "description": "Unique issuance identifier. Use this to poll the status endpoint."
+          },
+          "credentialId": {
+            "type": "string",
+            "description": "The Issuance Program ID (echoed from request)."
+          },
+          "userUuid": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID of the user who received the credential."
+          }
+        }
+      },
+      "CredentialStatus": {
+        "type": "object",
+        "properties": {
+          "coreClaimHash": {
+            "type": "string",
+            "description": "The issuance identifier."
+          },
+          "issuanceDate": {
+            "type": "string",
+            "description": "Timestamp when the credential was issued."
+          },
+          "expirationDate": {
+            "type": "string",
+            "description": "Timestamp when the credential expires."
+          },
+          "issuerDid": {
+            "type": "string",
+            "description": "DID of the issuer."
+          },
+          "issuerId": {
+            "type": "string",
+            "description": "Internal issuer identifier."
+          },
+          "schemeId": {
+            "type": "string",
+            "description": "Schema identifier for the credential."
+          },
+          "vcId": {
+            "type": "string",
+            "description": "Verifiable credential identifier."
+          },
+          "vcDstorageId": {
+            "type": "string",
+            "description": "Decentralized storage identifier for the credential."
+          },
+          "vcStatus": {
+            "type": "string",
+            "enum": ["WAIT_ONCHAIN", "ONCHAIN"],
+            "description": "`WAIT_ONCHAIN` — issuance in progress. `ONCHAIN` — credential is confirmed on-chain."
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error description."
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,98 @@
+---
+title: "Login Configuration"
+description: "The login screen can be customized through the partner config properties that are configured on the backend. These settings control which login methods are available and how the login interface appears to users."
+---
+
+## Login Methods (`loginMethods`)
+
+Control which authentication methods are available on the login screen:
+
+```tsx
+type LoginMethod =
+  | "passwordless" // Email-based passwordless login
+  | "google" // Google OAuth login
+  | "wallet"; // Wallet connection login
+```
+
+**Available Options:**
+
+- **`passwordless`**: Enables email-based passwordless authentication
+- **`google`**: Enables Google OAuth login integration
+- **`wallet`**: Enables wallet-based authentication
+
+**Example Configuration:**
+
+```tsx
+// Enable only email login
+loginMethods: ["passwordless", "google"];
+
+// Enable all login methods
+loginMethods: ["passwordless", "google", "wallet"];
+```
+
+**Note:** The order in the array determines the display order in the UI (top to bottom).
+
+### Wallet Login Methods (`walletLoginMethods`)
+
+When `wallet` is included in `loginMethods`, specify which wallet providers are available:
+
+```tsx
+type LoginWalletId =
+  | "bybit" // Bybit Wallet
+  | "coinbase" // Coinbase Wallet
+  | "crypto.com" // Crypto.com DeFi Wallet
+  | "metamask" // MetaMask
+  | "okx" // OKX Wallet
+  | "phantom" // Phantom Wallet
+  | "rabby" // Rabby Wallet
+  | "rainbow" // Rainbow Wallet
+  | "trust" // Trust Wallet
+  | "walletConnect"; // WalletConnect
+```
+
+**Example Configuration:**
+
+```tsx
+// Enable wallet login with specific providers
+loginMethods: ["wallet"],
+walletLoginMethods: ["metamask", "coinbase", "walletConnect"]
+
+// Default wallet providers if not specified
+walletLoginMethods: undefined;
+// ["metamask", "phantom", "okx", "coinbase", "rabby", "walletConnect"]
+```
+
+<Info>
+The order in the array determines the display order in the UI (left to right, top to bottom). Since AIR accounts are shared across partners, consider including email-based login to avoid forcing users to link wallets to existing accounts.
+</Info>
+
+### Style Configuration (`style`)
+
+Customize the visual appearance of the login interface:
+
+```tsx
+type PartnerConfigStyle = {
+  passwordlessButtonVariant?: "inline" | "standalone";
+  airLogoTheme?: "default" | "reverse" | "dark_only" | "light_only";
+};
+```
+
+**Style Options:**
+
+- **`passwordlessButtonVariant`**: Controls how the passwordless login button appears
+  - `"inline"`: Button appears inline with other elements
+  - `"standalone"`: Button appears as a standalone element below the input
+- **`airLogoTheme`**: Controls the AIR logo appearance
+  - `"default"`: Standard logo theme
+  - `"reverse"`: Reversed color scheme
+  - `"dark_only"`: Dark theme only
+  - `"light_only"`: Light theme only
+
+**Example Configuration:**
+
+```tsx
+style: {
+  passwordlessButtonVariant: "standalone",
+  airLogoTheme: "dark_only",
+}
+```

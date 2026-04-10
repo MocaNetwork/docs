@@ -1,0 +1,34 @@
+---
+title: "Sponsoring Gas with Paymaster"
+description: "With our Paymaster service, we provide granular, API-driven tools to precisely manage your sponsorship strategy and budget."
+---
+
+<Warning>
+To update your gas sponsorship settings, please contact us.
+</Warning>
+
+1. **Granular Sponsorship Controls**
+   You have fine-grained control over which on-chain activities you sponsor. - **Sponsor Specific Contract Functions:** Whitelist transactions based on the specific function being called (via its `function selector`). - _Example:_ A DeFi protocol could sponsor the `deposit` function but not the `withdraw` function. - **Sponsor A Specific Contract:** Whitelist all interactions with a particular smart contract address. - **Support for Atomic Batch Transactions:** The service can process a `UserOperation` containing multiple actions. The entire batch is treated as a single, atomic unit; if any one of the bundled actions fails the policy validation, the entire transaction is rejected, preventing partial execution and unintended gas spending.
+2. **ERC-20 Paymaster Support**
+   - For user operations that do not qualify for sponsorship, users can opt to pay gas fees using ERC-20 tokens, including MOCA, USDT, USDC, EURe, and others. For a complete list of supported tokens, please contact us.
+3. **Powerful Policy & Budget Management**
+   You can define comprehensive policies to govern their sponsorship activities and control costs. - **Multi-Chain Policy Configuration:** Define and manage entirely separate sponsorship policies and allowlists for each supported blockchain (e.g., Ethereum, Polygon, Base). - **Set Granular Spending Limits:** Establish robust budgets with different scopes and reset intervals (daily, weekly, monthly): - **Global Limit:** A total budget for the entire policy. - **Per-User Limit:** A spending cap for each individual user. - **Control Transaction Costs:** Set a maximum gas cost (`maxGasCost`) you are willing to sponsor for a single `UserOperation` to protect against volatile or unexpectedly expensive transactions. - **Time-based Policy Activation:** Schedule policies to automatically activate and deactivate at specific `start` and `end` times, ideal for limited-time promotions or campaigns.
+
+## **How It Works: The Sponsorship Flow**
+
+The sponsorship process is a high-speed, automated workflow compliant with the ERC-4337 standard for Account Abstraction. It functions as the core logic for the `pm_sponsorUserOperation` RPC method.
+
+1. **Sponsorship Request:** The flow begins when a user action in a partner application, via our SDK, generates a `UserOperation`. The SDK then calls the `pm_sponsorUserOperation` endpoint to determine sponsorship eligibility.
+2. **Webhook to Paymaster:** our bundler provider receives this request and forwards it as a webhook to our Paymaster Service.
+3. **Policy Validation:** Our Paymaster Service validates the incoming `UserOperation` against the partner's configured **Sponsorship Policy**. This is a real-time check of all conditions, including spending limits, gas limits, and whether the transaction's target address and function selector are on the partner's **Allowlist**.
+4. **Sponsorship Decision:** Based on the validation result, our service responds:
+   - **On Success:** The Paymaster cryptographically signs the `UserOperation` and returns the `paymasterAndData` field. This serves as the on-chain proof of sponsorship, allowing the transaction to be bundled and executed.
+   - **On Failure:** The service returns an error, rejecting the sponsorship request. Our SDK is designed to handle this failure gracefully, falling back to a standard transaction flow where the user pays the gas fee themselves.
+
+{/* ## **The Future: The Developer Dashboard** (Coming Soon)
+
+Using the **Developer Dashboard**, you can manage your sponsorship policies directly, without engineering overhead. It will provide:
+
+- An intuitive UI for creating and updating sponsorship rules and allowlists.
+- Real-time analytics on spending, transaction volume, and user activity.
+- Simplified onboarding for new smart contracts and blockchains. */}

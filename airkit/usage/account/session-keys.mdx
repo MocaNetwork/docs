@@ -1,0 +1,54 @@
+---
+title: "Session Key Management (Beta)"
+description: "AIR Kit extends the standard EIP-1193 provider with custom RPC methods for session key management. Use `air_grantPermissions` to create a scoped session, then `air_executeAction` to send transactions within that scope."
+---
+
+Session keys allow your application to execute transactions on behalf of users without requiring approval for each action. This is useful for gaming, automated strategies, or any flow where per-transaction signing creates friction.
+
+**air_listSessionKeyScopes**
+
+```tsx
+const scopes = await provider.request({
+  method: "air_listSessionKeyScopes",
+  params: [chainId] // optional chain ID
+});
+// Returns: ActionPolicyInfo[]
+```
+
+**air_grantPermissions**
+
+```tsx
+const result = await provider.request({
+  method: "air_grantPermissions",
+  params: [policies] // ActionPolicyInfo[]
+});
+// Returns: { compressedSessionData: string, sessionOwnerPrivateKey: string, permissionIds: Hex[] }
+```
+
+**air_revokePermission**
+
+```tsx
+const txHash = await provider.request({
+  method: "air_revokePermission",
+  params: [permissionId] // Hex
+});
+// Returns: string (transaction hash)
+```
+
+**air_executeAction**
+
+```tsx
+const txHash = await provider.request({
+  method: 'air_executeAction',
+  params: [{
+    compressedSessionData: string,
+    sessionOwnerPrivateKey: string,
+    call: {
+      data?: Hex,
+      to: Address,
+      value?: bigint
+    }
+  }]
+});
+// Returns: string (transaction hash)
+```

@@ -1,0 +1,99 @@
+---
+title: "Smart Accounts"
+---
+
+Smart accounts are the primary interface for blockchain interactions in AIR Kit. The smart account is always used when interacting with the AIR Account, while the MPC (Multi-Party Computation) wallet only acts as a signer. AIR Kit provides methods to check deployment status and deploy smart accounts when needed.
+
+**Key Technical Details:**
+
+- Smart accounts are **chain-specific** - deployment status and operations depend on the currently selected chain
+- If a smart account is not deployed and your dApp triggers a transaction, AIR Kit will automatically bundle the smart account deployment with the transaction
+- Smart account deployments are **sponsored by AIR Kit** via paymaster policy, so users don't need to pay gas fees for deployment
+
+### isSmartAccountDeployed()
+
+Checks whether the user's smart account has been deployed on the currently selected blockchain.
+
+**Method Signature:**
+
+```tsx
+public async isSmartAccountDeployed(): Promise<boolean>
+```
+
+**Returns:**
+
+- `true` if the smart account is deployed on the current chain
+- `false` if the smart account is not yet deployed on the current chain
+
+**Requirements:**
+
+- User must be logged in
+- User must be on a supported chain
+
+### deploySmartAccount()
+
+Deploys the user's smart account to the currently selected blockchain. This method explicitly deploys the smart account, though deployment will also happen automatically when needed.
+
+**Method Signature:**
+
+```tsx
+public async deploySmartAccount(): Promise<{ txHash: string }>
+```
+
+**Returns:**
+
+```tsx
+{
+  txHash: string; // The transaction hash of the deployment transaction
+}
+```
+
+**What happens during deployment:**
+
+1. Checks if the smart account is already deployed on the current chain (throws error if already deployed)
+2. Creates a deployment transaction that sends to the zero address with no value
+3. Submits the transaction to the blockchain using the sponsored paymaster
+4. Returns the transaction hash for tracking
+
+**Requirements:**
+
+- User must be logged in
+- User must be on a supported chain
+- Smart account must not already be deployed on the current chain
+
+**Example:**
+
+```tsx
+try {
+  const { txHash } = await airService.deploySmartAccount();
+} catch (error) {
+  console.error("Smart account deployment failed:", error);
+  // Handle error appropriately
+}
+```
+
+**Important Notes:**
+
+- **Deployment is sponsored by AIR Kit** - users don't pay gas fees for deployment
+- The deployment transaction may take some time to be confirmed on the blockchain
+- After deployment, the user will be able to perform blockchain operations on this chain
+- **Automatic bundling**: If you don't explicitly deploy and trigger a transaction, deployment will be automatically bundled with the transaction
+
+### Smart Account Deployment Flow
+
+When working with smart accounts, you have two approaches:
+
+**Option 1: Explicit Deployment (Recommended for better UX)**
+
+```tsx
+const isDeployed = await airService.isSmartAccountDeployed();
+if (!isDeployed) {
+  const { txHash } = await airService.deploySmartAccount();
+  // Wait for deployment confirmation before proceeding
+}
+```
+
+**Option 2: Let AIR Kit Handle Deployment Automatically**
+Simply proceed with your transaction - deployment will be bundled automatically if needed.
+
+**Recommendation:** Use Option 1 for better user experience, as it allows you to show deployment progress and handle any deployment-specific errors separately from your main transaction logic.

@@ -1,0 +1,355 @@
+---
+title: "Reference"
+description: "For server-side credential issuance without user presence, use the Issue on Behalf API:"
+---
+
+## REST API
+
+For server-side credential issuance without user presence, use the Issue on Behalf API:
+
+- **Endpoint:** `POST /v1/credentials/issue-on-behalf`
+- **Status check:** `GET /v1/credentials/status?coreClaimHash={hash}`
+- **Sandbox:** `https://api.sandbox.mocachain.org/v1`
+- **Production:** `https://api.mocachain.org/v1`
+
+Authenticate with a Partner JWT in the `x-partner-auth` header. Full endpoint reference and implementation examples: [Issue on Behalf API & Examples](/airkit/usage/credential/issue-on-behalf-api).
+
+---
+
+<Tabs>
+
+<Tab title="Web">
+
+### AirService
+
+```ts
+class AirService {
+  constructor({ partnerId: string; });
+  get buildEnv(): BUILD_ENV_TYPE; // available env: SANDBOX
+  get isInitialized(): boolean;
+  get isLoggedIn(): boolean;
+  get isWalletInitialized(): boolean;
+  get provider(): EIP1193Provider;
+  init({
+    buildEnv: BUILD_ENV_TYPE;
+    credentialNetwork?: CredentialNetwork;
+    enableLogging: boolean;
+    skipRehydration: boolean;
+    preloadWallet: boolean;
+    preloadCredential: boolean;
+    sessionConfig?: Partial<AirSessionConfig>;
+  }): Promise<AirLoginResult | null>;
+  login(options?: { authToken?: string }): Promise<AirLoginResult>;
+  isSmartAccountDeployed(): Promise<boolean>;
+  deploySmartAccount(): Promise<{ txHash: string }>;
+  getProvider(): EIP1193Provider;
+  preloadWallet(): Promise<void>;
+  preloadCredential(): Promise<void>;
+  setupOrUpdateMfa(): Promise<void>;
+  getUserInfo(): Promise<AirUserDetails>;
+  goToPartner(partnerUrl: string): Promise<{ urlWithToken: string }>;
+  getAccessToken(): Promise<{ token: string }>;
+  updateSessionConfig(config: Partial<AirSessionConfig>): Promise<AirSessionConfig>;
+  showSwapUI(options?: {
+    initialFromToken?: string;
+    fallbackFromToken?: string;
+    initialToToken?: string;
+  }): Promise<{ txHash: `0x${string}` }>;
+  showOnRampUI(options: {
+    displayCurrencyCode: string;
+    targetCurrencyCode?: string;
+  }): Promise<void>;
+  issueCredential({
+    authToken: string;
+    issuerDid: string;
+    credentialId: string;
+    credentialSubject: Record<string, unknown>;
+    curve?: "secp256r1" | "secp256k1";
+  }): Promise<{ cakPublicKey?: string }>;
+  verifyCredential({
+    authToken: string;
+    programId: string;
+    redirectUrl?: string;
+  }): Promise<CredentialVerificationResult>;
+  logout(): Promise<void>;
+  cleanUp(): Promise<void>;
+  on(listener: AirEventListener): void;
+  off(listener: AirEventListener): void;
+  clearEventListeners(): void;
+}
+```
+
+### Types
+
+```ts
+export type AirIdDetails = {
+  id: string;
+  name?: string;
+  node: string;
+  status: "minting" | "minted";
+  chainId: number;
+  imageUrl?: string;
+};
+
+export type AirUserDetails = {
+  partnerId?: string;
+  partnerUserId?: string;
+  airId?: AirIdDetails;
+  user: {
+    id: string;
+    abstractAccountAddress?: string;
+    email?: string;
+    isMFASetup: boolean;
+  };
+};
+
+export type AirInitializationResult = {
+  rehydrated: boolean;
+};
+
+export type AirLoginResult = {
+  isLoggedIn: boolean;
+  id: string;
+  abstractAccountAddress?: string;
+  token: string;
+  isMFASetup: boolean;
+};
+
+export type AirWalletInitializedResult = {
+  abstractAccountAddress: string | null;
+  isMFASetup: boolean;
+};
+
+export type CredentialVerificationResult =
+  | {
+      status:
+        | "Non-Compliant"
+        | "Pending"
+        | "Revoking"
+        | "Revoked"
+        | "Expired"
+        | "NotFound";
+    }
+  | {
+      status: "Compliant";
+      zkProofs: Record<string, string>;
+      transactionHash: string;
+      cakPrivateKey?: string;
+    };
+
+export type ClaimAirIdResult = {
+  airId: AirIdDetails;
+};
+
+export type AirEventOnInitialized = {
+  event: "initialized";
+  result: AirInitializationResult;
+};
+
+export type AirEventOnLoggedIn = {
+  event: "logged_in";
+  result: AirLoginResult;
+};
+
+export type AirEventOnAirIdMintingStarted = {
+  event: "air_id_minting_started";
+};
+
+export type AirEventOnAirIdMintingFailed = {
+  event: "air_id_minting_failed";
+  errorMessage?: string;
+};
+
+export type AirEventOnLoggedOut = {
+  event: "logged_out";
+};
+
+export type AirEventOnWalletInitialized = {
+  event: "wallet_initialized";
+  result: AirWalletInitializedResult;
+};
+
+export type AirEventData =
+  | AirEventOnInitialized
+  | AirEventOnLoggedIn
+  | AirEventOnWalletInitialized
+  | AirEventOnAirIdMintingStarted
+  | AirEventOnAirIdMintingFailed
+  | AirEventOnLoggedOut;
+
+export type AirEventListener = (data: AirEventData) => void;
+
+export type CredentialNetwork = "devnet" | "testnet";
+
+export type SupportedCurrencyCode = "EUR" | "USD" | "CNY" | "KRW" | "TRY";
+
+export type AirSessionConfig = {
+  locale: string;
+  currency: SupportedCurrencyCode;
+};
+
+export type ClaimAirIdOptions =
+  | {
+      token?: string;
+      background?: false;
+    }
+  | {
+      token: string;
+      background: true;
+    };
+```
+
+</Tab>
+
+<Tab title="Flutter">
+
+### AirService
+
+```dart
+class AirService {
+
+  Stream<AirEvent> get airEvents;
+
+  void on(AirEventListener listener);
+  void off(AirEventListener listener);
+  void clearEventListeners();
+
+  bool get isInitialized;
+
+  Future<void> initialize({
+    required String partnerId,
+    Environment env = Environment.production,
+    required GlobalKey<NavigatorState> navigatorKey,
+    bool enableLogging = false,
+  });
+
+  Future<LoginResult> login({
+    required String authToken,
+    OnOtpRequest? onOtpRequest,
+  });
+
+  Future<LoginResult> rehydrate();
+
+  Future<UserInfo> getUserInfo();
+
+  Future<void> preloadWallet();
+
+  Future<String?> getAbstractAccountAddress();
+
+  Future<List<String>> getAccounts();
+
+  Future<void> setupOrUpdateMfa();
+
+  Future<BigInt> getBalance(String address);
+
+  Future<EthereumRpcSuccessResponse> call(
+    String address,
+    String function,
+    List<dynamic> params,
+    String abi,
+  );
+
+  Future<String> signMessage(String message);
+
+  Future<String> sendTransaction(Transaction transaction);
+
+  Future<EthereumRpcSuccessResponse> sendEthereumRpcRequest(
+    EthereumRpcRequest request
+  );
+
+  Future<String> deploySmartAccount();
+
+  Future<bool> isSmartAccountDeployed();
+
+  Future<void> showSwapUi();
+
+  Future<void> showOnRampUi({
+    required String displayCurrencyCode,
+    String? targetCurrencyCode,
+  });
+
+  Future<void> logout();
+
+  void cleanup();
+```
+
+### Models
+
+```dart
+
+enum Environment { staging, uat, sandbox, production }
+​
+class LoginResult {
+  final bool isLoggedIn;
+  final String? id;
+  final String? abstractAccountAddress;
+  final String? token;
+  final bool? isMFASetup;
+}
+​
+enum AirIdStatus {
+  minting,
+  minted,
+}
+​
+class AirId {
+  final String id;
+  final String name;
+  final String node;
+  final AirIdStatus status;
+  final int? chainId;
+  final String? imageUrl;
+}
+​
+class UserInfo {
+  final AirId? airId;
+  final String? partnerUserId;
+  final String? partnerId;
+  final User? user;
+}
+​
+class User {
+  final String id;
+  final String? abstractAccountAddress;
+  final String? email;
+  final bool isMFASetup;
+}
+​
+class EthereumRpcRequest {
+  final String method;
+  final List<dynamic> params;
+  final String? requestId;
+}
+
+class EthereumRpcSuccessResponse {
+  final dynamic response;
+}
+
+class AirEvent { }
+
+class AirInitializedEvent extends AirEvent {
+
+class AirLoggedInEvent extends AirEvent {
+  final LoginResult payload;
+}
+
+class AirLoggedOutEvent extends AirEvent { }
+
+class AirWalletInitializedEvent extends AirEvent { }
+
+typedef AirEventListener = void Function(AirEvent event);
+
+enum ExceptionType {
+  client,
+  sdk,
+  server,
+  unknown,
+}
+
+class AirKitException implements Exception {
+  final String message;
+  final ExceptionType type;
+}
+```
+</Tab>
+</Tabs>

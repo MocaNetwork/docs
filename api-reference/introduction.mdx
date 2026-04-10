@@ -1,0 +1,45 @@
+---
+title: "API Reference"
+description: "Server-to-server REST API for credential issuance, status tracking, and partner operations on the Moca Network."
+---
+
+The Moca Network REST API enables server-to-server operations that do not require user presence. Use it for backend automation, bulk credential issuance, and programmatic status checks.
+
+## Base URLs
+
+| Environment | Base URL |
+| --- | --- |
+| Sandbox | `https://api.sandbox.mocachain.org/v1` |
+| Production | `https://api.mocachain.org/v1` |
+
+## Authentication
+
+All API requests are authenticated with a **Partner JWT** passed in the `x-partner-auth` header. The JWT must be signed with your private key (RS256 or ES256) and include:
+
+| Claim | Required | Description |
+| --- | --- | --- |
+| `partnerId` | Yes | Your Partner ID from the Developer Dashboard |
+| `email` | Yes | Target user's email address |
+| `scope` | Yes | Operation scope (e.g. `"issue on-behalf"`) |
+| `exp` | Yes | Expiration timestamp (recommended: 5 minutes) |
+
+The JWT header must include `kid` (Key ID) matching a key in your JWKS endpoint and `typ: "JWT"`.
+
+For full setup instructions, key generation, and code examples see [Partner Authentication](/airkit/usage/partner-authentication).
+
+**API Playground:** Requests from the Try it out playground are sent directly from your browser to the API. Your API must allow CORS from your docs origin (e.g. your Mintlify subdomain or custom domain) for the playground to work. If you see 403 from the playground, check that the API allows the request origin and that your Partner JWT is valid.
+
+## Available endpoints
+
+<CardGroup cols={2}>
+  <Card title="Issue credential on behalf" icon="certificate" href="/api-reference/credentials/issue-credential-on-behalf">
+    Submit server-side credential issuance for a user without requiring their active session.
+  </Card>
+  <Card title="Check issuance status" icon="circle-check" href="/api-reference/credentials/get-credential-status">
+    Poll the status of an asynchronous credential issuance until it is confirmed on-chain.
+  </Card>
+</CardGroup>
+
+## Code examples
+
+For end-to-end integration examples including issue-and-poll flows, webhook-driven issuance, and retry logic, see [Issue on Behalf API & Examples](/airkit/usage/credential/issue-on-behalf-api).

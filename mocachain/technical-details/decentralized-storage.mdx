@@ -1,0 +1,134 @@
+---
+title: "Decentralized Storage"
+description: "How Moca Chain Storage Providers (MCSPs) work, including their lifecycle, data integrity, and payment flows."
+---
+
+# Moca Chain Storage Provider (MCSP)
+
+Moca Chain Storage Provider(MCSP) is an infrastructure provider for storage services. They work in synergy with Moca Chain validators to provide a complete storage service. Validators store metadata and financial ledgers with consensus, while MCSPs store the actual data (payload data) of objects using the Moca Chain chain as the ledger and single source of truth. MCSPs provide a range of convenient services for users and DApps to manage data on Moca Chain.
+
+### Key Functions
+
+- **Data Handling:** Provide APIs (similar to Amazon S3) for uploading, downloading, and managing data.
+- **Redundancy and Integrity:** Use virtual groups (GVGs) for data replication across providers, ensuring availability.
+- **Service Lifecycle:** From proposal and staking to maintenance and exit, MCSPs follow a structured process.
+
+## How it Works
+
+MCSP need to register themselves firstly by depositing on the Moca Chain as their Service Stake. The Moca Chain validators will then conduct a governance procedure to vote to elect the MCSP. When joining and leaving the network, MCSP must follow specific actions to ensure data redundancy for users, or they will face fines on their Service Stake.
+
+MCSP provide publicly accessible APIs that allow users to upload, download and manage data. These APIs are designed to be similar to Amazon S3 APIs, making it easier for existing developers to write code for them. MCSP are responsible for responding to user requests to write (upload) and read (download) data, as well as managing user permissions and authentications.
+
+Each MCSP maintains its own **local full node**, allowing for a strong connection with the Moca Chain network. This enables the MCSP to directly monitor state changes, properly index data, send transaction requests in a timely manner and manage local data accurately.
+
+To encourage MCSP to showcase their capabilities and provide a professional storage system with high-quality SLA, it is recommended that they advertise their information and prove to the community.
+
+## Technical Details
+
+### Architecture
+
+MCSP contains fifteen core modules as shown below:
+
+- **Gater**: Serves as the gateway for MCSP, providing HTTP services and adhering to the S3 protocol.
+- **Authenticator**: Responsible for verifying authentication.
+- **Approver**: Responsible for handling approval requests.
+- **Uploader**: Handles `PutObject` requests and stores payload data into the piece store of the primary MCSP.
+- **Downloader**: Responsible for handling `GetObject` requests and `GetChallengeInfo` requests.
+- **Executor**: Responsible for handling background tasks.
+- **Manager**: Responsible for managing task scheduling and other management functions.
+- **P2P**: Responsible for handling the interaction of control information between MCSP.
+- **Receiver**: Receives data from the primary MCSP, calculates the integrity hash, signs it, and returns it to the primary MCSP for sealing.
+- **Signer**: Handles the signing of the MCSP data and holds all the SP's private keys.
+- **Metadata**: Provides efficient query interfaces for meta info in MCSP.
+- **BlockSyncer**: Records block info in Moca Chain.
+- **PieceStore**: Interacts with underlying storage vendors, e.g., AWS S3, MinIO, OSS, etc.
+- **SPDB**: Stores all the contexts of the background jobs and the metadata of MCSP.
+- **BSDB**: Stores all the events' data from the Moca Chain and provides them to the Metadata service of MCSP.
+
+### Implement Customization in the Moca Chain Storage Provider
+
+From the code level, MCSP is not only an implementation layer, it has been expanded into a framework called **MocaSP**, which allows users to implement their own logics according to their own needs. If users want to implement some specific functions, they can override these methods that are declared in the abstract interfaces. If users don't need to implement customized requirements, MocaSP will use default implementations. There are nine important layers of abstraction:
+
+- `lifecycle`: Provides abstract interfaces to manage services.
+- `module`: Provides abstract interfaces to interact with different modules in MocaSP.
+- `consensus`: Provides abstract interfaces about how to query data on Moca Chain.
+- `piecestore`: Used to interact with underlying storage systems.
+- `spdb`: Provides abstract interfaces about how to store background tasks and metadata of MCSP.
+- `bsdb`: Provides abstract interfaces about how to query metadata in MCSP.
+- `rcmgr`: Provides abstract interfaces about managing cpu and memory resources in MCSP.
+- `task`: Provides abstract interfaces about the smallest unit for interacting with MCSP background services.
+- `taskqueue`: Provides abstract interfaces about task scheduling and executing.
+
+## Moca Chain Storage Provider Lifecycle
+
+### Preparation
+
+First, the storage provider needs to learn how to run and create a storage provider node, which requires several different user accounts and a unified external EndPoint.
+
+- Follow Recommended Prerequisites to get ready
+- Create the required accounts, E.g operator/funding/seal/approval/gv/bls
+- Run all services of Storage Provider
+
+### Proposal
+
+The Moca Chain Storage Provider (MCSP) must initiate an on-chain proposal that outlines the `Msg` information to be automatically executed after receiving approval through the voting process. Specifically, the `Msg` in this case is `MsgCreateStorageProvider`. It's essential to ensure that the deposit tokens exceed the minimum deposit tokens specified on the chain.
+
+Below are the required fields that need to be modified in the proposal:
+
+- **Addresses**:
+  - `sp_address`: The address of the storage provider that will be added to the network.
+  - `seal_address`: The address used for sealing object.
+  - `approval_address`: The address responsible for approving bucket/object creation.
+  - `gc_address`: The address for garbage collection.
+  - `maintenance_address`: The address is used for testing while in maintenance mode.
+- **EndPoint**: Details of the endpoint where the MCSP will serve data requests.
+- **Quota & Price**:
+  - `read_price`: The cost in Gwei per byte per second for read operations.
+  - `stora_price`: The cost in Gwei per byte per second for data storage.
+  - `free_read_quota`: The default free read quota allocated to users (e.g., 10GB).
+- **Deposit for MCSP Staking**: The MCSP must stake the minimum required amount of $MOCA as a commitment to providing storage services. Refer to the latest network parameters for the current staking requirement.
+- **Deposit for Proposal**: The proposal itself must meet the minimum deposit requirement. Refer to the latest network parameters for the current deposit amount.
+
+Initiating this on-chain proposal with the necessary modifications and deposits is a crucial step for the MCSP to become an active participant in the Moca Chain network, offering reliable and secure storage services to users.
+
+### In Service
+
+During the in-service status, Moca Chain Storage Providers (MCSPs) actively engage in the network's daily operations. They handle a variety of user requests, including data storage, retrieval, and other storage-related operations.
+
+MCSPs assume a critical role in maintaining the availability, integrity, and confidentiality of the data they store. As gatekeepers of user access, they enforce proper authentication and authorization procedures to safeguard data from unauthorized access or tampering.
+
+At this stage, MCSPs must create **virtual groups** within the Moca Chain network to efficiently serve buckets and objects. These virtual groups, resembling disk sectors, allow MCSPs to manage data storage in a more organized and optimized manner. By associating objects with virtual groups, MCSPs can limit the range of secondary storage providers responsible for storing object replica data, which enhances data redundancy and resilience.
+
+Additionally, MCSPs are required to provide corresponding stakes for the amount of data they store. This staking mechanism further incentivizes MCSPs to offer reliable and high-quality services to users.
+
+Moreover, the creation of virtual groups and staking helps to disentangle the interdependency between buckets/objects and MCSPs. By doing so, MCSPs mitigate the need for an extensive volume of transactions when modifying on-chain `BucketInfo` and `ObjectInfo` during MCSP exits and bucket migrations. This leads to more efficient network management and smoother transitions during changes in the network's composition.
+
+### In Maintenance
+
+The maintenance mode for service providers (MCSPs) is a status in which MCSPs do not serve any create/upload requests from users. There are two circumstances in which an MCSP can be in maintenance mode:
+
+- When an MCSP joins the network after a proposal has passed, it will stay in `STATUS_IN_MAINTENANCE` until it sends a transaction including `msg MsgUpdateStorageProviderStatus` to Moca Chain to change its status to `STATUS_IN_SERVICE`.
+- If an MCSP is already in service, it can send a transaction with `msg MsgUpdateStorageProviderStatus` to Moca Chain and request a maintenance duration. If there are no restrictions violated, the MCSP is allowed to enter maintenance mode immediately.
+
+There are two restrictions that apply when an MCSP requests to be in maintenance:
+
+- The total maintenance duration for each MCSP, within the number of blocks defined by `num_of_historical_blocks_for_maintenance_records`, should not exceed the `maintenance_duration_quota`.
+- An MCSP is not allowed to make two consecutive requests to `STATUS_IN_MAINTENANCE` within `num_of_lockup_blocks_for_maintenance`, even if there are enough quotas for it.
+
+To ensure the quality of service provided, we strongly recommend that MCSPs conduct a self-test via the maintenance account before turning back to `STATUS_IN_SERVICE`. This includes creating buckets/objects to verify that all functionalities work as expected.
+
+### Exit
+
+There are two types of exit based on the behavior and choices of the MCSP: **Graceful Exit** and **Forced Exit**.
+
+### Graceful Exit
+
+At some point, the MCSP may choose to voluntarily exit the Moca Chain storage network for various reasons. A graceful exit process is crucial to ensure a seamless transition of responsibilities and data to other MCSPs. During the exit process, the MCSP must continue to fulfill user query requests. Once the exit process is successfully completed, the MCSP can retrieve all the staked Moca.
+
+To execute a graceful exit, all its stored data need to be migrated to other successor MCSPs that are willing to take over. This data migration process involves recovering data from the exiting MCSP by successor MCSPs in a secure and efficient manner. After the exiting MCSP sends a `StorageProviderExit` transaction to the Moca Chain, its status will turn to `STATUS_GRACEFUL_EXITING`. A successor MCSP can initiate the recovery process by first sending a `ReserveSwapIn` transaction to the Moca Chain, reserving the exiting MCSP's position in the respective **Global Virtual Group (GVG)** or **GVG Family** so that it will be allowed to recover data from other MCSPs. Once the successor SP successfully takes over all data in a GVG or GVG Family, it will send a `CompleteSwapIn` transaction to the Moca Chain, confirming the completion of the data transfer process.
+
+Moca Chain incorporates an effective consensus mechanism to facilitate and validate the graceful exit process. Frequent data challenges are applied to the MCSPs that take over the data to verify the integrity and consistency of the migrated data.
+
+### Forced Exit
+
+An uncooperative MCSP no longer wishes to provide service and refuses to go through the standard graceful exit process. In such a case, Moca Chain governance will force the MCSP to exit, making it enter `STATUS_FORCED_EXITING`. The data recovery process for the successor MCSP is the same as the graceful exit mentioned above. However, a forced exit MCSP will face penalties, and its staked Moca will be locked into the Payment module governance account.

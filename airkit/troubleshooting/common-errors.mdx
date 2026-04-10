@@ -1,0 +1,63 @@
+---
+title: "Common Errors"
+description: "HTTP error codes, JWT errors, and JWKS issues you may encounter when integrating AIR Kit."
+---
+
+## API error codes
+
+These errors apply to the AIR Kit REST API (e.g. [Issue on Behalf](/api-reference/introduction)).
+
+| HTTP status | Likely cause | How to fix |
+| --- | --- | --- |
+| 400 | Missing or invalid request fields | Verify `issuerDid`, `credentialId`, and `credentialSubject` match your schema. Check that required fields are present and types are correct. |
+| 401 | Invalid or expired Partner JWT | Verify the JWT is not expired (`exp`), the signature matches your JWKS key, `kid` in the header maps to the correct key, and `typ: "JWT"` is set. |
+| 403 | Feature not enabled or schema not allowed | Confirm the feature (e.g. Issue on Behalf) is enabled for your partner account in the Developer Dashboard. Check that your `issuerDid` owns the schema. |
+| 404 | Unknown issuer DID or program ID | Double-check `issuerDid` and `credentialId` values against the Developer Dashboard. |
+| 409 | User consent rejected or duplicate conflict | The user has denied consent for credentials issued on their behalf, or a duplicate credential exists with `onDuplicate: "ignore"`. |
+| 500 | Server-side failure | Retry with exponential backoff. If persistent, check the [Moca Network status page](https://discord.gg/mocaversenft) or contact support. |
+
+## JWT and JWKS errors
+
+### "Invalid signature" or "JWT verification failed"
+
+- Confirm the `kid` in your JWT header matches a key ID in your JWKS endpoint.
+- Verify the algorithm (`RS256` or `ES256`) matches the key type in your JWKS.
+- Check that you are signing with the correct private key.
+
+### "Token expired"
+
+- The `exp` claim has passed. Generate a new JWT with a fresh `exp` (recommended: 5 minutes from now).
+- Verify your server clock is synchronized (NTP).
+
+### "JWKS endpoint unreachable"
+
+- Your JWKS URL must be publicly accessible over HTTPS.
+- Test it with `curl https://your-domain/.well-known/jwks.json` — it should return a valid JSON document.
+- Ensure no firewall or IP allowlist blocks AIR Kit's servers.
+
+### "kid not found"
+
+- The `kid` in your JWT header does not match any key in the JWKS response.
+- If you recently rotated keys, publish the new key to your JWKS endpoint before using it in JWTs.
+
+### "Missing typ header"
+
+- For Issue on Behalf, the JWT header must include `typ: "JWT"`. Add it to your JWT signing options:
+
+```js
+jwt.sign(payload, privateKey, {
+  algorithm: "RS256",
+  header: { kid: "your-key-id", typ: "JWT" },
+});
+```
+
+## CORS errors
+
+If you see CORS errors when initializing the SDK in a browser:
+
+- AIR Kit uses an iframe for login. Ensure your `Content-Security-Policy` allows `frame-src` from `*.air3.com`.
+- If you are proxying requests, ensure the `Origin` header is forwarded correctly.
+
+## Rate limiting
+
+API endpoints may return `429 Too Many Requests` if you exceed rate limits. Back off and retry with exponential delays. Avoid tight polling loops on the status endpoint — start with 1-second intervals and double each attempt.

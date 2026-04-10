@@ -1,0 +1,29 @@
+---
+title: "Moca Chain EVM Compatibility"
+description: "Moca Chain EVM compatibility"
+---
+
+Moca Chain is a blockchain platform developed based on EVMOS (aka Cosmos EVM), which is a trusted Ethereum Virtual Machine (EVM) within the Cosmos ecosystem. Evmos provides EVM compatibility, enabling Moca Chain to run Ethereum smart contracts.
+
+This compatibility means that developers can write and deploy the same smart contracts on Moca Chain and other EVM-compatible blockchains without requiring significant code modifications. Additionally, through EVM, smart contracts can interact with other EVM-compatible blockchains, making the development of multi-chain DApps possible.
+
+As a result
+
+- Cosmos $MOCA and EVM $MOCA are the same currency, managed by the same bank keeper module
+- Moca uses moca-cosmos-sdk accounts so it only has EVM addresses (e.g. `0x1234...7890`)
+
+Currently, EVM runs the LONDON instruction set, with support for some SHANGHAI opcodes, including
+
+- EIP-3855
+- EIP-3860
+- EIP-1153
+- EIP-5656
+- EIP-6780
+
+> _To learn what each EIP entails, check out the [EIP registry](https://eips.ethereum.org/)._
+
+<Warning>
+**Feedback wanted!**
+
+New EIP supports are constantly assessed for integration so please reach out to us if you require a specific EIP so we can add to our roadmap if necessary.
+</Warning>

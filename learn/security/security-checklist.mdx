@@ -1,0 +1,54 @@
+---
+title: "Security Checklist"
+description: "Integration best practices for partners building on AIR Kit and Moca Chain."
+---
+
+Use this checklist when integrating AIR Kit to ensure your implementation follows security best practices.
+
+## Partner JWT security
+
+- [ ] Private keys are stored in a secrets manager or HSM — never in source code or environment files checked into version control.
+- [ ] JWTs are short-lived (`exp` set to 5 minutes or less).
+- [ ] `kid` in the JWT header matches a key in your publicly accessible JWKS endpoint.
+- [ ] JWKS endpoint is served over HTTPS with a valid TLS certificate.
+- [ ] JWTs are generated server-side only. The private key never reaches the client.
+
+## Authentication
+
+- [ ] Use [Partner JWT](/airkit/usage/partner-authentication) for all SDK and API operations.
+- [ ] If using Custom Auth (BYO), verify the user's identity in your own system before issuing the Partner JWT.
+- [ ] Enable [MFA](/airkit/usage/user-management) for high-value operations (credential issuance, large transactions).
+- [ ] Set `skipRehydration: true` if your security model requires login on every session.
+
+## Credential issuance
+
+- [ ] Validate `credentialSubject` data on your backend before calling the Issue on Behalf API. Do not trust client-supplied values.
+- [ ] Use `onDuplicate: "revoke"` when credential data changes (e.g. tier upgrades). Use `"ignore"` only for idempotent operations.
+- [ ] Poll the [status endpoint](/api-reference/introduction) to confirm credentials reach `ONCHAIN` before treating them as issued.
+- [ ] If handling regulated data, enable [CAK encryption](/learn/advanced-topics/privacy-and-compliance).
+
+## API security
+
+- [ ] Use HTTPS for all API calls. Do not downgrade to HTTP, even in development.
+- [ ] Implement retry logic with exponential backoff for transient failures (HTTP 500, network timeouts).
+- [ ] Log API errors and monitor for unusual patterns (spikes in 401/403 responses may indicate key compromise).
+- [ ] Rotate signing keys periodically. Update your JWKS endpoint before removing the old key.
+
+## Frontend security
+
+- [ ] Do not expose your Partner ID's private key on the client. The `partnerId` itself is safe to include in client code.
+- [ ] Validate callback URLs and redirect URIs to prevent open-redirect attacks.
+- [ ] If embedding AIR Kit in an iframe, configure `Content-Security-Policy` headers to allow `frame-src` from AIR Kit domains.
+
+## Smart accounts and transactions
+
+- [ ] Use the [Paymaster](/airkit/usage/account/paymaster) for gas sponsorship. Monitor sponsorship spend to detect abuse.
+- [ ] Validate transaction parameters on your backend before relaying to the user's smart account.
+- [ ] If using [session keys](/airkit/usage/account/session-keys), scope permissions to the minimum necessary operations and set short expiry times.
+
+## Monitoring
+
+- [ ] Set up alerts for failed authentication attempts.
+- [ ] Monitor credential issuance volumes for anomalies.
+- [ ] Track `WAIT_ONCHAIN` durations — prolonged waits may indicate chain congestion or issues.
+- [ ] Log user consent events (CAK authorizations) for audit compliance.

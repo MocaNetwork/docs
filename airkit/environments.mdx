@@ -1,0 +1,113 @@
+---
+title: "Development Environments"
+description: "Starting with **AirKit 1.8.0-beta**, the Sandbox environment defaults to **Moca Chain Testnet**."
+---
+
+<Warning>
+**Breaking Change: Sandbox Now Defaults to Testnet**
+
+Starting with **AirKit 1.8.0-beta**, the Sandbox environment defaults to **Moca Chain Testnet**.
+
+If your integration is not ready, use the `chainNetwork` option to stay on Devnet. See [Migration Guide](#sandbox-testnet-migration) below.
+</Warning>
+
+<Tip>
+Make sure you're selecting the correct chain when using different build environment. Otherwise, your app may hit unexpected errors
+</Tip>
+
+| Environment       | Moca Chain                           | Purpose                                  | Developer Dashboard                         |
+| ----------------- | ------------------------------------ | ---------------------------------------- | ------------------------------------------- |
+| Sandbox (Testnet) | Testnet                              | For development & testing                | https://developers.sandbox.air3.com/dashboard |
+
+
+> Once Mainnet is available, Production credentials will be validated against Mainnet and hence previously issued credentials on Testnet will need to be re-issued. Issuance Schemas and Programs _may_ be migrated. Your Issuer and Verifier DID may also change.
+
+## Sandbox Environment Changes
+
+Starting with **AirKit 1.8.0-beta**, the Sandbox environment defaults to **Moca Chain Testnet** instead of Devnet. Both Testnet and Devnet remain available for development, with Testnet being the recommended choice to align with Production.
+
+### What's Changed
+
+| Before (< 1.8.0)                               | After (1.8.0-beta+)                                    |
+| ---------------------------------------------- | ------------------------------------------------------ |
+| Sandbox → Devnet (Chain ID: 5151)              | Sandbox → Testnet (Chain ID: 222888)                   |
+| Dashboard: https://developers.sandbox.air3.com | Dashboard: https://developers.sandbox.air3.com/testnet |
+
+### Impact
+
+- Credentials issued on Devnet are **not** available on Testnet
+- Smart Account addresses remain the same across networks
+- You will need to re-issue test credentials on Testnet
+
+### Using Devnet
+
+If your integration is not ready, you can temporarily stay on Devnet using the `credentialNetwork` option:
+
+```js
+import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
+
+const airService = new AirService({
+  partnerId: YOUR_PARTNER_ID
+});
+await airService.init({
+  buildEnv: BUILD_ENV.SANDBOX,
+  credentialNetwork: "devnet",
+  enableLogging: true,
+  preloadWallet: true, // Optional: Enable if wallet features will be used
+  preloadCredential: true // Optional: Enable if credential features will be used
+});
+```
+
+<Tip>
+We recommend migrating to Testnet as soon as possible to align with production. Devnet will continue to be available but will be deprecated later.
+</Tip>
+
+### Timeline
+
+| Phase                                        | Status     |
+| -------------------------------------------- | ---------- |
+| 1.8.0-beta release — Testnet becomes default | 🟡 Current |
+| Devnet support deprecated                    | 📅 TBD     |
+
+### Initializing AirService with the correct Environment
+
+<Tabs>
+
+<Tab title="Web">
+
+```js
+import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
+
+const airService = new AirService({
+  partnerId: YOUR_PARTNER_ID
+});
+await airService.init({
+  buildEnv: BUILD_ENV.SANDBOX, // BUILD_ENV.PRODUCTION
+  enableLogging: true
+});
+```
+
+</Tab>
+
+<Tab title="Flutter">
+
+```dart
+Future<void> initialize({
+  YOUR_PARTNER_ID,
+  navigatorKey,
+  Environment.sandbox, // Environment.production
+  true,
+})
+```
+
+
+</Tab>
+</Tabs>
+
+## Chains
+
+| Chain   | Chain ID | RPC                               | Explorer                           |
+| ------- | -------- | --------------------------------- | ---------------------------------- |
+| Devnet  | 5151     | https://devnet-rpc.mocachain.org  | https://devnet-scan.mocachain.org  |
+| Testnet | 222888   | https://testnet-rpc.mocachain.org | https://testnet-scan.mocachain.org |
+| Mainnet | 2288     | `coming soon`                     | `coming soon`                      |

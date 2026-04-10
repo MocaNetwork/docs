@@ -1,0 +1,71 @@
+---
+title: "Supported Chains"
+description: "AIR Kit supports multiple blockchain networks. The available chains depend on your partner configuration."
+---
+
+# Supported Chains
+
+AIR Kit supports multiple blockchain networks. The available chains depend on your partner configuration.
+
+**Mainnet Chains:**
+
+- **Base** (Chain ID: 8453) - Default mainnet chain
+- **BSC** (Chain ID: 56)
+- **Gnosis** (Chain ID: 100)
+- **Kaia** (Chain ID: 8217)
+- **Soneium** (Chain ID: 1868)
+
+**Testnet Chains:**
+
+- **Base Sepolia** (Chain ID: 84532) - Default testnet chain
+- **BSC Testnet** (Chain ID: 97)
+- **Gnosis Chiado** (Chain ID: 10200)
+- **Kairos** (Chain ID: 1001)
+- **Soneium Minato** (Chain ID: 1946)
+- **Sepolia** (Chain ID: 11155111)
+
+**Devnet Chains:**
+
+- **Moca Devnet** (Chain ID: 5151)
+
+## Chain Configuration
+
+Chains are configured per partner through the partner configuration:
+
+```tsx
+// Partner configuration example
+{
+  chainId: "8453", // Default chain (Base mainnet)
+  enabledChainIds: ["8453", "56", "100"] // All supported chains of that partner
+}
+```
+
+## Gas Cost Reference
+
+Gas costs on AIR Kit operations are paid in the native token of the selected chain (or sponsored via Paymaster). The table below shows **approximate gas units** for common operations. Actual $MOCA costs for Moca Chain credential anchoring are listed separately.
+
+<Note>
+  These benchmarks reflect Testnet measurements as of Q1 2025. Mainnet costs may differ. Enable [Gas Sponsorship (Paymaster)](/airkit/usage/account/paymaster) to abstract all gas costs from your end users.
+</Note>
+
+### Credential Operations (Moca Chain)
+
+| Operation | Estimated Gas | Approx. Cost |
+|-----------|:------------:|:------------:|
+| Smart account deployment (first-time) | ~200,000 | ~0.0002 MOCA |
+| Credential issuance (on-chain anchor) | ~80,000 | ~0.00008 MOCA |
+| Credential verification (ZK proof submit) | ~120,000 | ~0.00012 MOCA |
+| Credential revocation | ~50,000 | ~0.00005 MOCA |
+| Session key registration | ~60,000 | ~0.00006 MOCA |
+
+### EVM Chain Operations (Base, BSC, Gnosis, etc.)
+
+| Operation | Estimated Gas | Notes |
+|-----------|:------------:|-------|
+| Smart account deployment | ~200,000 | One-time per user per chain |
+| UserOperation (ERC-4337) | ~150,000–300,000 | Varies by calldata size |
+| ERC-20 transfer | ~65,000 | Standard token transfer |
+
+## Gas Sponsorship
+
+Use the [Paymaster](/airkit/usage/account/paymaster) to cover all user-facing gas costs from a pre-funded developer wallet. This removes all on-chain funding friction from your end users — they never need to hold or manage gas tokens.

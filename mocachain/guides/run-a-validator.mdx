@@ -1,0 +1,508 @@
+---
+title: "How to run a validator node for Moca Chain"
+description: "How to run a validator node for Moca Chain."
+---
+
+# Running a Validator
+
+<Warning>⚠️ This section may change without prior notice</Warning>
+Critical information in this section may be subject to change as the network is in early stages.
+
+<Info>
+🔓 The Moca Chain source code is publicly available on GitHub.
+</Info>
+
+## Validator Information
+
+### Minimum System Requirements
+
+| **Component** | **Recommended Specification**                                          | **Minimum Specification**                                              |
+| ------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Hardware      | Desktop or laptop running recent versions of **Mac OS X** or **Linux** | Desktop or laptop running recent versions of **Mac OS X** or **Linux** |
+| CPU           | **16 cores**                                                           | **8 cores**                                                            |
+| Memory (RAM)  | **128 GB**                                                             | **64 GB**                                                              |
+| Storage       | **4 TB NVMe SSD**                                                      | **2 TB NVMe SSD**                                                      |
+| Bandwidth     | **5 MB/s+**                                                            | **1 MB/s+**                                                            |
+
+
+Number of $MOCA to be staked: Refer to the latest network parameters for current staking requirements.
+
+Slashing details: Refer to the latest network parameters for current slashing conditions.
+
+## Setting up Validator Node
+
+### Install Fullnode
+
+Follow the instructions [here to set up a full node](./run-a-node).
+
+### Prepare validator, validator BLS, relayer, and challenger accounts
+
+**Warning**
+
+The current key generation and storage procedures are not very secure. It is highly recommended to implement a more robust method, particularly when dealing with keys like the validator operator key.
+
+For enhanced security and best practices, the usage of the Cold Wallet and MPC Wallet is strongly encouraged.
+
+```bash
+mocad keys add validator --keyring-backend test
+mocad keys add validator_bls --keyring-backend test --algo eth_bls
+mocad keys add validator_relayer --keyring-backend test
+mocad keys add validator_challenger --keyring-backend test
+
+```
+
+**Tip**
+
+Alternatively, if you choose a different **\$KEY_HOME** location and you are not using the suggested default **\~/.mocad**, you may start the full node by using below script, where **\$KEY_HOME** is your selected directory.
+
+```bash
+mocad keys add validator --keyring-backend test --home ${KEY_HOME}
+mocad keys add validator_bls --keyring-backend test --algo eth_bls --home ${KEY_HOME}
+mocad keys add validator_relayer --keyring-backend test --home ${KEY_HOME}
+mocad keys add validator_challenger --keyring-backend test --home ${KEY_HOME}
+
+```
+
+### Obtain validator, validator BLS, relayer, and challenger account addresses
+
+**Note**
+
+Ensure you choose the correct –keyring-backend and that –home is set correctly if you saved the files in a custom folder in step 2.
+
+**Note:** For the `MsgCreateValidator` proposal, the delegator and validator addresses must be the same account.
+
+```bash
+VALIDATOR_ADDR=$(mocad keys show validator -a --keyring-backend test)
+DELEGATOR_ADDR=$VALIDATOR_ADDR
+RELAYER_ADDR=$(mocad keys show validator_relayer -a --keyring-backend test)
+CHALLENGER_ADDR=$(mocad keys show validator_challenger -a --keyring-backend test)
+VALIDATOR_BLS=$(mocad keys show validator_bls --keyring-backend test --output json | jq -r '.pubkey_hex')
+VALIDATOR_BLS_PROOF=$(mocad keys sign ${VALIDATOR_BLS} --keyring-backend test --from validator_bls)
+VALIDATOR_NODE_PUB_KEY=$(cat ~/.mocad/config/priv_validator_key.json | jq -r '.pub_key.value')
+
+```
+
+**Warning**
+
+The file **\~/.mocad/config/priv_validator_key.json** contains your validator's consensus key. This key is used to sign blocks. Keep it secure — if compromised, your validator can be slashed.
+
+Ensure your validator account is funded with sufficient \$MOCA before proceeding.
+
+### Authorize Governance Module to allow Delegation
+
+Generic Authorization
+
+```bash
+VALIDATOR_ADDR=$(mocad keys show validator -a --keyring-backend test)
+DELEGATOR_ADDR=$VALIDATOR_ADDR
+GOV_ADDR=0x7b5Fe22B5446f7C62Ea27B8BD71CeF94e03f3dF2
+mocad tx authz grant ${GOV_ADDR} generic --msg-type=/cosmos.staking.v1beta1.MsgDelegate --keyring-backend test --chain-id "moca_222888-1" --from ${DELEGATOR_ADDR} --node "https://testnet-lcd.mocachain.org:443" -b sync --gas "200000000" --fees "100000000000000000000amoca" --yes
+```
+
+OR Limited Authorization
+
+```bash
+VALIDATOR_ADDR=$(mocad keys show validator -a --keyring-backend test)
+DELEGATOR_ADDR=$VALIDATOR_ADDR
+GOV_ADDR=0x7b5Fe22B5446f7C62Ea27B8BD71CeF94e03f3dF2
+mocad tx authz grant ${GOV_ADDR} delegate --allowed-validators=${VALIDATOR_ADDR} --spend-limit=10000000000000000000000amoca  --keyring-backend test --chain-id "moca_222888-1" --from ${DELEGATOR_ADDR} --node "https://testnet-lcd.mocachain.org:443" -b sync --gas "2000000" --fees "1000000000000000000amoca" --yes
+```
+
+### Submit a Create Validator Proposal
+
+Replace the values in the following JSON and save it as **create_validator_proposal.json**:
+
+**\${NODE_NAME}**: A custom human-readable name for this node.
+
+**\${VALIDATOR_NODE_PUB_KEY}**: The consensus key generated in step 1 (stored in **\${HOME}/.mocad/config/priv_validator_key.json** by default).
+
+**\${VALIDATOR_ADDR}**: The operator address created in step 2.
+
+**\${DELEGATOR_ADDR}**: The delegator address created in step 2.
+
+**\${VALIDATOR_BLS}**: The BLS key created in step 2.
+
+**\${VALIDATOR_BLS_PROOF}**: The BLS proof created in step2.
+
+**\${RELAYER_ADDR}**: The relayer address created in step 2.
+
+**\${CHALLENGER_ADDR}**: The challenger address created in step 2.
+
+```json
+{
+  "messages": [
+    {
+      "@type": "/cosmos.staking.v1beta1.MsgCreateValidator",
+      "description": {
+        "moniker": "${MONIKER_NAME}",
+        "identity": "",
+        "website": "https://${MONIKER_NAME}",
+        "security_contact": "",
+        "details": "${MONIKER_NAME} details"
+      },
+      "commission": {
+        "rate": "0.070000000000000000",
+        "max_rate": "1.000000000000000000",
+        "max_change_rate": "0.010000000000000000"
+      },
+      "min_self_delegation": "1",
+      "delegator_address": "${DELEGATOR_ADDR}",
+      "validator_address": "${VALIDATOR_ADDR}",
+      "pubkey": {
+        "@type": "/cosmos.crypto.ed25519.PubKey",
+        "key": "${VALIDATOR_NODE_PUB_KEY}"
+      },
+      "value": {
+        "denom": "amoca",
+        "amount": "10000000000000000000000"
+      },
+      "from": "0x7b5Fe22B5446f7C62Ea27B8BD71CeF94e03f3dF2",
+      "relayer_address": "${RELAYER_ADDR}",
+      "challenger_address": "${CHALLENGER_ADDR}",
+      "bls_key": "${VALIDATOR_BLS}",
+      "bls_proof": "${VALIDATOR_BLS_PROOF}"
+    }
+  ],
+  "metadata": "",
+  "title": "Create ${MONIKER_NAME} Validator",
+  "summary": "create ${MONIKER_NAME} validator",
+  "deposit": "10000000000000000000000amoca"
+}
+```
+
+You can also use the gen_validator_proposal.sh script to create：
+
+```bash
+# !/bin/bash
+
+MONIKER_NAME="validator-lsl"
+# create accounts
+echo "Creating validator, validator BLS, relayer, and challenger accounts..."
+mocad keys add validator --keyring-backend test
+mocad keys add validator_bls --keyring-backend test --algo eth_bls
+mocad keys add validator_relayer --keyring-backend test
+mocad keys add validator_challenger --keyring-backend test
+# get accounts and private key
+echo "Obtaining addresses and keys..."
+VALIDATOR_ADDR=$(mocad keys show validator -a --keyring-backend test)
+DELEGATOR_ADDR=$VALIDATOR_ADDR
+RELAYER_ADDR=$(mocad keys show validator_relayer -a --keyring-backend test)
+CHALLENGER_ADDR=$(mocad keys show validator_challenger -a --keyring-backend test)
+VALIDATOR_BLS=$(mocad keys show validator_bls --keyring-backend test --output json | jq -r '.pubkey_hex')
+VALIDATOR_BLS_PROOF=$(mocad keys sign ${VALIDATOR_BLS} --keyring-backend test --from validator_bls)
+VALIDATOR_NODE_PUB_KEY=$(cat ~/.mocad/config/priv_validator_key.json | jq -r '.pub_key.value')
+# grant staking authz to governance module
+echo "Granting staking authz to governance module..."
+GOV_ADDR=0x7b5Fe22B5446f7C62Ea27B8BD71CeF94e03f3dF2
+mocad tx authz grant ${GOV_ADDR} generic --msg-type=/cosmos.staking.v1beta1.MsgDelegate --keyring-backend test --chain-id "moca_222888-1" --from ${DELEGATOR_ADDR} --node "https://testnet-lcd.mocachain.org:443" -b sync --gas "200000000" --fees "100000000000000000000amoca" --yes
+# generate the JSON file
+echo "Generating create_validator_proposal.json..."
+cat <<EOF > proposal.json
+{
+"messages": [
+{
+"@type": "/cosmos.staking.v1beta1.MsgCreateValidator",
+"description": {
+"moniker": "${MONIKER_NAME}",
+"identity": "",
+"website": "https://${MONIKER_NAME}",
+"security_contact": "",
+"details": "${MONIKER_NAME} details"
+},
+"commission": {
+"rate": "0.070000000000000000",
+"max_rate": "1.000000000000000000",
+"max_change_rate": "0.010000000000000000"
+},
+"min_self_delegation": "1",
+"delegator_address": "${DELEGATOR_ADDR}",
+"validator_address": "${VALIDATOR_ADDR}",
+"pubkey": {
+"@type": "/cosmos.crypto.ed25519.PubKey",
+"key": "${VALIDATOR_NODE_PUB_KEY}"
+},
+"value": {
+"denom": "amoca",
+"amount": "10000000000000000000000"
+},
+"from": "0x7b5Fe22B5446f7C62Ea27B8BD71CeF94e03f3dF2",
+"relayer_address": "${RELAYER_ADDR}",
+"challenger_address": "${CHALLENGER_ADDR}",
+"bls_key": "${VALIDATOR_BLS}",
+"bls_proof": "${VALIDATOR_BLS_PROOF}"
+}
+],
+"metadata": "",
+"title": "Create ${MONIKER_NAME} Validator",
+"summary": "create ${MONIKER_NAME} validator",
+"deposit": "10000000000000000000000amoca"
+}
+EOF
+echo "proposal.json has been created."
+
+```
+
+Run the script
+
+```bash
+bash gen_validator_proposal.sh
+
+```
+
+and you will see the output:
+
+```bash
+VALIDATOR_ADDR: 0x400b809ec90B8666c671b7ceC82033Dd6186D8c8
+DELEGATOR_ADDR: 0x400b809ec90B8666c671b7ceC82033Dd6186D8c8
+RELAYER_ADDR: 0xf7B8eeC1E7eb13827a9738A39f965f06DdfE4A90
+CHALLENGER_ADDR: 0x5cc8eC44a7Cc8F5BcdF6Eb9301D9632828C20651
+VALIDATOR_BLS: 18726fbcace099dce4cee158410bdc94e1b19f6531dd5ccf5327dd5384ef3422037862be14e324d7b8e4175fa0c86d053974a320ee92681560aa947c310d63c827dd73092bf57da29b34f2e4844a55aee4f803f009efff1ce7edc797e16fcf31008f67eba9fabad94876d65d135458fa1c814562cf1da8e1574c68ad4cbda887
+VALIDATOR_BLS_PROOF: 0e5361e641ecc43b30fa2d921d39e5793d6def5638a5e6badb08827867a9a396134f0000ca9e20eebc51e62ab58c99c8576c2f384f103a55cfc568c2e98dc375
+VALIDATOR_NODE_PUB_KEY: uk+p1GR1/Iy5B9rkKRe6lmRta1bnkFTM3HLd+8wpZL4=
+
+```
+
+### Submit the governance proposal. Ensure the validator account has enough \$MOCA.
+
+**Info**
+
+If you are utilizing the Cold Wallet or MPC wallet, please proceed to next step
+
+```bash
+VALIDATOR_ADDR=$(mocad keys show validator -a --keyring-backend test)
+DELEGATOR_ADDR=$VALIDATOR_ADDR
+mocad tx gov submit-proposal ./proposal.json --keyring-backend test --chain-id "moca_222888-1" --from ${DELEGATOR_ADDR} --node "https://testnet-lcd.mocachain.org:443" -b sync --gas "600000" --fees "100000000000000000000amoca" --yes
+
+```
+
+You can see the following output:
+
+```bash
+code: 0
+codespace: ""
+data: 1A080000000000008A7A
+events: []
+gas_used: "0"
+gas_wanted: "0"
+height: "0"
+info: ""
+logs: []
+raw_log: '[]'
+timestamp: ""
+tx: null
+txhash: 94BFFAA9792A9C94BC1A925C433F5CA13CB1526C8E85D83D9D462ACF766E8475
+
+```
+
+Find the proposal ID:
+
+```bash
+mocad q tx BB845EA77C5051A8885FCEB6FAF06E279305D9DE7B03DBA8915D1A1E2804B3AF --node "https://testnet-lcd.mocachain.org:443" --output json | jq '.logs[] | .events[] | select(.type == "submit_proposal") | .attributes[] | select(.key == "proposal_id") | .value | tonumber'
+
+```
+
+```bash
+3
+
+```
+
+Query proposal status
+
+```bash
+curl -s https://testnet-api.mocachain.org/cosmos/gov/v1/proposals/3 | jq
+
+```
+
+Output:
+
+```bash
+{
+"proposal": {
+"id": "3",
+"messages": [
+{
+"@type": "/cosmos.staking.v1beta1.MsgCreateValidator",
+"description": {
+"moniker": "validator-lsl",
+"identity": "",
+"website": "https://validator-lsl",
+"security_contact": "",
+"details": "validator-lsl details"
+},
+"commission": {
+"rate": "0.070000000000000000",
+"max_rate": "1.000000000000000000",
+"max_change_rate": "0.010000000000000000"
+},
+"min_self_delegation": "1",
+"delegator_address": "0x0E47f44E8e5aaaFFB2D93f8Ec003470C76a70f1a",
+"validator_address": "0x0E47f44E8e5aaaFFB2D93f8Ec003470C76a70f1a",
+"pubkey": {
+"@type": "/cosmos.crypto.ed25519.PubKey",
+"key": "NgpQL9w9C36mRn5TRuEooCs7WSnfeSWTawUhleiAzJQ="
+},
+"value": {
+"denom": "amoca",
+"amount": "10000000000000000000000"
+},
+"from": "0x7b5Fe22B5446f7C62Ea27B8BD71CeF94e03f3dF2",
+"relayer_address": "0x2663170D78C7F2975abdd230Fa29Abf2E599dFf3",
+"challenger_address": "0xc1E3825A64e3fBeeb0F0dE301B9A5cf6A0b93555",
+"bls_key": "19788627475911af79040fb2cc06b3e2c55d294040aa2ea0cf82b0be34263fcd1546cadd9ef7cef43c0b8ace373b202f564d44f954ac1525a85694ea1cba8958093abea4bd8c042530d1028bd53030292983f3fe52a81ae262cdf23e056470a009d43f34369193f197c409533726cd62ce049a63ee80577718df85fec4874b31",
+"bls_proof": "256d6283d5eb2e989f7dcb37f9c87db714a626af5bd40efc98d807c6c9acab3828f432091f3923b2b680e2c8479f60d896557586d916d5e06609eae5859912c0"
+}
+],
+"status": "PROPOSAL_STATUS_VOTING_PERIOD",
+"final_tally_result": {
+"yes_count": "0",
+"abstain_count": "0",
+"no_count": "0",
+"no_with_veto_count": "0"
+},
+"submit_time": "2024-11-18T10:13:17.955988297Z",
+"deposit_end_time": "2024-11-19T10:13:17.955988297Z",
+"total_deposit": [
+{
+"denom": "amoca",
+"amount": "10000000000000000000000"
+}
+],
+"voting_start_time": "2024-11-18T10:13:17.955988297Z",
+"voting_end_time": "2024-11-19T10:13:17.955988297Z",
+"metadata": "",
+"title": "Create validator-lsl Validator",
+"summary": "create validator-lsl validator",
+"proposer": "0x73C4fCB7Dc03f30C2d8662d1ba146b387C3d063a",
+"failed_reason": ""
+}
+}
+
+```
+
+You can find the proposal status is PROPOSAL_STATUS_VOTING_PERIOD
+
+### Wait for the voting until the Proposal is passed.
+
+After submitting the proposal successfully, you must wait for the voting to be completed and the proposal to be approved. The voting period varies by network. Once it has passed and is successfully executed, you can verify that the node has become a validator.
+
+Please announce your proposal ID to the existing validators, as they must vote in favour of it for it to pass.
+
+**For existing validators** — run the following to vote on the proposal:
+
+```bash
+mocad tx gov vote <PROPOSAL_ID> yes \
+  --from validator \
+  --keyring-backend test \
+  --chain-id "<CHAIN_ID>" \
+  --node "<NODE_URL>" \
+  --gas 200000 \
+  --gas-prices "10000000000amoca" \
+  -y
+```
+
+**Warning**
+
+Please ensure that the validator node is running before it is selected and if the validator is also responsible for running relayer and/or running challenger, then please ensure all these services are running as expected before selection.
+
+### Query all validators
+
+```bash
+mocad query staking validators --node "https://testnet-lcd.mocachain.org:443"
+
+```
+
+You will see the following output:
+
+```yaml
+...
+- bls_key: Hq27eaPq9K9bQWOO8KDrB9Q9HtxujkTO1Bmx9peUexwUs9mAZQ9wVXzSs9Lqg5EK1C+JE1owNcgzy1ZM76BAdhnsRWnXOyNnGzzBHyMpsBauWEEs0eMg47TADYx5UWzQGk+cNiohUL6k36xL/48s4uuXf1nDxWB/WHnMkbqlIxw=
+challenger_address: 0x77C22b475bb76297BCEcad72aB4C9BAa9215dE57
+commission:
+commission_rates:
+max_change_rate: "0.010000000000000000"
+max_rate: "1.000000000000000000"
+rate: "0.070000000000000000"
+update_time: "2024-09-27T03:18:14.385577987Z"
+consensus_pubkey:
+"@type": /cosmos.crypto.ed25519.PubKey
+key: bIV4oNvEblriuduP9dBK2fKVeEj4bAAgRdSY+JJz6oM=
+delegator_shares: "10000000000000000000000.000000000000000000"
+description:
+details: my-validator details
+identity: ""
+moniker: my-validator
+security_contact: ""
+website: https://my-validator
+jailed: false
+min_self_delegation: "1"
+operator_address: 0xD4d6B184E53a5625d7B842245E8E46842912F151
+relayer_address: 0xa6bFd1EB8657bE66f7B9AcA7d27dB804214e2Af2
+self_del_address: 0x0FD3375177f9B118142738Fd732D242465A18a70
+status: BOND_STATUS_BONDED
+tokens: "10000000000000000000000"
+unbonding_height: "0"
+unbonding_ids: []
+unbonding_on_hold_ref_count: "0"
+unbonding_time: "1970-01-01T00:00:00Z"
+...
+
+```
+
+### One-step
+
+For ease of execution, we have encapsulated the above process into a script.
+
+### Prepare validator, validator BLS, relayer, and challenger accounts
+
+```bash
+./scripts/create_validator_proposal.sh generate ~/.mocad
+
+```
+
+This will print the generated **validator_address** (which is also used as the delegator address).
+
+```bash
+===== generate ====
+add keys...
+show keys...
+generated validator proposal file...
+create_validator_proposal.json has been generated successfully at ../scripts/proposal.json.
+VALIDATOR_ADDR: 0xD4d6B184E53a5625d7B842245E8E46842912F151
+
+```
+
+You need to ensure that the validator address is funded with sufficient Moca to be used for the subsequent proposal submission. Check the balance:
+
+```bash
+bash scripts/create_validator_proposal.sh balance ~/.mocad
+
+```
+
+### Submit a Create Validator Proposal
+
+```bash
+./scripts/create_validator_proposal.sh create ~/.mocad
+
+```
+
+### Wait for the Proposal to pass
+
+Alternatively, you can also check the proposal status with the following command:
+
+```bash
+bash scripts/create_validator_proposal.sh query_proposal ~/.mocad
+
+```
+
+```bash
+.....
+"status": "PROPOSAL_STATUS_PASSED",
+"final_tally_result": {
+"yes_count": "40000000000000000000000000",
+"abstain_count": "0",
+"no_count": "0",
+"no_with_veto_count": "0"
+},
+....
+
+```

@@ -1,0 +1,62 @@
+---
+title: "Data Privacy"
+description: "Where data lives, what is encrypted, and who can access what in the Moca Network architecture."
+---
+
+Moca Network follows a privacy-by-design approach. User data is minimized at every layer, and access is gated by cryptographic controls and explicit user consent.
+
+## Data minimization
+
+The default AIR Kit integration stores the minimum data necessary:
+
+| Data type | Stored by Moca? | Notes |
+| --- | --- | --- |
+| User email | Yes (hashed identifier) | Used as the AIR Account identifier for cross-partner portability |
+| Credential claims | On-chain proof only | Raw claim data is not stored on-chain unless CAK is enabled |
+| Private keys | No | Keys are split via MPC; no single party holds a full key |
+| Transaction data | On-chain | Standard blockchain transaction visibility |
+| PII (ID photos, biometrics) | Only if CAK is enabled | Encrypted in dStorage, accessible only with user consent |
+
+## Who can access what
+
+### Without CAK (default)
+
+In the default zero-knowledge flow:
+
+- **Issuers** know the data they put into the credential (they are the source of truth).
+- **Verifiers** receive only boolean ZK proof results. They never see raw claim data.
+- **Moca Network** sees on-chain proof hashes. It cannot reconstruct credential content.
+- **Users** hold the credential in their AIR Account and control when and to whom it is presented.
+
+### With CAK enabled
+
+When the Compliance Access Key framework is active:
+
+- **Issuers** encrypt raw data with a user-derived public key before storing it. After issuance, the issuer cannot read it back.
+- **Verifiers** can decrypt raw data only after the user grants explicit consent in the SDK UI. Consent is per-verifier and per-session.
+- **dStorage** holds encrypted blobs. Storage providers cannot decrypt them.
+- **Users** are the only party who can authorize decryption by generating the corresponding private key locally.
+
+See [Privacy & Compliance (CAK)](/learn/advanced-topics/privacy-and-compliance) for the full framework.
+
+## Data residency
+
+- **On-chain data** (proofs, state anchors, transaction records) lives on Moca Chain and is globally replicated across validators.
+- **Encrypted payloads** (CAK) are stored in decentralized storage (dStorage) on Moca Chain.
+- **Session tokens and MPC key shards** are stored on the user's device and in secure execution environments. They are not centrally stored.
+
+## User control
+
+Users can:
+
+- **Revoke consent** — If a user previously authorized a verifier, they can deny future requests.
+- **Export keys** — Users can export their wallet private key for portability.
+- **Delete their account** — Account deletion removes the user's session and local key material. On-chain proofs remain (blockchains are append-only), but they cannot be linked back to the user without the account.
+
+## Compliance considerations
+
+Moca Network provides technical primitives (encryption, consent management, audit trails) that support compliance frameworks such as GDPR, CCPA, and industry-specific regulations. The [Security Checklist](/learn/security/security-checklist) covers integration best practices for maintaining compliance.
+
+<Warning>
+Moca Network provides infrastructure and tooling. Compliance responsibility ultimately lies with the issuer and verifier organizations. Consult legal counsel for your specific regulatory requirements.
+</Warning>

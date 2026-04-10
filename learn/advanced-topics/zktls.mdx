@@ -1,0 +1,40 @@
+---
+title: "zkTLS: Secure Web2 → On-Chain Proofs"
+description: "How zkTLS bridges Web2 data sources to on-chain verifiable proofs, enabling secure identity onboarding without exposing raw data."
+---
+
+One of the critical challenges in decentralized identity is bridging the gap between **Web2 data sources** (e.g., social accounts, emails, KYC providers) and **Web3 smart contracts** without compromising privacy.
+
+**zkTLS (Zero-Knowledge Transport Layer Security)** solves this problem by enabling verifiable proofs of HTTPS interactions, allowing on-chain applications to trust data from Web2 endpoints without exposing the underlying payload.
+
+## How zkTLS Works
+
+1. **TLS Handshake Capture**
+   - When a client communicates with a Web2 service (e.g., an email provider), the TLS handshake and session are cryptographically captured.
+
+2. **Proof Generation**
+   - A **zero-knowledge proof** is constructed showing that the interaction took place with the genuine server, over HTTPS, with specific outputs (e.g., "this email is verified").
+   - Importantly, the raw data exchanged remains private.
+
+3. **On-Chain Verification**
+   - The ZK proof is submitted to a smart contract, which verifies the claim without needing access to the underlying data.
+
+## Key Advantages
+
+- **Privacy-Preserving**  
+  Users can prove statements about their Web2 accounts (like GitHub activity, employment, or KYC status) without exposing personal details.
+
+- **Trustless Bridging**  
+  Eliminates the need for centralized verification intermediaries between Web2 and Web3.
+
+- **Interoperability**  
+  Works across diverse Web2 data sources and can integrate with multiple blockchains.
+
+- **Compliance-Ready**  
+  Sensitive data never leaves the user’s control, reducing liability for dApps and partners.
+
+## Example Use Cases
+
+- **Proof of Humanity**: Verifying a user’s email or social profile to prevent bots.
+- **KYC/AML**: On-chain DeFi protocols can accept compliance proofs without storing user passports or IDs.
+- **Reputation Systems**: Bringing provable GitHub or LinkedIn credentials into decentralized professional networks.

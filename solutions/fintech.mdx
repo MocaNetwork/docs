@@ -1,0 +1,66 @@
+---
+title: "Fintech & Payments"
+description: "Reduce KYC costs, eliminate PII liability, and enable cross-platform compliance verification — without changing your KYC provider or your user flow."
+icon: "credit-card"
+---
+
+## The Problem
+
+Financial services carry the heaviest identity verification burden of any industry. Every new product, every new partner integration, every new regulatory jurisdiction demands another round of KYC — costs running $5–$50 per user, abandonment rates averaging 30%, and a growing database of sensitive documents that represents liability, not value.
+
+## What Changes With AIR Kit
+
+- **KYC costs fall per partner onboarded** — Your first KYC verification is the only one your customers need. Partners accept the credential, not a new document submission
+- **No PII liability for verifiers** — Partners accepting your KYC credential receive only COMPLIANT / NON_COMPLIANT. They never hold your customer's identity documents
+- **Age and accreditation gates without storing raw data** — Prove a user is 18+, 21+, or an accredited investor without ever transmitting or storing the underlying facts
+- **Cross-border compliance without bilateral agreements** — One KYC credential, presentable to partners across the Moca ecosystem. Partner acceptance depends on their regulatory requirements
+
+## Specific Use Cases
+
+**KYC Re-use Across Partners**
+Your bank onboards a customer, passes KYC, issues a credential. That customer opens an account with a partner fintech. The partner verifies the credential in one SDK call — no new document submission, no re-KYC cost, no waiting period.
+
+**DeFi and Financial Product Access**
+Gate access to financial products, DeFi pools, or high-value transactions behind a KYC credential check. Users who have already verified are admitted instantly. Users who haven't are prompted to verify once.
+
+**Accredited Investor Verification**
+Issue an income or net worth attestation on your platform. Any partner offering private placements, alternative investments, or regulated financial products can verify it via ZK proof — without ever seeing the income figures.
+
+**Age Gating**
+Prove `isOver18` or `isOver21` without revealing the user's birthdate to the verifier. Regulatory requirements for age-restricted financial products are met without creating a new data storage obligation.
+
+## What Compliance Will Ask
+
+**Does this satisfy our AML/KYC obligations?**
+Your KYC obligations remain with your KYC provider. AIR Kit converts the pass result into a portable credential — it does not replace or modify the KYC process itself.
+
+**What does the credential contain?**
+Only derived facts you define: KYC level, provider name, pass date, country of verification, boolean age checks. No raw documents, no national ID numbers, no financial data.
+
+**Who is liable if a credential is fraudulent?**
+You, as the issuer, are responsible for the KYC process that underlies the credential — the same as today. AIR Kit provides the credential infrastructure; the compliance process is yours.
+
+**Can we revoke credentials immediately?**
+Yes. Revocation is one API call and takes effect on-chain instantly.
+
+## Integration at a Glance
+
+| | |
+|---|---|
+| **What your team builds** | One API call in your KYC webhook |
+| **Engineering effort** | 1 backend engineer |
+| **Timeline to live** | 2–3 weeks |
+| **User flow changes** | None |
+| **Partner integration** | 3 lines of SDK code |
+
+<CardGroup cols={2}>
+  <Card title="Developer integration guide" icon="code" href="/airkit/guides/air-for-fintech">
+    Full schemas, KYC webhook code, and age gate patterns.
+  </Card>
+  <Card title="Compliance FAQ" icon="shield-check" href="/solutions/compliance-faq">
+    Full regulatory and data handling answers.
+  </Card>
+  <Card title="Partner Economics" icon="coins" href="/solutions/partner-economics">
+    Revenue model, fee structure, and rewards.
+  </Card>
+</CardGroup>

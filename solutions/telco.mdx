@@ -1,0 +1,76 @@
+---
+title: "Telco & Subscriptions"
+description: "Issue subscriber credentials at activation. Roaming and MVNO partners verify KYC status without re-running identity checks or receiving subscriber PII."
+icon: "signal"
+---
+
+## The Problem
+
+Carriers spend on KYC at activation, then that verified status expires at the edge of their network. A prepaid subscriber who passed full identity verification at your MVNO is unknown to your roaming partner. Carrier partnerships that could unlock subscriber benefits require bilateral API agreements that take months to negotiate and are rarely worth the integration cost.
+
+## What Changes With AIR Kit
+
+- **KYC travels with the subscriber** — Pass once at activation, accept everywhere in the ecosystem. Roaming partners verify the credential without calling your API or receiving subscriber data
+- **Loyalty tiers become cross-carrier benefits** — Issue a Silver or Gold subscriber credential. Partner MVNOs, device retailers, and service providers accept it to unlock benefits — no direct agreement required
+- **Age-restricted services gated properly** — Prove `isOver18` at point of service without transmitting or storing a subscriber's date of birth
+- **Churn intervention without data sharing** — Issue a "5-year subscriber" tenure credential. Retention partners can verify loyalty without accessing your customer database
+
+## How It Works
+
+<Steps>
+  <Step title="Subscriber activates and passes KYC">
+    Your existing activation flow. Your existing identity verification. Nothing changes at this step.
+  </Step>
+  <Step title="AIR Kit issues a subscriber credential">
+    At activation success, your backend fires one API call. A credential encoding KYC level, plan type, and age verification lands in the subscriber's AIR Account. Invisible to the subscriber.
+  </Step>
+  <Step title="Subscriber accesses a partner service">
+    At a roaming partner, MVNO, or retail service, the subscriber authenticates with their AIR Account — the same login they use with you.
+  </Step>
+  <Step title="Partner verifies — no PII crosses">
+    The partner calls one SDK method. They receive COMPLIANT or NON_COMPLIANT, plus the KYC level. No MSISDN, no IMSI, no subscriber documents are transmitted.
+  </Step>
+</Steps>
+
+## What Crosses the Network — and What Doesn't
+
+| What the Roaming Partner Receives | What Stays Private |
+|-----------------------------------|--------------------|
+| COMPLIANT / NON_COMPLIANT | MSISDN / phone number |
+| KYC level (basic / enhanced / full) | IMSI / SIM identifiers |
+| `isOver18: true` | Date of birth, full name |
+| Plan type (prepaid / postpaid) | Address, national ID |
+| Credential expiry | Billing history |
+
+## What Compliance Will Ask
+
+**Does this satisfy roaming KYC obligations?**
+The credential attests to the level of KYC completed at your platform. Roaming partners accepting it are verifying that fact — the underlying compliance obligation remains with the issuing carrier.
+
+**Is subscriber PII transmitted to roaming partners?**
+No. The ZK proof flow transmits only a boolean result and the credential attributes you choose to expose. MSISDN and subscriber identity documents never leave your systems.
+
+**GDPR: where is subscriber data stored?**
+On Moca Chain — a credential hash with no personal data. The raw subscriber PII stays in your systems and your KYC provider's systems, exactly as today.
+
+## Integration at a Glance
+
+| | |
+|---|---|
+| **What your team builds** | One API call in your activation event handler |
+| **Engineering effort** | 1 backend engineer |
+| **Timeline to live** | 2–4 weeks |
+| **Changes to existing activation flow** | None |
+| **Roaming partner integration** | 3 lines of SDK code to verify |
+
+<CardGroup cols={2}>
+  <Card title="Developer integration guide" icon="code" href="/airkit/guides/air-for-telco">
+    Subscriber schemas, activation handler code, and roaming verification.
+  </Card>
+  <Card title="Compliance FAQ" icon="shield-check" href="/solutions/compliance-faq">
+    Full GDPR and regulatory answers.
+  </Card>
+  <Card title="Partner Economics" icon="coins" href="/solutions/partner-economics">
+    Revenue model, fee structure, and reward.
+  </Card>
+</CardGroup>

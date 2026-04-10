@@ -1,0 +1,184 @@
+---
+title: "Architecture & Data Flow"
+description: "End-to-end technical architecture of AIR Kit — SDK services, Moca Chain, credential lifecycle, and how data moves through the system."
+icon: "diagram-project"
+---
+
+AIR Kit is a modular SDK that sits between your application and Moca Chain. It exposes two independent service surfaces — **Account Services** and **Credential Services** — that can be used together or independently.
+
+## System Overview
+
+```mermaid
+graph TD
+    subgraph YourApp["Your Application"]
+      A[Frontend / Mobile App]
+      B[Backend Server]
+    end
+
+    subgraph SDK["AIR Kit SDK"]
+      C[Account Services]
+      D[Credential Services]
+    end
+
+    subgraph Chain["Moca Chain"]
+      E[Identity Oracle]
+      F[EVM Layer]
+      G[Decentralized Storage - MCSP]
+    end
+
+    A -->|Web SDK / Flutter SDK| C
+    A -->|Web SDK / Flutter SDK| D
+    B -->|Partner JWT + REST API| D
+    C -->|Wallet & session management| F
+    D -->|Issue / Verify credentials| E
+    E -->|Anchors credential hash| F
+    F -->|Payload stored| G
+```
+
+## Account Services Flow
+
+Account Services handles user authentication, smart account creation, and wallet operations.
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant App as Your App
+    participant SDK as AIR Kit SDK
+    participant Chain as Moca Chain
+
+    U->>App: Click "Login"
+    App->>SDK: airService.login()
+    SDK->>U: Show login UI (email / social / wallet)
+    U->>SDK: Authenticate
+    SDK->>Chain: Create / fetch smart account
+    Chain-->>SDK: Account address + session
+    SDK-->>App: User session + wallet provider
+    App-->>U: Logged in ✓
+```
+
+## Credential Issuance Flow (User-Initiated)
+
+The standard issuance path — the user is present and triggers the credential claim.
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant App as Your App (Issuer)
+    participant SDK as AIR Kit SDK
+    participant Chain as Moca Chain
+
+    U->>App: Triggers credential claim
+    App->>SDK: airService.issueCredential(credentialId, subject)
+    SDK->>U: Prompt user to sign consent
+    U->>SDK: Signs with AIR Account
+    SDK->>Chain: Submit issuance transaction
+    Chain->>Chain: Identity Oracle verifies & anchors hash
+    Chain-->>SDK: coreClaimHash
+    SDK-->>App: Issuance confirmed
+    App-->>U: Credential delivered to AIR Account
+```
+
+## Credential Verification Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User (Holder)
+    participant App as Your App (Verifier)
+    participant SDK as AIR Kit SDK
+    participant Chain as Moca Chain
+
+    U->>App: Requests access / action
+    App->>SDK: airService.verifyCredential(programId)
+    SDK->>U: Prompt user to select credential
+    U->>SDK: Presents credential (ZK proof generated client-side)
+    SDK->>Chain: Submit ZK proof for verification
+    Chain->>Chain: Oracle validates proof on-chain
+    Chain-->>SDK: COMPLIANT / NON_COMPLIANT
+    SDK-->>App: Verification result
+    App-->>U: Access granted or denied
+```
+
+## Issue on Behalf Flow (Server-Side, No User Session)
+
+Use this path when a **backend event** should trigger issuance without the user being present.
+
+```mermaid
+sequenceDiagram
+    participant Event as Backend Event
+    participant Server as Your Server
+    participant API as AIR Kit API
+    participant Chain as Moca Chain
+
+    Event->>Server: KYC passed / purchase confirmed / check-in scanned
+    Server->>Server: Sign Partner JWT (scope:"issue on-behalf", email: user)
+    Server->>API: POST /v1/credentials/issue-on-behalf
+    API->>Chain: Queue credential for on-chain processing
+    Chain-->>API: coreClaimHash
+    API-->>Server: { coreClaimHash }
+    Server->>API: GET /v1/credentials/status?coreClaimHash=...
+    API-->>Server: { vcStatus: "ONCHAIN" }
+    Note over Chain: User receives credential in AIR Account silently
+```
+
+## Multi-Vendor Stack Integration
+
+AIR Kit is **additive** — it does not replace your existing infrastructure. The diagram below shows how it slots into a typical enterprise stack alongside loyalty platforms, KYC providers, ticketing systems, and payment processors.
+
+```mermaid
+graph LR
+    subgraph Existing["Your Existing Stack"]
+      L[Loyalty Platform]
+      K[KYC Provider]
+      T[Ticketing System]
+      P[Payment Processor]
+    end
+
+    subgraph AIR["AIR Kit Integration Layer"]
+      IB[Issue on Behalf API]
+      SDK2[Web / Flutter SDK]
+    end
+
+    subgraph MocaChain["Moca Chain"]
+      ORC[Identity Oracle]
+      STORE[Decentralized Storage]
+    end
+
+    L -->|Milestone event| IB
+    K -->|Verification pass| IB
+    T -->|Scan / check-in| IB
+    P -->|Transaction event| IB
+    IB --> ORC
+    ORC --> STORE
+    SDK2 -->|Verify credential| ORC
+```
+
+## Service Independence
+
+Account Services and Credential Services are decoupled — integrate one, both, or mix server-side and client-side patterns.
+
+| Feature | Account Services | Credential Services | Requires Both |
+|---------|:---:|:---:|:---:|
+| User login / SSO | ✓ | — | — |
+| Smart account / wallet | ✓ | — | — |
+| Gas sponsorship (Paymaster) | ✓ | — | — |
+| Wagmi connector | ✓ | — | — |
+| Issue credentials (user-initiated) | — | ✓ | ✓ user must be logged in |
+| Issue on Behalf (server-side) | — | ✓ | — |
+| Verify credentials | — | ✓ | — |
+
+## Next Steps
+
+<Columns cols={2}>
+  <Card title="Quick Setup" icon="bolt" href="/airkit/usage/getting-started">
+    Install and initialize the SDK in minutes.
+  </Card>
+  <Card title="Integration Guides" icon="puzzle-piece" href="/airkit/guides/air-for-loyalty">
+    Vertical-specific guides with code examples for Loyalty, Fintech, Gaming, and Ticketing.
+  </Card>
+  <Card title="Quickstart: Issue Credentials" icon="badge-check" href="/airkit/quickstart/issue-credentials">
+    Step-by-step credential issuance walkthrough.
+  </Card>
+  <Card title="Issue on Behalf" icon="server" href="/airkit/usage/credential/issue-on-behalf">
+    Server-side issuance without user presence.
+  </Card>
+</Columns>

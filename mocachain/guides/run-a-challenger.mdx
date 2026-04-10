@@ -1,0 +1,138 @@
+---
+title: "How to run a challenger for Moca Chain"
+description: "How to run a challenger for Moca Chain."
+---
+
+<Warning>⚠️ This section may change without prior notice</Warning>
+Critical information in this section may be subject to change as the network is in early stages.
+
+<Warning>
+🔒 Repo not publicly available — please reach out to us if you would like to run this code.
+</Warning>
+
+## Challenger Information
+
+### Minimum System Requirements
+
+| Component    | Minimum Specification                                                  |
+| ------------ | ---------------------------------------------------------------------- |
+| Hardware     | Desktop or laptop running recent versions of **Mac OS X** or **Linux** |
+| CPU          | **4 cores**                                                            |
+| Memory (RAM) | **12 GB**                                                              |
+| Storage      | **1 TB HDD/SSD**                                                       |
+| Bandwidth    | **1 MB/s**                                                             |
+
+## Setting up a challenger
+
+### Prerequisite
+
+- Pull the `develop` branch of the `moca-challenger` repository.
+- The deployment of `moca-challenger` relies on validator binding initialization. If you want to deploy your own `moca-challenger`, you need to join as a new validator.
+
+### Challenger Introduction
+
+Moca ensures data integrity by regularly issuing challenge events to storage providers to prove that stored data has not been tampered with. This service allows end-users to monitor challenge events in the blockchain and perform verification.
+
+#### Moca-challenger main components
+
+`moca-challenger` includes 7 main goroutines: Monitor, Verifier, Vote Collector, Vote Broadcaster, Vote Collator, Tx Submitter, and Attest Monitor.
+
+- **Monitor:** Polls the Moca blockchain to obtain new blocks, parse challenge events, and add them to the local database.
+- **Verifier:** Verifies the integrity of the stored data by comparing root hashes.
+- **Vote Broadcaster:** Broadcasts a signed vote on the blockchain for events that failed verification.
+- **Vote Collector:** Polls the blockchain for votes broadcast by other Challenger services.
+- **Vote Collator:** Collates votes to achieve a 2/3 consensus.
+- **Tx Submitter:** Sends a `MsgAttest` to the blockchain after enough consensus votes are received.
+- **Attest Monitor:** Polls the blockchain for successfully attested challenges and updates the database.
+
+### Deploy moca-challenger
+
+#### Configuration file
+
+Set your private key, deployment environment, and gas limit. The `private_key` and `bls_private_key` can be obtained as described in the next section.
+
+```json
+"moca_config": {
+    "key_type": "local_private_key",
+    "private_key": "your_challenger_private_key",
+    "bls_private_key": "your_bls_private_key",
+    "rpc_addrs": [ "https://testnet-lcd.mocachain.org" ],
+    ...
+},
+"db_config": {
+    "dialect": "mysql",
+    "db_path": "tcp(127.0.0.1:3306)/challenger?charset=utf8&parseTime=True&loc=Local",
+    ...
+},
+"sp_config": {
+    "internal_sp_endpoints": [
+      "https://testnet-sp0.mocachain.org",
+      ...
+    ]
+}
+```
+
+#### Run locally
+
+##### Running MySQL in Docker
+
+```bash
+docker run -p 3306:3306 --name moca -e MYSQL_ROOT_PASSWORD=moca -d mysql:8
+```
+
+##### Create a database
+
+```sql
+mysql --port=3306 -h127.0.0.1 -uroot -pmoca
+CREATE SCHEMA IF NOT EXISTS challenger DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+```
+
+##### Get validator BLS key and challenger key
+
+```bash
+./build/mocad keys export ${BLS_KEY_NAME} --unsafe --unarmored-hex --home=${CLIENT_KEYRING_DIR} --keyring-backend=test
+./build/mocad keys export ${CHALLENGER_NAME} --unsafe --unarmored-hex --home=${CLIENT_KEYRING_DIR} --keyring-backend=test
+```
+
+##### Compile and launch moca-challenger
+
+Assuming you have a validator running, compile and start the process.
+
+```bash
+make build
+./build/moca-challenger --config-type local --config-path ./config/config.json
+```
+
+#### Test and Verification
+
+##### Create your own SP
+
+The process is similar to creating a validator.
+
+1.  **Authorization:** Grant spending limits.
+2.  **Submit a proposal:** Use a JSON template to create a storage provider.
+
+##### Tampering with data stored on SP
+
+1.  Create a bucket and upload a file.
+2.  Find the storage directory on your SP and modify the content of the data chunk file.
+
+```bash
+./build/moca-cmd --home deployment/localup/ bucket create --primarySP 0x...yourSPAddress moca1
+./build/moca-cmd --home deployment/localup/ object put --contentType "application/octet-stream" ./abctest moca://moca1/abctest
+```
+
+##### Challenge the data chunk of the object
+
+- **Regular challenge:** Moca automatically generates random data availability challenges. The `moca-challenger` monitors these events. If data has been tampered with, the root hashes will not match, and the challenge will be successful. The validator will vote, and if 2/3 consensus is reached, the SP will be slashed.
+- **Manual challenge:** Anyone can submit a transaction to challenge data availability.
+
+##### Data recovery
+
+Data recovery ensures that original data can be restored if lost on SPs.
+
+1.  Data is automatically recovered after a successful data challenge.
+2.  Data is automatically recovered when users find that the data is unreadable.
+3.  SPs can selectively recover lost data through tools.
+
+When a challenge succeeds, the tampered data chunk file will be restored to the original file after a while.

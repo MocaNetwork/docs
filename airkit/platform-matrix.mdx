@@ -1,0 +1,106 @@
+---
+title: "SDK Platform Support Matrix"
+description: "Supported platforms, frameworks, browsers, and feature availability across AIR Kit SDKs."
+icon: "grid-2"
+---
+
+## SDK Packages
+
+| SDK | Package | Install |
+|-----|---------|---------|
+| Web (JS / TS) | `@mocanetwork/airkit` | `npm install @mocanetwork/airkit` |
+| Flutter | `airkit_flutter` | pub.dev |
+
+For the latest version numbers see [Release Notes](/airkit/release-notes).
+
+## Platform Support
+
+| Platform | Web SDK | Flutter SDK |
+|----------|:-------:|:-----------:|
+| Web (Browser) | ✓ | — |
+| iOS (native) | — | ✓ |
+| Android (native) | — | ✓ |
+| React Native | Partial — WebView only | — |
+| Electron | ✓ | — |
+
+## Browser Support (Web SDK)
+
+| Browser | Minimum Version | Notes |
+|---------|:--------------:|-------|
+| Chrome / Chromium | 126+ | Full support (passkey required) |
+| Firefox | 97+ | Full support (passkey required) |
+| Safari | 16+ | Full support (passkey required) |
+| Edge | 126+ | Full support (Chromium-based) |
+| Opera | 112+ | Full support (Chromium-based) |
+| Samsung Internet | 14+ | Full support |
+| IE 11 | ✗ | Not supported |
+
+## Framework Compatibility (Web SDK)
+
+| Framework | Status | Notes |
+|-----------|:------:|-------|
+| React 17+ | ✓ | Full support |
+| React 16 | ✓ | Full support |
+| Next.js 13+ (App Router) | ✓ | Add `'use client'` directive to the initializing component |
+| Next.js 12 (Pages Router) | ✓ | Full support |
+| Vue 3 | ✓ | Full support |
+| Vue 2 | ✓ | Full support |
+| Nuxt 3 | ✓ | Full support |
+| SvelteKit | ✓ | Full support |
+| Angular 14+ | ✓ | Full support |
+| Vanilla JS | ✓ | UMD / ESM builds available |
+
+## Feature Matrix by SDK
+
+| Feature | Web SDK | Flutter SDK |
+|---------|:-------:|:-----------:|
+| **Account Services** | | |
+| Email / social login | ✓ | ✓ |
+| Smart account creation | ✓ | ✓ |
+| Wallet provider (EIP-1193) | ✓ | — |
+| Wagmi connector | ✓ | — |
+| Gas sponsorship (Paymaster) | ✓ | ✓ |
+| Session keys | Beta | — |
+| Built-in Swap UI | ✓ | — |
+| Built-in On-Ramp UI | ✓ | — |
+| **Credential Services** | | |
+| Issue credentials (user-initiated) | ✓ | Coming Soon |
+| Verify credentials | ✓ | Coming Soon |
+| Schema management | ✓ | Coming Soon |
+| Plug & Play issuer template | ✓ | — |
+| Plug & Play verifier template | ✓ | — |
+| **Server-Side (any language)** | | |
+| Issue on Behalf API | ✓ | ✓ |
+| **Configuration** | | |
+| Theming / custom CSS | ✓ | ✓ |
+| Multi-language / i18n | ✓ | ✓ |
+| Login method config | ✓ | ✓ |
+| Sandbox / Testnet mode | ✓ | ✓ |
+
+<Warning>
+  Credential Services (issue, verify) are not yet available in the Flutter SDK. For credential-heavy mobile flows, embed the Web SDK in a WebView, or contact the team about the Flutter credential support timeline.
+</Warning>
+
+## Module Formats (Web SDK)
+
+| Format | Import | Best For |
+|--------|--------|----------|
+| ESM | `import { AirService } from '@mocanetwork/airkit'` | Vite, Webpack 5, modern bundlers |
+| CommonJS | `const { AirService } = require('@mocanetwork/airkit')` | Node.js, older bundlers |
+| UMD | `<script>` CDN tag | No-bundler / script-tag setups |
+
+## Issue on Behalf — Server Language Support
+
+The Issue on Behalf API is HTTP + JWT — any backend language works. Common JWT libraries:
+
+| Language | Library |
+|----------|---------|
+| Node.js | `jsonwebtoken` |
+| Java | `com.auth0:java-jwt` |
+| C# | `System.IdentityModel.Tokens.Jwt` |
+| Go | `github.com/golang-jwt/jwt/v5` |
+| Python | `PyJWT` |
+| Ruby | `ruby-jwt` |
+| PHP | `firebase/php-jwt` |
+
+See full signing examples for Node.js, Java, C#, and Go in [Partner Authentication](/airkit/usage/partner-authentication).

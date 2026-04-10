@@ -1,0 +1,96 @@
+---
+title: "Theming Configurations"
+description: "You can customize the visual appearance of AIR Kit interfaces by providing a custom CSS files that overrides the default styling."
+---
+
+### Customizable Elements
+
+| Element Category      | CSS Variables                                                                             | Description                                          |
+| --------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| **Text Colors**       | `--air-text-primary-color` `--air-text-secondary-color` `--air-text-placeholder-color`    | Primary text, secondary text, input placeholders     |
+| **Button Colors**     | `--air-button-primary-color` `--air-button-secondary-color` `--air-button-outlined-color` | Primary buttons, secondary buttons, outlined buttons |
+| **Background Colors** | `--air-background-color` `--air-surface-color` `--air-container-primary-color`            | Main background, surface areas, containers           |
+| **Border Colors**     | `--air-border-color` `--air-border-focus-color`                                           | Default borders, focused input borders               |
+| **Status Colors**     | `--air-status-success-color` `--air-status-error-color` `--air-status-pending-color`      | Success, error, pending states                       |
+| **Icon Colors**       | `--air-icon-primary-color` `--air-icon-secondary-color` `--air-icon-hover-color`          | Primary icons, secondary icons, hover states         |
+| **Logo**              | `--air-logo`                                                                              | Custom logo URL                                      |
+| **Font Family**       | `--air-font-family`                                                                       | Custom font family (requires font import)            |
+
+### Example Partner Theme:
+
+Our own Mocaverse theme for mocaverse.xyz
+
+```css
+:root {
+  --mocaverse-air-logo: url(https://static.air3.com/assets/mocaverse.svg);
+
+  --mocaverse-air-text-primary-color: #ffffff;
+  --mocaverse-air-text-secondary-color: #b0b0b0;
+  --mocaverse-air-text-placeholder-color: #767676;
+  --mocaverse-air-text-disabled-color: #ffffff40;
+  --mocaverse-air-text-inverse-color: #000000;
+  --mocaverse-air-text-on-color: #ffffff;
+
+  --mocaverse-air-button-primary-color: #ff49a0;
+  --mocaverse-air-button-primary-hover-color: #000000;
+  --mocaverse-air-button-secondary-color: #2450ee;
+  --mocaverse-air-button-secondary-hover-color: #ffffff;
+  --mocaverse-air-button-disabled-color: #3a3a3a;
+  --mocaverse-air-button-outlined-color: #ffffff;
+  --mocaverse-air-button-outlined-hover-color: #ffffff14;
+  --mocaverse-air-button-outlined-secondary-color: #4e4150;
+  --mocaverse-air-button-outlined-secondary-hover-color: #ffffff14;
+
+  --mocaverse-air-border-color: #ffffff40;
+  --mocaverse-air-border-focus-color: #ffffff;
+
+  --mocaverse-air-link-color: #3c8cff;
+  --mocaverse-air-text-button-color: #ef6aba;
+
+  --mocaverse-air-icon-primary-color: #ffffff;
+  --mocaverse-air-icon-secondary-color: #b0b0b0;
+  --mocaverse-air-icon-hover-color: #000000;
+  --mocaverse-air-icon-disabled-color: #00000040;
+
+  --mocaverse-air-status-success-color: #74ffcd;
+  --mocaverse-air-status-error-color: #ff49a0;
+  --mocaverse-air-status-pending-color: #f99247;
+
+  --mocaverse-air-surface-color: #110a17;
+  --mocaverse-air-surface-dim-color: #343a3b;
+
+  --mocaverse-air-overlay-color: #00000080;
+
+  --mocaverse-air-container-primary-color: #1d1d1d;
+  --mocaverse-air-container-secondary-color: #2f2f2f;
+
+  --mocaverse-air-decorative-color: #ef6aba;
+  --mocaverse-air-secondary-5-color: #ffffff;
+
+  --mocaverse-air-background-color: linear-gradient(90deg, #202734 0.5%, #3c253c 100.5%);
+}
+```
+
+### Testing Your Theme
+
+The best way to test your custom theme is to use browser developer tools to manipulate CSS custom properties in real-time:
+
+1. **Open Developer Tools**: Press F12 or right-click → Inspect
+2. **Navigate to Elements Tab**: Find the `<html>` element
+3. **Access CSS Variables**: In the Styles panel, look for `:root` or `html[theme='your-theme']`
+4. **Modify Properties**: Click on any CSS custom property value to edit it
+5. **See Changes Instantly**: Changes apply immediately without page refresh
+
+This allows you to:
+
+- Test different color combinations quickly
+- Verify contrast ratios
+- Ensure your theme works across all screens
+- Fine-tune values before finalizing your CSS file
+
+### Best Practices
+
+- **Accessibility**: Ensure sufficient contrast ratios for text and backgrounds. Adjust our AIR logo via config value if necessary
+- **Dark/Light Mode**: Consider both light and dark theme variations
+- **Font Testing**: Test custom fonts across different devices and browsers
+- **Real-time Testing**: Use browser dev tools to iterate quickly on your theme

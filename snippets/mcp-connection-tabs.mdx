@@ -1,0 +1,115 @@
+<Tabs>
+  <Tab title="Claude">
+    <Steps>
+      <Step title="Get your MCP server URL">
+        Your MCP server URL is: `https://docs.moca.network/mcp`
+      </Step>
+
+      <Step title="Add the Moca Network MCP server to Claude">
+        1. Navigate to the [Connectors](https://claude.ai/settings/connectors) page in the Claude settings.
+        2. Select **Add custom connector**.
+        3. Add the Moca Network MCP server:
+           - Name: `MocaNetwork`
+           - URL: `https://docs.moca.network/mcp`
+        4. Select **Add**.
+      </Step>
+
+      <Step title="Access the MCP server in your chat">
+        1. When using Claude, select the attachments button (the plus icon).
+        2. Select the MocaNetwork MCP server.
+        3. Ask Claude a question about Moca Network or AIR Kit.
+      </Step>
+    </Steps>
+
+    See the [Model Context Protocol documentation](https://modelcontextprotocol.io/docs/tutorials/use-remote-mcp-server#connecting-to-a-remote-mcp-server) for more details.
+  </Tab>
+
+  <Tab title="Claude Code">
+    <Steps>
+      <Step title="Get your MCP server URL">
+        Your MCP server URL is: `https://docs.moca.network/mcp`
+      </Step>
+
+      <Step title="Add the MCP server to Claude Code">
+        Run the following command:
+
+        ```bash
+        claude mcp add --transport http MocaNetwork https://docs.moca.network/mcp
+        ```
+      </Step>
+
+      <Step title="Test the connection">
+        Verify the connection by running:
+
+        ```bash
+        claude mcp list
+        ```
+      </Step>
+    </Steps>
+
+    See the [Claude Code documentation](https://docs.anthropic.com/en/docs/claude-code/mcp#installing-mcp-servers) for more details.
+  </Tab>
+
+  <Tab title="Cursor">
+    <Steps>
+      <Step title="Get your MCP server URL">
+        Your MCP server URL is: `https://docs.moca.network/mcp`
+      </Step>
+
+      <Step title="Open MCP settings">
+        1. Use <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> on Windows) to open the command palette.
+        2. Search for "Open MCP settings".
+        3. Select **Add custom MCP**. This opens the `mcp.json` file.
+      </Step>
+
+      <Step title="Configure the Moca Network MCP server">
+        In `mcp.json`, add:
+
+        ```json
+        {
+          "mcpServers": {
+            "MocaNetwork": {
+              "url": "https://docs.moca.network/mcp"
+            }
+          }
+        }
+        ```
+      </Step>
+
+      <Step title="Test the connection">
+        In Cursor's chat, ask "What tools do you have available?" Cursor should show the MocaNetwork MCP server as an available tool.
+      </Step>
+    </Steps>
+
+    See the [Cursor documentation](https://docs.cursor.com/en/context/mcp#installing-mcp-servers) for more details.
+  </Tab>
+
+  <Tab title="VS Code">
+    <Steps>
+      <Step title="Get your MCP server URL">
+        Your MCP server URL is: `https://docs.moca.network/mcp`
+      </Step>
+
+      <Step title="Create MCP configuration">
+        Create a `.vscode/mcp.json` file in your project root.
+      </Step>
+
+      <Step title="Configure the Moca Network MCP server">
+        In `.vscode/mcp.json`, add:
+
+        ```json
+        {
+          "servers": {
+            "MocaNetwork": {
+              "type": "http",
+              "url": "https://docs.moca.network/mcp"
+            }
+          }
+        }
+        ```
+      </Step>
+    </Steps>
+
+    See the [VS Code documentation](https://code.visualstudio.com/docs/copilot/chat/mcp-servers) for more details.
+  </Tab>
+</Tabs>

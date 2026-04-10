@@ -1,0 +1,157 @@
+---
+title: "AIR Kit Developer Dashboard"
+description: "AIR Kit dashboard - manage account and credentials all in one place"
+---
+
+The <a href="https://developers.sandbox.air3.com/dashboard" target="_blank" rel="noreferrer">Developer Dashboard</a> is a self-service platform for partners of the Moca Network.
+
+It provides the tools for both developers of AIR Account and AIR Credential and has the following key sections:
+
+- Account
+- Issuer
+- Verifiers
+
+It is designed to manage the entire lifecycle of AIR Kits, from account creation to issuance to verification.
+
+The dashboard is accessed via a connected EVM wallet, which serves as the primary account identifier, and allows users to access your app's settings.
+
+## Account
+
+The account section contains your partner configuration.
+
+### 1. General Settings
+
+This is where you can get a generated set of IDs that is used for your implementation. Below is an example of what your generated settings might look like, which you can easily copy from the dashboard.
+
+```json
+{
+  "partnerId": "1234-5678-9012",
+  "issuerDid": "did:moca:0xabcdef1234567890abcdef1234567890abcdef",
+  "verifierDid": "did:moca:0x9876543210fedcba9876543210fedcba987654",
+  "name": "My Awesome dApp",
+  "logoUrl": "https://your-cdn.com/logo.png",
+  "websiteUrl": "https://your-dapp.com",
+  "jwksUrl": "https://your-auth-provider.com/.well-known/jwks.json"
+}
+```
+
+| Field            | Description                                                                                                                                                                                                                                    |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Partner ID**   | Your AIR Kit partner ID, used to identify you across the AIR Kit ecosystem.                                                                                                                                                                    |
+| **Issuer DID**   | Your Issuer DID, used to let users and verifiers know who is the issuer of the credentials.                                                                                                                                                    |
+| **Verifier DID** | Your Verifier DID, used to let users and issuers know who requested usage of the credentials.                                                                                                                                                  |
+| **Name**         | Your App's name, which may be shown to users during various operations such as wallet transactions, credential issuance, or credential verification.                                                                                           |
+| **Logo URL**     | Your App's logo, which may be shown to users during various operations such as wallet transactions, credential issuance, or credential verification.                                                                                           |
+| **Website URL**  | Your App's website, which may be shown to users if they want to learn more about your application.                                                                                                                                             |
+| **JWKS URL**     | Required for Credential Services, or if you utilize the [bring your own auth](/airkit/usage/user-authentication#custom-auth-bring-your-own-auth) feature. See [Authentication (Partner JWT)](/airkit/usage/partner-authentication) for details |
+
+### 2. Allowed Domains
+
+As a security setting, we require partners to set the app domains that are allowed to load AIR Kit. Wildcards are supported (e.g. \*.myapp.example.com)
+
+You can add up to 3 domains or subdomains as you need. But do note that some domains may be blocked for security purposes and if you require these domains to be supported please reach out to our team to further discuss your requirements.
+
+<Info>
+`localhost` is whitelisted for following ports: `3000`, `5173` and `8200`. We do not support adding `localhost` to the allowed domains list.
+In addition, our production environment requires all domains to use HTTPS.
+</Info>
+
+## Issuer
+
+The Issuer section is designed for any entity that needs to create and distribute verifiable credentials. Its functionalities are organized into three main areas: Schemas, Credentials, and a monitoring Dashboard.
+
+### 1. Schema Builder
+
+This is the starting point for creating any new credential. A Schema acts as a blueprint, defining the structure, data type, and rules for a specific type of credential.
+
+- **Create Schemas**: Issuers can build custom schemas by defining a title, version, and description.
+- **Define Attributes**: Within each schema, issuers add specific data fields (attributes). For each attribute, they define a name, data type (e.g., string, number, boolean), a descriptive title, and can mark it as required.
+- **Publish and Store**: Once defined, schemas are published and stored on either a centralized server (OSS) or decentralized storage (dStorage) on Moca Chain to be used for issuing credentials.
+
+Here is an example of a simple schema for a "DAO Membership" credential:
+
+```json
+{
+  "title": "DAO Membership",
+  "version": "1.0",
+  "description": "Verifies that the holder is a member of a specific DAO.",
+  "attributes": [
+    {
+      "name": "daoName",
+      "type": "string",
+      "title": "DAO Name",
+      "required": true
+    },
+    {
+      "name": "memberSince",
+      "type": "date",
+      "title": "Member Since",
+      "required": true
+    },
+    {
+      "name": "votingPower",
+      "type": "number",
+      "title": "Voting Power",
+      "required": false
+    }
+  ]
+}
+```
+
+### 2. Issuance Program
+
+Once a schema is in place, issuers can create and configure the actual credentials that will be distributed to users.
+
+- **Select a Schema**: The process begins by selecting the appropriate schema, which loads its predefined attributes.
+- **Set Issuance Rules**: Issuers can configure key parameters for the credential, such as:
+  - **Accessible Until**: An optional date range during which the credential is valid.
+  - **Maximum Issuance**: An optional cap on the total number of credentials that can be claimed.
+  - **Expiration Duration**: The lifespan of the credential after it has been issued to a user (e.g., 90 days, 1 year, permanent).
+- **Issue Credential**: After confirming the details, the credential is issued and becomes available for users to claim.
+
+### 3. Issuer Dashboard Monitoring
+
+This section provides a high-level overview and detailed logs of all issuance activity.
+
+- **Key Metrics**: View statistics like the Total Issued Number (the total number of credentials claimed by users) and the Total Credential Number (the number of different credential types created).
+- **Claim Records**: See a detailed list of every credential that has been claimed by a user, including the Holder ID, Credential ID, and the Claimed Time. Issuers can also revoke a claimed credential directly from this interface.
+
+## Verifier
+
+The Verifier section is for any application or service that needs to confirm the validity of a user's AIR Credential. It is centered around creating Verification Programs and monitoring their usage.
+
+### 1. Verification Program Management
+
+A Verification Program is a set of rules created by a verifier to check a user's credential for specific attributes.
+
+- **Create Programs**: Verifiers build programs by defining a name and selecting the credential schema they intend to verify.
+- **Define Verification Logic**: The core of the program is its logic. Verifiers add specific Operators (e.g., "equals," "greater than," "is a member of") and Attribute Values to create precise verification conditions. For example, a program could verify if a "Country" attribute equals "USA" or if an "Age" attribute is greater than "18".
+- **Data Recovery Options**: Programs can be configured to allow verifiers to request access to the underlying data from the user, subject to their explicit consent.
+
+Here is an example of verification logic to check if a user is a member of "Moca DAO":
+
+```json
+{
+  "programName": "Moca DAO Member Check",
+  "credentialSchema": "DAO Membership",
+  "logic": [
+    {
+      "attribute": "daoName",
+      "operator": "equals",
+      "value": "Moca DAO"
+    }
+  ],
+  "dataRecovery": false
+}
+```
+
+### 2. Verifier Dashboard Monitoring
+
+This dashboard provides a comprehensive record of all verification activities.
+
+- **Key Metrics**: View the Total Verified Number of credentials and other relevant statistics.
+- **Verification Records**: Access a detailed log of all verification attempts, including the Holder ID, the Program Name used, the Verified Time, and the Current Status (e.g., Passed, Verification Failed).
+
+### 3. Settings and Fee Wallet
+
+Both Issuers and Verifiers have access to a settings panel to manage their operations. For Verifiers, this includes a Fee Wallet system. Because issuance and verifications can incur on-chain gas fees, the dashboard provides a dedicated wallet that verifiers can pre-fund with $MOCA. The system automatically deducts fees from this balance for verification transactions, and the dashboard provides a detailed history of all deposits and charges.

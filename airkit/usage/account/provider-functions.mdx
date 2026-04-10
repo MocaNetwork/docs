@@ -1,0 +1,145 @@
+---
+title: "Wallet Functions"
+description: "AIR Kit provides comprehensive wallet functionality that allows you to interact with blockchain networks, manage smart accounts, and perform transactions. The wallet system is built on top of EIP-1193 standards and supports multiple blockchain networks."
+---
+
+## Wallet Preloading
+
+### preloadWallet()
+
+Preloads the wallet service to improve performance by initializing the wallet infrastructure before it's needed.
+
+**Method Signature:**
+
+```tsx
+public async preloadWallet(): Promise<void>
+```
+
+**Usage:**
+
+```tsx
+try {
+  await airService.preloadWallet();
+  console.log("Wallet preloaded successfully");
+} catch (error) {
+  console.error("Failed to preload wallet:", error);
+}
+```
+
+**Important notes:**
+
+- The wallet can be preloaded even before the user is logged in
+- Improves response time for subsequent wallet operations
+- Even if preloading hasn't finished, using the provider or any other wallet operation will ensure that the wallet is done initializing before executing the actual call
+
+**Requirements:**
+
+- Service must be initialized
+
+## EIP-1193 Wallet Provider
+
+### getProvider()
+
+Returns an EIP-1193 compatible provider that works seamlessly with popular Web3 libraries such as [web3](https://github.com/web3/web3.js), [ethers](https://github.com/ethers-io/ethers.js), and [Viem](https://viem.sh/).
+
+**Method Signature:**
+
+```tsx
+getProvider(): EIP1193Provider
+```
+
+**Returns:**
+An EIP-1193 compatible provider object with the following interface:
+
+```tsx
+interface EIP1193Provider {
+  request(request: AirProviderParameters): Promise<unknown>;
+  on<EventName extends keyof EIP1193EventMap>(
+    event: EventName,
+    listener: EIP1193EventMap[EventName]
+  ): void;
+  removeListener<EventName extends keyof EIP1193EventMap>(
+    event: EventName,
+    listener: EIP1193EventMap[EventName]
+  ): void;
+}
+```
+
+**Supported Events:**
+
+```tsx
+type EIP1193EventMap = {
+  accountsChanged(accounts: string[]): void;
+  chainChanged(chainId: string): void;
+  connect(connectInfo: ProviderConnectInfo): void;
+  disconnect(error: ProviderRpcError): void;
+  message(message: ProviderMessage): void;
+};
+```
+
+**Requirements:**
+
+- User must be logged in
+
+## Standard RPC Methods
+
+The provider also supports all standard EIP-1193 methods:
+
+```tsx
+// Get accounts
+const accounts = await provider.request({ method: "eth_accounts" });
+
+// Request accounts
+const accounts = await provider.request({ method: "eth_requestAccounts" });
+
+// Get chain ID
+const chainId = await provider.request({ method: "eth_chainId" });
+
+// Send transaction
+const txHash = await provider.request({
+  method: "eth_sendTransaction",
+  params: [transactionParams]
+});
+
+// Sign message
+const signature = await provider.request({
+  method: "personal_sign",
+  params: [message, address]
+});
+
+// Switch chain
+await provider.request({
+  method: "wallet_switchEthereumChain",
+  params: [{ chainId: "0x2105" }] // Base mainnet
+});
+
+// And more standard RPC calls
+```
+
+## Wallet Events
+
+The EIP-1193 provider supports standard wallet events:
+
+```tsx
+const provider = airService.getProvider();
+
+// Listen for account changes
+provider.on("accountsChanged", (accounts) => {
+  console.log("Accounts changed:", accounts);
+});
+
+// Listen for chain changes
+provider.on("chainChanged", (chainId) => {
+  console.log("Chain changed to:", chainId);
+});
+
+// Listen for connection events
+provider.on("connect", (connectInfo) => {
+  console.log("Wallet connected:", connectInfo);
+});
+
+// Listen for disconnects
+provider.on("disconnect", (error) => {
+  console.log("Wallet disconnected:", error);
+});
+```

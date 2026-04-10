@@ -1,0 +1,70 @@
+---
+title: "Gaming & Entertainment"
+description: "Make player achievements, ranks, and identities portable across games. Issue credentials at milestone events — players carry them into tournaments, partner games, and airdrops."
+icon: "gamepad"
+---
+
+## The Problem
+
+In gaming, players rebuild their reputation from zero every time they switch titles. A Diamond-ranked player in your game is nobody in the next one. Achievements don't transfer. Identities don't travel. Bot accounts create fake engagement metrics that poison every distribution event you run.
+
+## What Changes With AIR Kit
+
+- **Player achievements become portable** — A rank, badge, or title earned in your game is a verifiable credential the player carries to partner games, tournaments, and community platforms
+- **Cross-game identity without account linking** — Players authenticate with their AIR Account in any game in the ecosystem. Same identity, no re-registration
+- **Bot-resistant distribution** — Gate airdrops, whitelist spots, and in-game rewards to players who provably hold specific credentials — verified human, minimum playtime, achieved rank
+- **Guild and DAO membership proofs** — Issue guild credentials that gate Discord roles, governance votes, and cross-game benefits without a separate verification tool
+
+## How It Works
+
+<Steps>
+  <Step title="In-game event fires">
+    A player reaches Diamond rank. Completes a raid. Achieves 100 hours of playtime. Your game server triggers the same event it always has.
+  </Step>
+  <Step title="Achievement credential issues automatically">
+    Your backend calls AIR Kit with the achievement details. The credential lands in the player's AIR Account in the background. No wallet prompt, no UX interruption.
+  </Step>
+  <Step title="Player carries the credential anywhere">
+    In tournament registration, partner game login, or airdrop claims — the player presents their credential. One tap. Verified instantly.
+  </Step>
+  <Step title="Partners verify with one call">
+    Any partner game or platform calls one SDK method. They receive COMPLIANT or NON_COMPLIANT — plus the achievement tier. No account linking required.
+  </Step>
+</Steps>
+
+## What Your Players Experience
+
+Nothing changes at the moment of earning. The credential issues silently. Players see a notification: "You earned a Diamond Rank credential." When they arrive at a partner tournament or airdrop, they tap once to present it. No new account, no form, no ID.
+
+## What Compliance Will Ask
+
+**What data does the credential contain?**
+Only game-specific identifiers and achievement facts: game ID, achievement name, tier, timestamp. No personal data, no real-world identity.
+
+**Can players transfer or sell credentials?**
+Credentials are tied to the user's AIR Account. They are not transferable — which is precisely what makes them useful for anti-cheat and anti-bot purposes.
+
+**Do we need to change our terms of service?**
+You are issuing your own achievement data in a portable format. No new data processing category is introduced. Review with your legal team for your jurisdiction, but in most cases this falls within existing gameplay data handling.
+
+## Integration at a Glance
+
+| | |
+|---|---|
+| **What your team builds** | One API call in your rank-up / achievement event handler |
+| **Engineering effort** | 1 backend engineer |
+| **Timeline to live** | 2–3 weeks |
+| **Frontend changes** | None required for issuance |
+| **Partner integration** | 3 lines of SDK to verify |
+
+<CardGroup cols={2}>
+  <Card title="Developer integration guide" icon="code" href="/airkit/guides/air-for-gaming">
+    Achievement schemas, tournament gate code, and airdrop filtering.
+  </Card>
+  <Card title="Compliance FAQ" icon="shield-check" href="/solutions/compliance-faq">
+    Data handling and GDPR answers.
+  </Card>
+  <Card title="Partner Economics" icon="coins" href="/solutions/partner-economics">
+    Revenue model, fee structure, and rewards.
+  </Card>
+</CardGroup>

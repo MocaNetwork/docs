@@ -1,0 +1,26 @@
+---
+title: "Moca Chain Architecture Overview"
+description: "Moca Chain Architecture Overview, EVMos, cometBFT"
+---
+
+# How Moca Chain Works
+
+Moca Chain is built on the **CometBFT (Cosmos)** framework with Ethereum Virtual Machine **(EVM) compatibility** based on EVMOS and integrates with its own decentralized data storage network based on BNB Greenfield.
+
+## Key Components
+
+Moca Chain's architecture primarily comprises two interconnected components:
+
+1. **EVM-Compatible Blockchain**
+2. **Moca Chain Storage Providers (MCSP)**
+
+These elements work synergistically alongside the account & credential services powered by AIR Kit to provide secure, scalable data management and identity verification.
+
+## Integration and Operations
+
+Moca Chain's components integrate to form a cohesive system:
+
+- **Consensus and Security:** Validators use PoS to secure the network, challenge data integrity, and govern parameters.
+- **Token Economics:** [$MOCA](/learn/moca-coin) enables governance, staking, fees (verification, gas, storage), and incentives for honest behavior.
+- **Cross-Chain Programmability:** EVM support allows smart contracts to interact across chains.
+- **Data Flow:** Users store data via MCSPs, which sync metadata with the chain. Challenges ensure integrity, and ZKPs maintain privacy.

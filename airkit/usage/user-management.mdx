@@ -1,0 +1,97 @@
+---
+title: "User Management"
+description: "AIR Kit provides user management capabilities that allow you to retrieve user information, manage multi-factor authentication (MFA), and handle smart account operations."
+---
+
+## User Information
+
+### getUserInfo()
+
+Retrieves detailed information about the currently logged-in user.
+
+**Method Signature:**
+
+```ts
+public async getUserInfo(): Promise<AirUserDetails>
+```
+
+**Returns:**
+
+```ts
+{
+  partnerId?: string;
+  partnerUserId?: string;
+  airId?: AirIdDetails;
+  user: {
+    id: string;
+    abstractAccountAddress?: string;
+    email?: string;
+    isMFASetup: boolean;
+  };
+}
+```
+
+**Requirements:**
+
+- User must be logged in
+
+**Example:**
+
+```ts
+try {
+  const userInfo = await airService.getUserInfo();
+} catch (error) {
+  console.error("Failed to get user info:", error);
+  // Handle error appropriately
+}
+```
+
+## Multi-Factor Authentication (MFA)
+
+### setupOrUpdateMfa()
+
+Sets up or updates multi-factor authentication for the user's account. This method guides the user through the MFA setup process using passkeys.
+
+**Method Signature:**
+
+```ts
+public async setupOrUpdateMfa(): Promise<void>
+```
+
+**What happens during MFA setup:**
+
+1. The method ensures the wallet is initialized
+2. Opens the MFA setup flow and guides the user through passkey creation/verification
+3. Updates the user's MFA status in the system, including `loginResult` to reflect the new MFA status
+
+**Requirements:**
+
+- User must be logged in
+
+**Important Notes:**
+
+- **MFA is generally required**: If your dApp doesn't trigger `setupOrUpdateMfa()` after login and the user hasn't set up MFA, it will be triggered automatically with any wallet related request, requiring the user to complete setup before the request can be processed
+- **Currently only passkey is supported** as the MFA method
+- **Only MFA setup is currently implemented, not updates**: It's recommended to check if the user has already set up MFA before calling this method to avoid unnecessary prompts
+- **Abstract Account Address availability**: The abstract account address will only be returned in user info and token if MFA is set up
+
+### MFA Setup Integration
+
+Since MFA is generally required, you can either:
+
+**Option 1: Proactive Setup (Recommended)**
+
+```ts
+try {
+  const userInfo = await airService.getUserInfo();
+  if (!userInfo.user.isMFASetup) {
+    await airService.setupOrUpdateMfa();
+    // Abstract account address will now be available
+  }
+} catch (error) {
+  // Handle error appropriately
+}
+```
+
+**Option 2: Let AIR Kit Handle Automatically**
+Simply proceed with wallet operations - MFA will be prompted automatically if required.

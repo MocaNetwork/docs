@@ -1,0 +1,187 @@
+---
+title: "Quickstart: Credential Issuance Template"
+description: "This guide provides the steps necessary to get the AIR Credential Issuer running, configured, and ready to issue credentials."
+---
+
+This guide provides the steps necessary to get the AIR Credential Issuer running, configured, and ready to issue credentials.
+
+> **🌟 Support the Project**
+>
+> If you find this template useful, please consider starring the repository on GitHub!
+>
+> [![Star on GitHub](https://img.shields.io/github/stars/MocaNetwork/air-credential-issuance-template?style=social)](https://github.com/MocaNetwork/air-credential-issuance-template)
+
+## 1\. Local Setup & Prerequisites
+
+Before you begin, ensure your local environment is configured and you have the necessary accounts ready.
+
+### 1.1 Prerequisites Checklist
+
+| Item                            | Requirement                                                                                                                                                               | Source                                                                                                 |
+| :------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------- |
+| **Node.js**                     | v18 or later                                                                                                                                                              | Development Environment                                                                                |
+| **Package Manager**             | `pnpm` (recommended) or `npm`                                                                                                                                             | Development Environment                                                                                |
+| **Partner ID & Issuer DID**     | Obtain Credentials. Understand more on Partner ID [here](/airkit/airkit-dashboard#_1-general-settings)                                                                    | [Sandbox Developer Dashboard](https://developers.sandbox.air3.com/dashboard)                           |
+| **Issuance Program ID**         | Create Program & Schema. Refer to [this](/airkit/quickstart/issue-credentials#step-4-create-schema-for-credential-issuance) guide to create Schema and issuance programID | [Sandbox Dashboard (Issuer Section)](https://developers.sandbox.air3.com/dashboard/issuer/credentials) |
+| **Reown Project ID** (Optional) | Required for `wallet` authentication                                                                                                                                      | [Reown](https://reown.com)                                                                             |
+
+### 1.2 Local Development
+
+1.  **Clone the Repository**
+
+    ```bash
+    git clone https://github.com/MocaNetwork/air-credential-issuance-template.git
+    cd air-credential-issuance-template
+    ```
+
+2.  **Install Dependencies**
+
+    ```bash
+    pnpm install
+    # or npm install
+    ```
+
+3.  **Configure Environment Variables**
+    Copy the example file and start populating your credentials.
+
+    ```bash
+    cp .env.example .env.local
+    ```
+
+4.  **Start the Development Server**
+
+    ```bash
+    pnpm dev
+    # or npm run dev
+    ```
+
+    Your issuer app is now running at [http://localhost:3000](http://localhost:3000).
+
+## 2\. Partner Configuration
+
+This section details the critical steps for connecting your application to the AIR Kit services.
+
+### 2.1 Set Issuance Details
+
+1.  Log into the [Sandbox Developer Dashboard](https://developers.sandbox.air3.com/dashboard).
+2.  Retrieve your **Partner ID** and **Issuer DID** from **Account -\> General Settings**.
+3.  Create an **Issuance Program** and **Schema** in the **Issuer** section.
+4.  Update the following variables in your `.env.local`:
+    - `NEXT_PUBLIC_PARTNER_ID`
+    - `NEXT_PUBLIC_ISSUER_DID`
+    - `NEXT_PUBLIC_ISSUE_PROGRAM_ID`
+
+### 2.2 Select Authentication Method
+
+Set the method the application will use to identify the user before issuance:
+
+| Method Option | Set `NEXT_PUBLIC_AUTH_METHOD` | Details                                                                                                      |
+| :------------ | :---------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| **Wallet**    | `wallet`                      | Uses Web3 Wallet Connect (requires `NEXT_PUBLIC_REOWN_PROJECT_ID`).                                          |
+| **AIR Kit**   | `airkit`                      | Uses the native AIR Kit User ID system.                                                                      |
+| **Custom**    | _Leave blank/Configure_       | Use your existing internal user sessions (JWTs/Cookies). [See details here](#bringing-your-own-user-session) |
+
+### 2.3 Set up Partner Signing Key
+
+A private key is required to sign the Partner JWT used for user sessions and issuance.
+
+1.  **Generate an ES256 Private Key**:
+
+    ```bash
+    openssl ecparam -name prime256v1 -genkey -noout | openssl pkcs8 -topk8 -nocrypt | tr -d '\n'
+    ```
+
+2.  Copy the generated key (the content between `BEGIN` and `END` lines) and set it securely as a server-side variable.
+
+    ```bash
+    # .env.local (Server-side)
+    PARTNER_PRIVATE_KEY="MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg..."
+    ```
+
+    > **⚠️ Security Note**: This key must be kept secret and never committed to source control.
+
+---
+
+## 3\. Data Integration & Issuance Logic
+
+You must customize the endpoint that retrieves user data to populate the credential claims.
+
+### 3.1 Retrieve User Data
+
+1.  Open the data fetching endpoint file:
+    ```
+    app/(home)/api/user/user-data/route.ts
+    ```
+2.  Replace the mock logic with real data retrieval, typically a **secure backend-to-backend API call** using the authenticated `userId`.
+
+### 3.2 Map Data to Schema
+
+Ensure the data fetched in the previous step is transformed to exactly match the attribute structure defined in your **Credential Schema**. This data is what will be signed and embedded in the issued credential.
+
+## 4\. Deployment & Finalization
+
+The final step is deploying the application and registering its public key endpoint with the AIR Partner Dashboard.
+
+### 4.1 Production Build and Deployment
+
+1.  **Build**:
+    ```bash
+    pnpm build
+    # or npm run build
+    ```
+2.  Deploy the output to your chosen hosting service (e.g., Vercel, Netlify).
+
+### 4.2 Set JWKS URL (Critical Step)
+
+The **JWKS URL** allows AIR Kit to verify the JWTs signed by your deployed application.
+
+1.  Once deployed, your application automatically hosts the public key at:
+    ```
+    <your-host-url>/jwks.json
+    ```
+2.  Navigate to the **Sandbox Developer Dashboard** (**Account -\> General Settings**) and configure this full URL as your **JWKS URL** setting.
+
+### 4.3 Whitelist Your Domain
+
+To ensure communication with AIR Kit services is secure and allowed:
+
+1.  Go to the **Sandbox Developer Dashboard** (**Account \> Domains**).
+2.  Add your deployed application URL (e.g., `https://my-issuer-app.com`) to the allowed domains list.
+
+### 4.4 Bringing your own user session
+
+To use your internal User ID and User session within this app, you'll need the user to log into your app before starting the issuance process on this app.
+
+This app reads cookies from air.issuer-template.session, expecting the following format (`{"state":{"accessToken":null},"version":0}`), where the accessToken is a signed JWT verifiable by your public key.
+
+<Note>Under the hood, the template uses a lightweight state management library called [zustand](https://www.npmjs.com/package/zustand).</Note>
+
+Once the session is validated, you would use the contents of the payload (e.g., user Id) to retrieve specific user data info from your application.
+
+## 5\. Configuration Reference
+
+### Client-side Environment Variables
+
+| Variable                       | Description                        | Example Value                |
+| :----------------------------- | :--------------------------------- | :--------------------------- |
+| `NEXT_PUBLIC_PARTNER_ID`       | Your Partner ID.                   | `partner_abc123`             |
+| `NEXT_PUBLIC_ISSUER_DID`       | Your Decentralized Identifier.     | `did:air:issuer_xyz`         |
+| `NEXT_PUBLIC_ISSUE_PROGRAM_ID` | The ID of your Issuance Program.   | `prog_987`                   |
+| `NEXT_PUBLIC_AUTH_METHOD`      | Authentication method for the app. | `wallet` or `airkit`         |
+| `NEXT_PUBLIC_REOWN_PROJECT_ID` | Reown ID (if using `wallet` auth). | `proj_reown_def`             |
+| `NEXT_PUBLIC_BUILD_ENV`        | Build environment.                 | `sandbox` or `production`    |
+| `NEXT_PUBLIC_THEME`            | Application color theme.           | `light`, `dark`, or `system` |
+
+### Server-side Environment Variables
+
+| Variable              | Description                                    |
+| :-------------------- | :--------------------------------------------- |
+| `PARTNER_PRIVATE_KEY` | **Your private key** (must be kept secret).    |
+| `SIGNING_ALGORITHM`   | Algorithm for signing the JWT (e.g., `ES256`). |
+
+---
+
+The **Credential Issuer Template** handles all the user flow and cryptographic signing necessary to issue a Verifiable Credential.
+Once configured, the issued credential is ready to be presented to any application using the [Verifier Template](/airkit/templates/plug-and-play-verifier).
+
+Now that you have setup the issuance and verification, you can now customize the theming of the issuance and verification screens. Refer to the [customization section](/airkit/usage/config-theming) for more details

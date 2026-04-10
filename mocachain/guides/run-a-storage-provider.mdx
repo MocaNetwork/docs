@@ -1,0 +1,1065 @@
+---
+title: "How to run a storage provider for Moca Chain"
+description: "How to run a storage provider for Moca Chain."
+---
+
+# Running a Storage Provider (MCSP)
+
+<Warning>⚠️ This section may change without prior notice</Warning>
+Critical information in this section may be subject to change as the network is in early stages.
+
+<Info>
+🔓 The Moca Storage Provider source code is publicly available on GitHub.
+</Info>
+
+## Storage Provider Information
+
+### Recommended System Requirements
+
+| **Component** | **Recommended Specification**                                                  | **Minimum Specification**                                                  |
+| ------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| Hardware      | VPS running recent versions of **macOS**, **Linux**, or **Windows**            | VPS running recent versions of **macOS**, **Linux**, or **Windows**        |
+| CPU           | **16 cores**                                                                   | **8 cores**                                                                |
+| Memory (RAM)  | **64 GB**                                                                      | **32 GB**                                                                  |
+| Storage       | At least **4** **TB** disk space for backend storage + **50 GB+ SQL database** | At least 2 **TB** disk space for backend storage + **50 GB+ SQL database** |
+| Bandwidth     | **10 MB/s+** upload/download speed                                             | **10 MB/s+** upload/download speed                                         |
+
+## Setting Up Moca Chain Data Storage Provider
+
+### MCSP Compiling and Dependencies
+
+#### Compile MCSP
+
+**Compilation dependencies:**
+
+- **Golang:** MCSP is written in Golang, and you need to install version 1.20+.
+- **Buf:** A new way of working with Protocol Buffers. MCSP uses Buf to manage proto files.
+- **protoc-gen-gocosmos:** Protocol Buffers for Go with Gadgets. MCSP uses this protobuf compiler to generate `pb.go` files.
+- **mockgen:** A mocking framework for the Go programming language that is used in unit tests.
+- **jq:** A command-line JSON processor. Users should install `jq` according to their operating system.
+
+```bash
+# clone source code
+git clone https://github.com/mocachain/moca-storage-provider.git
+cd moca-storage-provider/
+
+# install dependent tools: buf, protoc-gen-gocosmos and mockgen
+make install-tools
+
+# compile sp
+make build
+
+# move to build directory
+cd build
+
+# execute moca-sp binary file
+./moca-sp version
+```
+
+#### Note
+
+If you've already executed the `make install-tools` command in your shell, but you failed to `make build` and encountered one of the following error messages:
+
+**Error message 1:**
+
+```
+buf: command not found
+```
+
+You can execute the following command, assuming you installed Golang in `/usr/local/go/bin`. Other OS are similar.
+
+```bash
+GO111MODULE=on GOBIN=/usr/local/go/bin go install github.com/bufbuild/buf/cmd/buf@v1.25.0
+```
+
+**Error message 2:**
+
+```
+Failure: plugin gocosmos: could not find protoc plugin for name gocosmos - please make sure protoc-gen-gocosmos is installed and present on your $PATH
+```
+
+You can execute the following command, assuming you installed Golang in `/usr/local/go/bin`. Other OS are similar.
+
+```bash
+GO111MODULE=on GOBIN=/usr/local/go/bin go install github.com/cosmos/gogoproto/protoc-gen-gocosmos@latest
+```
+
+If you want to execute a unit test of sp, you should execute the following command, assuming you installed Golang in `/usr/local/go/bin`. Other OS are similar.
+
+```bash
+GO111MODULE=on GOBIN=/usr/local/go/bin go install go.uber.org/mock/mockgen@latest
+```
+
+> The error messages above are due to users not setting the Go environment correctly. For more info, users can search for GOROOT, GOPATH, and GOBIN.
+
+### MCSP Dependencies
+
+If a user wants to start MCSP in local mode or testnet mode, you must prepare `SPDB`, `BSDB`, and `PieceStore` dependencies.
+
+#### SPDB and BSDB
+
+MCSP uses `SPDB` and `BSDB` to store some metadata such as object info, object integrity hash, etc. These two DBs now use RDBMS to complete corresponding functions.
+
+Users can now use MySQL or MariaDB to store metadata. The following lists the supported RDBMS:
+
+- MySQL
+- MariaDB
+
+> More types of databases such as PostgreSQL or NewSQL will be supported in the future.
+
+#### PieceStore
+
+Moca Chain is a decentralized data storage system that uses object storage as the main data storage system. MCSP encapsulates data storage as `PieceStore`, which provides common interfaces to be compatible with multiple data storage systems. Therefore, if a user wants to join MCSP or test the function of MCSP, you must use a data storage system.
+
+The following lists the supported data storage systems:
+
+- **AWS S3:** An object storage that can be used in a production environment.
+- **Aliyun OSS:** Fully managed object storage service to store and access any amount of data from anywhere.
+- **B2:** Backblaze B2 provides unlimited data storage in the cloud at ⅕th the cost of Amazon S3.
+- **MinIO:** An object storage that can be used in a production environment and is compatible with AWS S3.
+- **POSIX Filesystem:** A local filesystem is used for experiencing the basic features of MCSP and understanding how MCSP works. The piece data created by MCSP cannot be gotten within the network and can only be used on a single machine.
+
+## Run Local MCSP Network
+
+This guide helps you to set up a local Moca Chain Storage Provider network for testing and other development-related purposes.
+
+### Recommended Prerequisites
+
+The following lists the recommended hardware requirements:
+
+- VPS running recent versions of Mac OS X, Linux, or Windows;
+- 16 cores of CPU, 64 GB of memory (RAM);
+- At least 100GB disk space for backend storage;
+- 10GB+ SQL Database.
+
+### Quickly setup local Moca Chain network
+
+**Build Moca Chain**
+
+```bash
+git clone https://github.com/mocachain/moca.git
+cd moca
+make build
+```
+
+**Start Moca Chain**
+
+```bash
+# 1 validator and 4 storage providers
+bash ./deployment/localup/localup.sh all 1 2
+```
+
+**Export the keys of MCSPs**
+
+```bash
+bash ./deployment/localup/localup.sh export_sps 1 2
+```
+
+These JSON data will be used to set up the local MCSP network, so you'd better save it as a JSON file:
+
+```bash
+bash ./deployment/localup/localup.sh export_sps 1 2 > sp.json
+```
+
+### Setup local MCSP network
+
+**Compile MCSP**
+
+```bash
+git clone https://github.com/mocachain/moca-storage-provider.git
+cd moca-storage-provider
+make build
+```
+
+**Generate localup env**
+Use the following instruction to generate a template config file, `sp.info`, and `db.info` in seven different directories. This command is used for generating the MCSP env for the first time or regenerating the MCSP env.
+
+```bash
+# This command accepts four args, the first arg is json file path that only supports absolute path, the second arg is db user name,
+# the third arg is db password and the fourth arg is db address.
+cd moca-storage-provider/
+bash ./deployment/localup/localup.sh --generate json_file_path db_username db_password db_address
+```
+
+> The json file path accepted for the first arg is generated by the "Quickly setup local Moca Chain network" step.
+
+**View directory structure:**
+
+```
+ls deployment/localup/local_env/sp0
+├── sp0
+│   ├── config.toml # generated template config file
+│   ├── db.info # generated db.info is used for config.toml
+│   ├── moca-sp0 # moca-sp binary
+│   └── sp.info # generated sp.info is used for config.toml
+├── sp1
+├── ...
+```
+
+An example for generating a local sp env:
+
+```bash
+cd moca-storage-provider/
+bash ./deployment/localup/localup.sh --generate /root/sp.json root moca localhost:3306
+```
+
+```bash
+[root@yourmachine sp0]# cat db.info
+#!/usr/bin/env bash
+USER="root" # database username
+PWD="moca" # database password
+ADDRESS="localhost:3306" # db endpoint, e.g. "localhost:3306"
+DATABASE="sp_0" # database name
+```
+
+```bash
+[root@yourmachine sp0]# cat sp.info
+#!/usr/bin/env bash
+SP_ENDPOINT="127.0.0.1:9033" # gateway endpoint, e.g. "127.0.0.1:9033"
+OPERATOR_ADDRESS="0x14539343413EB47899B0935287ab1111Df891d04" # OperatorAddr is generated in setup local Moca Chain step 3.
+OPERATOR_PRIVATE_KEY="ba6e97958d9c43d1ad54923eba99f8d59f54a0c66c78a5dcbc004c5c3ec72f8c" # OperatorPrivKey is generated in setup local Moca Chain step 3.
+FUNDING_PRIVATE_KEY="bd9d9e7823cd2dc7bc20f1b6676c3025cdda6cf5a8df9b04597fdff42c29af01" # FundingPrivKey is generated in setup local Moca Chain step 3.
+SEAL_PRIVATE_KEY="aacd6b834627fdbc5de2bfdb1db31be0ea810a941854787653814c8040a9dd39" # SealPrivKey is generated in setup local Moca Chain step 3.
+APPROVAL_PRIVATE_KEY="32108ed1a47c0af965824f84ac2162c029f347eec6d0988e642330b0ac264c85" # ApprovalPrivKey is generated in setup local Moca Chain step 3.
+GC_PRIVATE_KEY="2fad16031b4fd9facb7dacda3da4ca4dd5f005f4166891bf9f7be13e02abb12d" # GcPrivateKey is generated in setup local Moca Chain step 3.
+BLS_PRIVATE_KEY="6f349866f18413abb1a78cab947933459042044649686f354e941a646b9ed6e7" # BlsPrivateKey is generated in setup local Moca Chain step 3.
+```
+
+### Start Four MCSPs
+
+Make `config.toml` according to `db.info`, `sp.info` and start four MCSPs.
+
+```bash
+cd moca-storage-provider/
+bash ./deployment/localup/localup.sh --reset
+bash ./deployment/localup/localup.sh --start
+```
+
+The environment directory is as follows:
+
+```
+deployment/localup/local_env/
+├── sp0
+│   ├── config.toml # real config
+│   ├── data/ # piecestore data directory
+│   ├── db.info
+│   ├── moca-sp0
+│   ├── moca-sp.log # moca-sp log file
+│   ├── log.txt
+│   └── sp.info
+├── sp1
+├── ...
+```
+
+### Recompile MCSP
+
+If you want to modify `config.toml` in different MCSP directories or recompile the `moca-sp` binary file, you can use the following commands to reset and start the local MCSP:
+
+```bash
+cd moca-storage-provider/
+bash ./deployment/localup/localup.sh --reset
+bash ./deployment/localup/localup.sh --start
+```
+
+### One-step (Recommended)
+
+#### Quickly setup local Moca Chain network
+
+Build Moca Chain Image and start Moca Chain network with docker-compose.
+
+```bash
+git clone https://github.com/mocachain/moca.git
+cd moca
+# export sp config json file to moca-storage-provider/deployment/dockerup
+bash deployment/dockerup/localup.sh backup
+```
+
+#### Setup local MCSP network
+
+```bash
+git clone https://github.com/mocachain/moca-storage-provider.git
+cd moca-storage-provider
+```
+
+### Operate With MCSP
+
+If you have already started Moca Chain and Moca Chain MCSP successfully locally, you can use `moca-cmd` to operate with MCSP such as `CreateBucket`, `PutObject`, and `GetObject`. Detailed info about `moca-cmd` can be found here.
+
+Next, we provide you a hand-by-hand tutorial to operate with the chain and MCSP.
+
+#### Generate your test account
+
+First, we need to generate a test account and private key:
+
+```bash
+# this command will generate a test account whose name is testkey, you can change its name
+mocad keys add testkey --keyring-backend test
+
+# export the private key of test account
+mocad keys export testkey --unarmored-hex --unsafe --keyring-backend test
+```
+
+After generating a test account, there are no tokens in this account. We should transfer some $MOCA:
+
+```bash
+# transfer 5000 $MOCA
+mocad tx bank send validator0 {generated_test_account_address} 5000000000000000000000amoca --home /{your_moca_path}/moca/deployment/localup/.local/validator0 --keyring-backend test --node http://localhost:26750 -y
+
+# query your account balances
+mocad q bank balances {generated_test_account_address} --node http://localhost:26750
+```
+
+#### Use cmd to send requests
+
+If you have come to this step, congratulations, you can operate with your own private chain and MCSP.
+
+First, we need to configure `cmd`:
+
+```bash
+cd moca-cmd/
+make build
+
+# generate a keystore file to manage private key information
+touch key.txt & echo ${TEST_ACCOUNT_PRIVATE_KEY} > key.txt
+touch password.txt & echo "test_sp_function" > password.txt
+./build/moca-cmd --home ./ --passwordfile password.txt account import key.txt
+
+# construct config.toml
+touch config.toml
+```
+
+Write the following content:
+
+```
+rpcAddr = "https://testnet-lcd.mocachain.org:443"
+chainId = "moca_222888-1"
+```
+
+Second, you can do some operations with MCSP:
+
+**Create bucket**
+
+```bash
+# list current available SPs
+./build/moca-cmd -c ./config.toml --home ./ sp ls
+
+# random choose one SP to create bucket
+./build/moca-cmd -c ./config.toml --home ./ bucket create moca://${BUCKET_NAME}
+
+# head bucket info
+./build/moca-cmd -c ./config.toml --home ./ bucket head moca://${BUCKET_NAME}
+
+# choose one sp to create bucket, operator_address is shown in sp ls result
+./build/moca-cmd -c ./config.toml --home ./ bucket create --primarySP ${operator_address} moca://${BUCKET_NAME}
+```
+
+**PutObject & GetObject**
+
+```bash
+# generate a 17MB random file
+dd if=/dev/urandom of=./random_file bs=17M count=1
+
+# put object
+./build/moca-cmd -c ./config.toml --home ./ object put --contentType "application/octet-stream" ./random_file moca://${BUCKET_NAME}/random_file
+
+# get object
+./build/moca-cmd -c ./config.toml --home ./ object get moca://${BUCKET_NAME}/random_file ./new_random_file
+```
+
+> Users can use `md5` to compare your generated file and the downloaded file to see whether it is the same. You can explore other functions of `moca-cmd`.
+
+## Run MCSP Node
+
+This guide helps you set up an MCSP Node. Once you set up the MCSP Node successfully, you can follow the "Join SP Network" guide to make it online.
+
+### Prerequisites
+
+#### Recommended Hardware
+
+The following lists the recommended hardware requirements:
+
+- VPS running recent versions of Mac OS X, Linux, or Windows;
+- 16 cores of CPU, 64 GB of memory (RAM);
+- 1 Gbps network connection with upload/download speeds of 10MB/s+;
+- At least 1 TB disk space for backend storage;
+- 50GB+ SQL database;
+- Piece Store: AWS S3, MinIO (Beta);
+- 6 `mocad` accounts with enough $MOCA.
+  > **IMPORTANT:** Each storage provider will hold 7 different accounts serving different purposes.
+
+#### Wallet Preparation
+
+- **Operator Account:** Used to edit the information of the StorageProvider. Please make sure it has enough Moca to pay the gas fee of `EditStorageProvider` and `UpdateStorageProviderStatus` transactions.
+- **Funding Account:** Used to deposit staking tokens and receive earnings. It is important to ensure that there is enough money in this account, and the MCSP must submit a deposit as a guarantee. At least 500+ Moca are required for staking. You should use this address to send a `CreateStorageProvider` proposal on-chain. Besides the 500 Moca for staking, the funding address should have enough tokens for creating VGF to store more data, so we suggest depositing at least 510 Moca into this account.
+- **Seal Account:** Used to seal the user's object. Please make sure it has enough Moca to pay the gas fee of the `SealObject` transaction. We suggest depositing 10 Moca into this account.
+- **Approval Account:** Used to approve user's requests. This account does not require holding $MOCA.
+- **GC Account:** It is a special address for sp and is used by sp to clean up local expired or unwanted storage. Please make sure it has enough $MOCA because it's going to keep sending transactions up the chain.
+- **Maintenance Account:** It is used for MCSP self-testing while in maintenance mode. This account for creating buckets and objects will be allow-listed by the Chain, while other users' create requests will fail.
+- **Bls Account:** Used to create a bls signature when sealing objects to ensure integrity; it does not need to be deposited.
+
+There are six accounts below. You can use the command below to generate these accounts:
+
+```bash
+mocad keys add operator --keyring-backend test
+mocad keys add seal --keyring-backend test
+mocad keys add approval --keyring-backend test
+mocad keys add gc --keyring-backend test
+mocad keys add maintenance --keyring-backend test
+mocad keys add bls --keyring-backend test --algo eth_bls
+```
+
+and then export these private keys to prepare for SP deployment:
+
+```bash
+mocad keys export operator --unarmored-hex --unsafe --keyring-backend test
+mocad keys export seal --unarmored-hex --unsafe --keyring-backend test
+mocad keys export approval --unarmored-hex --unsafe --keyring-backend test
+mocad keys export gc --unarmored-hex --unsafe --keyring-backend test
+mocad keys export bls --unarmored-hex --unsafe --keyring-backend test
+```
+
+> **IMPORTANT:** `FundingAddress` is used to deposit staking tokens and receive earnings. Therefore, users should prepare their own `FundingAddress` public key and private key. And keep the private key of `FundingAddress` in a cold wallet for safety! The private keys of `OperatorAddress`, `SealAddress`, `ApprovalAddress`, `GCAddress`, and `BlsAddress` can be kept in a hot wallet because they are often used to send transactions.
+
+If you want to generate a public key and private key of `FundingAddress` in the `mocad` binary file, you can execute the following commands:
+
+```bash
+mocad keys add funding --keyring-backend test
+mocad keys export funding --unarmored-hex --unsafe --keyring-backend test
+```
+
+The `maintenance` account is not needed for MCSP deployment, but you should export it to conduct a self-test:
+
+```bash
+mocad keys export maintenance --unarmored-hex --unsafe --keyring-backend test
+```
+
+> Please keep these seven private keys safe!
+
+Moreover, obtain the `bls` public key and generate a `bls` proof to fill in the proposal of creating a Storage Provider.
+
+**bls_pub_key:**
+
+```bash
+mocad keys show bls --keyring-backend test --output json | jq -r '.pubkey_hex'
+```
+
+**bls_proof:**
+
+```bash
+# Replace the ${bls_pub_key} with the above bls_pub_key to ensure you sign the correct bls pub key!!!
+mocad keys sign "${bls_pub_key}" --from bls --keyring-backend test
+```
+
+#### Database Configuration
+
+You should create two databases: `${SpDB.Database}` and `${BsDB.Database}`.
+
+> **IMPORTANT:** `${BsDB.Database}` requires `utf8mb4_unicode_ci` as the character set and collation.
+
+The following example assumes `${SpDB.Database}` as `storage_provider_db` and `${BsDB.Database}` as `block_syncer`.
+
+```sql
+-- login to mysql and create database
+-- the default encoding for the database should be utf8mb4_unicode_ci
+mysql> CREATE DATABASE storage_provider_db;
+mysql> CREATE DATABASE block_syncer CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- check the database encoding format
+mysql> show create database block_syncer;
+```
+
+> This is the encoding we expect to see.
+
+### Create Storage Provider
+
+#### Compile MCSP
+
+Follow the "Compile MCSP" doc to compile the MCSP binary or you can download the binary from the Moca Chain Storage Provider Release.
+
+#### MCSP Config
+
+##### Generate config template
+
+```bash
+cd moca-storage-provider/build
+# dump default configuration
+./build/moca-sp config.dump
+```
+
+##### Write config
+
+You can learn about how to write your `config.toml` file here.
+
+> It's recommended to deploy a Kubernetes cluster following this guide. The corresponding config file is here.
+
+#### Run MCSP
+
+```bash
+# start sp
+./moca-sp --config ${config_file_path}
+```
+
+## Join MCSP Network
+
+This guide will help you join the MCSP Network: Testnet.
+
+### Prerequisite for Becoming a Testnet MCSP
+
+To ensure the stable provision of data services, Storage Providers must meet specific criteria to join the testnet.
+
+- The MCSP must join the testnet for a minimum of one month.
+- The MCSP must store over 1K files across more than 100 buckets on the testnet.
+- There were no slash events on the MCSP in the past week.
+
+### How to Join MCSP Network
+
+Moca Chain validators are responsible for selecting storage providers. For each on-chain proposal to add a new storage provider, there is a deposit period for depositing Moca and a voting period for validators to cast votes. Once the proposal passes, the new MCSP can join the network afterwards.
+
+#### Submit Proposal
+
+The MCSP needs to initiate an on-chain proposal that specifies the `Msg` information to be automatically executed after the vote is approved. In this case, the `Msg` is `MsgCreateStorageProvider`. It's worth noting that the deposit tokens need to be greater than the minimum deposit tokens specified on the chain.
+
+```
+rpcAddr = "https://testnet-lcd.mocachain.org:443"
+chainId = "moca_222888-1"
+```
+
+##### Hot Wallet Manual
+
+You can use the `mocad` command to directly send the transaction for creating a storage provider. To do this, please import the private key of the funding account into the Keystore.
+
+> However, it is not safe to use a hot wallet for Testnet. Instead, you should refer to the Hardware Wallet Manual for instructions on using a hardware wallet.
+
+Command for creating storage provider:
+
+```bash
+mocad tx sp create-storage-provider ./create_storage_provider.json --from {funding_address} --node ${rpcAddr} --chain-id ${chainId} --keyring-backend test
+```
+
+The content for `create_storage_provider.json`, modify it with the correct values as you need:
+
+```json
+{
+  "title": "create storage provider",
+  "summary": "use proposal create storage provider",
+  "messages": [
+    {
+      "@type": "/moca.sp.MsgCreateStorageProvider",
+      "creator": "0x7b5Fe22B5446f7C62Ea27B8BD71CeF94e03f3dF2",
+      "description": {
+        "moniker": "sp_one_0",
+        "identity": "",
+        "website": "http://website",
+        "security_contact": "",
+        "details": "sp_one_0 detail"
+      },
+      "sp_address": "0x138b2fa467B83432E2AB97Df560A21E5b947fF3F",
+      "funding_address": "0x3b8388788238AE1D2C3aA0fbdE88fE91161f5753",
+      "seal_address": "0x2d7dAF0a129B93017072782fF0a8bB6923cde51b",
+      "approval_address": "0xC8E82835fc2713f55ce7F762926A1B7e68eF4163",
+      "gc_address": "0xcD0A9C31C27C231b3417D57083f87Fc1B5aa8ED0",
+      "maintenance_address": "0x3b8388788238AE1D2C3aA0fbdE88fE91161f5753",
+      "endpoint": "http://moca-sp-one-0.moca-sp-one:9033",
+      "deposit": {
+        "denom": "amoca",
+        "amount": "100000000000000000000000"
+      },
+      "read_price": "100.000000000000000000",
+      "free_read_quota": "100000000",
+      "store_price": "10000.000000000000000000",
+      "bls_key": "2a3be31fa821e170ec5c13812fd77e072cf7985361ea72aee01723f3f38582df1a3d7440d2b5517d02901ccf5adb4250bf2e8ead1c7908cae4cfb1348abfd33007ade14bc03b28578ff08ef6cdf20c8d0fb07498caeb6c9c85d48a29da6d45a6169ee49ff754703d233dbfb1bf35ef8aa14128a91227a8b03dab3c8812d865db",
+      "bls_proof": "1b535ba8f1e307deea80a5be6919a20cb98c2cc46b78984b3052775a6f5293e9134be6012f68f6cff059cd4483b62a231d7c76bdbc6066ff5058bc5b90511f1e"
+    }
+  ],
+  "metadata": "ipfs://CID",
+  "deposit": "10000000000000000000000amoca"
+}
+```
+
+##### Hardware Wallet Manual
+
+The `mocad` command is not available for connecting with the hardware wallet, so you should use the `mocad-tx-sender` to send transactions. Here are the steps:
+
+**Generate the transaction data:**
+
+```bash
+mocad tx sp create-storage-provider ./create_storage_provider.json --from {funding_address} --print-eip712-msg-type
+```
+
+> **Note:**
+>
+> - You can get the `gov` module address by this command: `curl -X GET "https://testnet-api.mocachain.org/cosmos/auth/v1beta1/module_accounts/gov" -H "accept: application/json"`
+> - `endpoint` is the URL of your gateway.
+> - `read_price` and `store_price` units are wei/bytes/s.
+> - `free_read_quota` unit is Bytes.
+> - `creator` is the address of the `gov` module.
+> - `metadata` is optional.
+
+#### Deposit Moca to Proposal
+
+> **Note:** You can get the minimum deposit for a proposal by the above command. Please make sure that the initial deposit is greater than `min_deposit` when submitting the proposal.
+
+```bash
+curl -X GET "https://testnet-api.mocachain.org/cosmos/gov/v1/params/deposit" -H "accept: application/json"
+```
+
+You can skip this step if the initial deposit amount is greater than the min deposit required by the proposal. Each proposal needs to deposit enough tokens to enter the voting phase.
+
+```bash
+mocad tx gov deposit ${proposal_id} 1Moca --from ${funding_address} --keyring-backend test --node ${rpcAddr} --chain-id ${chainId}
+```
+
+#### Wait Voting and Check Voting Result
+
+After submitting the proposal successfully, you must wait for the voting to be completed and the proposal to be approved. It will last 1 day on Testnet. Once it has passed and is executed successfully, you can verify that the storage provider has been joined.
+
+> **Warning:** Please ensure that the storage provider service is running before it has been joined.
+
+You can check the on-chain MCSP information to confirm whether the MCSP has been successfully created.
+
+```bash
+mocad query sp storage-providers --node ${rpcAddr}
+```
+
+Alternatively, you can check the proposal to know about its execution status.
+
+```bash
+mocad query gov proposal ${proposal_id} --node ${rpcAddr}
+```
+
+#### Activate MCSP
+
+##### Storage Provider Standard Test
+
+After the proposal has passed, the status of MCSP is `STATUS_IN_MAINTENANCE`. To prevent being slashed due to functional abnormalities, you should first perform a full functional test using the maintenance account. You can refer to the MCSP standard test.
+
+##### Update MCSP status
+
+Once the testing is completed, you need to send a transaction to activate the MCSP to `STATUS_IN_SERVICE`.
+
+```bash
+mocad tx sp update-status [sp-address] STATUS_IN_SERVICE [flags]
+```
+
+#### MCSP address deposit
+
+##### Funding Address
+
+As a new MCSP, you need to deposit a minimum amount of Moca into the funding address. Please note the initial deposit requirement varies in different environments. You can check the `sp.params.min_deposit` value (in wei Moca) from the genesis endpoint response of the Moca Chain testnet. At the time when this doc is written, according to `https://testnet-lcd.mocachain.org/genesis`, MCSP in testnet requires a minimum of 500 Moca deposited in the funding address.
+In addition, to join the network, an MCSP must initiate a proposal using a funding address and have an additional >1 Moca to cover these costs.
+
+##### Operator Address
+
+The MCSP operator address will be used to send "Create Global Virtual Group", "Edit Storage Provider", "Update Storage Provider Status", and other transactions to the Moca Chain. So it requires some Moca deposited for the transaction fee as well. We recommend the MCSP operator address can hold at least 0.1 Moca but not necessarily as much as possible.
+
+### Storage Provider Operations
+
+#### EditStorageProvider
+
+This command is used to edit the information of the MCSP, including endpoint, description, etc.
+
+**Usage:**
+
+```bash
+mocad tx sp edit-storage-provider [sp-address] [flags]
+```
+
+For example, to edit the endpoint:
+
+```bash
+mocad tx sp edit-storage-provider ${operator_address} --endpoint ${new_endpoint} --from ${operator_address} --keyring-backend test --node ${rpcAddr} --chain-id ${chainId}
+```
+
+#### Update MCSP Price
+
+Update the storage provider read, store price and free read quota. If there is no change to a specific value, the current value should also be provided.
+
+- The unit of price is a decimal, which indicates wei Moca per byte per second. E.g. the price is 0.02183945725, which means approximately $0.018/GB/Month.
+- The `free-read-quota` unit is bytes; for 1GB free quota, it should be 1073741824.
+
+**Usage:**
+
+```bash
+mocad tx sp update-price [sp-address] [read-price] [store-price] [free-read-quota] [flags]
+```
+
+**Example:**
+
+```bash
+mocad tx sp update-price ${operator_address} 0.1469890427 0.02183945725 1073741824 --from ${operator_address} --keyring-backend test --node ${rpcAddr} --chain-id ${chainId}
+```
+
+#### Update MCSP Quota
+
+Besides the `update-price` command above, you can also use the `moca-sp` command to update the free read quota for MCSP. The `update.quota` command is used to update the free quota of the MCSP; it will send a transaction to the blockchain to update the free read quota but keep the storage price and read price unchanged.
+
+**Usage:**
+
+```bash
+./build/moca-sp update.quota [command options] [arguments...]
+```
+
+**Example:**
+
+```bash
+./build/moca-sp update.quota --quota 1073741824 --config ./config.toml
+```
+
+#### Recover MCSP Objects
+
+Besides the commands above, you can also use the `moca-sp` command to recover objects for MCSP, whether it is the primary or secondary sp of the object. The `recover.object` command is used to recover an object or objects of the MCSP; it will send a request to other MCSPs to get a replicate of the object(s) you want to recover.
+
+**Usage:**
+
+```bash
+./build/moca-sp recover.object [command options] [arguments...]
+```
+
+**Example:**
+
+```bash
+./build/moca-sp recover.object --config ./config.toml -b bucket_name -o single_object_name
+./build/moca-sp recover.object --config ./config.toml -b bucket_name -l object_name1//_object_name2//object_name3
+```
+
+#### Claim MCSP Income
+
+To claim income, a storage provider can use the `settle` command to settle income in global virtual group families or global virtual groups. To find the global virtual group families or global virtual groups to settle, a storage provider can use `query.primary.sp.income` or `query.secondary.sp.income` of `moca-sp` commands.
+
+##### To query the income of a primary sp
+
+**Usage:**
+
+```bash
+# query sp's income in global virtual group families
+moca-sp query.primary.sp.income --config config.toml --sp.id ${sp_id}
+```
+
+An example of a response will look like:
+
+```json
+querying primary sp income details for sp 1query timestamp 1698830787 2023-11-01 17:26:27 +0800 CSTquery results: [{"vgf_id":2,"stream_record":{"account":"primary_sp_virtual_payment_account_address_1","crud_timestamp":1698631653,"netflow_rate":"4643666191","static_balance":"1093710972008743","buffer_balance":"0","lock_balance":"0","frozen_netflow_rate":"0"},"income":"2018422795287337"},...]
+```
+
+> The unit of the unsettled income is aMoca. The first element in the query result array above means that sp 1 gets 2018422795287337 wei Moca in `vgf_id` 2.
+
+##### To query the income of a secondary sp
+
+```bash
+# query sp's income in global virtual groups
+moca-sp query.secondary.sp.income --config config.toml --sp.id ${sp_id}
+```
+
+An example of a response will look like:
+
+```json
+querying secondary sp income details for sp 1query timestamp 1698830440 2023-11-01 17:20:40 +0800 CSTquery results: [{"gvg_id":2531,"stream_record":{"account":"secondary_sp_virtual_payment_account_address_1","crud_timestamp":1695347375,"netflow_rate":"22256589564","static_balance":"917684637479280","buffer_balance":"0","lock_balance":"0","frozen_netflow_rate":"0"},"income":"13073138794535490"},...]
+```
+
+> The unit of the unsettled income is wei Moca. The first element in the query result array above means that sp 1 gets 13073138794535490 wei Moca in `gvg_id` 2531.
+
+```bash
+# settle income in global virtual group family or global virtual groups
+mocad tx virtualgroup settle [global-virtual-group-family-id] [global-virtual-group-ids] [flags]
+```
+
+**Example:**
+
+```bash
+# query sp's income in global virtual group families
+moca-sp query.primary.sp.income --config config.toml --sp.id 1
+
+# query sp's income in global virtual groups
+moca-sp query.secondary.sp.income --config config.toml --sp.id 2
+
+# settle income in global virtual group family with id 100
+mocad tx virtualgroup settle 100 0 [flags]
+
+# settle income in global virtual groups with id 2 or 3 or 4
+mocad tx virtualgroup settle 0 2,3,4 [flags]
+```
+
+## Exit MCSP Network
+
+### How to exit Moca Chain network
+
+When an MCSP decides to exit the Moca Chain network, there are three main steps to go through, involving both the exiting MCSP and other MCSPs in the network:
+
+1.  Declare the exit
+2.  Data recovery by successor MCSP(s)
+3.  Finalize the exit
+
+#### Declare the exit
+
+The exiting MCSP needs to initiate a `StorageProviderExit` transaction to Moca Chain, which will turn its status to `STATUS_GRACEFUL_EXITING`. To exit the network, you can use the following commands based on the desired network:
+
+```
+rpcAddr = "https://testnet-lcd.mocachain.org"
+chainId = "moca_222888-1"
+```
+
+Command for storage provider to exit:
+
+```bash
+moca-sp spExit [command options] [arguments...]
+```
+
+**Example:**
+
+```bash
+./build/bin/moca-sp spExit --config ./config.toml
+```
+
+#### Data recovery
+
+For MCSPs interested in becoming successors, you need to perform the following data recovery steps:
+
+##### ReserveSwapIn
+
+The prospective successor MCSP needs to determine the Global Virtual group (GVG) and Global Virtual Group Family (VGF) that the exiting MCSP has. This information can be obtained from Moca ChainScan or by using the provided CLI.
+
+**Usage:**
+
+```bash
+# List the GVG that the exit MCSP acts as a secondary MCSP
+./moca-sp query-gvg-by-sp [command options] [arguments...]
+
+# List the GVG Family that the exit SP acts as a primary SP
+./moca-sp query-vgf-by-sp [command options] [arguments...]
+```
+
+**Example:**
+
+```bash
+# List the GVG that the exit SP (id=1) acts as a secondary SP
+./moca-sp query-gvg-by-sp --config ./config.toml -sp 1
+
+# List the GVG Family that the exit SP (id=1) acts as a primary SP
+./moca-sp query-vgf-by-sp --config ./config.toml -sp 1
+```
+
+Once the successor MCSP has obtained the necessary information, it needs to reserve the position in the exiting MCSP's GVG Family or GVG.
+
+**Usage:**
+
+```bash
+# Reserve the exit SP's position in a GVG family or GVG
+./moca-sp swapIn [command options] [arguments...]
+```
+
+**Example:**
+
+```bash
+# Reserve the exit SP's (id=1) position in GVG family (id=1)
+./moca-sp swapIn --config ./config.toml -f 1 -sp 1
+
+# Reserve the exit SP's (id=1) position in GVG (id=1)
+./moca-sp swapIn --config ./config.toml --gid 1 -sp 1
+```
+
+##### Data Recovery
+
+The data recovery process is triggered by the successor MCSP using the following commands:
+**Usage:**
+
+```bash
+./moca-sp recover-vgf [command options] [arguments...]
+./moca-sp recover-gvg [command options] [arguments...]
+```
+
+**Example:**
+
+```bash
+# To recover the exit SP's data in the VGF (id=1) as a primary SP:
+./moca-sp recover-vgf --config /config/config.toml -f 1
+
+# To recover the exit SP's data in the GVG (id=1) as a secondary SP:
+./moca-sp swapIn --config ./config.toml --gid 1
+```
+
+Once the recovery job is triggered, it will run in the background in the MCSP Manager module. The progress can be queried using the following command:
+**Usage:**
+
+```bash
+./moca-sp query-recover-p [command options] [arguments...]
+```
+
+**Example:**
+
+```bash
+# Query the GVG family (id=1) recovery progress
+./moca-sp recover-vgf --config /config/config.toml -f 1
+
+# Query the GVG (id=1) recovery progress
+./moca-sp recover-vgf --config /config/config.toml --gid 1
+```
+
+##### CompleteSwapIn
+
+Upon completion of the data recovery process and successful verification, the successor MCSP needs to send a `CompleteSwapIn` transaction to the Moca Chain. It will be automatically conducted before the recovery process concludes. This will finalize the recovery process and allow the successor MCSP to take over the position in the GVG Family or GVG.
+
+> **Note:** It is crucial to note that under no circumstances should the `CompleteSwapIn` be triggered manually if the successor MCSP has not completed the data recovery process but acknowledges it. Doing so may result in data availability challenges and potential loss of funds.
+
+#### Finalize the Exit
+
+Once the successor MCSP has completed the data recovery process and taken over the position in the GVG Family or GVG, by checking the GVG statistic of the exiting MCSP, confirm that there are no more GVGs associated with it. Anyone in the Moca Chain network can send a `CompleteStorageProviderExit` transaction to the Moca Chain to finalize its exit from the network. Below shows the CLI triggered by the exiting MCSP itself.
+
+**Usage:**
+
+```bash
+./moca-sp completeSpExit [command options] [arguments...]
+```
+
+**Example:**
+
+```bash
+./moca-sp completeSpExit --config /config/config.toml
+```
+
+## Deploy Piece Store
+
+_Coming soon._
+
+## MCSP Config
+
+### MCSP Config
+
+This section gives you a complete config of MCSP. `./moca-sp config.dump` will generate a template `config.toml`.
+
+#### App info
+
+These fields are optional.
+
+```toml
+# optional
+Env = ''
+# optional
+AppID = ''
+# optional
+Server = []
+# optional
+GRPCAddress = ''
+```
+
+#### Database
+
+To config `[SpDB]`, `[BsDB]`, you have to input the username, db password, db address, and db name in these fields.
+
+#### PieceStore
+
+To config `[PieceStore]` and `[PieceStore.Store]`, you can read the details in this doc.
+
+#### Chain info
+
+- `ChainID` of testnet is `moca_222888-1`.
+- `ChainAddress` is the RPC endpoint of Testnet; you can find RPC info here.
+
+#### SpAccount
+
+These private keys are generated during wallet setup.
+
+#### Endpoint
+
+`[Endpoint]` specifies the URL of different services.
+
+**For single-machine host (not recommended):**
+
+```toml
+[Endpoint]
+ApproverEndpoint = ''
+ManagerEndpoint = ''
+DownloaderEndpoint = ''
+ReceiverEndpoint = ''
+MetadataEndpoint = ''
+UploaderEndpoint = ''
+P2PEndpoint = ''
+SignerEndpoint = ''
+AuthenticatorEndpoint = ''
+```
+
+**For K8S cluster:**
+
+```toml
+[Endpoint]
+ApproverEndpoint = 'manager:9333'
+ManagerEndpoint = 'manager:9333'
+DownloaderEndpoint = 'downloader:9333'
+ReceiverEndpoint = 'receiver:9333'
+MetadataEndpoint = 'metadata:9333'
+UploaderEndpoint = 'uploader:9333'
+P2PEndpoint = 'p2p:9333'
+SignerEndpoint = 'signer:9333'
+AuthenticatorEndpoint = 'localhost:9333'
+```
+
+#### P2P
+
+> **Note:** We don't use P2P service in Testnet, so users can ignore P2P items.
+
+- `P2PPrivateKey` and `node_id` are generated by `./moca-sp p2p.create.key -n 1`.
+- `P2PAntAddress` is your load balance address. If you don't have a load balance address, you should have a public IP and use it in `P2PAddress`. It consists of `ip:port`.
+- `P2PBootstrap` can be left empty.
+
+#### Gateway
+
+```toml
+[Gateway]
+DomainName = 'region.sp-name.com'
+```
+
+> The correct configuration should not include the protocol prefix `https://`.
+
+#### BlockSyncer
+
+Here is the `block_syncer` config. The configuration of `BsDBWriteAddress` can be the same as the `BSDB.Address` module here. To enhance performance, you can set up the write database address here and the corresponding read database address in `BSDB`.
+
+```toml
+Modules = ['epoch','bucket','object','payment','group','permission','storage_provider','prefix_tree', 'virtual_group','sp_exit_events','object_id_map','general']
+Workers = 50
+BsDBWriteAddress = 'localhost:3306'
+```
+
+#### FundingPrivateKey
+
+There is no need to write `FundingPrivateKey` in `config.toml`. It should be kept in a cold wallet for safety.
+
+#### Rcmgr
+
+ResourceManager manages resources within the MCSP system, tracking and accounting for usage across the stack, from internal components to applications. It also allows for resource usage to be limited based on user-configurable policies. The config schema is shown below:
+
+```protobuf
+message GfSpLimit {
+  int64 memory = 1;
+  int32 tasks = 2;
+  int32 tasks_high_priority = 3;
+  int32 tasks_medium_priority = 4;
+  int32 tasks_low_priority = 5;
+  int32 fd = 6;
+  int32 conns = 7;
+  int32 conns_inbound = 8;
+  int32 conns_outbound = 9;
+}
+
+message GfSpLimiter {
+  GfSpLimit system = 1;
+  GfSpLimit transient = 2;
+  map<string, GfSpLimit> service_limit = 3;
+}
+```
+
+#### Quota
+
+Here is the quota config. The configuration of `MonthlyFreeQuota` defines the free quota for each month. It will be reduced when the charge quota is exhausted.
+
+```toml
+[Quota]
+MonthlyFreeQuota = 0
+```
+
+#### MCSP Probe
+
+It contains two probes: `liveness` and `readiness` probe. If users want to check whether MCSP is healthy and ready, they can refer to the Kubernetes docs to learn related concepts. For detailed MCSP probe info, users can refer to the MCSP probe documentation.
+
+### MCSP Testnet Recommended Config
+
+_Coming soon._

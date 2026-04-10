@@ -1,0 +1,112 @@
+---
+title: "Built-in UI (Beta)"
+description: "Opens the AIR Kit swap interface, allowing users to exchange tokens directly within your application."
+---
+
+## Swap Interface
+
+### showSwapUI()
+
+Opens the AIR Kit swap interface, allowing users to exchange tokens directly within your application.
+
+**Method Signature:**
+
+```ts
+public async showSwapUI(options?: {
+  initialFromToken?: string;
+  fallbackFromToken?: string;
+  initialToToken?: string;
+}): Promise<{ txHash: `0x${string}` }>
+```
+
+**Returns:**
+
+```ts
+{
+  txHash: string; // The transaction hash of the swap transaction
+}
+```
+
+**Usage:**
+
+```ts
+try {
+  const result = await airService.showSwapUI();
+  console.log("Swap completed! Transaction hash:", result.txHash);
+} catch (error) {
+  console.error("Swap failed:", error);
+}
+```
+
+**What happens during swap:**
+
+1. Opens the swap interface
+2. User selects token and amount to swap
+3. User confirms the swap transaction
+4. Returns the transaction hash upon successful completion
+
+**Requirements:**
+
+- User must be logged in
+
+**Important Notes:**
+
+- **Experimental feature**: This method is marked as experimental and may change in future versions
+- **Chain support**: Currently only supported on Base network
+- **User experience**: Opens a full swap interface with token selection, amount input, and slippage settings.
+- **Advanced control**: For more control over the swap flow, use the RPC method `air_getSwapQuote` and `air_sendSwapTransaction` to specify exact token addresses, amounts, and slippage settings
+
+## On-Ramp Interface
+
+### showOnRampUI()
+
+Opens the AIR Kit on-ramp interface, allowing users to purchase cryptocurrency with fiat currency.
+
+**Method Signature:**
+
+```ts
+public async showOnRampUI(options: {
+  displayCurrencyCode: string;
+  targetCurrencyCode?: string;
+}): Promise<void>
+```
+
+**Parameters:**
+
+```ts
+{
+  displayCurrencyCode: string; // Fiat currency code (e.g., "USD", "EUR")
+  targetCurrencyCode?: string; // Optional target cryptocurrency (e.g., "ETH", "USDC")
+}
+```
+
+**Usage:**
+
+```ts
+try {
+  await airService.showOnRampUI({
+    displayCurrencyCode: "USD",
+    targetCurrencyCode: "USDC"
+  });
+  console.log("On-ramp interface opened");
+} catch (error) {
+  console.error("Failed to open on-ramp:", error);
+}
+```
+
+**What happens during on-ramp:**
+
+1. Opens the on-ramp interface
+2. User selects payment method and amount
+3. User completes the fiat-to-crypto purchase
+4. Cryptocurrency is deposited to their wallet
+
+**Requirements:**
+
+- User must be logged in
+
+**Important Notes:**
+
+- **Experimental feature**: This method is marked as experimental and may change in future versions
+- **No return value**: This method doesn't return a transaction hash as the purchase is handled by the on-ramp provider
+- **Currency support**: Supported currencies depend on the on-ramp provider configuration

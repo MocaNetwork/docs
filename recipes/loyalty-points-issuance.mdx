@@ -1,0 +1,112 @@
+---
+title: "End-to-End Loyalty Credential Flow"
+description: "Issue tiered loyalty credentials from your backend when users hit spend or activity thresholds."
+---
+
+This recipe walks through issuing a portable loyalty credential that users carry across your partner ecosystem. When a user crosses a tier threshold (e.g. Gold, Platinum), your backend issues a new credential automatically.
+
+## What you'll build
+
+1. A credential schema that encodes loyalty tier, lifetime points, and membership date.
+2. A backend function that issues (or upgrades) the credential when a user crosses a tier boundary.
+3. Status polling to confirm on-chain issuance.
+
+## Prerequisites
+
+- [Issue on Behalf](/airkit/usage/credential/issue-on-behalf) enabled for your partner account
+- A published issuance program with a loyalty schema
+- [Partner JWT](/airkit/usage/partner-authentication) signing configured
+
+## Step 1: Design the credential schema
+
+Create a schema in the Developer Dashboard (Issuer > Schemas) with fields like:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `tier` | string | Loyalty tier name (e.g. `"Gold"`, `"Platinum"`) |
+| `lifetimePoints` | integer | Total points accumulated |
+| `memberSince` | string | ISO date when membership started |
+| `upgradedAt` | string | ISO date of the most recent tier upgrade |
+
+See [Schema Creation](/airkit/usage/credential/schema-creation) for full setup instructions.
+
+## Step 2: Issue on tier upgrade
+
+When your loyalty engine determines a user has crossed a tier boundary, call Issue on Behalf with `onDuplicate: "revoke"` to replace the previous tier credential.
+
+```js
+const jwt = require("jsonwebtoken");
+const fs = require("fs");
+
+const privateKey = fs.readFileSync("path/to/private.key");
+const BASE_URL = process.env.API_BASE_URL || "https://api.sandbox.mocachain.org/v1";
+
+function getPartnerJwt(email) {
+  const now = Math.floor(Date.now() / 1000);
+  return jwt.sign(
+    { partnerId: process.env.PARTNER_ID, scope: "issue", email, iat: now, exp: now + 300 },
+    privateKey,
+    { algorithm: "RS256", header: { kid: process.env.KEY_ID, typ: "JWT" } }
+  );
+}
+
+async function issueLoyaltyCredential(userEmail, tierData) {
+  const token = getPartnerJwt(userEmail);
+
+  const res = await fetch(`${BASE_URL}/credentials/issue-on-behalf`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-partner-auth": token },
+    body: JSON.stringify({
+      issuerDid: process.env.ISSUER_DID,
+      credentialId: process.env.LOYALTY_CREDENTIAL_ID,
+      credentialSubject: {
+        tier: tierData.tier,
+        lifetimePoints: tierData.lifetimePoints,
+        memberSince: tierData.memberSince,
+        upgradedAt: new Date().toISOString(),
+      },
+      onDuplicate: "revoke",
+    }),
+  });
+
+  if (!res.ok) throw new Error(`Issue failed: ${res.status}`);
+  return res.json();
+}
+```
+
+## Step 3: Trigger on purchase events
+
+Wire the issuance into your purchase or activity pipeline:
+
+```js
+async function onPurchaseComplete(userEmail, purchaseAmount) {
+  const user = await getUserProfile(userEmail);
+  const newPoints = user.lifetimePoints + calculatePoints(purchaseAmount);
+  const newTier = resolveTier(newPoints);
+
+  if (newTier !== user.currentTier) {
+    const result = await issueLoyaltyCredential(userEmail, {
+      tier: newTier,
+      lifetimePoints: newPoints,
+      memberSince: user.memberSince,
+    });
+    console.log(`Upgraded ${userEmail} to ${newTier}, hash: ${result.coreClaimHash}`);
+  }
+
+  await updateUserProfile(userEmail, { lifetimePoints: newPoints, currentTier: newTier });
+}
+```
+
+## Step 4: Let verifiers read the credential
+
+Any partner in the ecosystem can verify the user's tier using [Credential Verification](/airkit/usage/credential/verify). The user presents the credential (via AIR Kit SDK), and the verifier confirms tier status without accessing underlying purchase data.
+
+## Duplicate handling
+
+Use `onDuplicate: "revoke"` (default) to replace the old tier credential each time the user upgrades. Use `onDuplicate: "ignore"` only if you want to keep the existing credential unchanged (e.g. for one-time membership issuance).
+
+## Next steps
+
+- [AIR for Loyalty](/airkit/guides/air-for-loyalty) for a broader integration guide
+- [Issue on Behalf API reference](/api-reference/introduction) for endpoint details
+- [Credential Verification](/airkit/usage/credential/verify) to set up cross-partner verification

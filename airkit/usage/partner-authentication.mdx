@@ -1,0 +1,201 @@
+---
+title: "SDK Authentication (Partner JWT)"
+description: "To ensure requests are coming from your servers, a JSON Web Token (JWT) signed by your backend is required for various operations with AIR Kit."
+---
+
+You need to generate and use the JWT when:
+
+- Authenticating a User
+- Performing credentials-related operations such as issuing or verifying credentials
+
+For **Issue on Behalf** (server-side credential issuance without user presence), the JWT must include `scope: "issue on-behalf"`, `typ: "JWT"`, and the target user's `email` claim. See [Issue on Behalf](/airkit/usage/credential/issue-on-behalf) for concepts and [Issue on Behalf API & Examples](/airkit/usage/credential/issue-on-behalf-api) for endpoint usage.
+
+**JWT Details**
+
+- **Signing algorithms supported:** ES256, RS256
+- **Expiry**: 5 min (recommended)
+- **Claims**: varies depending on the operation. You would always need to include your `partnerId` as one of the claims
+- **Header**: You must include a `kid` (Key ID) header to indicate which key was used to sign the JWT. This is important for AIR Kit to select the correct key from your JWKS endpoint for verification.
+- **JWKS URL** - AIR Kit validates your JWT using JWK standards ([https://datatracker.ietf.org/doc/html/rfc7517](https://datatracker.ietf.org/doc/html/rfc7517)). By specifying your JSON Web Key Set (JWKS) endpoint, we could validate your JWT issued by your Authorization Server. - Example: [https://static.air3.com/.well-known/example-jwks.json](https://static.air3.com/.well-known/example-jwks.json)
+
+To learn more about JWT, visit [jwt.io](https://www.jwt.io).
+
+## Issue on Behalf JWT requirements
+
+For [Issue on Behalf (API)](/airkit/usage/credential/issue-on-behalf), use a Partner JWT with these fields:
+
+| Category | Required fields | Notes |
+| --- | --- | --- |
+| Claims | `partnerId`, `scope: "issue on-behalf"`, `email` | `email` must be the target user's AIR Account email |
+| Header | `kid`, `typ: "JWT"` | `kid` identifies which key in your JWKS is used |
+| Algorithm | `RS256` or `ES256` | Keep consistent with your JWKS key type |
+| Expiry | `exp` (recommended 5 minutes) | Short-lived token recommended |
+
+JWKS reminders for Issue on Behalf:
+
+- `kid` in JWT header must match a key ID exposed by your JWKS endpoint
+- JWKS endpoint must be publicly reachable by AIR Kit
+
+Focused Node.js example (payload + header shape):
+
+```js
+const jwt = require("jsonwebtoken");
+const fs = require("fs");
+
+const privateKey = fs.readFileSync("path/to/private.key");
+const now = Math.floor(Date.now() / 1000);
+
+const payload = {
+  partnerId: "your-partner-id",
+  scope: "issue on-behalf",
+  email: "user@example.com",
+  iat: now,
+  exp: now + 5 * 60
+};
+
+const token = jwt.sign(payload, privateKey, {
+  algorithm: "RS256",
+  header: {
+    kid: "your-partner-id",
+    typ: "JWT"
+  }
+});
+```
+
+## Generating Partner JWTs
+
+### Generating an RS256 Key Pair
+
+To generate a private/public key pair, you may use OpenSSL:
+
+```sh
+# Generate a 2048-bit RSA private key
+openssl genpkey -algorithm RSA -out private.key -pkeyopt rsa_keygen_bits:2048
+
+# Extract the public key in PEM format
+openssl rsa -pubout -in private.key -out public.key
+```
+
+- `private.key`: Use this file as your signing key in backend code.
+- `public.key`: Use this to configure your JWKS endpoint for JWT verification.
+
+> **Tip:** Keep your private key secure and never share it publicly.
+
+### Examples
+
+Below are backend code examples for generating a JWT using ES256 or RS256 algorithms, including the `kid` (Key ID) header.
+
+
+<Tabs>
+<Tab title="Node.js">
+
+```js
+const jwt = require("jsonwebtoken");
+const fs = require("fs");
+
+const privateKey = fs.readFileSync("path/to/private.key");
+const payload = {
+  partnerId: "your-partner-id",
+  // other claims as needed
+  exp: Math.floor(Date.now() / 1000) + 5 * 60 // 5 minutes expiry
+};
+
+const token = jwt.sign(payload, privateKey, {
+  algorithm: "RS256",
+  header: {
+    kid: "your-key-id"
+  }
+});
+console.log(token);
+```
+
+</Tab>
+<Tab title="Java">
+
+```java
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import java.util.HashMap;
+import java.util.Map;
+
+Algorithm algorithm = Algorithm.RSA256(null, privateKey); // Use your private key
+Map<String, Object> headerClaims = new HashMap<>();
+headerClaims.put("kid", "your-key-id");
+
+String token = JWT.create()
+                .withHeader(headerClaims)
+                .withClaim("partnerId", "your-partner-id")
+                .withExpiresAt(new Date(System.currentTimeMillis() + 5 * 60 * 1000))
+                .sign(algorithm);
+
+System.out.println(token);
+```
+
+</Tab>
+<Tab title="C#">
+
+```csharp
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
+
+// Load your private key and create signing credentials
+var securityKey = new RsaSecurityKey(yourPrivateRsa);
+var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
+
+var claims = new[] {
+        new Claim("partnerId", "your-partner-id"),
+        // other claims
+};
+
+var header = new JwtHeader(credentials);
+header["kid"] = "your-key-id";
+
+var token = new JwtSecurityToken(
+        header,
+        new JwtPayload(
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(5),
+                notBefore: null,
+                issuedAt: null,
+                audience: null,
+                issuer: null
+        )
+);
+
+var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+Console.WriteLine(jwt);
+```
+
+</Tab>
+<Tab title="Go">
+
+```go
+import (
+        "fmt"
+        "time"
+        "github.com/golang-jwt/jwt/v5"
+)
+
+func main() {
+        privateKey := []byte("your-private-key") // Use PEM for RS256/ES256
+        claims := jwt.MapClaims{
+                "partnerId": "your-partner-id",
+                "exp":       time.Now().Add(5 * time.Minute).Unix(),
+        }
+        token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+        token.Header["kid"] = "your-key-id"
+        signedToken, err := token.SignedString(privateKey)
+        if err != nil {
+                panic(err)
+        }
+        fmt.Println(signedToken)
+}
+```
+
+
+> **Note:** Replace `"your-partner-id"`, `"your-key-id"`, and private key paths with your actual values. For ES256, use the appropriate signing method and key type.
+</Tab>
+</Tabs>
