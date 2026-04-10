@@ -1,0 +1,51 @@
+---
+title: "Flutter UI components"
+description: "Built-in AIR Kit UI flows on Flutter: swap, on-ramp, and MFA."
+icon: "layout-panel-left"
+---
+
+# Flutter UI components
+
+AIR Kit exposes several **hosted UI flows** on Flutter through `AirService`. APIs below match the [Reference](/airkit/usage/reference) Flutter tab.
+
+## Prerequisites
+
+- [Initialization](/airkit/usage/initialization) with a valid `GlobalKey<NavigatorState>` on `MaterialApp`
+- User logged in
+- Optional: `preloadWallet()` before opening wallet UIs for smoother first open
+
+## Swap UI
+
+```dart
+await airService.showSwapUi();
+```
+
+## On-ramp UI
+
+```dart
+await airService.showOnRampUi(
+  displayCurrencyCode: 'USD',
+  targetCurrencyCode: 'ETH', // optional
+);
+```
+
+## MFA setup
+
+```dart
+await airService.setupOrUpdateMfa();
+```
+
+Check status via `getUserInfo()` → `user.isMFASetup` (see Reference models).
+
+## Theming, locale, and currency
+
+Web SDK uses `sessionConfig` / `updateSessionConfig` on `init`. For Flutter, confirm behavior in your SDK version and [Release notes](/airkit/release-notes). Dashboard and partner configuration also affect login and widget appearance — see [Theming](/airkit/usage/config-theming) and [Language & currency](/airkit/usage/config-language) for product-level options.
+
+## Web-only UI
+
+Some built-in Web SDK UIs (exact parity varies by platform) are documented under [Built-in UI](/airkit/usage/account/builtin-ui). Compare with the [platform matrix](/airkit/platform-matrix) for Flutter vs Web.
+
+## Next steps
+
+- [Wallet operations](/airkit/flutter/wallet-operations)
+- [User login & sessions](/airkit/usage/user-authentication)

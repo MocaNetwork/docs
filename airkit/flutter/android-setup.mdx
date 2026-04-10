@@ -1,0 +1,132 @@
+---
+title: "Flutter Android setup"
+description: "Configure Android for AIR Kit Flutter: Digital Asset Links, manifest, network security, and build settings."
+icon: "android"
+---
+
+# Flutter Android setup
+
+Configure your Android app for passkeys, AIR Kit WebViews, and secure networking. These steps align with [SDK installation](/airkit/usage/installation) (Flutter tab).
+
+## Prerequisites
+
+- Android Gradle Plugin and Kotlin versions supported by your Flutter template
+- **`minSdk` 26** and **`compileSdk` 34** (required for AIR Kit)
+
+## Asset statements (Digital Asset Links)
+
+Create or edit `android/app/src/main/res/values/strings.xml`:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="asset_statements" translatable="false">
+        [
+        {"include": "https://account.air3.com/.well-known/assetlinks.json"},
+        {"include": "https://account.sandbox.air3.com/.well-known/assetlinks.json"}
+        ]
+    </string>
+</resources>
+```
+
+Reference the resource from `AndroidManifest.xml` inside `<application>`:
+
+```xml
+<meta-data
+    android:name="asset_statements"
+    android:resource="@string/asset_statements" />
+```
+
+## App signing and allowlisting
+
+Provide your app’s **SHA-256 signing certificate fingerprint** and **package name** to Moca for allowlisting (debug and release may differ). Use `keytool`:
+
+```bash
+keytool -list -v -keystore <path-to-keystore> -alias <alias>
+```
+
+## `minSdk` and `compileSdk`
+
+In your app-level Gradle file (Kotlin DSL or Groovy), set at least:
+
+```kotlin
+android {
+    compileSdk = 34
+    defaultConfig {
+        minSdk = 26
+    }
+}
+```
+
+## Network security config
+
+Optional: add `android/app/src/main/res/xml/network_security_config.xml` for TLS and (if needed) local dev domains:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+    </domain-config>
+</network-security-config>
+```
+
+Point `<application>` to it:
+
+```xml
+android:networkSecurityConfig="@xml/network_security_config"
+```
+
+## Permissions
+
+Typical requirements:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+```
+
+## ProGuard / R8
+
+If you minify release builds, add keep rules for AIR Kit, WebView, and crypto dependencies. **Verify package names** against your resolved dependencies after `flutter pub get`:
+
+```proguard
+-keepattributes Signature,*Annotation*,EnclosingMethod,InnerClasses
+# Adjust package patterns to match your app’s dependencies
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**
+```
+
+## Verify the build
+
+```bash
+flutter clean
+flutter pub get
+flutter build apk
+```
+
+## Troubleshooting
+
+| Issue | What to check |
+|-------|----------------|
+| Passkey / domain errors | Asset statements JSON, signing cert vs allowlist, `meta-data` wiring |
+| WebView blank / SSL | `networkSecurityConfig`, INTERNET permission |
+| Gradle conflicts | `flutter clean`, `./gradlew clean` under `android/` |
+
+More help: [Flutter troubleshooting](/airkit/flutter/troubleshooting) and [SDK issues](/airkit/troubleshooting/sdk-issues).
+
+## Next steps
+
+- [iOS setup](/airkit/flutter/ios-setup)
+- [Google Sign-In](/airkit/flutter/google-signin) (optional)
+- [SDK initialization](/airkit/usage/initialization)
+
+## Reference
+
+- [Digital Asset Links](https://developers.google.com/digital-asset-links/v1/getting-started)
+- [Flutter Android deploy](https://docs.flutter.dev/deployment/android)

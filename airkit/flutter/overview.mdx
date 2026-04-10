@@ -1,0 +1,39 @@
+---
+title: "Flutter SDK overview"
+description: "Integrate AIR Kit in Flutter apps for account services, wallet features, and native mobile flows."
+icon: "smartphone"
+---
+
+# Flutter SDK overview
+
+Use the AIR Kit Flutter SDK to integrate **account services** and **wallet features** in native Android and iOS apps. Flutter docs in this section complement the shared AIR Kit guides under **Quick Setup**, **Authentication**, and **Reference**.
+
+## What to read first
+
+1. [Flutter installation](/airkit/flutter/installation) — OnePub setup and `pubspec.yaml`
+2. [Android setup](/airkit/flutter/android-setup) and [iOS setup](/airkit/flutter/ios-setup) — passkeys, asset links, associated domains
+3. [SDK initialization](/airkit/usage/initialization) (Flutter tab) and [Reference](/airkit/usage/reference) (Flutter tab) for `AirService` APIs
+
+## Capability summary
+
+See the [platform support matrix](/airkit/platform-matrix) for Web vs Flutter feature availability.
+
+<Warning>
+  **Credential Services** (user-initiated issue and verify in the client SDK) are not yet available on Flutter. For credential-heavy mobile flows, use the Web SDK in a WebView or server-side [Issue on Behalf](/airkit/usage/credential/issue-on-behalf-api). Details are in the matrix and [issuing](/airkit/usage/credential/issuing-credentials) / [verify](/airkit/usage/credential/verify) docs.
+</Warning>
+
+## Authentication on Flutter
+
+On Flutter, sign-in uses `login` with a **Partner JWT** (`authToken`) after `initialize()`. See [User login & sessions](/airkit/usage/user-authentication) (Flutter tab) and [Partner authentication](/airkit/usage/partner-authentication).
+
+## Environment and dashboard
+
+Use the [Developer Dashboard](https://developers.sandbox.air3.com/dashboard) for partner ID, programs, and configuration. Environment values match [Environments](/airkit/environments) (`Environment.sandbox`, `production`, etc.).
+
+## Related guides
+
+- [Google Sign-In](/airkit/flutter/google-signin) — Firebase / platform OAuth setup
+- [Wallet operations](/airkit/flutter/wallet-operations) — balances, transactions, signing
+- [Provider functions](/airkit/flutter/provider-functions) — JSON-RPC via `AirService`
+- [UI components](/airkit/flutter/ui-components) — swap, on-ramp, MFA
+- [Troubleshooting](/airkit/flutter/troubleshooting) — common Flutter issues

@@ -1,0 +1,65 @@
+---
+title: "Flutter installation"
+description: "Install the AIR Kit Flutter package with OnePub and configure minimum platform versions."
+icon: "download"
+---
+
+# Flutter installation
+
+Install the **`airkit`** Dart package from the hosted OnePub repository. This matches the Flutter tab on [SDK installation](/airkit/usage/installation).
+
+## Prerequisites
+
+- Flutter SDK and Dart toolchain on your PATH
+- OnePub access (credentials provided by Moca)
+- Android: `compileSdk` 34+, `minSdk` 26+ (see [Android setup](/airkit/flutter/android-setup))
+- iOS: platform 14.0+ in `Podfile` (see [iOS setup](/airkit/flutter/ios-setup))
+
+## OnePub CLI
+
+```bash
+dart pub global activate onepub
+onepub login
+```
+
+<Warning>
+If `onepub` is not found, add Pub’s global bin directory to your PATH, for example: `export PATH=$PATH:$HOME/.pub-cache/bin`
+</Warning>
+
+## Add the dependency
+
+**Option A — `pubspec.yaml`**
+
+```yaml
+dependencies:
+  airkit:
+    hosted: https://onepub.dev/api/sxhddavuhn/
+    version: ^1.5.0-beta.0
+```
+
+Use the version your team recommends; check [Release notes](/airkit/release-notes) for current Flutter SDK versions.
+
+**Option B — CLI**
+
+```bash
+onepub pub add airkit
+```
+
+Then run:
+
+```bash
+flutter pub get
+```
+
+## Import
+
+```dart
+import 'package:airkit/airkit.dart';
+```
+
+## Next steps
+
+1. [Android setup](/airkit/flutter/android-setup) — asset statements, manifest, network security
+2. [iOS setup](/airkit/flutter/ios-setup) — associated domains, `Podfile`
+3. [Initialization](/airkit/usage/initialization) — `AirService` and `navigatorKey`
+4. [Google Sign-In](/airkit/flutter/google-signin) if you use Google login

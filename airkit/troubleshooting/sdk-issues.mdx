@@ -49,15 +49,18 @@ await airService.init({ partnerId: "your-partner-id" });
 
 ## Flutter-specific
 
+For a consolidated checklist, see [Flutter troubleshooting](/airkit/flutter/troubleshooting).
+
 ### SDK not loading on iOS
 
 - Ensure your `ios/Runner/Info.plist` includes the required URL schemes and capabilities.
-- Check the [Installation guide](/airkit/usage/installation) for iOS-specific configuration.
+- Follow [Flutter iOS setup](/airkit/flutter/ios-setup) and the [Installation guide](/airkit/usage/installation) (Flutter tab).
 
 ### SDK not loading on Android
 
-- Verify the minimum SDK version in `android/app/build.gradle` meets the requirement.
+- Verify `minSdk` 26+ and `compileSdk` 34+ in your Gradle config.
 - Ensure internet permission is declared in `AndroidManifest.xml`.
+- Follow [Flutter Android setup](/airkit/flutter/android-setup).
 
 ## wagmi connector
 

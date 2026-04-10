@@ -1,0 +1,86 @@
+---
+title: "Flutter wallet operations"
+description: "Use AirService on Flutter for accounts, balances, contract calls, signing, and transactions."
+icon: "wallet"
+---
+
+# Flutter wallet operations
+
+After [initialization](/airkit/usage/initialization) and login, use `AirService` for embedded wallet operations. Method names match the [Reference](/airkit/usage/reference) Flutter tab.
+
+## Prerequisites
+
+- `await airService.initialize(...)` completed
+- User authenticated (see [User login & sessions](/airkit/usage/user-authentication))
+- Optional: `await airService.preloadWallet()` before first wallet UI or heavy RPC use
+
+## Accounts and address
+
+```dart
+final accounts = await airService.getAccounts();
+final address = await airService.getAbstractAccountAddress();
+```
+
+## Balances
+
+```dart
+final address = await airService.getAbstractAccountAddress();
+if (address != null) {
+  final balanceWei = await airService.getBalance(address);
+  // Format for display (example: 18 decimals)
+}
+```
+
+## Sign messages
+
+```dart
+final signature = await airService.signMessage('Hello from AIR Kit');
+```
+
+## Contract reads (`call`)
+
+```dart
+final result = await airService.call(
+  '0xContractAddress',
+  'balanceOf',
+  [/* parameters */],
+  erc20AbiJsonString,
+);
+```
+
+## Transactions (`sendTransaction`)
+
+Use `web3dart` `Transaction` / `Transaction.callContract` types as in your SDK version:
+
+```dart
+import 'package:web3dart/web3dart.dart';
+
+// Example shape — adjust gas, chain, and contract types to your app
+final txHash = await airService.sendTransaction(transaction);
+```
+
+## Smart account deployment
+
+```dart
+final deployed = await airService.isSmartAccountDeployed();
+if (!deployed) {
+  final txHash = await airService.deploySmartAccount();
+}
+```
+
+## Built-in wallet UI
+
+- Swap: `await airService.showSwapUi();`
+- On-ramp: `await airService.showOnRampUi(displayCurrencyCode: 'USD');`
+
+See [UI components](/airkit/flutter/ui-components).
+
+## Error handling
+
+Catch `AirKitException` and inspect `type` (`client`, `sdk`, `server`, `unknown`) for logging and user messaging.
+
+## Next steps
+
+- [Provider functions](/airkit/flutter/provider-functions) — raw JSON-RPC
+- [Account Services](/airkit/usage/account/smart-account) — product concepts (web-centric sections may still apply conceptually)
+- [Paymaster](/airkit/usage/account/paymaster) — gas sponsorship where supported

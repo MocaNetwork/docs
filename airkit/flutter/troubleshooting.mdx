@@ -1,0 +1,46 @@
+---
+title: "Flutter troubleshooting"
+description: "Common fixes for AIR Kit Flutter integration: install, platform config, login, and WebView issues."
+icon: "wrench"
+---
+
+# Flutter troubleshooting
+
+## Installation and OnePub
+
+| Issue | What to try |
+|-------|-------------|
+| `onepub` command not found | Add `$HOME/.pub-cache/bin` to PATH |
+| Package resolve failures | `onepub login`, verify hosted URL and version in [Flutter installation](/airkit/flutter/installation) |
+
+## Android
+
+| Issue | What to try |
+|-------|-------------|
+| Passkey / asset links | [Android setup](/airkit/flutter/android-setup): `strings.xml`, manifest `meta-data`, signing cert allowlisting |
+| `minSdk` / manifest merge errors | Set `minSdk` 26+, `compileSdk` 34+ |
+
+## iOS
+
+| Issue | What to try |
+|-------|-------------|
+| Associated Domains | [iOS setup](/airkit/flutter/ios-setup): capability, exact domain entries, physical device |
+| CocoaPods | `cd ios && rm -rf Pods Podfile.lock && pod install` |
+
+## Runtime
+
+| Issue | What to try |
+|-------|-------------|
+| Login UI does not appear | `navigatorKey` passed to `MaterialApp` and `initialize()` |
+| `Service is not initialized` | Await `initialize()` before other calls |
+| WebView blank | Platform network config, ATS (iOS), Associated Domains / asset links |
+
+## Credentials on Flutter
+
+Client-side **issue** and **verify** flows are not available on Flutter yet. Use WebView + Web SDK or server APIs — see [Platform matrix](/airkit/platform-matrix) and [Credential issues](/airkit/troubleshooting/credential-issues).
+
+## More help
+
+- [SDK issues](/airkit/troubleshooting/sdk-issues) — includes Flutter-specific notes
+- [Common errors](/airkit/troubleshooting/common-errors)
+- Support via your Moca / partner channel
