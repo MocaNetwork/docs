@@ -180,7 +180,6 @@
           },
           {
             "group": "Flutter",
-            "icon": "smartphone",
             "pages": [
               "airkit/flutter/overview",
               "airkit/flutter/installation",
