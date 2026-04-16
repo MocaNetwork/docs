@@ -13,7 +13,7 @@ AIR Kit can expose **Google** as a login method when your partner configuration 
 
 ## How it connects to AIR Kit
 
-Partner configuration supplies the Google OAuth client behavior expected by AIR Kit. Ensure the **same OAuth clients** you configure in Firebase match what you register in the dashboard.
+Partner configuration supplies the Google OAuth client behavior expected by AIR Kit. Ensure the **same OAuth clients** you configure in Firebase are the ones you share with Moca for manual dashboard setup (see [Dashboard](#dashboard)).
 
 ## iOS
 
@@ -30,7 +30,9 @@ Partner configuration supplies the Google OAuth client behavior expected by AIR 
 
 ## Dashboard
 
-In the Developer Dashboard, configure the Google OAuth client IDs and enable Google as a login method for your partner. If the option does not appear in the hosted login UI, confirm partner settings and environment (sandbox vs production).
+Partners must provide the **Google OAuth client IDs** for iOS and Android (from Firebase / Google Cloud). The Developer Dashboard does **not** yet let partners enter these values themselves. Moca sets them **manually** for your partner, the same way as other allowlisted values (for example Android signing certificate fingerprints and iOS app identifiers — see [Android setup](/airkit/flutter/android-setup) and [iOS setup](/airkit/flutter/ios-setup)).
+
+Enable Google as a login method in partner configuration once your client IDs are on file. If you need IDs added or updated, use your Moca / partner channel.
 
 ## Troubleshooting
 
