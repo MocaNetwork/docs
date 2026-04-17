@@ -1,0 +1,53 @@
+---
+title: "Flutter UI components"
+description: "Built-in AIR Kit UI on Flutter: login, swap, on-ramp, and MFA."
+icon: "book"
+---
+
+AIR Kit exposes **native Flutter UI** for login and several **hosted UI flows** through `AirService`. APIs below match the [Reference](/airkit/usage/reference) Flutter tab.
+
+## Prerequisites
+
+- [Initialization](/airkit/usage/initialization) with a valid `GlobalKey<NavigatorState>` on `MaterialApp`
+- For **Swap**, **On-ramp**, and **MFA** below: an authenticated session after `login`
+- Optional: `preloadWallet()` before opening wallet UIs for smoother first open
+
+## Login
+
+`login` presents **native Flutter UI** for the configured login methods. After `initialize()`, call `login` with your **Partner JWT** (`authToken`) as described in [User login & sessions](/airkit/usage/user-authentication) (Flutter tab).
+
+## Swap UI
+
+```dart
+await airService.showSwapUi();
+```
+
+## On-ramp UI
+
+```dart
+await airService.showOnRampUi(
+  displayCurrencyCode: 'USD',
+  targetCurrencyCode: 'ETH', // optional
+);
+```
+
+## MFA setup
+
+```dart
+await airService.setupOrUpdateMfa();
+```
+
+Check status via `getUserInfo()` → `user.isMFASetup` (see Reference models).
+
+## Theming, locale, and currency
+
+Web SDK uses `sessionConfig` / `updateSessionConfig` on `init`. For Flutter, confirm behavior in your SDK version and [Release notes](/airkit/release-notes). Dashboard and partner configuration also affect login and widget appearance — see [Theming](/airkit/usage/config-theming) and [Language & currency](/airkit/usage/config-language) for product-level options.
+
+## Web-first built-in UI
+
+Some Account Services UIs documented under [Built-in UI](/airkit/usage/account/builtin-ui) are Web-first; Flutter parity varies by release. Confirm APIs and behavior in the [Reference](/airkit/usage/reference) Flutter tab and [Release notes](/airkit/release-notes).
+
+## Next steps
+
+- [Wallet operations](/airkit/flutter/wallet-operations)
+- [User login & sessions](/airkit/usage/user-authentication)

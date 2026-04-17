@@ -1,0 +1,59 @@
+---
+title: "Flutter Google Sign-In"
+icon: "google"
+---
+
+AIR Kit can expose **Google** as a login method when your partner configuration enables it. Configure native Google Sign-In on each platform so the SDK can complete the OAuth flow.
+
+## Prerequisites
+
+- [Flutter installation](/airkit/flutter/installation) and platform setup ([Android](/airkit/flutter/android-setup), [iOS](/airkit/flutter/ios-setup))
+- Google Cloud / Firebase project with OAuth client IDs for your Android package name and iOS bundle ID
+- Google OAuth settings aligned with the [Developer Dashboard](https://developers.sandbox.air3.com/dashboard/general)
+
+## How it connects to AIR Kit
+
+Partner configuration supplies the Google OAuth client behavior expected by AIR Kit. Ensure the **same OAuth clients** you configure in Firebase are the ones you share with Moca for manual dashboard setup (see [Dashboard](#dashboard)).
+
+## iOS
+
+1. In [Firebase Console](https://console.firebase.google.com/), add an iOS app with your bundle ID.
+2. Download `GoogleService-Info.plist` and add it to `ios/Runner/` in Xcode (copy if needed).
+3. In `Info.plist`, add `CFBundleURLTypes` using the **`REVERSED_CLIENT_ID`** from `GoogleService-Info.plist` as the URL scheme (see Google’s Flutter / iOS Sign-In docs).
+
+## Android
+
+1. In Firebase, add an Android app with your **application ID** (package name).
+2. Download `google-services.json` to `android/app/`.
+3. In the **project** `android/build.gradle`, include the Google services classpath if required by your template.
+4. In the **app** `android/app/build.gradle`, apply the Google Services plugin per [FlutterFire / Google Sign-In setup](https://pub.dev/packages/google_sign_in).
+
+## Dashboard
+
+Partners must provide the **Google OAuth client IDs** for iOS and Android (from Firebase / Google Cloud). The Developer Dashboard does **not** yet let partners enter these values themselves. Moca sets them **manually** for your partner, the same way as other allowlisted values (for example Android signing certificate fingerprints and iOS app identifiers — see [Android setup](/airkit/flutter/android-setup) and [iOS setup](/airkit/flutter/ios-setup)).
+
+Enable Google as a login method in partner configuration once your client IDs are on file. If you need IDs added or updated, use your Moca / partner channel.
+
+## Troubleshooting
+
+| Symptom | Checks |
+|---------|--------|
+| `redirect_uri_mismatch` | iOS URL scheme matches `REVERSED_CLIENT_ID`; OAuth client matches bundle ID |
+| Google button missing | Partner config; correct `partnerId` and environment |
+| Android build errors | `google-services.json` path; package name; Play Services on device |
+
+## Security
+
+- Do not commit `GoogleService-Info.plist` or `google-services.json` to public repos if they contain secrets; use CI secrets or private config distribution.
+
+## Next steps
+
+- [User login & sessions](/airkit/usage/user-authentication)
+- [Partner authentication](/airkit/usage/partner-authentication)
+- [User management](/airkit/usage/user-management)
+
+## Reference
+
+- [Google Sign-In for Flutter](https://pub.dev/packages/google_sign_in)
+- [Google Sign-In iOS](https://developers.google.com/identity/sign-in/ios/start)
+- [Google Sign-In Android](https://developers.google.com/identity/sign-in/android/start)

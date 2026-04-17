@@ -1,0 +1,33 @@
+---
+title: "Flutter SDK overview"
+description: "Integrate AIR Kit in Flutter apps for account services, wallet features, and native mobile flows."
+icon: "mobile"
+---
+
+## What to read first
+
+1. [Flutter installation](/airkit/flutter/installation) — OnePub setup and `pubspec.yaml`
+2. [Android setup](/airkit/flutter/android-setup) and [iOS setup](/airkit/flutter/ios-setup) — passkeys, asset links, associated domains
+3. [SDK initialization](/airkit/usage/initialization) (Flutter tab) and [Reference](/airkit/usage/reference) (Flutter tab) for `AirService` APIs
+
+## Capability summary
+
+See the [platform support matrix](/airkit/platform-matrix) for supported platforms, browsers, and package installs.
+
+Credential **issuance** and **verification** in the client SDK are available on Flutter. Start with [Issue credentials](/airkit/quickstart/issue-credentials), [Verify credentials](/airkit/quickstart/verify-credentials), [Issuing credentials](/airkit/usage/credential/issuing-credentials), and [Verify](/airkit/usage/credential/verify). Server-side [Issue on Behalf](/airkit/usage/credential/issue-on-behalf-api) works from any backend.
+
+## Authentication on Flutter
+
+On Flutter, sign-in uses `login` with a **Partner JWT** (`authToken`) after `initialize()`. See [User login & sessions](/airkit/usage/user-authentication) (Flutter tab) and [Partner authentication](/airkit/usage/partner-authentication).
+
+## Environment and dashboard
+
+Use the [Developer Dashboard](https://developers.sandbox.air3.com/dashboard) for partner ID, programs, and configuration. Environment values match [Environments](/airkit/environments) (`Environment.sandbox`, `production`, etc.).
+
+## Related guides
+
+- [Google Sign-In](/airkit/flutter/google-signin) — Firebase / platform OAuth setup
+- [Wallet operations](/airkit/flutter/wallet-operations) — balances, transactions, signing
+- [Provider functions](/airkit/flutter/provider-functions) — JSON-RPC via `AirService`
+- [UI components](/airkit/flutter/ui-components) — login, swap, on-ramp, MFA
+- [Troubleshooting](/airkit/flutter/troubleshooting) — common Flutter issues

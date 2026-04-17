@@ -49,5 +49,23 @@ Future<void> initialize({
 ```
 
 The `partnerId` you will receive from us and the `navigatorKey` parameter is needed to overlay dialogs necessary for specific user flows. During development we recommend using `Environment.sandbox` and enabled logging.
+
+**Guides:** [Flutter overview](/airkit/flutter/overview) · [Flutter installation](/airkit/flutter/installation) · [Android setup](/airkit/flutter/android-setup) · [iOS setup](/airkit/flutter/ios-setup)
+
+Minimal pattern:
+
+```dart
+final navigatorKey = GlobalKey<NavigatorState>();
+final airService = AirService();
+
+await airService.initialize(
+  partnerId: 'YOUR_PARTNER_ID',
+  navigatorKey: navigatorKey,
+  env: Environment.sandbox,
+  enableLogging: true,
+);
+
+// In MaterialApp: navigatorKey: navigatorKey
+```
 </Tab>
 </Tabs>

@@ -1,0 +1,64 @@
+---
+title: "Flutter provider functions"
+description: "Call Ethereum JSON-RPC methods through AirService on Flutter."
+icon: "plug"
+---
+
+On Flutter, `AirService.sendEthereumRpcRequest` exposes an **EIP-1193-style** surface for common RPC methods. Use it directly or wrap it for libraries like **web3dart**.
+
+<Note>
+  **wagmi** is for web React apps. For wagmi, see [Wagmi integration](/recipes/wagmi-integration) and the Web SDK [provider](/airkit/usage/account/provider-functions) docs.
+</Note>
+
+## Request and response shapes
+
+See [Reference](/airkit/usage/reference) (Flutter tab) for `EthereumRpcRequest` and `EthereumRpcSuccessResponse`.
+
+## Examples
+
+### `eth_accounts` and `eth_chainId`
+
+```dart
+final accountsRes = await airService.sendEthereumRpcRequest(
+  EthereumRpcRequest(method: 'eth_accounts', params: []),
+);
+final chainRes = await airService.sendEthereumRpcRequest(
+  EthereumRpcRequest(method: 'eth_chainId', params: []),
+);
+```
+
+### `eth_getBalance`
+
+```dart
+final address = await airService.getAbstractAccountAddress();
+if (address != null) {
+  final res = await airService.sendEthereumRpcRequest(
+    EthereumRpcRequest(
+      method: 'eth_getBalance',
+      params: [address, 'latest'],
+    ),
+  );
+}
+```
+
+### Switch or add chain
+
+```dart
+await airService.sendEthereumRpcRequest(
+  EthereumRpcRequest(
+    method: 'wallet_switchEthereumChain',
+    params: [
+      {'chainId': '0x1'},
+    ],
+  ),
+);
+```
+
+## web3dart
+
+You can implement a thin adapter that forwards `JsonRpc` calls to `sendEthereumRpcRequest`. Keep the adapter in your app repo and test against your SDK version.
+
+## Next steps
+
+- [Wallet operations](/airkit/flutter/wallet-operations)
+- [Supported chains](/airkit/usage/account/supported-chains)

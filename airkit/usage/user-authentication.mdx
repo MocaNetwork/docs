@@ -22,7 +22,16 @@ login(options?: { authToken?: string }): Promise<AirLoginResult>
 </Tab>
 <Tab title="Flutter">
 
-Currently not supported.
+On Flutter, call `login` with a **Partner JWT** after `initialize()`:
+
+```dart
+Future<LoginResult> login({
+  required String authToken,
+  OnOtpRequest? onOtpRequest,
+});
+```
+
+See [Reference](/airkit/usage/reference) (Flutter tab) and [Flutter overview](/airkit/flutter/overview). Build the JWT using [Partner authentication](/airkit/usage/partner-authentication).
 
 </Tab>
 </Tabs>

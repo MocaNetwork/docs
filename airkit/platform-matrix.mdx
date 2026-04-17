@@ -1,6 +1,6 @@
 ---
 title: "SDK Platform Support Matrix"
-description: "Supported platforms, frameworks, browsers, and feature availability across AIR Kit SDKs."
+description: "Supported platforms, frameworks, browsers, and module formats across AIR Kit SDKs."
 icon: "grid-2"
 ---
 
@@ -9,7 +9,7 @@ icon: "grid-2"
 | SDK | Package | Install |
 |-----|---------|---------|
 | Web (JS / TS) | `@mocanetwork/airkit` | `npm install @mocanetwork/airkit` |
-| Flutter | `airkit_flutter` | pub.dev |
+| Flutter | `airkit` (Dart) | OnePub hosted — see [Flutter installation](/airkit/flutter/installation) |
 
 For the latest version numbers see [Release Notes](/airkit/release-notes).
 
@@ -49,37 +49,6 @@ For the latest version numbers see [Release Notes](/airkit/release-notes).
 | SvelteKit | ✓ | Full support |
 | Angular 14+ | ✓ | Full support |
 | Vanilla JS | ✓ | UMD / ESM builds available |
-
-## Feature Matrix by SDK
-
-| Feature | Web SDK | Flutter SDK |
-|---------|:-------:|:-----------:|
-| **Account Services** | | |
-| Email / social login | ✓ | ✓ |
-| Smart account creation | ✓ | ✓ |
-| Wallet provider (EIP-1193) | ✓ | — |
-| Wagmi connector | ✓ | — |
-| Gas sponsorship (Paymaster) | ✓ | ✓ |
-| Session keys | Beta | — |
-| Built-in Swap UI | ✓ | — |
-| Built-in On-Ramp UI | ✓ | — |
-| **Credential Services** | | |
-| Issue credentials (user-initiated) | ✓ | Coming Soon |
-| Verify credentials | ✓ | Coming Soon |
-| Schema management | ✓ | Coming Soon |
-| Plug & Play issuer template | ✓ | — |
-| Plug & Play verifier template | ✓ | — |
-| **Server-Side (any language)** | | |
-| Issue on Behalf API | ✓ | ✓ |
-| **Configuration** | | |
-| Theming / custom CSS | ✓ | ✓ |
-| Multi-language / i18n | ✓ | ✓ |
-| Login method config | ✓ | ✓ |
-| Sandbox / Testnet mode | ✓ | ✓ |
-
-<Warning>
-  Credential Services (issue, verify) are not yet available in the Flutter SDK. For credential-heavy mobile flows, embed the Web SDK in a WebView, or contact the team about the Flutter credential support timeline.
-</Warning>
 
 ## Module Formats (Web SDK)
 

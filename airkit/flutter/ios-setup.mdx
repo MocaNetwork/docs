@@ -1,0 +1,89 @@
+---
+title: "Flutter iOS setup"
+description: "Configure iOS for AIR Kit Flutter: Associated Domains, Podfile, and passkey-related settings."
+icon: "apple"
+---
+
+## Prerequisites
+
+- Xcode and CocoaPods
+- **iOS deployment target 14.0+** in `Podfile` (required for AIR Kit)
+
+## Associated Domains
+
+1. Open `ios/Runner.xcworkspace` in Xcode.
+2. Select the **Runner** target → **Signing & Capabilities**.
+3. Add **Associated Domains**.
+4. Add the domains you use:
+
+```
+webcredentials:account.air3.com
+webcredentials:account.sandbox.air3.com
+```
+
+Optional for non-production testing:
+
+```
+webcredentials:account.staging.air3.com
+webcredentials:account.uat.air3.com
+```
+
+<Note>
+Include only environments you actually use. Production and sandbox are the usual minimum.
+</Note>
+
+## App ID allowlisting
+
+Provide Moca with your **Apple Team ID** and **bundle identifier** in the form `TEAMID.com.example.app`.
+
+## Podfile
+
+Set the platform version:
+
+```ruby
+platform :ios, '14.0'
+```
+
+Then:
+
+```bash
+cd ios
+pod install
+```
+
+## Info.plist (optional)
+
+If you need ATS exceptions for specific domains, configure them narrowly in `Info.plist`. Prefer default secure TLS where possible.
+
+Optional usage strings if you add camera / photo features:
+
+```xml
+<key>NSCameraUsageDescription</key>
+<string>Required for features that use the camera.</string>
+```
+
+## Testing
+
+- Passkeys and full WebAuthn behavior require a **physical device** in many cases.
+- Build with `flutter build ios` and run from Xcode or `flutter run`.
+
+## Troubleshooting
+
+| Issue | What to check |
+|-------|----------------|
+| Domain verification failures | Capability enabled, correct team, provisioning profile, domains spelled correctly |
+| `pod install` errors | `rm -rf Pods Podfile.lock`, `pod repo update`, `pod install` |
+| WebView / network | Associated Domains, device network, ATS settings |
+
+See also [Flutter troubleshooting](/airkit/flutter/troubleshooting).
+
+## Next steps
+
+- [Google Sign-In](/airkit/flutter/google-signin) (optional)
+- [SDK initialization](/airkit/usage/initialization)
+- [User login & sessions](/airkit/usage/user-authentication)
+
+## Reference
+
+- [Associated Domains](https://developer.apple.com/documentation/xcode/supporting-associated-domains)
+- [Flutter iOS deploy](https://docs.flutter.dev/deployment/ios)

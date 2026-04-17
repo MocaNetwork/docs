@@ -179,6 +179,20 @@
             ]
           },
           {
+            "group": "Flutter",
+            "pages": [
+              "airkit/flutter/overview",
+              "airkit/flutter/installation",
+              "airkit/flutter/android-setup",
+              "airkit/flutter/ios-setup",
+              "airkit/flutter/google-signin",
+              "airkit/flutter/wallet-operations",
+              "airkit/flutter/provider-functions",
+              "airkit/flutter/ui-components",
+              "airkit/flutter/troubleshooting"
+            ]
+          },
+          {
             "group": "Authentication",
             "icon": "lock",
             "pages": [
