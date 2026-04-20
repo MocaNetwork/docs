@@ -21,5 +21,30 @@ Your MCP server provides access to all indexed content on the Moca Network docum
 Connect the Moca Network documentation MCP server to your preferred AI tool:
 
 import MCPConnectionTabs from "/snippets/mcp-connection-tabs.mdx";
+import IntegratingAiStaticAndClients from "/snippets/integrating-ai-static-and-clients.mdx";
 
 <MCPConnectionTabs />
+
+## Setup with other agents
+
+The Moca skill works with any tool that supports the [Agent Skills](https://agentskills.io/home) standard, including Cursor, VS Code Copilot, Gemini CLI, OpenAI Codex, and more.
+
+Run:
+
+```bash
+npx skills add https://docs.moca.network
+```
+
+The CLI detects your installed agents and places the skill in the correct directory for each one.
+
+## What the skill provides
+
+| Feature | Description |
+| --- | --- |
+| Quick references | Curated links across Moca Chain, AIR Kit, and API docs—where to go next from a single index |
+| Decision guidance | When to explore Moca Chain vs AIR Kit first, and how identity, credentials, and chain pieces fit together |
+| Workflows | High-level paths for understanding the network, then diving into integration quickstarts |
+| Common gotchas | Pointers into troubleshooting and “when to use” guides so agents avoid common integration mistakes |
+| Verification checklist | Pre-flight questions: which product surface, environment, and doc set match your use case |
+
+<IntegratingAiStaticAndClients />
