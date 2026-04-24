@@ -9,7 +9,8 @@
   "seo": {
     "indexing": "all",
     "metatags": {
-      "og:image": "/images/preview.png"
+      "og:image": "/images/preview.png",
+      "twitter:image": "/images/preview.png"
     }
   },
   "logo": {
