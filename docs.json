@@ -7,7 +7,10 @@
     }
   },
   "seo": {
-    "indexing": "all"
+    "indexing": "all",
+    "metatags": {
+      "og:image": "/images/preview.png"
+    }
   },
   "logo": {
     "light": "/logo/light.svg",
