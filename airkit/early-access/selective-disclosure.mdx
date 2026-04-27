@@ -1,0 +1,242 @@
+---
+title: "Selective Disclosure"
+description: "Let a Verifier read some or all of the issued credential subject after a successful zero-knowledge verification."
+---
+
+<Warning>
+**Early Access**
+
+Selective Disclosure is in early access and the API surface may change. It requires the latest AIR Kit SDK and an issuance program with disclosure explicitly enabled by the Issuer.
+</Warning>
+
+By default, AIR Kit credential verification only returns a **Compliant / Non-Compliant** result with a zero-knowledge proof — the Verifier never sees the underlying credential data. Some flows still need a small amount of plaintext after the cryptographic check passes.
+
+**Selective Disclosure** lets the Issuer opt-in to data disclosure for a credential. Once enabled, a Verifier can request specific fields from the credential subject — or the entire credential subject — alongside the zero-knowledge proof. The Verifier still validates the credential cryptographically; disclosure is layered on top of that result.
+
+## When to Use It
+
+Selective Disclosure is useful whenever the Verifier needs to take a manual or downstream step that depends on the actual credential data, not just a yes/no answer.
+
+A common example is a **loyalty rewards redemption flow**:
+
+- A user wants to redeem a perk that requires at least 5,000 reward points.
+- The ZK verification confirms the user holds a valid loyalty credential issued by your brand.
+- Your support team still needs the exact `rewardPoints` value to debit the correct amount from your loyalty ledger.
+
+With Selective Disclosure, the Verifier requests only `rewardPoints` after a `Compliant` result, and uses that value to drive the redemption — without exposing other fields like `tier` or `memberSince`.
+
+Other typical scenarios:
+
+- A KYC Verifier that needs `countryCode` and `kycLevel` to route the user through the correct compliance flow.
+- A ticketing partner that needs `seatTier` to issue a physical wristband at the venue.
+- A fintech onboarding step where an analyst manually reviews disclosed `verifiedAt` timestamps.
+
+## Prerequisites
+
+Before using Selective Disclosure you need:
+
+1. **Latest AIR Kit SDK** — Install or upgrade to the latest version of `@mocanetwork/airkit`.
+2. **Issuer with disclosure enabled** — The Issuer of the credential must have **Allow data disclosure** turned on for the issuance program.
+3. **Active verification program** — A published verification program in the Developer Dashboard (Verifier → Programs).
+4. **Partner JWT with `scope=verify`** — See [Partner Authentication](/airkit/usage/partner-authentication).
+
+## Step 1: Enable Disclosure on the Issuance Program
+
+Selective Disclosure must be enabled by the **Issuer** at the program level. As a Verifier, you cannot request disclosed data unless the Issuer has opted in.
+
+<Steps>
+  <Step title="Open the Developer Dashboard">
+    Sign in to the <a href="https://developers.sandbox.air3.com/dashboard" target="_blank" rel="noreferrer">Developer Dashboard</a> with your Issuer account.
+  </Step>
+  <Step title="Create or edit an issuance program">
+    Navigate to **Issuer → Programs** and either create a new program (Issue Pricing) or open an existing one to edit.
+  </Step>
+  <Step title="Expand Advanced set up">
+    In the credential form, expand the **Advanced set up** section.
+  </Step>
+  <Step title="Enable Allow data disclosure">
+    Toggle **Allow data disclosure** on, then save the program.
+  </Step>
+</Steps>
+
+Any credential issued from this program will now support Selective Disclosure during verification.
+
+## Step 2: Request Disclosure During Verification
+
+On the Verifier side, pass `fieldsToDisclose` to `airService.verifyCredential`. There are two supported shapes.
+
+### Disclose the Entire Credential Subject
+
+Pass `'*'` to receive every field in the credential subject.
+
+<Tabs>
+<Tab title="Web">
+
+```ts
+const result = await airService!.verifyCredential({
+  authToken,
+  programId,
+  fieldsToDisclose: '*',
+});
+```
+
+</Tab>
+<Tab title="Flutter">
+
+Not supported yet.
+
+</Tab>
+</Tabs>
+
+### Disclose Specific Fields
+
+Pass an array of field names from the credential subject. Only the listed fields are returned.
+
+<Tabs>
+<Tab title="Web">
+
+```ts
+const result = await airService!.verifyCredential({
+  authToken,
+  programId,
+  fieldsToDisclose: ['rewardPoints'],
+});
+```
+
+</Tab>
+<Tab title="Flutter">
+
+Not supported yet.
+
+</Tab>
+</Tabs>
+
+<Note>
+Field names in `fieldsToDisclose` must match keys defined in the credential schema. Fields the Issuer has not enabled for disclosure are silently omitted.
+</Note>
+
+## Response Shape
+
+When the verification result is `Compliant` and disclosure is requested, the response includes a `disclosedData` object alongside the standard verification fields.
+
+```ts
+type SelectiveDisclosureResult = {
+  status: "Compliant";
+  zkProofs: Record<string, string>;
+  transactionHash: string;
+  disclosedData: {
+    credentialSubject: IssuedCredential;
+    credentialType: string;
+    issuerDid: string;
+    issuanceDate: string;
+    expirationDate: string;
+    proof: CredentialProof[];
+  };
+};
+```
+
+`IssuedCredential` is the same subject shape you defined when issuing the credential — selective disclosure simply mirrors back the fields your verifier requested.
+
+### Example: Full Disclosure (`fieldsToDisclose: '*'`)
+
+```json
+{
+  "status": "Compliant",
+  "zkProofs": {
+    "<proofId>": "<base64-encoded-zk-proof>"
+  },
+  "transactionHash": "0x085181eba94e7d606ed663070d3832dd3894b90113806eea4468783749a122a6",
+  "disclosedData": {
+    "credentialSubject": {
+      "// ...": "your IssuedCredential data, e.g.",
+      "isOver18": true,
+      "kycLevel": "enhanced",
+      "kycProvider": "Acme KYC Provider",
+      "countryCode": "US",
+      "verifiedAt": "2026-04-22T10:50:04.804Z"
+    },
+    "credentialType": "object",
+    "issuerDid": "did:air:id:testnet:<issuerId>",
+    "issuanceDate": "2026-04-22T10:51:53.354Z",
+    "expirationDate": "2031-04-21T10:51:53.000Z",
+    "proof": [
+      {
+        "type": "BJJSignature2021",
+        "coreClaim": "<hex>",
+        "issuerData": {
+          "id": "did:air:id:testnet:<issuerId>",
+          "state": { "claimsTreeRoot": "<hex>", "value": "<hex>", "rootOfRoots": "<hex>", "revocationTreeRoot": "<hex>" },
+          "authCoreClaim": "<hex>",
+          "credentialStatus": {
+            "id": "https://credential-issuer-node.air3.com/v2/agent",
+            "revocationNonce": 0,
+            "type": "Iden3commRevocationStatusV1.0"
+          }
+        },
+        "signature": "<hex>"
+      }
+    ]
+  }
+}
+```
+
+### Example: Specific Fields (`fieldsToDisclose: ['isOver18']`)
+
+Only the requested fields are present in `disclosedData.credentialSubject`. Everything else in the response is unchanged.
+
+```json
+{
+  "status": "Compliant",
+  "zkProofs": {
+    "<proofId>": "<base64-encoded-zk-proof>"
+  },
+  "transactionHash": "0xff70a2d7c423fda81502af33206c0951c7b43b2e55e0cd728d5df7a8e7772998",
+  "disclosedData": {
+    "credentialSubject": {
+      "isOver18": true
+    },
+    "credentialType": "object",
+    "issuerDid": "did:air:id:testnet:<issuerId>",
+    "issuanceDate": "2026-04-22T10:51:53.354Z",
+    "expirationDate": "2031-04-21T10:51:53.000Z",
+    "proof": [
+      {
+        "type": "BJJSignature2021",
+        "coreClaim": "<hex>",
+        "issuerData": {
+          "id": "did:air:id:testnet:<issuerId>",
+          "state": { "claimsTreeRoot": "<hex>", "value": "<hex>", "rootOfRoots": "<hex>", "revocationTreeRoot": "<hex>" },
+          "authCoreClaim": "<hex>",
+          "credentialStatus": {
+            "id": "https://credential-issuer-node.air3.com/v2/agent",
+            "revocationNonce": 0,
+            "type": "Iden3commRevocationStatusV1.0"
+          }
+        },
+        "signature": "<hex>"
+      }
+    ]
+  }
+}
+```
+
+## Behavior and Limits
+
+- `disclosedData` is only returned when `status === "Compliant"`. Non-compliant verifications never expose credential data.
+- If the Issuer has not enabled **Allow data disclosure** on the program, `fieldsToDisclose` is ignored and `disclosedData` is omitted from the response.
+- Requesting fields that do not exist on the schema or were not enabled for disclosure does not fail the verification — those fields are simply absent.
+- The zero-knowledge proof in `zkProofs` is generated and validated regardless of which fields you disclose. Disclosure is additive, not a replacement for verification.
+
+<Tip>
+Treat `disclosedData.credentialSubject` as user data: store it only as long as you need it for the downstream action (redemption, compliance review, fulfillment), and apply the same retention rules as any PII you receive directly from the user.
+</Tip>
+
+## Related
+
+<Card title="Verifying Credentials" icon="arrow-right" href="/airkit/usage/credential/verify">
+  The base verification flow that Selective Disclosure builds on.
+</Card>
+
+<Card title="Partner Authentication" icon="key" href="/airkit/usage/partner-authentication">
+  Generate the `scope=verify` Partner JWT used as `authToken`.
+</Card>
