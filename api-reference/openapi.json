@@ -161,8 +161,11 @@
         "description": "Returns a paginated list of credential schemas with their credential count and number of distinct issuers (providers). Only schemas marked as discoverable and enabled are included. Results are sortable by `created_at`, `credential_count`, `provider_count`, or `title` (default `created_at`).",
         "tags": ["Catalog (Pilot)"],
         "security": [],
+        "servers": [
+          { "url": "https://api.sandbox.mocachain.org/v1", "description": "Sandbox (only environment available during pilot)" }
+        ],
         "x-mint": {
-          "content": "<Note>\n**Pilot API** — This endpoint is under active development and may change without notice. It is not yet recommended for production workloads.\n</Note>"
+          "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
         },
         "parameters": [
           { "$ref": "#/components/parameters/Page" },
@@ -211,8 +214,11 @@
         "description": "Returns a single schema together with every discoverable credential built on it. Each credential includes issuer info and traction metrics (holder count, issuance count, and demand count — the number of verification programs that accept it).",
         "tags": ["Catalog (Pilot)"],
         "security": [],
+        "servers": [
+          { "url": "https://api.sandbox.mocachain.org/v1", "description": "Sandbox (only environment available during pilot)" }
+        ],
         "x-mint": {
-          "content": "<Note>\n**Pilot API** — This endpoint is under active development and may change without notice. It is not yet recommended for production workloads.\n</Note>"
+          "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
         },
         "parameters": [
           {
@@ -274,8 +280,11 @@
         "description": "Returns a single credential with its full profile: the schema-defined data points (field name, type, required flag), issuer identity (name, DID, origin), traction metrics (unique holders, total issuances, total verifications), linked verification programs, and availability window (accessible start/end, expiration duration, first/last issuance timestamps).",
         "tags": ["Catalog (Pilot)"],
         "security": [],
+        "servers": [
+          { "url": "https://api.sandbox.mocachain.org/v1", "description": "Sandbox (only environment available during pilot)" }
+        ],
         "x-mint": {
-          "content": "<Note>\n**Pilot API** — This endpoint is under active development and may change without notice. It is not yet recommended for production workloads.\n</Note>"
+          "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
         },
         "parameters": [
           {
@@ -357,8 +366,11 @@
         "description": "Returns a paginated list of verification programs with their total verification count and the number of distinct credential types they accept. Only programs marked as discoverable are included. Results are sortable by `created_at`, `verification_count`, `credential_count`, or `name` (default `created_at`).",
         "tags": ["Catalog (Pilot)"],
         "security": [],
+        "servers": [
+          { "url": "https://api.sandbox.mocachain.org/v1", "description": "Sandbox (only environment available during pilot)" }
+        ],
         "x-mint": {
-          "content": "<Note>\n**Pilot API** — This endpoint is under active development and may change without notice. It is not yet recommended for production workloads.\n</Note>"
+          "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
         },
         "parameters": [
           { "$ref": "#/components/parameters/Page" },
@@ -408,8 +420,11 @@
         "description": "Returns a single verification program with the verifier's identity, pricing model, the full list of accepted credentials (each with holder/issuance counts), and the zero-knowledge verification conditions required for each credential (e.g. `age >= 18`).",
         "tags": ["Catalog (Pilot)"],
         "security": [],
+        "servers": [
+          { "url": "https://api.sandbox.mocachain.org/v1", "description": "Sandbox (only environment available during pilot)" }
+        ],
         "x-mint": {
-          "content": "<Note>\n**Pilot API** — This endpoint is under active development and may change without notice. It is not yet recommended for production workloads.\n</Note>"
+          "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
         },
         "parameters": [
           {
@@ -479,8 +494,11 @@
         "description": "Performs a MySQL full-text search (natural language mode) across three entity types in parallel — credentials (matched on ID, name, category, and schema), issuers (matched on name and short name), and verification programs (matched on program name). Returns grouped results with relevance scores, paginated independently per group.",
         "tags": ["Catalog (Pilot)"],
         "security": [],
+        "servers": [
+          { "url": "https://api.sandbox.mocachain.org/v1", "description": "Sandbox (only environment available during pilot)" }
+        ],
         "x-mint": {
-          "content": "<Note>\n**Pilot API** — This endpoint is under active development and may change without notice. It is not yet recommended for production workloads.\n</Note>"
+          "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
         },
         "parameters": [
           {
