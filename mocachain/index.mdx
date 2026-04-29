@@ -5,65 +5,95 @@ description: "Moca Chain is a Layer 1 EVM-compatible blockchain purpose-built fo
 
 > _Moca Chain is a Layer 1 EVM-compatible blockchain purpose-built for decentralized identity, enabling chain-agnostic identity data issuance and verifications._
 
-Moca Chain is built upon EVMOS (a cosmos-sdk EVM implementation) and integrates with Moca's version of BNB Greenfield’s decentralized storage system, and uses oracles and bridges for making identity data available across different chains.
+Moca Chain is built on EVMOS (a Cosmos SDK EVM implementation) and integrates Moca's adaptation of BNB Greenfield's decentralized storage. Oracles and bridges relay identity data to other chains, so Moca Chain becomes the single source of truth for identity while staying interoperable with the rest of Web3.
 
-This enables Moca Chain to become the single source of truth for identity data since it:
+This means Moca Chain:
 
-- Houses all the credential and identity-based smart contracts
-- Manages the decentralized storage where credentials are stored
-- Enables users to relay proofs crosschain
+- Houses the credential and identity-based smart contracts
+- Manages the decentralized storage where credentials live
+- Lets users relay proofs across chains
 
-## Quick Chain Facts
+## Sub-second identity flows
+
+CometBFT consensus with 1-second blocks and instant finality. Age checks, KYC gates, and logins commit in a single block, so identity flows feel synchronous to the end user.
+
+## Consumer-scale capacity
+
+800 transactions per block and a 60,000,000 gas limit. The chain is sized for ZK verifier contracts and batched credential issuance at production volume rather than testnet workloads.
+
+## Builder-ready
+
+EVM-compatible with transient storage (EIP-1153) and other Shanghai opcodes. Existing Solidity contracts port over with little to no rewrite, and standard Ethereum tooling (Hardhat, Foundry, Remix, MetaMask) works out of the box. Integration timelines move from quarters to days.
+
+## Storage without the liability (MCSP)
+
+The Moca Chain Storage Provider network (MCSP) gives partners S3-compatible decentralized storage, modeled after BNB Greenfield. Partners stop running their own credential databases, and users keep ownership of the underlying data.
+
+- Payload data is stored by independent Storage Providers
+- Object metadata, payments, and permissions are recorded on-chain
+- Apps interact via S3-compatible APIs to upload, download, and manage objects
+- Replication and integrity proofs protect data availability
+
+## Privacy by construction
+
+Zero-knowledge proofs use Circom circuits and Groth16, with selective disclosure defined at the schema level. Apps confirm a user is over 18, KYC'd, or accredited without ever seeing the underlying attributes. Raw data stays on the user's device, which materially reduces GDPR and CCPA exposure for partners.
+
+## Verify once, recognized everywhere
+
+Proofs are relayed off Moca Chain via oracles and bridges. A single verification carries to every chain a partner ships into next, so users do not re-prove the same credential per ecosystem.
+
+## Quick chain facts
 
 | **Field**                  | **Details**                                                      |
 | -------------------------- | ---------------------------------------------------------------- |
 | Consensus                  | CometBFT                                                         |
 | Framework                  | Cosmos SDK                                                       |
 | EVM                        | Ethereum Compatible. LONDON instruction set. Based on EvmOS v12. |
-| Block Time                 | ~ 1 second.                                                      |
+| Block Time                 | ~ 1 second                                                       |
+| Finality                   | Instant (single-block)                                           |
 | Native Token               | MOCA                                                             |
 | Block Rewards              | Exponential decay from rewards pool. Not yet implemented.        |
 | Max Validators             | 100 (CometBFT hard limit: 10,000)                                |
 | Chain ID                   | 222888 (0x366a8)                                                 |
-| Max Transactions Per Block | 2400                                                             |
-| Max Gas Limit              | 4,294,967,295                                                    |
+| Max Transactions Per Block | 800                                                              |
+| Max Gas Limit              | 60,000,000                                                       |
 | Validator Key Scheme       | ed25519                                                          |
 
-## CometBFT Consensus Layer
+## CometBFT consensus layer
 
-Moca Chain utilizes CometBFT consensus and is governed by $MOCA holders who participate in deciding the future direction of the ecosystem:
+Moca Chain uses CometBFT consensus and is governed by \$MOCA holders who decide the future direction of the ecosystem:
 
-- Community members can submit governance proposals with a minimum deposit requirement
+- Community members can submit governance proposals with a minimum deposit
 - Proposals enter a voting period
 - Proposals must meet minimum participation thresholds
-- Approved proposals are automatically executed on-chain
+- Approved proposals are executed on-chain automatically
 
-[More on Consensus Layer →](./technical-details/consensus-layer/)
+[More on the consensus layer →](/mocachain/technical-details/consensus-layer)
 
-## Cosmos SDK with EVM Compatibility
+## Cosmos SDK with EVM compatibility
 
-Moca Chain integrates Cosmos SDK with Ethereum Virtual Machine (EVM) functionality based on EVMOS, creating a unified environment:
+Moca Chain combines the Cosmos SDK with EVM functionality based on EVMOS in a single environment:
 
-- Cosmos $MOCA and EVM $MOCA are the same currency, managed by the same bank keeper module
+- Cosmos \$MOCA and EVM \$MOCA are the same currency, managed by the same bank keeper module
 - All addresses on chain look like EVM addresses (e.g., 0x1234...7890)
-- The EVM runs the LONDON instruction set, with support for some SHANGHAI opcodes, including:
+- The EVM runs the LONDON instruction set with selected SHANGHAI opcodes:
   - EIP-3855
   - EIP-3860
-  - EIP-1153
+  - EIP-1153 (transient storage)
   - EIP-5656
   - EIP-6780
 
-[More on EVM Compatibility →](./technical-details/evm-compatibility/)
+[More on EVM compatibility →](/mocachain/technical-details/evm-compatibility)
 
-## Moca Chain Storage Provider Network (MCSP)
+## Moca Chain Storage Provider network (MCSP)
 
-Moca Chain includes a built-in decentralized storage layer called MCSP network inspired by BNB Greenfield:
+Moca Chain ships with a built-in decentralized storage layer, the MCSP network, inspired by BNB Greenfield:
 
 - Payload data is stored by independent Storage Providers
 - Object metadata, payments, and permissions are recorded on-chain
-- Users and DApps interact via S3-compatible APIs to upload, download, and manage objects
+- Users and apps interact via S3-compatible APIs to upload, download, and manage objects
 - Data availability is protected through replication and integrity proofs
 - Providers earn storage fees for service, with penalties for misbehavior
-- Enables verifiable, cost-efficient storage for Moca Credential System and broader applications
+- Verifiable, cost-efficient storage for the Moca credential system and broader applications
 
-[More about MCSP Network →](./technical-details/decentralized-storage/)
+[More about the MCSP network →](/mocachain/technical-details/decentralized-storage)

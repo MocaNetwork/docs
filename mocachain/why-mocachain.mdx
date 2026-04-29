@@ -1,42 +1,45 @@
 ---
 title: "Why Moca Chain?"
-description: "Key features that differentiate Moca Chain: EVM compatibility, decentralized storage, zero-knowledge privacy, and fast finality."
+description: "Key features that differentiate Moca Chain: sub-second identity flows, consumer-scale capacity, EVM compatibility with transient storage, MCSP storage, ZK privacy, and cross-chain proof recognition."
 ---
 
 > _Moca Chain is a Layer 1 EVM-compatible blockchain purpose-built for decentralized identity, enabling chain-agnostic identity data issuance and verifications._
 
-## EVM Compatible
+## Sub-second identity flows
 
-Moca Chain is fully EVM-compatible. Developers can deploy existing Solidity smart contracts and use familiar tooling (Hardhat, Foundry, Remix, MetaMask) without modification.
+CometBFT consensus, 1-second blocks, instant finality. Age checks, KYC gates, and logins commit in a single block, so identity flows feel synchronous to the end user.
 
-## Decentralized Data Storage
+## Consumer-scale capacity
 
-Moca Chain stores credentials in its decentralized storage network (MCSP) to:
+800 transactions per block and a 60,000,000 gas limit. Moca Chain handles ZK verifier contracts and batched credential issuance at full production volume, not just testnet workloads.
 
-- Ensure data availability is consistent with chain uptime
-- Distribute storage across independent providers for resilience
-- Support geolocation-specific storage for data residency requirements
+## Builder-ready
 
-## Privacy and Zero-Knowledge Focus
+Moca Chain is fully EVM-compatible and supports transient storage (EIP-1153) along with other Shanghai opcodes. Existing Solidity contracts port over with little to no rewrite, and standard Ethereum tooling (Hardhat, Foundry, Remix, MetaMask) works as is. Integration moves from quarters to days.
+
+## Storage without the liability (MCSP)
+
+Moca Chain stores credentials in the Moca Chain Storage Provider network (MCSP), a decentralized storage layer with S3-compatible APIs:
+
+- Data availability tracks chain uptime
+- Storage is distributed across independent providers for resilience
+- Geolocation-specific storage supports data residency requirements
+- Partners stop running their own credential databases, and users keep ownership of the underlying data
+
+## Privacy by construction
 
 Privacy is built into the protocol:
 
-- **Zero-Knowledge Proofs (ZKPs):** Verify claims without exposing data (e.g., prove you're 18 without sharing your birthday).
+- **Zero-knowledge proofs:** Verify claims without exposing data (e.g., prove you are over 18 without sharing your birthday). Moca Chain currently uses Circom circuits with Groth16.
+- **Selective disclosure at the schema level:** Apps confirm a user is over 18, KYC'd, or accredited without ever seeing the underlying attributes.
+- **Raw data stays on device:** Personal data never leaves the user's device, which materially reduces GDPR and CCPA exposure for partners.
 - **zkTLS:** Enables secure onboarding from web sources while keeping information encrypted and user-authorized.
 
-Moca Chain currently uses Circom with Groth16 for ZK proofs. More information on zkTLS will be provided as it rolls out.
+## Verify once, recognized everywhere
 
-## Performance & Availability
+Proofs are relayed off Moca Chain via oracles and bridges. A single verification carries to every chain a partner ships into next, so users do not re-prove the same credential per ecosystem.
 
-Leveraging CometBFT consensus, Moca Chain provides:
-
-- Instant finality
-- ~1 second block time
-- 2,400 max transactions per block
-
-Most major L1s have 2+ second block times without instant finality.
-
-## Next Steps
+## Next steps
 
 - [Technical Architecture](/mocachain/technical-details/architecture)
 - [Connect to Moca Chain](/mocachain/using-moca-chain/connect-to-mocachain)
