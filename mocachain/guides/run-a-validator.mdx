@@ -96,7 +96,7 @@ Generic Authorization
 VALIDATOR_ADDR=$(mocad keys show validator -a --keyring-backend test)
 DELEGATOR_ADDR=$VALIDATOR_ADDR
 GOV_ADDR=0x7b5Fe22B5446f7C62Ea27B8BD71CeF94e03f3dF2
-mocad tx authz grant ${GOV_ADDR} generic --msg-type=/cosmos.staking.v1beta1.MsgDelegate --keyring-backend test --chain-id "moca_222888-1" --from ${DELEGATOR_ADDR} --node "https://testnet-lcd.mocachain.org:443" -b sync --gas "200000000" --fees "100000000000000000000amoca" --yes
+mocad tx authz grant ${GOV_ADDR} generic --msg-type=/cosmos.staking.v1beta1.MsgDelegate --keyring-backend test --chain-id "moca_222888-1" --from ${DELEGATOR_ADDR} --node "https://tm-rpc.testnet.mocachain.dev:443" -b sync --gas "200000000" --fees "100000000000000000000amoca" --yes
 ```
 
 OR Limited Authorization
@@ -105,7 +105,7 @@ OR Limited Authorization
 VALIDATOR_ADDR=$(mocad keys show validator -a --keyring-backend test)
 DELEGATOR_ADDR=$VALIDATOR_ADDR
 GOV_ADDR=0x7b5Fe22B5446f7C62Ea27B8BD71CeF94e03f3dF2
-mocad tx authz grant ${GOV_ADDR} delegate --allowed-validators=${VALIDATOR_ADDR} --spend-limit=10000000000000000000000amoca  --keyring-backend test --chain-id "moca_222888-1" --from ${DELEGATOR_ADDR} --node "https://testnet-lcd.mocachain.org:443" -b sync --gas "2000000" --fees "1000000000000000000amoca" --yes
+mocad tx authz grant ${GOV_ADDR} delegate --allowed-validators=${VALIDATOR_ADDR} --spend-limit=10000000000000000000000amoca  --keyring-backend test --chain-id "moca_222888-1" --from ${DELEGATOR_ADDR} --node "https://tm-rpc.testnet.mocachain.dev:443" -b sync --gas "2000000" --fees "1000000000000000000amoca" --yes
 ```
 
 ### Submit a Create Validator Proposal
@@ -194,7 +194,7 @@ VALIDATOR_NODE_PUB_KEY=$(cat ~/.mocad/config/priv_validator_key.json | jq -r '.p
 # grant staking authz to governance module
 echo "Granting staking authz to governance module..."
 GOV_ADDR=0x7b5Fe22B5446f7C62Ea27B8BD71CeF94e03f3dF2
-mocad tx authz grant ${GOV_ADDR} generic --msg-type=/cosmos.staking.v1beta1.MsgDelegate --keyring-backend test --chain-id "moca_222888-1" --from ${DELEGATOR_ADDR} --node "https://testnet-lcd.mocachain.org:443" -b sync --gas "200000000" --fees "100000000000000000000amoca" --yes
+mocad tx authz grant ${GOV_ADDR} generic --msg-type=/cosmos.staking.v1beta1.MsgDelegate --keyring-backend test --chain-id "moca_222888-1" --from ${DELEGATOR_ADDR} --node "https://tm-rpc.testnet.mocachain.dev:443" -b sync --gas "200000000" --fees "100000000000000000000amoca" --yes
 # generate the JSON file
 echo "Generating create_validator_proposal.json..."
 cat <<EOF > proposal.json
@@ -271,7 +271,7 @@ If you are utilizing the Cold Wallet or MPC wallet, please proceed to next step
 ```bash
 VALIDATOR_ADDR=$(mocad keys show validator -a --keyring-backend test)
 DELEGATOR_ADDR=$VALIDATOR_ADDR
-mocad tx gov submit-proposal ./proposal.json --keyring-backend test --chain-id "moca_222888-1" --from ${DELEGATOR_ADDR} --node "https://testnet-lcd.mocachain.org:443" -b sync --gas "600000" --fees "100000000000000000000amoca" --yes
+mocad tx gov submit-proposal ./proposal.json --keyring-backend test --chain-id "moca_222888-1" --from ${DELEGATOR_ADDR} --node "https://tm-rpc.testnet.mocachain.dev:443" -b sync --gas "600000" --fees "100000000000000000000amoca" --yes
 
 ```
 
@@ -297,7 +297,7 @@ txhash: 94BFFAA9792A9C94BC1A925C433F5CA13CB1526C8E85D83D9D462ACF766E8475
 Find the proposal ID:
 
 ```bash
-mocad q tx BB845EA77C5051A8885FCEB6FAF06E279305D9DE7B03DBA8915D1A1E2804B3AF --node "https://testnet-lcd.mocachain.org:443" --output json | jq '.logs[] | .events[] | select(.type == "submit_proposal") | .attributes[] | select(.key == "proposal_id") | .value | tonumber'
+mocad q tx BB845EA77C5051A8885FCEB6FAF06E279305D9DE7B03DBA8915D1A1E2804B3AF --node "https://tm-rpc.testnet.mocachain.dev:443" --output json | jq '.logs[] | .events[] | select(.type == "submit_proposal") | .attributes[] | select(.key == "proposal_id") | .value | tonumber'
 
 ```
 
@@ -309,7 +309,7 @@ mocad q tx BB845EA77C5051A8885FCEB6FAF06E279305D9DE7B03DBA8915D1A1E2804B3AF --no
 Query proposal status
 
 ```bash
-curl -s https://testnet-api.mocachain.org/cosmos/gov/v1/proposals/3 | jq
+curl -s https://api.testnet.mocachain.dev/cosmos/gov/v1/proposals/3 | jq
 
 ```
 
@@ -407,7 +407,7 @@ Please ensure that the validator node is running before it is selected and if th
 ### Query all validators
 
 ```bash
-mocad query staking validators --node "https://testnet-lcd.mocachain.org:443"
+mocad query staking validators --node "https://tm-rpc.testnet.mocachain.dev:443"
 
 ```
 
