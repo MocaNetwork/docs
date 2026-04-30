@@ -183,11 +183,23 @@ curl -s "$RPC/genesis" | jq -r '.result.genesis' > ~/.mocad/config/genesis.json
 
 ## 5. Add peers
 
-Fetch and configure peers from the network:
+Configure persistent peers so your node can join the p2p network.
+
+<CodeGroup>
+
+```bash [Mainnet]
+# Mainnet public sentry nodes
+PEERS="d3e1ea4ad789bfc6c259019ae3ca13f05205f364@p2p.sentry-node-0.mocachain.dev:26656,015fda7c14ddd2e74a29a3118e5c28c069219257@p2p.sentry-node-1.mocachain.dev:26656"
+```
+
+```bash [Testnet]
+# Discover peers dynamically from the testnet RPC
+PEERS=$(curl -s "$RPC/net_info" | jq -r '.result.peers[] | select(.node_info.id and .remote_ip) | "\(.node_info.id)@\(.remote_ip):26656"' | paste -sd, -)
+```
+
+</CodeGroup>
 
 ```bash
-PEERS=$(curl -s "$RPC/net_info" | jq -r '.result.peers[] | select(.node_info.id and .remote_ip) | "\(.node_info.id)@\(.remote_ip):26656"' | paste -sd, -)
-
 # Update config with peers
 # Use sed -i '' on macOS, sed -i on Linux
 if [[ "$OSTYPE" == "darwin"* ]]; then SED_FLAG=(-i ''); else SED_FLAG=(-i); fi
