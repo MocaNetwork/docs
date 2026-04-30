@@ -16,7 +16,6 @@ const airService = new AirService({
 });
 await airService.init({
   buildEnv: BUILD_ENV.SANDBOX,
-  credentialNetwork: "devnet", // Optional: testnet (default) or devnet
   enableLogging: true,
   preloadWallet: true, // Optional: Enable if wallet features will be used
   preloadCredential: true, // Optional: Enable if credential features will be used

@@ -7,8 +7,6 @@ description: "Starting with **AirKit 1.8.0-beta**, the Sandbox environment defau
 **Breaking Change: Sandbox Now Defaults to Testnet**
 
 Starting with **AirKit 1.8.0-beta**, the Sandbox environment defaults to **Moca Chain Testnet**.
-
-If your integration is not ready, use the `chainNetwork` option to stay on Devnet. See [Migration Guide](#sandbox-testnet-migration) below.
 </Warning>
 
 <Tip>
@@ -39,35 +37,9 @@ Starting with **AirKit 1.8.0-beta**, the Sandbox environment defaults to **Moca 
 - Smart Account addresses remain the same across networks
 - You will need to re-issue test credentials on Testnet
 
-### Using Devnet
-
-If your integration is not ready, you can temporarily stay on Devnet using the `credentialNetwork` option:
-
-```js
-import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
-
-const airService = new AirService({
-  partnerId: YOUR_PARTNER_ID
-});
-await airService.init({
-  buildEnv: BUILD_ENV.SANDBOX,
-  credentialNetwork: "devnet",
-  enableLogging: true,
-  preloadWallet: true, // Optional: Enable if wallet features will be used
-  preloadCredential: true // Optional: Enable if credential features will be used
-});
-```
-
 <Tip>
-We recommend migrating to Testnet as soon as possible to align with production. Devnet will continue to be available but will be deprecated later.
+We recommend migrating to Testnet as soon as possible to align with production.
 </Tip>
-
-### Timeline
-
-| Phase                                        | Status     |
-| -------------------------------------------- | ---------- |
-| 1.8.0-beta release — Testnet becomes default | 🟡 Current |
-| Devnet support deprecated                    | 📅 TBD     |
 
 ### Initializing AirService with the correct Environment
 
@@ -108,6 +80,5 @@ Future<void> initialize({
 
 | Chain   | Chain ID | RPC                               | Explorer                           |
 | ------- | -------- | --------------------------------- | ---------------------------------- |
-| Devnet  | 5151     | https://devnet-rpc.mocachain.org  | https://devnet-scan.mocachain.org  |
 | Testnet | 222888   | https://testnet-rpc.mocachain.org | https://testnet-scan.mocachain.org |
 | Mainnet | 2288     | `coming soon`                     | `coming soon`                      |
