@@ -14,7 +14,7 @@ Critical information in this section may be subject to change as the network is 
 
 | Network | Chain ID      | EVM Chain ID | RPC (Tendermint)                  |
 | ------- | ------------- | ------------ | --------------------------------- |
-| Mainnet | moca_2288-1   | 2288         | https://tm-rpc.mocachain.dev      |
+| Mainnet | moca_2288-1   | 2288         | https://tm-rpc.mocachain.org      |
 | Testnet | moca_222888-1 | 222888       | https://tm-rpc.testnet.mocachain.dev |
 
 <Tip>
@@ -169,7 +169,7 @@ Fetch the genesis file for your target network.
 <CodeGroup>
 
 ```bash [Mainnet]
-RPC=https://tm-rpc.mocachain.dev
+RPC=https://tm-rpc.mocachain.org
 curl -s "$RPC/genesis?key=<YOUR_ACCESS_KEY>" | jq -r '.result.genesis' > ~/.mocad/config/genesis.json
 ```
 
