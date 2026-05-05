@@ -12,10 +12,10 @@ Critical information in this section may be subject to change as the network is 
 
 ## Network Information
 
-| Network | Chain ID      | EVM Chain ID | RPC (Tendermint)                  |
+| Network | Chain ID      | EVM Chain ID | RPC (CometBFT)                    |
 | ------- | ------------- | ------------ | --------------------------------- |
-| Mainnet | moca_2288-1   | 2288         | https://tm-rpc.mocachain.dev      |
-| Testnet | moca_222888-1 | 222888       | https://testnet-lcd.mocachain.org |
+| Mainnet | moca_2288-1   | 2288         | https://tm-rpc.mocachain.org      |
+| Testnet | moca_222888-1 | 222888       | https://tm-rpc.testnet.mocachain.dev |
 
 <Tip>
 **Mainnet Access**
@@ -169,12 +169,12 @@ Fetch the genesis file for your target network.
 <CodeGroup>
 
 ```bash [Mainnet]
-RPC=https://tm-rpc.mocachain.dev
+RPC=https://tm-rpc.mocachain.org
 curl -s "$RPC/genesis?key=<YOUR_ACCESS_KEY>" | jq -r '.result.genesis' > ~/.mocad/config/genesis.json
 ```
 
 ```bash [Testnet]
-RPC=https://testnet-lcd.mocachain.org
+RPC=https://tm-rpc.testnet.mocachain.dev
 curl -s "$RPC/genesis" | jq -r '.result.genesis' > ~/.mocad/config/genesis.json
 ```
 
@@ -183,11 +183,23 @@ curl -s "$RPC/genesis" | jq -r '.result.genesis' > ~/.mocad/config/genesis.json
 
 ## 5. Add peers
 
-Fetch and configure peers from the network:
+Configure persistent peers so your node can join the p2p network.
+
+<CodeGroup>
+
+```bash [Mainnet]
+# Mainnet public sentry nodes
+PEERS="d3e1ea4ad789bfc6c259019ae3ca13f05205f364@p2p.sentry-node-0.mocachain.dev:26656,015fda7c14ddd2e74a29a3118e5c28c069219257@p2p.sentry-node-1.mocachain.dev:26656"
+```
+
+```bash [Testnet]
+# Discover peers dynamically from the testnet RPC
+PEERS=$(curl -s "$RPC/net_info" | jq -r '.result.peers[] | select(.node_info.id and .remote_ip) | "\(.node_info.id)@\(.remote_ip):26656"' | paste -sd, -)
+```
+
+</CodeGroup>
 
 ```bash
-PEERS=$(curl -s "$RPC/net_info" | jq -r '.result.peers[] | select(.node_info.id and .remote_ip) | "\(.node_info.id)@\(.remote_ip):26656"' | paste -sd, -)
-
 # Update config with peers
 # Use sed -i '' on macOS, sed -i on Linux
 if [[ "$OSTYPE" == "darwin"* ]]; then SED_FLAG=(-i ''); else SED_FLAG=(-i); fi

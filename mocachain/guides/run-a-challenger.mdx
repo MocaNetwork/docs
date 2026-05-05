@@ -56,7 +56,7 @@ Set your private key, deployment environment, and gas limit. The `private_key` a
     "key_type": "local_private_key",
     "private_key": "your_challenger_private_key",
     "bls_private_key": "your_bls_private_key",
-    "rpc_addrs": [ "https://testnet-lcd.mocachain.org" ],
+    "rpc_addrs": [ "https://tm-rpc.testnet.mocachain.dev" ],
     ...
 },
 "db_config": {
@@ -66,8 +66,9 @@ Set your private key, deployment environment, and gas limit. The `private_key` a
 },
 "sp_config": {
     "internal_sp_endpoints": [
-      "https://testnet-sp0.mocachain.org",
-      ...
+      "https://gateway.storage-provider-0.testnet.mocachain.dev",
+      "https://gateway.storage-provider-1.testnet.mocachain.dev",
+      "https://gateway.storage-provider-2.testnet.mocachain.dev"
     ]
 }
 ```

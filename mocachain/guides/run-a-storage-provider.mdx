@@ -32,7 +32,7 @@ Critical information in this section may be subject to change as the network is 
 
 **Compilation dependencies:**
 
-- **Golang:** MCSP is written in Golang, and you need to install version 1.20+.
+- **Golang:** MCSP is written in Golang, and you need to install version 1.23+.
 - **Buf:** A new way of working with Protocol Buffers. MCSP uses Buf to manage proto files.
 - **protoc-gen-gocosmos:** Protocol Buffers for Go with Gadgets. MCSP uses this protobuf compiler to generate `pb.go` files.
 - **mockgen:** A mocking framework for the Go programming language that is used in unit tests.
@@ -303,10 +303,10 @@ After generating a test account, there are no tokens in this account. We should 
 
 ```bash
 # transfer 5000 \$MOCA
-mocad tx bank send validator0 {generated_test_account_address} 5000000000000000000000amoca --home /{your_moca_path}/moca/deployment/localup/.local/validator0 --keyring-backend test --node http://localhost:26750 -y
+mocad tx bank send validator0 {generated_test_account_address} 5000000000000000000000amoca --home /{your_moca_path}/moca/deployment/localup/.local/validator0 --keyring-backend test --node http://localhost:26657 -y
 
 # query your account balances
-mocad q bank balances {generated_test_account_address} --node http://localhost:26750
+mocad q bank balances {generated_test_account_address} --node http://localhost:26657
 ```
 
 #### Use cmd to send requests
@@ -331,7 +331,7 @@ touch config.toml
 Write the following content:
 
 ```
-rpcAddr = "https://testnet-lcd.mocachain.org:443"
+rpcAddr = "https://tm-rpc.testnet.mocachain.dev:443"
 chainId = "moca_222888-1"
 ```
 
@@ -520,7 +520,7 @@ Moca Chain validators are responsible for selecting storage providers. For each 
 The MCSP needs to initiate an on-chain proposal that specifies the `Msg` information to be automatically executed after the vote is approved. In this case, the `Msg` is `MsgCreateStorageProvider`. It's worth noting that the deposit tokens need to be greater than the minimum deposit tokens specified on the chain.
 
 ```
-rpcAddr = "https://testnet-lcd.mocachain.org:443"
+rpcAddr = "https://tm-rpc.testnet.mocachain.dev:443"
 chainId = "moca_222888-1"
 ```
 
@@ -588,7 +588,7 @@ mocad tx sp create-storage-provider ./create_storage_provider.json --from {fundi
 
 > **Note:**
 >
-> - You can get the `gov` module address by this command: `curl -X GET "https://testnet-api.mocachain.org/cosmos/auth/v1beta1/module_accounts/gov" -H "accept: application/json"`
+> - You can get the `gov` module address by this command: `curl -X GET "https://api.testnet.mocachain.dev/cosmos/auth/v1beta1/module_accounts/gov" -H "accept: application/json"`
 > - `endpoint` is the URL of your gateway.
 > - `read_price` and `store_price` units are wei/bytes/s.
 > - `free_read_quota` unit is Bytes.
@@ -600,7 +600,7 @@ mocad tx sp create-storage-provider ./create_storage_provider.json --from {fundi
 > **Note:** You can get the minimum deposit for a proposal by the above command. Please make sure that the initial deposit is greater than `min_deposit` when submitting the proposal.
 
 ```bash
-curl -X GET "https://testnet-api.mocachain.org/cosmos/gov/v1/params/deposit" -H "accept: application/json"
+curl -X GET "https://api.testnet.mocachain.dev/cosmos/gov/v1/params/deposit" -H "accept: application/json"
 ```
 
 You can skip this step if the initial deposit amount is greater than the min deposit required by the proposal. Each proposal needs to deposit enough tokens to enter the voting phase.
@@ -645,7 +645,7 @@ mocad tx sp update-status [sp-address] STATUS_IN_SERVICE [flags]
 
 ##### Funding Address
 
-As a new MCSP, you need to deposit a minimum amount of Moca into the funding address. Please note the initial deposit requirement varies in different environments. You can check the `sp.params.min_deposit` value (in wei Moca) from the genesis endpoint response of the Moca Chain testnet. At the time when this doc is written, according to `https://testnet-lcd.mocachain.org/genesis`, MCSP in testnet requires a minimum of 500 Moca deposited in the funding address.
+As a new MCSP, you need to deposit a minimum amount of Moca into the funding address. Please note the initial deposit requirement varies in different environments. You can check the `sp.params.min_deposit` value (in wei Moca) from the genesis endpoint response of the Moca Chain testnet. At the time when this doc is written, according to `https://tm-rpc.testnet.mocachain.dev/genesis`, MCSP in testnet requires a minimum of 500 Moca deposited in the funding address.
 In addition, to join the network, an MCSP must initiate a proposal using a funding address and have an additional >1 Moca to cover these costs.
 
 ##### Operator Address
@@ -794,7 +794,7 @@ When an MCSP decides to exit the Moca Chain network, there are three main steps 
 The exiting MCSP needs to initiate a `StorageProviderExit` transaction to Moca Chain, which will turn its status to `STATUS_GRACEFUL_EXITING`. To exit the network, you can use the following commands based on the desired network:
 
 ```
-rpcAddr = "https://testnet-lcd.mocachain.org"
+rpcAddr = "https://tm-rpc.testnet.mocachain.dev"
 chainId = "moca_222888-1"
 ```
 
