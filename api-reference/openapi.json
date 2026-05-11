@@ -162,7 +162,7 @@
         "tags": ["Catalog"],
         "security": [],
         "servers": [
-          { "url": "https://api.sandbox.mocachain.org/v1", "description": "Sandbox (only environment available during pilot)" }
+          { "url": "https://credential-testnet.api.sandbox.air3.com", "description": "Credential API sandbox (catalog)" }
         ],
         "x-mint": {
           "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
@@ -215,7 +215,7 @@
         "tags": ["Catalog"],
         "security": [],
         "servers": [
-          { "url": "https://api.sandbox.mocachain.org/v1", "description": "Sandbox (only environment available during pilot)" }
+          { "url": "https://credential-testnet.api.sandbox.air3.com", "description": "Credential API sandbox (catalog)" }
         ],
         "x-mint": {
           "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
