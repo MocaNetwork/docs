@@ -9,8 +9,8 @@
   "seo": {
     "indexing": "all",
     "metatags": {
-      "og:image": "/images/preview.png",
-      "twitter:image": "/images/preview.png"
+      "og:image": "/images/preview.png?v=1",
+      "twitter:image": "/images/preview.png?v=1"
     }
   },
   "logo": {
@@ -172,6 +172,12 @@
               "airkit/when-to-use-airkit",
               "airkit/environments",
               "airkit/platform-matrix"
+            ]
+          },
+          {
+            "group": "Early Access",
+            "pages": [
+              "airkit/early-access/selective-disclosure"
             ]
           },
           {
