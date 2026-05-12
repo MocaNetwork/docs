@@ -1,57 +1,66 @@
 ---
 title: "KYC (Veriff powered by zkMe)"
-description: "Turnkey KYC for Moca partners — document checks, NFC ePassport, liveness, AML screening, and manual review, issued as portable AIR Credentials by zkMe."
+description: "Turnkey identity verification for Moca Network partners — document checks, NFC ePassport, liveness, AML screening, and manual review — legally provided by zkMe Labs, issued as AIR Credentials."
 icon: "id-card"
 ---
 
-**Veriff powered by zkMe** is Moca Network's **on-chain IDV/KYC solution**. The bundled pipeline runs document, biometric, liveness, and AML checks; on success, **zkMe** issues a portable **AIR Credential** that any partner in the ecosystem can verify — without you running a separate KYC vendor procurement or holding raw identity data on your servers.
+Moca Network partners can onboard users with **Veriff powered by zkMe** — a bundled KYC pipeline that produces standard **AIR Kit credentials**. You contract with **zkMe Labs** for this path; no separate KYC vendor procurement is required. **zkMe Labs** is the exclusive Web3 on-chain provider for **Veriff powered by zkMe**.
 
-**Disclosure is configurable per verification program.** Verifiers can receive a simple pass/fail eligibility signal, a selective set of attributes, or the full raw KYC dataset — with full raw access gated by explicit user consent through the **Compliance Access Key (CAK)** framework where your program requires it.
+The output is the same credential model as the rest of AIR Kit: users hold attestations in their AIR Account, and verifiers receive **COMPLIANT** or **NON_COMPLIANT** signals via zero-knowledge proofs — not raw identity documents on your servers.
+
+<CardGroup cols={2}>
+  <Card title="Contact us" icon="envelope" href="https://moca.network/partners">
+    Talk to the Moca Network team about **Veriff powered by zkMe**, enterprise volume, and AIR Kit onboarding.
+  </Card>
+  <Card title="Developer Dashboard" icon="layout-dashboard" href="https://developers.sandbox.air3.com/dashboard">
+    Open the self-service dashboard to manage partner settings, schemas, and programs (when you are already onboarded).
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="diagram-project" href="/kyc/how-it-works">
+    Programmatic verification, manual fallback, AML, and credential issuance — end to end.
+  </Card>
+  <Card title="Data collection & sharing" icon="database" href="/kyc/data-collection-and-sharing">
+    What is collected, what partners see, what lands on Moca Chain, and optional CAK access.
+  </Card>
+  <Card title="zkMe security architecture" icon="shield-halved" href="/kyc/zkme-security-architecture">
+    zkPassport, zkVault, homomorphic face matching, and credential cryptography — in Moca context.
+  </Card>
+  <Card title="Pricing & FAQ" icon="circle-dollar" href="/kyc/pricing-and-faq">
+    Per-check pricing, what is included, and how this relates to bring-your-own KYC.
+  </Card>
+</CardGroup>
 
 ---
 
-## What the on-chain IDV/KYC bundle includes
+## Two ways to run KYC on Moca
 
-- **Programmatic IDV** — including **zkPassport**-style NFC reading of ICAO-compliant electronic passports and national eIDs where supported, with **strong document authenticity** via NFC chip signatures — the same class of evidence as high-assurance eKYC, feeding whatever disclosure level your verification program defines.
+| Path | When to use |
+|------|----------------|
+| **[Veriff powered by zkMe](/kyc/index)** (this section) | You want a turnkey pipeline: document + biometric + AML + optional manual review, operated under zkMe Labs, with no separate KYC vendor contract. |
+| **[Identity & Compliance](/solutions/identity)** (bring your own provider) | You already use Jumio, Onfido, Persona, or another provider and only need AIR Kit to turn pass results into portable credentials. |
+
+Both paths issue **AIR Credentials** and support the same verification experience for downstream apps. Choose based on procurement and who operates the verification stack.
+
+---
+
+## What is included
+
+- **Programmatic verification** — including **zkPassport**-style NFC reading of ICAO-compliant electronic passports and national eIDs where supported, with on-device zero-knowledge proof generation so raw chip data does not leave the user device for that step.
 - **Manual reverification** — if automated checks cannot reach a decision (poor NFC read, edge-case document, biometric mismatch), the case escalates to human review under the **Veriff powered by zkMe** operator workflow — the same regulatory outcome as a classic eKYC session.
-- **AML and sanctions screening** — bundled as part of the **on-chain IDV/KYC pipeline** (not optional add-ons you must source separately).
+- **AML and sanctions screening** — bundled as part of the regulated identity pipeline (not optional add-ons you must source separately).
 - **Face matching and liveness** — standard components of compliant identity verification.
-
----
-
-## Disclosure flexibility
-
-Each **verification program** in the Developer Dashboard defines what downstream verifiers receive. Typical patterns:
-
-- **Pass/fail** — a single eligibility signal (for example **COMPLIANT** / **NON_COMPLIANT**) with no underlying document fields.
-- **Selective disclosure** — an explicit subset of attributes (for example `kycLevel`, `isOver18`, country band) without sharing the full KYC packet.
-- **Full raw data** — the original verification payload (images, MRZ, structured fields) delivered to the verifier only when the program requires it **and** the user consents under **CAK**. See [CAK overview](/airkit/usage/credential/cak-overview).
-
-```mermaid
-flowchart LR
-  passFail["PassFail eligibility signal"]
-  selective["Selective attribute set"]
-  fullRaw["Full raw KYC via CAK consent"]
-  passFail --> selective --> fullRaw
-```
-
-For selective disclosure product detail on AIR Kit, see [Selective disclosure](/airkit/early-access/selective-disclosure) (early access).
 
 ---
 
 ## Next steps
 
 <CardGroup cols={2}>
-  <Card title="How it works" icon="diagram-project" href="/kyc/how-it-works">
-    Programmatic verification, manual fallback, AML, credential issuance, and verifier outcomes — end to end.
+  <Card title="Identity & Compliance (BYO KYC)" icon="shield-check" href="/solutions/identity">
+    Compare with the path where you keep your existing KYC vendor.
   </Card>
-  <Card title="Data collection & sharing" icon="database" href="/kyc/data-collection-and-sharing">
-    What is collected, what partners see, what lands on Moca Chain, and how disclosure modes map to CAK.
-  </Card>
-  <Card title="zkMe security architecture" icon="shield-halved" href="/kyc/zkme-security-architecture">
-    zkPassport, zkVault, homomorphic face matching, and credential cryptography — in Moca context.
-  </Card>
-  <Card title="Pricing & FAQ" icon="circle-dollar" href="/kyc/pricing-and-faq">
-    Per-check pricing, what is included, and how disclosure level is chosen per verification program.
+  <Card title="Privacy & CAK" icon="key" href="/learn/advanced-topics/privacy-and-compliance">
+    When verifiers need consent-gated access to underlying data, not just ZK results.
   </Card>
 </CardGroup>

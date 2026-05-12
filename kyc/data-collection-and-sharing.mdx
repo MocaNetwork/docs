@@ -1,12 +1,10 @@
 ---
 title: "Data collection & sharing"
-description: "Data lifecycle for Moca's on-chain KYC — what users submit, what partners receive, what is anchored on-chain, and how disclosure modes work."
+description: "What Veriff powered by zkMe collects from users, what Moca partners receive, what is anchored on Moca Chain, and how optional CAK unlocks regulated access to underlying data."
 icon: "database"
 ---
 
-This page is for **legal, compliance, and security reviewers** evaluating **Veriff powered by zkMe** — Moca Network's **on-chain IDV/KYC solution** — alongside AIR Kit on Moca Network. It complements [How it works](/kyc/how-it-works) and [zkMe security architecture](/kyc/zkme-security-architecture).
-
-The **disclosure spectrum** (pass/fail, selective attributes, full raw under consent) is summarized on the [KYC overview](/kyc/index) under **Disclosure flexibility**.
+This page is for **legal, compliance, and security reviewers** evaluating **Veriff powered by zkMe** alongside AIR Kit on Moca Network. It complements [How it works](/kyc/how-it-works) and [zkMe security architecture](/kyc/zkme-security-architecture).
 
 ---
 
@@ -21,63 +19,54 @@ Typical inputs across programmatic and manual paths include:
 | Device signals | IP address, coarse geo, device metadata | Risk scoring and sanctions workflows |
 | NFC chip payload | ePassport / eID chip data | Cryptographic authenticity (zkPassport path) |
 
-Exact fields depend on the verification program configured for your partnership. **Your application does not need to persist these artifacts** to participate in the **on-chain IDV/KYC model** unless your own compliance policy requires local copies.
+Exact fields depend on the verification program configured for your partnership. **Your application does not need to persist these artifacts** to participate in the AIR credential model.
 
 ---
 
 ## What the partner receives
 
-What your platform and downstream verifiers see depends entirely on the **verification program** and whether **CAK** is in play — not on a single fixed "privacy mode."
+| Data | Partner receives? |
+|------|-------------------|
+| Passport / ID images | No — not for routine verification-by-ZK |
+| MRZ text, chip dumps | No |
+| Selfie / liveness media | No |
+| AML raw hits | No — policy outputs are reflected in the **credential** your programs define |
+| **AIR Credential** reference and attributes | Yes — only what the Issuance program encodes (for example `kycLevel`, `isOver18`, compliance flags) |
+| **Verifier result** | Yes — **COMPLIANT** / **NON_COMPLIANT** (and related proof metadata from AIR Kit) |
 
-| Data | When does the partner or verifier receive it? |
-|------|-----------------------------------------------|
-| Passport / ID images | **Pass/fail or selective-only programs:** not delivered as raw media. **Full-raw program with CAK:** only after explicit user consent per verifier session. |
-| MRZ text, structured chip fields | Same pattern: **only via CAK** when the program requests full raw disclosure and the user consents. |
-| Selfie / liveness media | Same: **only via CAK** with user consent when the program requires raw biometric evidence at the verifier. |
-| AML policy outputs | Usually reflected as **credential attributes** or pass/fail eligibility (for example sanctions-clear flag). Raw vendor hit detail follows the same program + CAK rules as other sensitive fields. |
-| **AIR Credential** reference and attributes | **Yes** — whatever the Issuance program encodes (for example `kycLevel`, `isOver18`, compliance flags) for selective or pass/fail modes. |
-| **Verifier outcome** | **Yes** — from a simple **COMPLIANT** / **NON_COMPLIANT** signal through to **field-level payloads** when the program and CAK consent allow. |
-
-Partners should treat the credential and verification program as the **integration contract**: define the minimum disclosure that meets each use case, and rely on revocation and re-issuance when users or regulators require updates.
+Partners should treat the credential as the **integration contract**: define minimal attributes, avoid storing duplicates of identity media, and rely on revocation and re-issuance when users or regulators require updates.
 
 ---
 
 ## What Moca Chain stores
 
-Moca Chain records **cryptographic commitments** for credentials — for example hashes, Merkle roots, and revocation state — not plaintext PII. That design lets verifiers trust a credential without every verifier inheriting a full document vault.
+Moca Chain records **cryptographic commitments** for credentials — for example hashes, Merkle roots, and revocation state — not plaintext PII. That design is what lets verifiers trust a credential without inheriting a document vault.
 
 ---
 
-## What zkMe holds
+## What zkMe Labs holds
 
-**zkMe** operates the verification orchestration for **Veriff powered by zkMe** and **encrypts sensitive verification payloads** under the **zkVault** model (hardware-backed trusted execution, threshold encryption, and supporting cryptography — summarized on [zkMe security architecture](/kyc/zkme-security-architecture)).
+Under **Veriff powered by zkMe**, zkMe Labs operates the verification orchestration and **encrypts sensitive verification payloads** under the zkMe **zkVault** model (hardware-backed trusted execution, threshold encryption, and supporting cryptography — summarized on [zkMe security architecture](/kyc/zkme-security-architecture)).
 
-zkMe stores the original verification material so it can be **re-issued**, **refreshed**, or **partially or fully disclosed** in line with each verifier's program configuration and the **user's consent** (including CAK where enabled). Retention follows regulated identity-provider practices: fraud investigation, regulatory inquiry support, and operational quality — not resale to unrelated third parties.
+zkMe uses retained material only for lawful purposes you would expect from a regulated identity provider: session quality, fraud investigation, re-verification, regulatory inquiry support, and credential refresh — not for resale to advertisers.
 
 ---
 
 ## How the verification stack fits together
 
-End-user verification sessions for **Veriff powered by zkMe** may execute on infrastructure operated under **zkMe's** commercial and technical arrangements. Outputs are consumed by **zkMe** as the **legal and contracting party** for your Moca-facing KYC bundle. Partners contract for this path with **zkMe** only.
+End-user verification sessions for **Veriff powered by zkMe** may execute on infrastructure operated under zkMe Labs' commercial and technical arrangements. Outputs are consumed by **zkMe Labs** as the **legal and contracting party** for your Moca-facing KYC bundle. Partners contract for this path with **zkMe Labs** only.
 
 Always refer to the offering in public materials as **Veriff powered by zkMe** — use the full product name, not a shortened form.
 
 ---
 
-## Disclosure spectrum (configured per verification program)
+## When verifiers need plaintext data
 
-Three common patterns — all are **first-class** options, not a ladder you must climb:
-
-1. **Pass/fail** — the verifier receives only an eligibility boolean (for example **COMPLIANT** / **NON_COMPLIANT**).
-2. **Selective disclosure** — the verifier receives an agreed subset of attributes from the credential (and any attached proofs your schema defines).
-3. **Full raw data** — the verifier receives underlying KYC media and fields only when the program requires it **and** the user has granted access through **Compliance Access Key (CAK)**.
+The default AIR Kit flow minimizes disclosure: verifiers see ZK results. If a regulated workflow requires a verifier to receive **underlying identity media or fields** after explicit user consent, use the **Compliance Access Key (CAK)** framework:
 
 <CardGroup cols={2}>
   <Card title="CAK overview" icon="key" href="/airkit/usage/credential/cak-overview">
-    Consent-gated encryption and decryption across Issuer, Holder, and Verifier for full-raw workflows.
-  </Card>
-  <Card title="Selective disclosure" icon="eye-slash" href="/airkit/early-access/selective-disclosure">
-    Early-access AIR Kit capability for attribute-level presentation controls.
+    Consent-gated encryption and decryption across Issuer, Holder, and Verifier.
   </Card>
   <Card title="Privacy & compliance" icon="scale-balanced" href="/learn/advanced-topics/privacy-and-compliance">
     How CAK fits the credential lifecycle on Moca Network.
@@ -86,17 +75,14 @@ Three common patterns — all are **first-class** options, not a ladder you must
 
 ---
 
-## Pass/fail program (eligibility-only signal)
+## What the verifier sees (ZK path)
 
-When the verification program is configured for **eligibility only**, a typical verifier sees:
-
-| Verifier may receive | Not part of this program unless separately requested |
-|----------------------|--------------------------------------------------------|
-| **COMPLIANT** / **NON_COMPLIANT** | Full legal name, document number, DOB, address |
-| Credential identifier, expiry, issuer DID | Passport / ID images, selfie video |
-| (Optional) a small set of boolean flags encoded in the credential schema | MRZ or raw AML vendor payloads |
-
-For **selective** programs, the left column expands to include whichever attributes the schema and verification program expose (for example `kycLevel`, `isOver18`). For **full raw** programs with CAK, the verifier may additionally receive decrypted media and structured fields after consent — the table above is no longer the right mental model; follow the [CAK verifier guide](/airkit/usage/credential/cak-verifier-guide).
+| Verifier may receive | Stays private by default |
+|----------------------|---------------------------|
+| COMPLIANT / NON_COMPLIANT | Full legal name on ID |
+| Program-defined attributes (for example `kycLevel`) | Passport / national ID number |
+| Credential identifier, expiry, issuer | Date of birth, full address |
+| Proof metadata from verification | Document images, selfie video |
 
 Exact fields depend on your **credential schema** and **verification program** configuration in the Developer Dashboard.
 
@@ -106,6 +92,5 @@ Exact fields depend on your **credential schema** and **verification program** c
 
 <CardGroup cols={2}>
   <Card title="Overview" icon="book" href="/kyc/index" />
-  <Card title="zkMe security architecture" icon="shield-halved" href="/kyc/zkme-security-architecture" />
   <Card title="Pricing & FAQ" icon="circle-dollar" href="/kyc/pricing-and-faq" />
 </CardGroup>
