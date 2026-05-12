@@ -1,0 +1,66 @@
+---
+title: "KYC (Veriff powered by zkMe)"
+description: "Turnkey identity verification for Moca Network partners — document checks, NFC ePassport, liveness, AML screening, and manual review — legally provided by zkMe Labs, issued as AIR Credentials."
+icon: "id-card"
+---
+
+Moca Network partners can onboard users with **Veriff powered by zkMe** — a bundled KYC pipeline that produces standard **AIR Kit credentials**. You contract with **zkMe Labs** for this path; no separate KYC vendor procurement is required. **zkMe Labs** is the exclusive Web3 on-chain provider for **Veriff powered by zkMe**.
+
+The output is the same credential model as the rest of AIR Kit: users hold attestations in their AIR Account, and verifiers receive **COMPLIANT** or **NON_COMPLIANT** signals via zero-knowledge proofs — not raw identity documents on your servers.
+
+<CardGroup cols={2}>
+  <Card title="Contact us" icon="envelope" href="https://moca.network/partners">
+    Talk to the Moca Network team about **Veriff powered by zkMe**, enterprise volume, and AIR Kit onboarding.
+  </Card>
+  <Card title="Developer Dashboard" icon="layout-dashboard" href="https://developers.sandbox.air3.com/dashboard">
+    Open the self-service dashboard to manage partner settings, schemas, and programs (when you are already onboarded).
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="diagram-project" href="/kyc/how-it-works">
+    Programmatic verification, manual fallback, AML, and credential issuance — end to end.
+  </Card>
+  <Card title="Data collection & sharing" icon="database" href="/kyc/data-collection-and-sharing">
+    What is collected, what partners see, what lands on Moca Chain, and optional CAK access.
+  </Card>
+  <Card title="zkMe security architecture" icon="shield-halved" href="/kyc/zkme-security-architecture">
+    zkPassport, zkVault, homomorphic face matching, and credential cryptography — in Moca context.
+  </Card>
+  <Card title="Pricing & FAQ" icon="circle-dollar" href="/kyc/pricing-and-faq">
+    Per-check pricing, what is included, and how this relates to bring-your-own KYC.
+  </Card>
+</CardGroup>
+
+---
+
+## Two ways to run KYC on Moca
+
+| Path | When to use |
+|------|----------------|
+| **[Veriff powered by zkMe](/kyc/index)** (this section) | You want a turnkey pipeline: document + biometric + AML + optional manual review, operated under zkMe Labs, with no separate KYC vendor contract. |
+| **[Identity & Compliance](/solutions/identity)** (bring your own provider) | You already use Jumio, Onfido, Persona, or another provider and only need AIR Kit to turn pass results into portable credentials. |
+
+Both paths issue **AIR Credentials** and support the same verification experience for downstream apps. Choose based on procurement and who operates the verification stack.
+
+---
+
+## What is included
+
+- **Programmatic verification** — including **zkPassport**-style NFC reading of ICAO-compliant electronic passports and national eIDs where supported, with on-device zero-knowledge proof generation so raw chip data does not leave the user device for that step.
+- **Manual reverification** — if automated checks cannot reach a decision (poor NFC read, edge-case document, biometric mismatch), the case escalates to human review under the **Veriff powered by zkMe** operator workflow — the same regulatory outcome as a classic eKYC session.
+- **AML and sanctions screening** — bundled as part of the regulated identity pipeline (not optional add-ons you must source separately).
+- **Face matching and liveness** — standard components of compliant identity verification.
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Identity & Compliance (BYO KYC)" icon="shield-check" href="/solutions/identity">
+    Compare with the path where you keep your existing KYC vendor.
+  </Card>
+  <Card title="Privacy & CAK" icon="key" href="/learn/advanced-topics/privacy-and-compliance">
+    When verifiers need consent-gated access to underlying data, not just ZK results.
+  </Card>
+</CardGroup>

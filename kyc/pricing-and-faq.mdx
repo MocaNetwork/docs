@@ -1,0 +1,78 @@
+---
+title: "Pricing & FAQ"
+description: "Veriff powered by zkMe: per-check pricing for automated and manual paths, what is excluded, contracting with zkMe Labs, and how this compares to bring-your-own KYC on AIR Kit."
+icon: "circle-dollar"
+---
+
+Pricing figures below follow **zkMe's public list pricing** communicated for this partnership model. **Moca Chain** transaction fees (gas, storage operations) are **separate** — your finance team should model both zkMe verification charges and on-chain costs for issuance and verification traffic.
+
+<CardGroup cols={2}>
+  <Card title="Contact us" icon="envelope" href="https://moca.network/partners">
+    Discuss enterprise pricing, volume discounts, and **Veriff powered by zkMe** with the Moca Network team.
+  </Card>
+  <Card title="Overview" icon="book" href="/kyc/index">
+    Return to the **Veriff powered by zkMe** overview and technical deep dives.
+  </Card>
+</CardGroup>
+
+---
+
+## Pricing
+
+| Check type | Price (USD) | When it applies |
+|------------|-------------|-----------------|
+| **Automated verification** | **$0.50** per credential | User completes the programmatic path successfully; credential issued for the agreed validity window. |
+| **Manual reverification** | **$1.50** per credential | Automated path cannot complete; case is resolved via human review under **Veriff powered by zkMe**, then a credential is issued or the user fails. |
+
+Billing semantics (per issuance year, refresh rules, volume discounts) should be confirmed in your **order form or statement of work** with **zkMe Labs**. Published zkMe materials describe pay-as-you-go credential billing; enterprise volume may differ.
+
+---
+
+## FAQ
+
+### Who is my contracting party?
+
+**zkMe Labs.** Services for this turnkey path are legally provided by zkMe. You do **not** need a separate direct agreement outside **zkMe Labs** for the standard **Veriff powered by zkMe** bundle described in these docs.
+
+### How should we refer to the product in writing?
+
+Always use the full product name **Veriff powered by zkMe**. Do not shorten it in customer-facing materials.
+
+### Does this replace "bring your own KYC"?
+
+No. [Identity & Compliance](/solutions/identity) continues to describe the path where **you** keep Jumio, Onfido, Persona, or another vendor and only use AIR Kit to mint credentials from your own pass events. **Veriff powered by zkMe** is an alternative when you want zkMe to operate the verification stack end to end.
+
+### Is AML screening included?
+
+Yes. **Sanctions and AML screening** are part of the regulated identity bundle — not an optional third SKU you must license separately for this path.
+
+### Are liveness and face matching included?
+
+Yes. They are standard components of compliant **KYC** and are part of **Veriff powered by zkMe**.
+
+### What happens if NFC or automation fails?
+
+The user may be routed to **manual reverification**. Pricing for that path is the **$1.50** manual rate (see table above). From a product perspective the experience matches traditional eKYC with human review.
+
+### What do we store on our servers?
+
+For the default ZK verification experience, **you should not need to store document media** to participate — you rely on **AIR Credentials** and verifier outcomes. If you must retain regulated copies, that is a separate architectural and legal decision; many teams still choose **not** to duplicate what zkMe already holds under its vault model.
+
+### Can a verifier ever see raw KYC fields?
+
+Only with **explicit user consent** under optional **Compliance Access Key (CAK)** flows. See [CAK overview](/airkit/usage/credential/cak-overview).
+
+### Where is zkPassport supported?
+
+See zkMe's published list: [Supported countries](https://docs.zk.me/hub/how-built/id-infra/zkpassport/supported-countries). Other documents may still verify without NFC subject to program rules.
+
+---
+
+## Related reading
+
+<CardGroup cols={2}>
+  <Card title="Overview" icon="book" href="/kyc/index" />
+  <Card title="How it works" icon="route" href="/kyc/how-it-works" />
+  <Card title="Compliance FAQ" icon="shield-check" href="/solutions/compliance-faq" />
+  <Card title="AIR Kit" icon="code" href="/airkit/index" />
+</CardGroup>
