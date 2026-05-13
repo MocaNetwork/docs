@@ -1,10 +1,10 @@
 ---
 title: "zkMe security architecture"
-description: "How zkMe protects identity data behind Veriff powered by zkMe: zkPassport trust anchors, zkVault encryption, homomorphic face matching, and on-chain credential proofs — aligned with AIR Kit on Moca Chain."
+description: "Security architecture behind Moca Network's on-chain IDV/KYC solution (Veriff powered by zkMe): zkPassport trust anchors, zkVault encryption, homomorphic face matching, and on-chain credential proofs — aligned with AIR Kit on Moca Chain."
 icon: "shield-halved"
 ---
 
-The content below summarizes **public zkMe Protocol documentation** in language consistent with Moca Network. It explains how **zkMe** under **Veriff powered by zkMe** acts as a **credential Issuer** and how cryptographic components support **pass/fail**, **selective**, and **CAK-gated full-raw** disclosure models on AIR Kit. For the canonical technical detail, see [zkMe docs — Architecture](https://docs.zk.me/hub/how-works/architecture) and [zkPassport](https://docs.zk.me/hub/how-built/id-infra/zkpassport).
+Behind Moca Network's **on-chain IDV/KYC solution**, **zkMe** contributes the cryptographic stack summarized below. The content below summarizes **public zkMe Protocol documentation** in language consistent with Moca Network. It explains how **zkMe** under **Veriff powered by zkMe** acts as a **credential Issuer** and how cryptographic components support **pass/fail**, **selective**, and **CAK-gated full-raw** disclosure models on AIR Kit. For the canonical technical detail, see [zkMe docs — Architecture](https://docs.zk.me/hub/how-works/architecture) and [zkPassport](https://docs.zk.me/hub/how-built/id-infra/zkpassport).
 
 ---
 
@@ -28,7 +28,8 @@ zkMe's **zkVault** is an encrypted storage and execution model for sensitive mat
 - **Threshold encryption** and **Shamir secret sharing** so no single operator party can arbitrarily decrypt user payloads.
 - **Trusted Execution Environments (TEEs)** — Intel SGX / AMD SEV — so decryption and high-risk operations occur inside **attested enclaves** rather than in ordinary application memory.
 
-Partners on Moca still receive **AIR Credentials** and **ZK verification results**; they do not host zkVault.
+Partners on Moca still receive **AIR Credentials** and **program-configured verification outcomes** (pass/fail, selective attributes, or CAK-mediated raw payloads as defined per verification program); they do not host zkVault.
+
 ---
 
 ## Face binding without exposing raw biometrics
