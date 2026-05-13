@@ -1,10 +1,10 @@
 ---
 title: "Data collection & sharing"
-description: "What Veriff powered by zkMe collects from users, what Moca partners receive, what is anchored on Moca Chain, and how pass/fail, selective disclosure, and full raw data (via CAK) are configured per program."
+description: "Data lifecycle for Moca Network's on-chain IDV/KYC solution: what users provide, what partners and verifiers receive, what is anchored on Moca Chain, and how pass/fail, selective, and full-raw disclosure modes work."
 icon: "database"
 ---
 
-This page is for **legal, compliance, and security reviewers** evaluating **Veriff powered by zkMe** alongside AIR Kit on Moca Network. It complements [How it works](/kyc/how-it-works) and [zkMe security architecture](/kyc/zkme-security-architecture).
+This page is for **legal, compliance, and security reviewers** evaluating **Veriff powered by zkMe** — Moca Network's **on-chain IDV/KYC solution** — alongside AIR Kit on Moca Network. It complements [How it works](/kyc/how-it-works) and [zkMe security architecture](/kyc/zkme-security-architecture).
 
 The **disclosure spectrum** (pass/fail, selective attributes, full raw under consent) is summarized on the [KYC overview](/kyc/index) under **Disclosure flexibility**.
 
@@ -21,7 +21,7 @@ Typical inputs across programmatic and manual paths include:
 | Device signals | IP address, coarse geo, device metadata | Risk scoring and sanctions workflows |
 | NFC chip payload | ePassport / eID chip data | Cryptographic authenticity (zkPassport path) |
 
-Exact fields depend on the verification program configured for your partnership. **Your application does not need to persist these artifacts** to participate in the AIR credential model unless your own compliance policy requires local copies.
+Exact fields depend on the verification program configured for your partnership. **Your application does not need to persist these artifacts** to participate in the **on-chain IDV/KYC model** unless your own compliance policy requires local copies.
 
 ---
 
@@ -58,7 +58,7 @@ zkMe stores the original verification material so it can be **re-issued**, **ref
 
 ## How the verification stack fits together
 
-End-user verification sessions for **Veriff powered by zkMe** may execute on infrastructure operated under zkMe' commercial and technical arrangements. Outputs are consumed by **zkMe** as the **legal and contracting party** for your Moca-facing KYC bundle. Partners contract for this path with **zkMe** only.
+End-user verification sessions for **Veriff powered by zkMe** may execute on infrastructure operated under **zkMe's** commercial and technical arrangements. Outputs are consumed by **zkMe** as the **legal and contracting party** for your Moca-facing KYC bundle. Partners contract for this path with **zkMe** only.
 
 Always refer to the offering in public materials as **Veriff powered by zkMe** — use the full product name, not a shortened form.
 
