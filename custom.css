@@ -188,19 +188,6 @@ h2[data-component-part="card-title"] {
     font-family: "Outfit", sans-serif;
 }
 
-.landing-highlight {
-    text-align: center;
-}
-
-.landing-highlight--heading {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #AA5130;
-    margin-bottom: 20px;
-    font-family: "Outfit", sans-serif;
-}
 
 .section--block-sm {
     margin: 0 0 40px;
