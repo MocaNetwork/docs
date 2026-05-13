@@ -1,0 +1,74 @@
+---
+title: "Pricing & FAQ"
+description: "Pricing and FAQ for Moca Network's on-chain IDV/KYC solution (Veriff powered by zkMe): per-check pricing for automated and manual paths, contracting with zkMe, and how disclosure level is chosen per verification program."
+icon: "circle-dollar"
+---
+
+Pricing for **Veriff powered by zkMe**, Moca Network's **on-chain IDV/KYC solution**.
+
+Pricing figures below follow **zkMe's public list pricing** communicated for this partnership model. **Moca Chain** transaction fees (gas, storage operations) are **separate** — your finance team should model both zkMe verification charges and on-chain costs for issuance and verification traffic.
+
+---
+
+## Pricing
+
+| Check type | Price (USD) | When it applies |
+|------------|-------------|-----------------|
+| **Automated verification** | **$0.50** per credential | User completes the programmatic path successfully; credential issued for the agreed validity window. |
+| **Manual reverification** | **$1.50** per credential | Automated path cannot complete; case is resolved via human review under **Veriff powered by zkMe**, then a credential is issued or the user fails. |
+
+Billing semantics (per issuance year, refresh rules, volume discounts) should be confirmed in your **order form or statement of work** with **zkMe**. Published zkMe materials describe pay-as-you-go credential billing; enterprise volume may differ.
+
+---
+
+## FAQ
+
+### Who is my contracting party?
+
+**zkMe.** Services for this turnkey path are legally provided by zkMe. You do **not** need a separate direct agreement outside **zkMe** for the standard **Veriff powered by zkMe** bundle described in these docs.
+
+### How should we refer to the product in writing?
+
+Always use the full product name **Veriff powered by zkMe**. Do not shorten it in customer-facing materials.
+
+### What does the verifier actually receive?
+
+It depends on how you configure each **verification program**:
+
+- **Pass/fail** — typically a single eligibility outcome (for example **COMPLIANT** / **NON_COMPLIANT**) plus credential metadata your schema defines.
+- **Selective disclosure** — the verifier receives only the attributes and proofs the program asks for (for example tier, age gate, jurisdiction band).
+- **Full raw KYC** — underlying documents and structured fields are available to the verifier only when the program requires it **and** the user consents under **Compliance Access Key (CAK)**. See [CAK overview](/airkit/usage/credential/cak-overview).
+
+### Is AML screening included?
+
+Yes. **Sanctions and AML screening** are part of the regulated identity bundle — not an optional third SKU you must license separately for this path.
+
+### Are liveness and face matching included?
+
+Yes. They are standard components of compliant **KYC** and are part of **Veriff powered by zkMe**.
+
+### What happens if NFC or automation fails?
+
+The user may be routed to **manual reverification**. Pricing for that path is the **$1.50** manual rate (see table above). From a product perspective the experience matches traditional eKYC with human review.
+
+### What do we store on our servers?
+
+Many partners rely on **AIR Credentials** and verifier outcomes without duplicating raw KYC media on their own infrastructure. If your policy or regulator requires local retention, that is a separate architectural decision; coordinate with your compliance team and with **zkMe** contract terms.
+
+### Can a verifier ever see raw KYC fields?
+
+Yes, when your **verification program** is built for it **and** the user has granted access through **Compliance Access Key (CAK)** where required. See [CAK overview](/airkit/usage/credential/cak-overview).
+
+### Where is zkPassport supported?
+
+See zkMe's published list: [Supported countries](https://docs.zk.me/hub/how-built/id-infra/zkpassport/supported-countries). Other documents may still verify without NFC subject to program rules.
+
+---
+
+## Related reading
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="route" href="/kyc/how-it-works" />
+  <Card title="Privacy & compliance" icon="scale-balanced" href="/learn/advanced-topics/privacy-and-compliance" />
+  <Card title="Contact us" icon="envelope" href="https://moca.network/partners" />
+</CardGroup>

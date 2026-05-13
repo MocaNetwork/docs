@@ -1,0 +1,82 @@
+---
+title: "How Veriff powered by zkMe works"
+description: "End-to-end on-chain IDV/KYC flow on Moca Network: programmatic and manual verification paths, AML screening, credential issuance to the AIR Account, and verifier outcomes configured per program."
+icon: "route"
+---
+
+This page describes the **product flow** for **Veriff powered by zkMe**, the **on-chain IDV/KYC solution** on Moca Network. It is not an integration guide; for AIR Kit setup and APIs, see [AIR Kit](/airkit/index).
+
+---
+
+## End-to-end flow
+
+<Steps>
+  <Step title="User starts verification in your app">
+    The user launches the **Veriff powered by zkMe** experience inside your application (AIR Kit surfaces the flow; your product does not need to host raw KYC storage to participate).
+  </Step>
+  <Step title="Programmatic path (default)">
+    The user completes document capture, **NFC chip read** where the document supports it (electronic passport / eID), **liveness**, and **face matching**. On supported documents, **zkPassport** establishes cryptographic authenticity of the chip (ICAO-style passive authentication). The verified outcome feeds the **AIR Credential** with whatever **disclosure level** the issuance and verification programs require — from pass/fail only through selective attributes to full raw payloads where CAK and user consent apply.
+  </Step>
+  <Step title="AML and sanctions screening">
+    Screening runs as part of the **on-chain IDV/KYC pipeline** so the resulting credential reflects both **identity** and **financial crime compliance** signals your programs require.
+  </Step>
+  <Step title="Manual reverification (when needed)">
+    If the automated path cannot complete — for example unreadable chip, document edge case, or biometric mismatch — the session moves to **human review** under **Veriff powered by zkMe**. From the user's perspective this matches a traditional eKYC outcome: approved, rejected, or more information requested.
+  </Step>
+  <Step title="Credential issuance (AIR)">
+    On success, **zkMe** (as Issuer) issues an **AIR Credential** into the user's **AIR Account**. Cryptographic commitments anchor on **Moca Chain**; sensitive payloads remain under zkMe's protection model (see [Data collection & sharing](/kyc/data-collection-and-sharing) and [zkMe security architecture](/kyc/zkme-security-architecture)).
+  </Step>
+  <Step title="Verification at any partner">
+    When the user presents the credential elsewhere in the ecosystem, the verifier calls AIR Kit verification and receives **whatever the verification program is configured to return** — a pass/fail signal, a selective set of attributes, or the full raw dataset under explicit user consent (including the **CAK** path when enabled).
+  </Step>
+</Steps>
+
+---
+
+## Sequence overview
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant PartnerApp as PartnerApp
+  participant VpZ as VeriffPoweredByZkMe
+  participant ZkMeIssuer as ZkMeIssuer
+  participant MocaChain as MocaChain
+  participant Verifier as VerifierApp
+
+  User->>PartnerApp: Start KYC
+  PartnerApp->>VpZ: Verification session
+  alt ProgrammaticPass
+    VpZ->>User: NFC_liveness_doc
+    VpZ->>ZkMeIssuer: PassPlusAML
+  else ManualReview
+    VpZ->>VpZ: HumanReview
+    VpZ->>ZkMeIssuer: PassOrFail
+  end
+  ZkMeIssuer->>MocaChain: CredentialAnchor
+  ZkMeIssuer->>User: AIRCredentialInWallet
+  User->>Verifier: PresentCredential
+  Verifier->>MocaChain: VerifyCredential
+  Verifier->>User: AccessDecision
+```
+
+---
+
+## Geographic coverage (zkPassport)
+
+For **electronic passport** flows that rely on published country signing keys, **zkPassport** supports a large set of issuing countries. Documents from other jurisdictions may still be verified through the **document-and-biometric** path without NFC, subject to **Veriff powered by zkMe** coverage rules.
+
+For the authoritative country list, see zkMe documentation: [Supported countries](https://docs.zk.me/hub/how-built/id-infra/zkpassport/supported-countries).
+
+---
+
+## Related reading
+
+<CardGroup cols={2}>
+  <Card title="Overview" icon="book" href="/kyc/index">
+    On-chain IDV/KYC positioning, disclosure flexibility, and what the bundle includes.
+  </Card>
+  <Card title="Data lifecycle" icon="database" href="/kyc/data-collection-and-sharing">
+    What each party sees and stores across pass/fail, selective, and full-raw modes.
+  </Card>
+</CardGroup>

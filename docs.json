@@ -158,6 +158,16 @@
               "solutions/telco",
               "solutions/advertising"
             ]
+          },
+          {
+            "group": "KYC (Veriff powered by zkMe)",
+            "pages": [
+              "kyc/index",
+              "kyc/how-it-works",
+              "kyc/data-collection-and-sharing",
+              "kyc/zkme-security-architecture",
+              "kyc/pricing-and-faq"
+            ]
           }
         ]
       },

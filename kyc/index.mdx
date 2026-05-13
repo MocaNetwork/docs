@@ -1,0 +1,57 @@
+---
+title: "KYC (Veriff powered by zkMe)"
+description: "Turnkey identity verification for Moca Network partners — document checks, NFC ePassport, liveness, AML screening, and manual review — legally provided by zkMe, issued as AIR Credentials."
+icon: "id-card"
+---
+
+**Veriff powered by zkMe** is Moca Network's **on-chain IDV/KYC solution**. The bundled pipeline runs document, biometric, liveness, and AML checks; on success, **zkMe** issues a portable **AIR Credential** that any partner in the ecosystem can verify — without you running a separate KYC vendor procurement or holding raw identity data on your servers.
+
+**Disclosure is configurable per verification program.** Verifiers can receive a simple pass/fail eligibility signal, a selective set of attributes, or the full raw KYC dataset — with full raw access gated by explicit user consent through the **Compliance Access Key (CAK)** framework where your program requires it.
+
+---
+
+## What the on-chain IDV/KYC bundle includes
+
+- **Programmatic IDV** — including **zkPassport**-style NFC reading of ICAO-compliant electronic passports and national eIDs where supported, with **strong document authenticity** via NFC chip signatures — the same class of evidence as high-assurance eKYC, feeding whatever disclosure level your verification program defines.
+- **Manual reverification** — if automated checks cannot reach a decision (poor NFC read, edge-case document, biometric mismatch), the case escalates to human review under the **Veriff powered by zkMe** operator workflow — the same regulatory outcome as a classic eKYC session.
+- **AML and sanctions screening** — bundled as part of the **on-chain IDV/KYC pipeline** (not optional add-ons you must source separately).
+- **Face matching and liveness** — standard components of compliant identity verification.
+
+---
+
+## Disclosure flexibility
+
+Each **verification program** in the Developer Dashboard defines what downstream verifiers receive. Typical patterns:
+
+- **Pass/fail** — a single eligibility signal (for example **COMPLIANT** / **NON_COMPLIANT**) with no underlying document fields.
+- **Selective disclosure** — an explicit subset of attributes (for example `kycLevel`, `isOver18`, country band) without sharing the full KYC packet.
+- **Full raw data** — the original verification payload (images, MRZ, structured fields) delivered to the verifier only when the program requires it **and** the user consents under **CAK**. See [CAK overview](/airkit/usage/credential/cak-overview).
+
+```mermaid
+flowchart LR
+  passFail["PassFail eligibility signal"]
+  selective["Selective attribute set"]
+  fullRaw["Full raw KYC via CAK consent"]
+  passFail --> selective --> fullRaw
+```
+
+For selective disclosure product detail on AIR Kit, see [Selective disclosure](/airkit/early-access/selective-disclosure) (early access).
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="diagram-project" href="/kyc/how-it-works">
+    Programmatic verification, manual fallback, AML, credential issuance, and verifier outcomes — end to end.
+  </Card>
+  <Card title="Data collection & sharing" icon="database" href="/kyc/data-collection-and-sharing">
+    What is collected, what partners see, what lands on Moca Chain, and how disclosure modes map to CAK.
+  </Card>
+  <Card title="zkMe security architecture" icon="shield-halved" href="/kyc/zkme-security-architecture">
+    zkPassport, zkVault, homomorphic face matching, and credential cryptography — in Moca context.
+  </Card>
+  <Card title="Pricing & FAQ" icon="circle-dollar" href="/kyc/pricing-and-faq">
+    Per-check pricing, what is included, and how disclosure level is chosen per verification program.
+  </Card>
+</CardGroup>
