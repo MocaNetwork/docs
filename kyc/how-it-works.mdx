@@ -4,8 +4,6 @@ description: "End-to-end flow: user verification, programmatic and manual paths,
 icon: "route"
 ---
 
-This page describes the **product flow** for **Veriff powered by zkMe** on Moca Network. It is not an integration guide; for AIR Kit setup and APIs, see [AIR Kit](/airkit/index).
-
 ---
 
 ## End-to-end flow
@@ -24,7 +22,7 @@ This page describes the **product flow** for **Veriff powered by zkMe** on Moca 
     If the automated path cannot complete — for example unreadable chip, document edge case, or biometric mismatch — the session moves to **human review** under **Veriff powered by zkMe**. From the user's perspective this matches a traditional eKYC outcome: approved, rejected, or more information requested.
   </Step>
   <Step title="Credential issuance (AIR)">
-    On success, **zkMe Labs** (as Issuer) issues an **AIR Credential** into the user's **AIR Account**. Cryptographic commitments anchor on **Moca Chain**; sensitive payloads remain under zkMe's protection model (see [Data collection & sharing](/kyc/data-collection-and-sharing) and [zkMe security architecture](/kyc/zkme-security-architecture)).
+    On success, **zkMe** (as Issuer) issues an **AIR Credential** into the user's **AIR Account**. Cryptographic commitments anchor on **Moca Chain**; sensitive payloads remain under zkMe's protection model (see [Data collection & sharing](/kyc/data-collection-and-sharing) and [zkMe security architecture](/kyc/zkme-security-architecture)).
   </Step>
   <Step title="Verification at any partner">
     When the user presents the credential elsewhere in the ecosystem, the verifier calls AIR Kit verification and receives a **ZK-backed COMPLIANT / NON_COMPLIANT** result — not passport images or national ID numbers.
@@ -64,7 +62,7 @@ sequenceDiagram
 
 ## Geographic coverage (zkPassport)
 
-For **electronic passport** flows that rely on published country signing keys, **zkPassport** supports a large set of issuing countries (zkMe publishes a current list). Documents from other jurisdictions may still be verified through the **document-and-biometric** path without NFC, subject to **Veriff powered by zkMe** coverage rules.
+For **electronic passport** flows that rely on published country signing keys, **zkPassport** supports a large set of issuing countries. Documents from other jurisdictions may still be verified through the **document-and-biometric** path without NFC, subject to **Veriff powered by zkMe** coverage rules.
 
 For the authoritative country list, see zkMe documentation: [Supported countries](https://docs.zk.me/hub/how-built/id-infra/zkpassport/supported-countries).
 
@@ -73,10 +71,10 @@ For the authoritative country list, see zkMe documentation: [Supported countries
 ## Related reading
 
 <CardGroup cols={2}>
-  <Card title="Overview" icon="book" href="/kyc/index">
-    Positioning and what is included in the bundle.
+  <Card title="Data collection & sharing" icon="database" href="/kyc/data-collection-and-sharing">
+    What is collected, what partners see, what lands on Moca Chain, and optional CAK access.
   </Card>
-  <Card title="Data lifecycle" icon="database" href="/kyc/data-collection-and-sharing">
-    What each party sees and stores.
+  <Card title="zkMe security architecture" icon="shield-halved" href="/kyc/zkme-security-architecture">
+    zkPassport, zkVault, homomorphic face matching, and credential cryptography — in Moca context.
   </Card>
 </CardGroup>
