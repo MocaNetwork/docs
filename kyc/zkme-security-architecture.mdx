@@ -1,10 +1,10 @@
 ---
 title: "zkMe security architecture"
-description: "How zkMe protects identity data behind Veriff powered by zkMe: zkPassport trust anchors, zkVault encryption, homomorphic face matching, and zero-knowledge credentials — aligned with AIR Kit on Moca Chain."
+description: "How zkMe protects identity data behind Veriff powered by zkMe: zkPassport trust anchors, zkVault encryption, homomorphic face matching, and on-chain credential proofs — aligned with AIR Kit on Moca Chain."
 icon: "shield-halved"
 ---
 
-The content below summarizes **public zkMe Protocol documentation** in language consistent with Moca Network. It explains how **zkMe** under **Veriff powered by zkMe** is acting as a **credential Issuer** while keeping partner systems free of raw KYC media. For the canonical technical detail, see [zkMe docs — Architecture](https://docs.zk.me/hub/how-works/architecture) and [zkPassport](https://docs.zk.me/hub/how-built/id-infra/zkpassport).
+The content below summarizes **public zkMe Protocol documentation** in language consistent with Moca Network. It explains how **zkMe** under **Veriff powered by zkMe** acts as a **credential Issuer** and how cryptographic components support **pass/fail**, **selective**, and **CAK-gated full-raw** disclosure models on AIR Kit. For the canonical technical detail, see [zkMe docs — Architecture](https://docs.zk.me/hub/how-works/architecture) and [zkPassport](https://docs.zk.me/hub/how-built/id-infra/zkpassport).
 
 ---
 
@@ -29,7 +29,6 @@ zkMe's **zkVault** is an encrypted storage and execution model for sensitive mat
 - **Trusted Execution Environments (TEEs)** — Intel SGX / AMD SEV — so decryption and high-risk operations occur inside **attested enclaves** rather than in ordinary application memory.
 
 Partners on Moca still receive **AIR Credentials** and **ZK verification results**; they do not host zkVault.
-
 ---
 
 ## Face binding without exposing raw biometrics
@@ -44,7 +43,7 @@ zkMe's credential system (W3C Verifiable Credentials style, JSON-LD claims) uses
 
 - **Sparse Merkle trees** and **Poseidon** hashing on the **Baby JubJub** curve for compact commitments.
 - **Groth16** zk-SNARKs for efficient on-chain verification of proofs.
-- **Selective disclosure** patterns so holders prove specific predicates without revealing full claim dictionaries.
+- **Selective disclosure** patterns so a verification program can request a specific subset of attributes; for **full raw-data** access at the verifier, AIR Kit uses **Compliance Access Key (CAK)** with explicit user consent — see [CAK overview](/airkit/usage/credential/cak-overview).
 - **Anti-sybil** tooling such as **nullifiers** where "one person, one action" guarantees matter.
 
 On **Moca Network**, your integration still lands as an **AIR Credential** with on-chain anchoring and AIR Kit verifier flows — the zkMe cryptographic stack sits **behind** Issuance operated by zkMe for this product bundle.
