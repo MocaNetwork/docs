@@ -4,7 +4,7 @@ description: "How zkMe protects identity data behind Veriff powered by zkMe: zkP
 icon: "shield-halved"
 ---
 
-The content below summarizes **public zkMe Protocol documentation** in language consistent with Moca Network. It explains how **zkMe Labs** can act as a **credential Issuer** for **Veriff powered by zkMe** while keeping partner systems free of raw KYC media. For the canonical technical detail, see [zkMe docs — Architecture](https://docs.zk.me/hub/how-works/architecture) and [zkPassport](https://docs.zk.me/hub/how-built/id-infra/zkpassport).
+The content below summarizes **public zkMe Protocol documentation** in language consistent with Moca Network. It explains how **zkMe** under **Veriff powered by zkMe** is acting as a **credential Issuer** while keeping partner systems free of raw KYC media. For the canonical technical detail, see [zkMe docs — Architecture](https://docs.zk.me/hub/how-works/architecture) and [zkPassport](https://docs.zk.me/hub/how-built/id-infra/zkpassport).
 
 ---
 
@@ -47,7 +47,7 @@ zkMe's credential system (W3C Verifiable Credentials style, JSON-LD claims) uses
 - **Selective disclosure** patterns so holders prove specific predicates without revealing full claim dictionaries.
 - **Anti-sybil** tooling such as **nullifiers** where "one person, one action" guarantees matter.
 
-On **Moca Network**, your integration still lands as an **AIR Credential** with on-chain anchoring and AIR Kit verifier flows — the zkMe cryptographic stack sits **behind** Issuance operated by zkMe Labs for this product bundle.
+On **Moca Network**, your integration still lands as an **AIR Credential** with on-chain anchoring and AIR Kit verifier flows — the zkMe cryptographic stack sits **behind** Issuance operated by zkMe for this product bundle.
 
 ---
 
@@ -83,6 +83,7 @@ flowchart LR
 When a verifier must access **plaintext regulated fields** with **user consent**, combine this Issuer model with CAK as documented for AIR Kit:
 
 <CardGroup cols={2}>
+  <Card title="Pricing & FAQ" icon="circle-dollar" href="/kyc/pricing-and-faq" />
   <Card title="CAK overview" icon="key" href="/airkit/usage/credential/cak-overview" />
   <Card title="Privacy & compliance" icon="scale-balanced" href="/learn/advanced-topics/privacy-and-compliance" />
 </CardGroup>
