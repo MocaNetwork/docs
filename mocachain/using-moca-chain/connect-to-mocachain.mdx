@@ -1,6 +1,6 @@
 ---
 title: "How to Connect a Wallet With Moca Chain"
-description: "Connect your Web3 wallet to Moca Chain — configure MetaMask and other EVM wallets, deploy an AIR Account, and start interacting with the network."
+description: "Connect your Web3 wallet to Moca Chain Mainnet or Testnet — configure MetaMask and other EVM wallets, deploy an AIR Account, and start interacting with the network."
 ---
 
 
@@ -18,17 +18,34 @@ Blockchain wallets allow you, and only you, to access your assets on Moca Chain.
 Interactive demo coming soon
 </Tip>
 
-## Moca Chain Testnet RPC 🌐
+## Moca Chain Networks 🌐
 
-Copy and paste these values into any wallet that supports importing RPCs.
+Copy and paste these values into any wallet that supports importing RPCs. Choose **Mainnet** for production assets or **Testnet** for development and experimentation. For the full network specification (CometBFT, LCD, consensus, and gas parameters), see the [Network Information](/mocachain/using-moca-chain/network-information) page.
 
-Quickly add Moca Chain's network to your wallet with one click.
+### Moca Chain Mainnet
+
+<Tip>
+**Access Required**
+
+Mainnet RPC access requires an API key. Contact the Moca Chain team to obtain your key before connecting your wallet.
+</Tip>
+
+| Key                | Value                            |
+| ------------------ | -------------------------------- |
+| Network            | `Moca Chain Mainnet`             |
+| RPC URL            | `https://rpc.mocachain.org`      |
+| Chain ID           | `2288` (`0x8F0`)                 |
+| Currency symbol    | `MOCA`                           |
+| Decimals           | `18`                             |
+| Block explorer URL | `https://scan.mocachain.org`     |
+
+### Moca Chain Testnet
 
 | Key                | Value                                  |
 | ------------------ | -------------------------------------- |
 | Network            | `Moca Chain Testnet`                   |
 | RPC URL            | `https://rpc.testnet.mocachain.dev`    |
-| Chain ID           | `222888`                               |
+| Chain ID           | `222888` (`0x366A8`)                   |
 | Currency symbol    | `MOCA`                                 |
 | Decimals           | `18`                                   |
 | Block explorer URL | `https://testnet-scan.mocachain.org`   |
@@ -78,7 +95,7 @@ Wallets can connect to various blockchains, with MetaMask setting Ethereum as it
 
 ### Add Moca Chain Network in One Click
 
-Use the network details from the table above to add Moca Chain Testnet to your MetaMask wallet, or add it manually below.
+Use the network details from the **Mainnet** or **Testnet** table above to add Moca Chain to your MetaMask wallet, or add it manually below.
 
 ### Add Moca Chain Network Manually
 
@@ -94,10 +111,10 @@ At the bottom of the existing list, click `Add network manually`.
 
 ![Metamask Add Network Step 3](/images/metamask-add-network-03.png)
 
-Enter the following details into MetaMask to configure the network and connect to Moca Chain Testnet.
+Enter the values from the table that matches the network you want to use — Moca Chain Mainnet or Moca Chain Testnet — to configure MetaMask.
 
 Once the data is entered correctly, click `Save`.
 
-After saving the network configuration, you should be connected to the Moca Chain Testnet!
+After saving the network configuration, you should be connected to your selected Moca Chain network.
 
 {/* ![Metamask Testnet](/images/metamask-testnet.png) */}
