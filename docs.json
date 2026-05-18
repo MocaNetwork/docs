@@ -172,6 +172,45 @@
         ]
       },
       {
+        "tab": "AIR AI",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "airai/index",
+              "airai/agent-taxonomy"
+            ]
+          },
+          {
+            "group": "AIR AI Services — For Users",
+            "pages": [
+              "airai/services/index",
+              "airai/services/agentic-identity",
+              "airai/services/agentic-money",
+              "airai/services/policy-and-audit"
+            ]
+          },
+          {
+            "group": "AIR AI Studio — For Builders",
+            "pages": [
+              "airai/studio/index",
+              "airai/studio/agent-tools",
+              "airai/studio/authorization-flows",
+              "airai/studio/integration-assets"
+            ]
+          },
+          {
+            "group": "Concepts & Reference",
+            "pages": [
+              "airai/concepts/architecture",
+              "airai/concepts/canonical-flows",
+              "airai/concepts/frameworks",
+              "airai/concepts/glossary"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "AIR Kit",
         "pages": [
           "airkit/integrating-using-ai",
