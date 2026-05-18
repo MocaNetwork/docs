@@ -1,0 +1,94 @@
+---
+title: "AI Integration Assets"
+description: "AI-consumable docs, tool schemas, integration recipes, reference apps, sandbox, and CLI / SDK wrappers — added into the existing AIR Developer Platform."
+---
+
+AI Integration Assets are the materials that turn AIR's existing developer platform into something an AI coding agent — or a developer using one — can integrate against quickly.
+
+<Info>
+**The core question.** How does a builder go from zero to a working AIR-enabled agent quickly?
+</Info>
+
+This is **not a separate developer platform**. These are AI-specific assets added into the existing [AIR Developer Platform](https://developers.sandbox.air3.com/dashboard) and the AIR Kit docs.
+
+## Two asset categories
+
+### AI-specific implementation assets
+
+Materials designed to be consumed by both human developers and AI coding agents.
+
+- **AI-consumable docs** — structured documentation an AI coding agent can read and act on.
+- **Tool schemas** — machine-readable schemas for every AIR Agent Tool.
+- **Integration recipes** — opinionated, end-to-end paths for the most common integrations.
+- **Examples** — annotated code samples for identity, money, and audit flows.
+- **Test flows** — runnable test scripts for sandbox integration.
+
+### Developer platform additions
+
+Existing AIR Developer Platform surfaces, extended for agent-native work.
+
+- **CLI flows** — install, scaffold, test, and deploy AIR-enabled agents.
+- **SDK wrappers** — language-specific wrappers for AIR Agent Tools.
+- **Sandbox** — isolated environment for end-to-end identity, money, and audit testing.
+- **Local testing** — tools for running AIR flows locally before connecting to live services.
+- **Reference integrations** — full sample projects integrators can fork.
+
+## What "AI-consumable" means in practice
+
+| Asset | Designed for |
+| --- | --- |
+| **Plain-language docs** | Human developers and AI coding agents reading documentation. |
+| **Tool schemas** | LLM agents discovering AIR capabilities at runtime. |
+| **Recipes** | Both AI coding agents and developers looking for an opinionated path. |
+| **Reference apps** | Forking, modifying, and learning from working code. |
+| **Sandbox + CLI** | Running and verifying integrations locally. |
+
+## Use AIR's contextual options
+
+The AIR docs site supports copy-to-LLM and direct integration with ChatGPT, Claude, Perplexity, Grok, and the AIR MCP server. Use the contextual menu in the docs to pull AIR documentation directly into the AI coding agent you're using to build with AIR.
+
+## A typical integration timeline
+
+<Steps>
+  <Step title="Read the AIR AI overview">
+    Start with [AIR AI](/airai/index) and [AIR AI Studio](/airai/studio/index) to understand the product layers.
+  </Step>
+  <Step title="Pick a recipe">
+    Use an integration recipe matching the closest pattern to your use case — Butler, Concierge, or Platform agent.
+  </Step>
+  <Step title="Scaffold via CLI">
+    Use the CLI to install AIR Kit, configure your agent binding, and pull a reference integration.
+  </Step>
+  <Step title="Run end-to-end in the sandbox">
+    Walk an identity, money, and audit flow end-to-end in the sandbox using mock partners.
+  </Step>
+  <Step title="Wire in your agent">
+    Replace the mock agent in the recipe with your real agent. The Authorization Flows and audit trail should work without modification.
+  </Step>
+  <Step title="Go live">
+    Move from sandbox to production credentials and start running real flows.
+  </Step>
+</Steps>
+
+## Example
+
+<Note>
+A developer uses the AIR Developer Platform's AI-specific docs, sandbox, and reference app to add AIR identity and payment flows to an agent demo in less than a day — no bespoke partner engineering required.
+</Note>
+
+## How this relates to AIR Kit
+
+AIR Kit is the base SDK and infrastructure layer. AI Integration Assets do not replace AIR Kit — they make the AIR Kit surface more usable for agent builders by adding agent-native docs, schemas, recipes, sandbox flows, and reference integrations on top of the existing developer platform.
+
+For underlying SDK reference, see:
+
+- [AIR Kit overview](/airkit/index)
+- [Quick setup](/airkit/usage/getting-started)
+- [Recipes](/recipes/index)
+- [API reference](/api-reference/introduction)
+
+## Next
+
+- [Reference architecture](/airai/concepts/architecture) — the system layout you're integrating against.
+- [Canonical flows](/airai/concepts/canonical-flows) — end-to-end sequences you can model your integration on.
+- [Existing frameworks](/airai/concepts/frameworks) — how AIR composes with x402, AP2, Stripe, Visa, Mastercard, MPP / Tempo, Ledger, and Open Wallet Standard.
