@@ -21,7 +21,7 @@ The account section contains your partner configuration.
 
 ### 1. General Settings
 
-This is where you can get a generated set of IDs that is used for your implementation. Below is an example of what your generated settings might look like, which you can easily copy from the dashboard.
+This is where you can get a generated set of IDs that is used for your implementation. **Partner ID, Issuer DID or Verifier DID, and JWKS URL are all mandatory fields for any partner that issues or verifies credentials — configure all four before integrating the SDK.** Below is an example of what your generated settings might look like, which you can easily copy from the dashboard.
 
 ```json
 {
@@ -43,7 +43,7 @@ This is where you can get a generated set of IDs that is used for your implement
 | **Name**         | Your App's name, which may be shown to users during various operations such as wallet transactions, credential issuance, or credential verification.                                                                                           |
 | **Logo URL**     | Your App's logo, which may be shown to users during various operations such as wallet transactions, credential issuance, or credential verification.                                                                                           |
 | **Website URL**  | Your App's website, which may be shown to users if they want to learn more about your application.                                                                                                                                             |
-| **JWKS URL**     | Required for Credential Services, or if you utilize the [bring your own auth](/airkit/usage/user-authentication#custom-auth-bring-your-own-auth) feature. See [Authentication (Partner JWT)](/airkit/usage/partner-authentication) for details |
+| **JWKS URL**     | **Blocking** for SDK `issueCredential` and `verifyCredential` as well as Issue on Behalf. Must be a public HTTPS URL reachable from AIR servers. Also required if you use the [bring your own auth](/airkit/usage/user-authentication#custom-auth-bring-your-own-auth) feature. See [JWKS endpoint setup](/airkit/usage/jwks-setup). |
 
 ### 2. Allowed Domains
 

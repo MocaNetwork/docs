@@ -18,20 +18,24 @@ Before starting the integration, ensure you have:
 The AIR Kit integration follows a structured approach:
 
 1. **Setup & Configuration** - Install SDKs and configure your environment
-2. **Issuer Integration** - Set up credential issuance capabilities
-3. **User Wallet Integration** - Enable users to store and manage credentials
-4. **Verification Integration** - Implement privacy-preserving verification
-5. **Testing & Deployment** - Test your integration and deploy to production
+2. **Configure JWKS** - Stand up a public HTTPS JWKS endpoint and register it in the Developer Dashboard. **Required before any `issueCredential` or `verifyCredential` call.** See [JWKS endpoint setup](/airkit/usage/jwks-setup).
+3. **Issuer Integration** - Set up credential issuance capabilities
+4. **User Wallet Integration** - Enable users to store and manage credentials
+5. **Verification Integration** - Implement privacy-preserving verification
+6. **Testing & Deployment** - Test your integration and deploy to production
 
 ```mermaid
 graph LR
-    A[Setup] --> B[AIR Account integration]
+    A[Setup] --> A2[Configure JWKS]
+    A2 --> B[AIR Account integration]
     B --> C[Onboard user using global AIR account]
     C --> D[Issue credential on Moca chain]
     D --> E[Verification]
     E --> F[Testing]
     F --> G[Production]
 ```
+
+JWKS is a peer-tier dashboard account field alongside Partner ID, Issuer DID, and Verifier DID — configure it early. The [JWKS endpoint setup](/airkit/usage/jwks-setup) page walks through the route, registration, and `kid` matching.
 
 Learn more about how to integrate the SDKs in the [Quickstart](/airkit/quickstart/) section.
 

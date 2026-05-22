@@ -194,6 +194,7 @@
             "group": "Quick Setup",
             "pages": [
               "airkit/usage/getting-started",
+              "airkit/usage/jwks-setup",
               "airkit/usage/installation",
               "airkit/usage/initialization"
             ]

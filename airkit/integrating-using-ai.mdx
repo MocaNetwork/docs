@@ -38,7 +38,17 @@ The CLI detects your installed agents and places the skill in the correct direct
 | Quick references | SDK install (`@mocanetwork/airkit`), platform matrix, provider and wallet APIs, and REST credential endpoints |
 | Decision guidance | Account-only vs credential flows, embedded AIR login vs bring-your-own auth, and client vs server signing with Partner JWT |
 | Workflows | Step-by-step sequences for onboarding, issuance, verification, Issue on Behalf, and advanced flows like paymaster or session keys where relevant |
-| Common gotchas | Initialization and iframe setup, JWKS and JWT errors, polling issuance until credentials are on-chain, and schema or verification pitfalls |
+| Common gotchas | Initialization and iframe setup, [JWKS](/airkit/usage/jwks-setup) and JWT errors, polling issuance until credentials are on-chain, and schema or verification pitfalls |
 | Verification checklist | Partner ID, environment (sandbox vs production), chain allowlists, auth headers, and error handling before you ship |
+
+## Credential E2E checklist for agents
+
+Before generating issue/verify app code, confirm all three. Skipping any one of these makes the generated code unable to complete `issueCredential` or `verifyCredential` at runtime.
+
+1. **JWKS route implemented and reachable over HTTPS** — `GET /api/.well-known/jwks` (or your equivalent path) returns a JSON document with a `keys` array.
+2. **Dashboard JWKS URL set to that exact path** — registered in **Account → General Settings → JWKS URL** as the full URL.
+3. **`PARTNER_PRIVATE_KEY` server-only; JWT `kid` matches a key in the JWKS** — the value you set in the JWT header must appear as `keys[].kid` in the JWKS response.
+
+Full procedure on the [JWKS endpoint setup](/airkit/usage/jwks-setup) page.
 
 <IntegratingAiStaticAndClients />

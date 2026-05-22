@@ -7,8 +7,11 @@ To get started, you’ll need to head to the <a href="https://developers.sandbox
 
 Depending on what your app supports, you'll be using the information:
 
-- Partner ID - your unique ID used throughout AIR Kit
-- Issuer DID - used for credentials issuance
-- Verifier DID - used for credentials verification
+- **Partner ID** — your unique ID used throughout AIR Kit
+- **Issuer DID** — used for credentials issuance
+- **Verifier DID** — used for credentials verification
+- **JWKS URL** — a public HTTPS endpoint that publishes your Partner JWT signing key. **Required before any `issueCredential` or `verifyCredential` call.** See [JWKS endpoint setup](/airkit/usage/jwks-setup).
+
+Partner ID, Issuer DID, Verifier DID, and JWKS URL are all configured in the same **Dashboard → Account → General Settings** panel. Set up all four before integrating the SDK — credential SDK operations will fail until your JWKS URL is live, public over HTTPS, and registered in the dashboard.
 
 To learn more about the Developer Dashboard's settings, head to the [AIR Kit Dashboard page](/airkit/airkit-dashboard).

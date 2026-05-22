@@ -31,9 +31,16 @@ These errors apply to the AIR Kit REST API (e.g. [Issue on Behalf](/api-referenc
 
 ### "JWKS endpoint unreachable"
 
-- Your JWKS URL must be publicly accessible over HTTPS.
-- Test it with `curl https://your-domain/.well-known/jwks.json` — it should return a valid JSON document.
+- Your JWKS URL must be publicly accessible over HTTPS — AIR servers cannot reach `localhost`. Use an HTTPS tunnel (ngrok, cloudflared) or deploy.
+- Test the **exact URL registered in the Developer Dashboard**, not a guess. For example:
+
+```bash
+curl https://your-domain/api/.well-known/jwks
+```
+
+- `air-examples` ships `/api/.well-known/jwks`; the plug-and-play template ships `/jwks.json`. Register whichever your app actually serves.
 - Ensure no firewall or IP allowlist blocks AIR Kit's servers.
+- Full setup procedure: [JWKS endpoint setup](/airkit/usage/jwks-setup).
 
 ### "kid not found"
 

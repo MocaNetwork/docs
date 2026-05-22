@@ -133,13 +133,17 @@ The final step is deploying the application and registering its public key endpo
 
 ### 4.2 Set JWKS URL (Critical Step)
 
-The **JWKS URL** allows AIR Kit to verify the JWTs signed by your deployed application.
+The **JWKS URL** allows AIR Kit to verify the JWTs signed by your deployed application. Without a working public HTTPS JWKS URL registered in the dashboard, `issueCredential` and `verifyCredential` calls fail.
 
 1.  Once deployed, your application automatically hosts the public key at:
     ```
     <your-host-url>/jwks.json
     ```
 2.  Navigate to the **Sandbox Developer Dashboard** (**Account -\> General Settings**) and configure this full URL as your **JWKS URL** setting.
+
+<Info>
+  This template hosts JWKS at `<host>/jwks.json`. The [`air-examples`](https://github.com/MocaNetwork/air-examples) repo uses `/api/.well-known/jwks` instead. **Register the exact URL your app actually serves** — there is no path discovery or fallback. For the full procedure (key generation, `kid` rule, path matrix, local HTTPS tunnels), see [JWKS endpoint setup](/airkit/usage/jwks-setup).
+</Info>
 
 ### 4.3 Whitelist Your Domain
 

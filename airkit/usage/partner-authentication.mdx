@@ -3,6 +3,10 @@ title: "SDK Authentication (Partner JWT)"
 description: "Sign a Partner JWT from your backend to authenticate AIR Kit operations — supported algorithms, required claims, JWKS setup, and Issue on Behalf scope."
 ---
 
+import JwksBlockingWarning from "/snippets/jwks-blocking-warning.mdx";
+
+<JwksBlockingWarning />
+
 You need to generate and use the JWT when:
 
 - Authenticating a User
@@ -15,12 +19,22 @@ For **Issue on Behalf** (server-side credential issuance without user presence),
 - **Signing algorithms supported:** ES256, RS256
 - **Expiry**: 5 min (recommended)
 - **Claims**: varies depending on the operation. You would always need to include your `partnerId` as one of the claims
-- **Header**: You must include a `kid` (Key ID) header to indicate which key was used to sign the JWT. This is important for AIR Kit to select the correct key from your JWKS endpoint for verification.
-- **JWKS URL** - AIR Kit validates your JWT using JWK standards ([https://datatracker.ietf.org/doc/html/rfc7517](https://datatracker.ietf.org/doc/html/rfc7517)). By specifying your JSON Web Key Set (JWKS) endpoint, we could validate your JWT issued by your Authorization Server. - Example: [https://static.air3.com/.well-known/example-jwks.json](https://static.air3.com/.well-known/example-jwks.json)
+- **Header**: You must include a `kid` (Key ID) header to indicate which key was used to sign the JWT. AIR Kit uses `kid` to select the matching key from your JWKS endpoint.
+- **JWKS URL**: AIR Kit validates your JWT using JWK standards ([RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517)). You must publish your public key at a JWKS URL and register it in the dashboard. See [JWKS endpoint setup](/airkit/usage/jwks-setup) for the full procedure.
 
 To learn more about JWT, visit [jwt.io](https://www.jwt.io).
 
-## Issue on Behalf JWT requirements
+## JWKS endpoint (required for all credential SDK operations)
+
+`issueCredential`, `verifyCredential`, and Issue on Behalf all rely on the same Partner JWT trust model — AIR Kit fetches your registered JWKS URL and validates every JWT against it. The endpoint must be:
+
+- A **public HTTPS URL** reachable from AIR servers (localhost is not enough).
+- Registered in **Dashboard → Account → General Settings → JWKS URL** as the full URL your app actually serves.
+- Returning a JSON document whose `keys[].kid` matches the `kid` you set in your JWT header.
+
+The canonical Next.js route is `app/api/.well-known/jwks/route.ts`, used by every issuer and verifier in [`air-examples`](https://github.com/MocaNetwork/air-examples). For implementation, dashboard registration, local HTTPS tunnels, and the `kid` rule, see the [JWKS endpoint setup](/airkit/usage/jwks-setup) page.
+
+## Issue-on-Behalf JWT specifics
 
 For [Issue on Behalf (API)](/airkit/usage/credential/issue-on-behalf), use a Partner JWT with these fields:
 
@@ -31,10 +45,7 @@ For [Issue on Behalf (API)](/airkit/usage/credential/issue-on-behalf), use a Par
 | Algorithm | `RS256` or `ES256` | Keep consistent with your JWKS key type |
 | Expiry | `exp` (recommended 5 minutes) | Short-lived token recommended |
 
-JWKS reminders for Issue on Behalf:
-
-- `kid` in JWT header must match a key ID exposed by your JWKS endpoint
-- JWKS endpoint must be publicly reachable by AIR Kit
+JWKS rules ([endpoint reachability, registration, `kid` matching](/airkit/usage/jwks-setup)) apply identically to Issue on Behalf — there is no separate JWKS configuration for the on-behalf flow.
 
 Focused Node.js example (payload + header shape):
 
