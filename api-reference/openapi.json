@@ -15,7 +15,7 @@
       "description": "Sandbox"
     },
     {
-      "url": "https://api.mocachain.org/v1",
+      "url": "https://mocachain-mainnet.api.air3.com/v1",
       "description": "Production"
     }
   ],
