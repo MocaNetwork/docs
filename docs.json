@@ -388,7 +388,7 @@
           },
           {
             "group": "Help",
-            "pages": ["mocachain/help/faq"]
+            "pages": ["mocachain/help/faq", "status"]
           }
         ]
       },
