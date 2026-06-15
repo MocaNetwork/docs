@@ -1,0 +1,167 @@
+---
+title: "How you can work with AIR AI"
+description: "The ways to work with AIR AI — whether you already know what you're building or are still exploring. Pick the path that matches where you are and follow it into the details."
+---
+
+import AirAiAlphaAccess from "/snippets/airai-alpha-access.mdx";
+
+AIR AI is the identity, money, consent, policy, and audit layer for agents. There are
+many ways to work with it — this page is the map. Whether you **already know what you're
+building** or are **still exploring**, pick the path that matches where you are and
+follow it into the details.
+
+<Info>
+**The short version.** You keep your agent, your product, and your rails. AIR adds the
+permission layer that makes agent actions safe, provable, and revocable — over one
+integration instead of N×M bespoke ones.
+</Info>
+
+## Where are you starting from?
+
+<CardGroup cols={2}>
+  <Card title="I know what I'm building" icon="map" href="#already-have-a-strategy">
+    You already have an agent or agent surface in mind and need the identity, money, and
+    policy layer underneath. Jump to the plug-in points by role.
+  </Card>
+  <Card title="I'm still exploring" icon="compass" href="#still-shaping-your-strategy">
+    You don't have an agent program yet — but your customers will soon arrive with their
+    own agents. Start by making one flow agent-safe.
+  </Card>
+</CardGroup>
+
+<a id="already-have-a-strategy" />
+
+## If you already know what you're building
+
+You're not looking for another agent — you're looking for the layer that lets your agent
+(or your users' agents) act safely. Pick the role that fits and follow it into the
+details:
+
+<CardGroup cols={2}>
+  <Card title="You build a consumer agent or assistant" icon="robot" href="/airai/integration-paths">
+    A personal assistant, shopping agent, or travel agent acting for the user. AIR makes
+    it a trusted **Butler** — it can carry the user's identity and spend within limits.
+  </Card>
+  <Card title="You build a merchant or enterprise surface" icon="store" href="/airai/integration-paths">
+    A checkout, booking flow, or support agent serving your customers. AIR makes it a
+    **Concierge** — it can verify eligibility and take payment without holding raw PII.
+  </Card>
+  <Card title="You build a wallet or signer" icon="wallet" href="/airai/concepts/frameworks">
+    AIR composes with your wallet as the user-controlled signing boundary — high-assurance
+    approval for high-risk or out-of-scope actions sits with you.
+  </Card>
+  <Card title="You build a payment rail or commerce protocol" icon="money-bill-transfer" href="/airai/concepts/frameworks">
+    AIR sits above your rail as the identity + policy + audit layer, routing
+    policy-approved authorizations into your settlement path.
+  </Card>
+  <Card title="You issue identity or credentials" icon="id-badge" href="/airai/identity">
+    A standard, KYC provider, or loyalty issuer. AIR exposes agent-callable proof handoff,
+    selective disclosure, and freshness / revocation on top of what you issue.
+  </Card>
+</CardGroup>
+
+### What you bring vs. what AIR provides
+
+| If you're building… | You bring | AIR provides | Plug-in point |
+| --- | --- | --- | --- |
+| **Consumer agent (Butler)** | The agent, its reasoning, its UX, the user relationship. | Scoped identity access, spend mandates, consent + revocation, audit. | Install an [AIR Skill / Plugin](/airai/integration-paths). |
+| **Merchant / enterprise surface (Concierge)** | The storefront, booking, or support experience. | Eligibility proofs, purpose-bound data release, payment authorization, merchant-facing receipts. | Build against the [AIR AI SDK](/airai/integration-paths). |
+| **Wallet / signer** | The custody and signing UX, key control. | A policy + audit layer that escalates high-risk actions to your signer. | User-controlled signer boundary; see [frameworks](/airai/concepts/frameworks). |
+| **Payment rail / protocol** | Settlement, network, instruments. | User-level authorization, credentials, budgets, receipts above the rail. | Framework adapter; see [frameworks](/airai/concepts/frameworks). |
+| **Standard / credential issuer** | The schema, issuance, or standard. | Agent-callable proof handoff, selective disclosure, freshness / revocation. | [AIR Identity (Agentic)](/airai/identity). |
+
+<a id="still-shaping-your-strategy" />
+
+## If you're still exploring
+
+You don't need a full agent program to benefit from AIR — and you don't need to predict
+the whole agent future to act. The pragmatic reality: **your customers will soon show up
+with their own agents** (a ChatGPT or Claude acting on their behalf), whether or not you
+have a strategy. The first move is to make your existing surfaces safe for that, then
+grow from there.
+
+### Three common first moves
+
+<CardGroup cols={3}>
+  <Card title="Make your checkout agent-ready" icon="cart-shopping" href="/airai/how-it-works#worked-example-status-matched-checkout">
+    Add a **Concierge** to an existing checkout or booking flow so it can verify
+    eligibility (age, KYC, membership) and take payment — without your team holding raw
+    PII. Lowest-lift, highest-value entry point for most enterprises.
+  </Card>
+  <Card title="Let users bring their own agent" icon="user-plus" href="/airai/concepts/agent-taxonomy">
+    Accept a user's **Butler** agent into your app with scoped, revocable permissions,
+    so it can act for them safely instead of scraping or screen-driving your UI.
+  </Card>
+  <Card title="Make your credentials agent-usable" icon="id-badge" href="/airai/identity">
+    If you already issue identity, loyalty, or KYC credentials via
+    [AIR Kit](/airkit/index), expose them for agent-driven proof handoff so any agent can
+    prove a user's status without re-verification.
+  </Card>
+</CardGroup>
+
+### Start with one flow
+
+You don't need to commit to a platform decision. Pick a single high-value flow, prove it
+end-to-end in the [sandbox](/airai/integration-paths) against mock partners, and decide
+from there. The [status-matched checkout](/airai/how-it-works#worked-example-status-matched-checkout)
+is a good first flow — it shows identity, money, and policy working together in one
+purchase.
+
+### Questions to find your first use case
+
+- Where do customers **re-verify** something they've already proven elsewhere (age, KYC, tier)?
+- Where would an agent **transacting on a user's behalf** save real friction — checkout, rebooking, renewals?
+- What data are you **holding today that you'd rather not** — and could replace with a proof?
+- Which flow has the clearest **budget and approval rules** an agent could follow?
+
+Any "yes" is a candidate for a first AIR-enabled flow.
+
+<div class="demo-cta">
+  <div class="demo-cta__text">
+    <p class="demo-cta__title">Not sure where to start? Book a demo</p>
+    <p class="demo-cta__subtitle">Walk through your use case with our team and we'll map the highest-value first flow for you — and get you alpha access to try it.</p>
+  </div>
+  <a class="demo-cta__button" href="https://mocanetwork.typeform.com/joinmocaeco?typeform-source=air3.com">Book a demo →</a>
+</div>
+
+## What AIR consistently adds on top
+
+No matter where you start, AIR is responsible for the same set of capabilities — the
+parts most agent stacks leave unsolved.
+
+<CardGroup cols={2}>
+  <Card title="User-level authorization" icon="user-check" href="/airai/policy-audit">
+    User approval and delegation — not just agent-level authentication.
+  </Card>
+  <Card title="Identity and credentials" icon="id-badge" href="/airai/identity">
+    Eligibility proofs, credential verification, selective disclosure, freshness and revocation.
+  </Card>
+  <Card title="Policy and budgets" icon="scale-balanced" href="/airai/money">
+    Spend mandates, merchant scope, category allowlists, expiry, approval thresholds.
+  </Card>
+  <Card title="Audit and receipts" icon="receipt" href="/airai/policy-audit">
+    User-visible and machine-readable evidence for every identity and money action.
+  </Card>
+</CardGroup>
+
+## How we work together
+
+AIR is infrastructure, so partnership is integration-first, not a rebuild:
+
+<AirAiAlphaAccess />
+
+- **Compose, don't replace.** AIR uses the existing [AIR Kit](/airkit/index) stack and
+  integrates with x402, AP2, Stripe, Visa, Mastercard, MPP / Tempo, Ledger, and the
+  Open Wallet Standard. See [Existing frameworks](/airai/concepts/frameworks).
+- **One permission model across both relationships.** Whether the agent is yours or
+  your users', the same identity / money / policy / audit semantics apply. See
+  [Agent taxonomy](/airai/concepts/agent-taxonomy).
+- **Start in a sandbox.** Once you have alpha access, prove a flow end-to-end against
+  mock partners before any bespoke engineering. See
+  [Integration paths](/airai/integration-paths).
+
+## Next
+
+- [Integration paths](/airai/integration-paths) — pick Skill / Plugin or AIR AI SDK and get started.
+- [How it works](/airai/how-it-works) — the five-stage lifecycle your integration runs on.
+- [Existing frameworks](/airai/concepts/frameworks) — the detailed mapping to rails and standards.

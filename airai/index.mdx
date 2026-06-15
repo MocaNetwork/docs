@@ -1,17 +1,29 @@
 ---
-title: "AIR AI"
-description: "The identity, money, consent, policy, and audit layer for AI agents — so agents can act on behalf of users with full user sovereignty over data and delegation."
+title: "What AIR AI is"
+description: "The identity, money, consent, policy, and audit layer for AI agents — so agents can act on behalf of users with the user staying sovereign over their data and delegation."
 ---
 
-AIR AI is the umbrella for how AIR enables AI agents to safely act on behalf of users — verifying identity, moving money, and accessing services — with the user staying sovereign over data and delegation.
+import AirAiAlphaAccess from "/snippets/airai-alpha-access.mdx";
 
-We build **infrastructure** (plugins, MCP tools, SDKs) — not agents. Any agent can integrate with AIR's identity and finance layers. The user stays sovereign; the agent becomes their trusted delegate.
+AIR AI is the layer that lets AI agents safely **act on behalf of users** — verifying
+identity, moving money, and accessing services — while the user stays sovereign over
+their data and delegation.
 
-## The hypothesis
+We build **infrastructure**, not agents: plugins, MCP tools, and SDKs that any agent can
+integrate. The user keeps control; the agent becomes their trusted delegate. Every
+sensitive action is permissioned, provable, and revocable.
 
-AI agents won't scale until they can **act, be trusted, and interoperate**. Intelligence and memory will be solved by the AI labs. What's missing is the stack that lets agents safely carry identity, move money, and access data across the existing internet.
+<AirAiAlphaAccess />
 
-### The gaps we're closing
+<Frame caption="How user-facing agents, AIR AI plugins, the AIR AI Services permission gate, the existing AIR Kit stack, and external rails compose — with HITL approval on the side. Click to zoom.">
+  <img src="/images/airai-architecture-horizontal.png" alt="AIR AI component architecture — external agent surfaces, AIR AI plugins, the AIR AI Services permission gate, AIR Kit, and external rails, with a HITL escalation lane" />
+</Frame>
+
+## The gaps we close
+
+AI agents won't scale until they can **act, be trusted, and interoperate**. Intelligence
+and memory are being solved by the AI labs. What's missing is the stack that lets agents
+safely carry identity, move money, and access data across the existing internet.
 
 <CardGroup cols={3}>
   <Card title="Identity gap" icon="id-badge">
@@ -25,33 +37,24 @@ AI agents won't scale until they can **act, be trusted, and interoperate**. Inte
   </Card>
 </CardGroup>
 
-## The hierarchy
+## How AIR AI is put together
 
-AIR AI is not a standalone product. It is composed of two product lines that sit on top of the existing AIR Kit infrastructure.
+AIR AI is a set of **capabilities your agent calls**, governed by **one policy and audit
+layer**, built on the existing [AIR Kit](/airkit/index) stack — not a new agent, rail, or
+commerce protocol.
 
-```mermaid
-flowchart TB
-  AIRAI["AIR AI<br/>Umbrella strategy"]
-  Services["AIR AI Services<br/>For users"]
-  Studio["AIR AI Studio<br/>For builders"]
-  Kit["AIR Kit<br/>Base SDK / infrastructure"]
+| Capability | What it controls |
+| --- | --- |
+| [AIR Identity (Agentic)](/airai/identity) | What an agent can know, prove, collect, store, or share. |
+| [AIR Money (Agentic)](/airai/money) | What an agent can spend, authorize, hold, route, or settle. |
+| [AIR Policy + Audit](/airai/policy-audit) | The boundary across both — consent, limits, revocation, and evidence for every action. |
 
-  AIRAI --> Services
-  AIRAI --> Studio
-  Services --> Kit
-  Studio --> Kit
-```
+Builders reach these through [builder surfaces](/airai/builder-surfaces) — Account
+Binding, Agent Tools, Authorization Flows, and Integration Assets — delivered as a
+lightweight Skill / Plugin or a full AIR AI SDK. The user brings their AIR account (set up once
+via AIR Kit); a builder makes an agent AIR-capable by installing an AIR package.
 
-<CardGroup cols={2}>
-  <Card title="AIR AI Services" icon="user-shield" href="/airai/services/index">
-    User-facing permission model: AIR Agentic Identity, AIR Agentic Money, and AIR Policy + Audit. Defines what an agent can know, prove, share, collect, store, spend, authorize, hold, route, or settle.
-  </Card>
-  <Card title="AIR AI Studio" icon="rectangle-terminal" href="/airai/studio/index">
-    Builder-facing product line: AIR Agent Tools, AIR Authorization Flows, and AI Integration Assets. Makes agents, AI products, apps, and workflows AIR-capable.
-  </Card>
-</CardGroup>
-
-## What we build
+## What we build, and what we don't
 
 <Columns cols={2}>
   <div>
@@ -59,7 +62,7 @@ flowchart TB
     <Check>**Flexible infrastructure** for one-to-many agent use cases</Check>
     <Check>**Identity, money, and reputation capabilities**</Check>
     <Check>**`npm install` today, no-code / 1-click later**</Check>
-    <Check>**A user permission control surface** to approve, monitor, limit, and revoke agent access</Check>
+    <Check>**A user permission surface** to approve, monitor, limit, and revoke agent access</Check>
   </div>
   <div>
     <Warning>We don't build our own AI agents</Warning>
@@ -69,19 +72,32 @@ flowchart TB
   </div>
 </Columns>
 
+## Two ways into these docs
+
+<CardGroup cols={2}>
+  <Card title="Understand what AIR AI does" icon="compass" href="/airai/how-it-works">
+    Start with the five-stage lifecycle and a worked checkout, then see where your
+    agentic strategy fits.
+  </Card>
+  <Card title="Start building" icon="code" href="/airai/integration-paths">
+    Pick a delivery path — Skill / Plugin or AIR AI SDK — and integrate against AIR's builder
+    surfaces.
+  </Card>
+</CardGroup>
+
 ## Where to go next
 
 <CardGroup cols={2}>
-  <Card title="Agent taxonomy" icon="sitemap" href="/airai/agent-taxonomy">
-    Butler, Concierge, and Platform agents — and how AIR's permission layer applies to each.
+  <Card title="How it works" icon="route" href="/airai/how-it-works">
+    The five-stage lifecycle every sensitive agent action follows, with a status-matched checkout example.
+  </Card>
+  <Card title="How you can work with AIR AI" icon="handshake" href="/airai/fit">
+    The ways to work with AIR — whether you already know what you're building or are still exploring — and what you bring vs. what AIR provides.
+  </Card>
+  <Card title="Agent taxonomy" icon="sitemap" href="/airai/concepts/agent-taxonomy">
+    Butler and Concierge agents — and how AIR's permission layer applies to each.
   </Card>
   <Card title="Reference architecture" icon="diagram-project" href="/airai/concepts/architecture">
-    The six-layer model from external agent surface down to external rails, and the architectural invariant every sensitive action follows.
-  </Card>
-  <Card title="Canonical flows" icon="route" href="/airai/concepts/canonical-flows">
-    End-to-end sequences: Holiday Agent (Butler), age-gated purchase (Concierge), and proof handoff (Platform agent).
-  </Card>
-  <Card title="Existing frameworks" icon="layer-group" href="/airai/concepts/frameworks">
-    How AIR maps to x402, AP2, Stripe ACP/SPT, Visa TAP, Mastercard Agent Pay/KYA, MPP/Tempo, Ledger Keychain Protocol, and Open Wallet Standard.
+    The five-layer model from external agent surface down to external rails, and the invariant every sensitive action follows.
   </Card>
 </CardGroup>

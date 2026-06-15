@@ -1,9 +1,9 @@
 ---
 title: "Existing frameworks"
-description: "How AIR Agentic Identity and AIR Agentic Money map to x402, AP2, Stripe ACP / SPT, Visa TAP, Mastercard Agent Pay / KYA, MPP / Tempo, Ledger Keychain Protocol, and Open Wallet Standard."
+description: "How AIR Identity (Agentic) and AIR Money (Agentic) map to x402, AP2, Stripe ACP / SPT, Visa TAP, Mastercard Agent Pay / KYA, MPP / Tempo, Ledger Keychain Protocol, and Open Wallet Standard."
 ---
 
-AIR does not build new payment rails or commerce protocols. It composes with existing frameworks by mapping AIR Agentic Identity, AIR Agentic Money, and the user-controlled signer / wallet layer into whatever each framework expects.
+AIR does not build new payment rails or commerce protocols. It composes with existing frameworks by mapping AIR Identity (Agentic), AIR Money (Agentic), and the user-controlled signer / wallet layer into whatever each framework expects.
 
 <Info>
 **The integration stance.** Each framework solves part of the agent commerce problem. AIR provides the identity, money, policy, and audit layer above them — adding what they don't natively cover and connecting them through one permission model.
@@ -11,7 +11,7 @@ AIR does not build new payment rails or commerce protocols. It composes with exi
 
 ## Payment frameworks
 
-| Framework | AIR Agentic Identity role | AIR Agentic Money role |
+| Framework | AIR Identity (Agentic) role | AIR Money (Agentic) role |
 | --- | --- | --- |
 | **x402** | Adds identity / credential requirements that x402 does not provide natively. | Acts as payment facilitator and policy-gated stablecoin payment source. |
 | **AP2** | Acts as credential provider and mandate / proof layer. | Provides payment instrument and policy checks for payment mandates. |
@@ -22,7 +22,7 @@ AIR does not build new payment rails or commerce protocols. It composes with exi
 
 ## Wallet and signing standards
 
-| Standard | AIR Agentic Identity role | AIR Agentic Money role |
+| Standard | AIR Identity (Agentic) role | AIR Money (Agentic) role |
 | --- | --- | --- |
 | **Ledger Keychain Protocol** | Sits in the user-controlled signer boundary for high-assurance signing, delegated signing, key-control policy, and user-approved credential or proof presentation. | Authorizes spend mandates, payment approvals, and transaction intents before AIR Kit or a rail adapter executes the money action. |
 | **Open Wallet Standard** | Sits in the wallet / credential interoperability boundary for portable user authority, credential presentation, proof handoff, and wallet-mediated authorization. | Represents payment authorization and transaction intent in a portable format before execution through AIR Kit, partner wallets, or external payment rails. |
@@ -58,4 +58,4 @@ In the [reference architecture](/airai/concepts/architecture), these frameworks 
 
 - [Reference architecture](/airai/concepts/architecture) — see where each framework plugs into the layered system.
 - [Canonical flows](/airai/concepts/canonical-flows) — examples that show identity and money composing with these frameworks end-to-end.
-- [AIR Agentic Money](/airai/services/agentic-money) — the transaction authority that drives rail integration.
+- [AIR Money (Agentic)](/airai/money) — the transaction authority that drives rail integration.

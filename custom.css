@@ -232,6 +232,76 @@ h2[data-component-part="card-title"] {
     font-family: "Adamina", serif;
 }
 
+/* CTA uses AIR design-system tokens (mocaverse/air-design-system):
+   the signature AIR brand gradient (loading-gradient stops) with deep-teal
+   ink #002536 text and a black primary button #000000. */
+.demo-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    background: linear-gradient(
+        110deg,
+        #f7df99 0%,
+        #fec5a4 22%,
+        #f1c6e3 44%,
+        #c3c4e5 64%,
+        #9bd5ea 84%,
+        #addbd0 100%
+    );
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin: 28px 0;
+    box-shadow: 0 8px 24px rgba(0, 37, 54, 0.14);
+}
+
+.demo-cta__text {
+    max-width: 640px;
+}
+
+.demo-cta__title {
+    color: #002536;
+    font-family: "Adamina", serif;
+    font-size: 1.35rem;
+    line-height: 1.25;
+    margin: 0 0 6px;
+}
+
+.demo-cta__subtitle {
+    color: #1c4a59;
+    font-family: "Outfit", sans-serif;
+    font-size: 0.98rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.demo-cta__button {
+    background: #000000;
+    color: #ffffff;
+    padding: 13px 28px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-block;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.demo-cta__button:hover {
+    background: #464646;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 37, 54, 0.28);
+}
+
+@media screen and (max-width: 768px) {
+    .demo-cta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
 .footer-links {
     display: flex;
     gap: 24px;

@@ -1,12 +1,17 @@
 ---
 title: "AIR Policy + Audit"
-description: "The shared control layer across AIR Agentic Identity and AIR Agentic Money. Consent, purpose binding, expiry, budgets, revocation, receipts, and machine-readable evidence."
+description: "The shared control layer across AIR Identity (Agentic) and AIR Money (Agentic). Consent, purpose binding, expiry, budgets, revocation, receipts, and machine-readable evidence."
 ---
 
-AIR Policy + Audit is the shared control layer that sits across both AIR Agentic Identity and AIR Agentic Money. It evaluates whether a sensitive agent action is allowed, surfaces user approval when required, records what happened, and produces evidence.
+AIR Policy + Audit is the shared control layer that sits across both AIR Identity
+(Agentic) and AIR Money (Agentic). It evaluates whether a sensitive agent action is
+allowed, surfaces user approval when required, records what happened, and produces
+evidence.
 
 <Info>
-**Architectural rule.** No sensitive agent action bypasses consent, policy, revocation, and audit. Every identity or money action produces a machine-readable decision and a user-visible evidence trail.
+**Architectural rule.** No sensitive agent action bypasses consent, policy, revocation,
+and audit. Every identity or money action produces a machine-readable decision and a
+user-visible evidence trail.
 </Info>
 
 ## What this layer governs
@@ -30,25 +35,15 @@ flowchart LR
   Decision --> Evidence["4.Audit evidence<br/>user receipt, merchant receipt, audit event, compliance artifact"]
 ```
 
-This pattern applies whether the agent is asking for data, for a proof, for a spend mandate, or for a payment authorization.
+This pattern applies whether the agent is asking for data, for a proof, for a spend
+mandate, or for a payment authorization.
 
 ## Permission verbs
 
-Every agent request maps to one of these canonical verbs. The policy engine evaluates the verb plus its scope.
-
-| Verb | Meaning | Example |
-| --- | --- | --- |
-| **Know** | Agent can access user context. | Read travel preferences or loyalty status. |
-| **Prove** | Agent can request or generate a proof / attestation. | Prove the user is 18+ without sharing date of birth. |
-| **Share** | Agent can disclose data or proof onward to another party. | Send an encrypted traveler payload to an airline. |
-| **Collect** | Agent can collect data from the user or external party during the task. | Ask the user for missing passport expiry. |
-| **Store** | Agent, AIR, or a partner can retain data beyond one-time use. | Save a loyalty number for future bookings. |
-| **Spend** | Agent can use a bounded budget or payment authority. | Spend up to $3,000 on flights and hotels. |
-| **Authorize** | Agent can request or initiate a payment action under policy. | Confirm a $420 hotel booking. |
-| **Hold** | Agent / account / sub-account can hold delegated balance or reserved funds. | Reserve $500 for a booking deposit. |
-| **Route** | Agent or platform can route a proof, payment intent, authorization, or settlement instruction. | Pass payment authorization from user to merchant through a platform. |
-| **Settle** | Value transfer is completed through a payment rail. | Complete card, stablecoin, or account-based settlement. |
-| **Revoke** | User or policy can remove access or invalidate a permission. | Cancel an agent's trip budget after the task ends. |
+Every agent request maps to one of eleven canonical verbs — **know, prove, share,
+collect, store, spend, authorize, hold, route, settle, revoke** — and the policy engine
+evaluates the verb plus its scope. Full definitions and examples live in the
+[glossary](/airai/concepts/glossary#permission-verbs).
 
 ## Policy decisions
 
@@ -63,7 +58,8 @@ Every check returns one of:
 
 ## Audit events
 
-A minimum event model produces machine-readable evidence for users, merchants, platforms, and compliance.
+A minimum event model produces machine-readable evidence for users, merchants,
+platforms, and compliance.
 
 | Event | When it's emitted |
 | --- | --- |
@@ -83,7 +79,8 @@ A minimum event model produces machine-readable evidence for users, merchants, p
 
 ## What users see, control, and revoke
 
-Through embeddable [AIR Authorization Flows](/airai/studio/authorization-flows), users can:
+Through embeddable [Authorization Flows](/airai/builder-surfaces#authorization-flows),
+users can:
 
 - Approve, modify, or deny any permission request
 - See an active list of grants, mandates, and bindings
@@ -98,6 +95,6 @@ Through the policy engine, partners and merchants get:
 
 ## Next
 
-- [AIR Agentic Identity](/airai/services/agentic-identity) and [AIR Agentic Money](/airai/services/agentic-money) — the two authorities Policy + Audit governs.
+- [AIR Identity (Agentic)](/airai/identity) and [AIR Money (Agentic)](/airai/money) — the two authorities Policy + Audit governs.
 - [Reference architecture](/airai/concepts/architecture) — where Policy + Audit sits in the full system.
 - [Glossary](/airai/concepts/glossary) — canonical objects (permission object, consent record, spend mandate, receipt, revocation status).

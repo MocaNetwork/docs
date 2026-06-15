@@ -1,0 +1,77 @@
+---
+title: "How it works"
+description: "Every sensitive agent action follows the same five stages — Intent, Permission, Authorize, Execute, Settle — with audit and receipts cross-cutting each one. A worked checkout shows it end to end."
+---
+
+Whatever the agent is doing — reading a preference, proving a fact, or paying for
+something — AIR runs it through the same five stages. The agent never touches raw keys
+or data; it receives the *result* of a permitted action, and every stage leaves an
+audit trail.
+
+## The five stages
+
+| Stage | What happens | Audit event |
+| --- | --- | --- |
+| **1 · Intent** | The user starts a request. The external agent (Butler or Concierge) calls AIR through the AIR AI Plugin (MCP / CLI / APIs); AIR normalizes it into a request. | Request received |
+| **2 · Permission** | The AIR Policy Engine decides: allow, deny, revoke, or require approval. It checks pre-authorized [Authorization Flows](/airai/builder-surfaces#authorization-flows) first, and escalates to HITL signers if the action is not covered. | Policy decision |
+| **3 · Authorize** | AIR Identity (Agentic) and/or AIR Money (Agentic) authorize against AIR Kit — vault data and credential proofs on the identity side, wallet / account / cards on the money side. | Claim / mandate asserted |
+| **4 · Execute** | AIR composes and adapts the request to the relevant standards, then runs identity-related actions, money-related actions, or both. | Action applied |
+| **5 · Settle** | External parties confirm — identity verification and fund settlement complete the request. | Result confirmed |
+
+**Cross-cutting — AIR Policy + Audit.** Every stage emits an audit event. Records,
+receipts, and revocation history all converge here, surfaced for the user, for
+compliance, and for revocation. No sensitive action bypasses consent, policy,
+revocation, and audit.
+
+## Worked example — status-matched checkout
+
+A user asks an agent to book a flight to Tokyo and keep it under **\$800**.
+
+<Frame caption="Status-matched checkout — an identity proof (Gold tier) unlocks a member fare that brings the purchase inside the agent's budget, across all five stages with audit cross-cutting. Click to zoom.">
+  <img src="/images/airai-status-matched-checkout.png" alt="Status-matched checkout flow — Intent, Permission, Authorize, Execute, Settle with the status match (Gold tier proof unlocks a 15% member fare, $920 to $782 under the $800 budget) and a cross-cutting AIR Audit / Receipts lane" />
+</Frame>
+
+<Steps>
+  <Step title="Set budget — Intent">
+    "Book the Tokyo flight, keep it under \$800." The agent calls AIR; the request is
+    normalized and a budget intent is recorded.
+  </Step>
+  <Step title="Policy allows — Permission">
+    The AIR Policy Engine checks the agent's pre-authorized scope and budget. Allowed
+    — no human approval needed for an in-scope request.
+  </Step>
+  <Step title="Prove Gold, match budget — Authorize">
+    The base fare is **\$920** — over budget. AIR Identity (Agentic) proves the user's
+    **Gold tier** loyalty credential — held in their vault, anchored on
+    [Moca Chain](/mocachain/index) — on demand. That unlocks a **15% member fare**.
+  </Step>
+  <Step title="Apply discount, charge — Execute">
+    The member fare brings the price to **\$782** — under the \$800 ceiling. AIR Money
+    (Agentic) confirms funds and authorizes the charge.
+  </Step>
+  <Step title="Verify tier, settle — Settle">
+    The airline verifies the Gold tier proof and settles the **\$782** charge. A
+    receipt is emitted to the user.
+  </Step>
+</Steps>
+
+<Tip>
+**The status match.** The tier proof is what makes the purchase achievable. Without it
+the fare stays at \$920 — over the ceiling — and the agent cannot transact. This is the
+core AIR AI pattern: an **identity proof** unlocks a price that brings a purchase inside
+**money's** budget, and **policy + audit** record every step.
+</Tip>
+
+## Why this matters for partners
+
+Because every action is shaped the same way, you integrate once and get identity,
+money, policy, and audit together — not four separate integrations. The same lifecycle
+applies whether the agent is yours (Butler) or you embed AIR inside your own surface
+(Concierge).
+
+## Next
+
+- [How you can work with AIR AI](/airai/fit) — the ways to work with AIR, whether you already know what you're building or are still exploring.
+- [Integration paths](/airai/integration-paths) — Skill / Plugin vs. AIR AI SDK, and how to get started.
+- [Canonical flows](/airai/concepts/canonical-flows) — the full end-to-end sequences behind this lifecycle.
+- [Reference architecture](/airai/concepts/architecture) — the layered system the lifecycle runs on.

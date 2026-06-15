@@ -1,31 +1,38 @@
 ---
-title: "AIR Agentic Money"
+title: "AIR Money (Agentic)"
 description: "Transaction authority for agents. What an agent can spend, authorize, hold, route, or settle on behalf of a user."
 ---
 
-AIR Agentic Money is the transaction authority for agents. It controls what an agent can spend, authorize, hold, route, or settle on behalf of a user.
+AIR Money (Agentic) is the transaction authority for agents. It controls what an agent
+can spend, authorize, hold, route, or settle on behalf of a user.
 
 <Info>
-**The core question.** Can the policy engine block a $5/day agent from betting on Polymarket while still allowing it to buy ETH?
+**The core question.** Can the policy engine stop a \$5/day agent from spending on an
+out-of-scope merchant, while still letting it renew a subscription or top up a
+stablecoin balance?
 </Info>
 
 ## Graduated autonomy
 
-AIR Agentic Money supports three levels of authority. Users move up the ladder as trust grows; partners and merchants pick the level appropriate to the task.
+AIR Money (Agentic) supports three levels of authority. Users move up the ladder as trust
+grows; partners and merchants pick the level appropriate to the task.
 
 <Steps>
   <Step title="Full account operation — human in the loop">
-    The agent prepares the transaction, but every payment requires explicit user confirmation. Used for first-time merchants, large amounts, or high-risk categories.
+    The agent prepares the transaction, but every payment requires explicit user
+    confirmation. Used for first-time merchants, large amounts, or high-risk categories.
   </Step>
   <Step title="Sub-accounts with delegated budgets">
-    The user provisions a sub-account or burner card with a fixed balance. The agent transacts freely within the sub-account; the main account is never touched.
+    The user provisions a sub-account or burner card with a fixed balance. The agent
+    transacts freely within the sub-account; the main account is never touched.
   </Step>
   <Step title="Action-restricted spending — policy engine allowlists / denylists">
-    The agent transacts directly under a spend mandate. The policy engine evaluates each request against budgets, merchant scope, category scope, expiry, and approval thresholds.
+    The agent transacts directly under a spend mandate. The policy engine evaluates each
+    request against budgets, merchant scope, category scope, expiry, and approval thresholds.
   </Step>
 </Steps>
 
-## What AIR Agentic Money controls
+## What AIR Money (Agentic) controls
 
 - **Spend mandate** — bounded transaction authority granted to an agent.
 - **Budget cap** — total amount cap, per-transaction cap, or recurring cap.
@@ -42,11 +49,15 @@ AIR Agentic Money supports three levels of authority. Users move up the ladder a
 
 ## A spend mandate in plain terms
 
-A spend mandate is the contract between user and agent for what the agent is allowed to pay for. It might say:
+A spend mandate is the contract between user and agent for what the agent is allowed to
+pay for. It might say:
 
-> Up to **$50** with **`merchant_abc`**, in the **office supplies** category, expiring **Friday at midnight**, with user approval required for any single charge above **$25**.
+> Up to **\$50** with **`merchant_abc`**, in the **office supplies** category, expiring
+> **Friday at midnight**, with user approval required for any single charge above **\$25**.
 
-When the agent later requests a payment, AIR Policy + Audit checks the mandate, and AIR Agentic Money returns an authorization, denial, or "approval required" response — with a receipt for every outcome.
+When the agent later requests a payment, AIR Policy + Audit checks the mandate, and AIR
+Money (Agentic) returns an authorization, denial, or "approval required" response — with
+a receipt for every outcome.
 
 ## What an agent receives, and what it never receives
 
@@ -67,22 +78,22 @@ When the agent later requests a payment, AIR Policy + Audit checks the mandate, 
   </div>
 </Columns>
 
-## How agent relationships use Agentic Money
-
-| Relationship | Typical money pattern |
-| --- | --- |
-| **Butler** | Bounded spend mandates, delegated sub-accounts, persistent payment authority within budget. |
-| **Concierge** | Merchant-bound, single-purpose payment authorization for the merchant's product or service. |
-| **Platform** | Routing of payment intent, proof of payment capability, escrow instructions, settlement metadata. |
+<Note>
+How a **Butler** (bounded mandates, delegated sub-accounts, persistent authority within
+budget) and a **Concierge** (merchant-bound, single-purpose authorization) use money
+differently is covered once in [Agent taxonomy](/airai/concepts/agent-taxonomy).
+</Note>
 
 ## Working with rails and frameworks
 
-AIR Agentic Money does not replace existing payment rails. It composes with x402, AP2, Stripe ACP / SPT, Visa TAP, Mastercard Agent Pay / KYA, and MPP / Tempo through framework adapters in AIR Kit.
+AIR Money (Agentic) does not replace existing payment rails. It composes with x402, AP2,
+Stripe ACP / SPT, Visa TAP, Mastercard Agent Pay / KYA, and MPP / Tempo through framework
+adapters in AIR Kit.
 
 See [Existing frameworks](/airai/concepts/frameworks) for the full mapping.
 
 ## Next
 
-- [AIR Agentic Identity](/airai/services/agentic-identity) — the information authority that pairs with this transaction authority.
-- [AIR Policy + Audit](/airai/services/policy-and-audit) — the shared control layer that gates every money action.
+- [AIR Identity (Agentic)](/airai/identity) — the information authority that pairs with this transaction authority.
+- [AIR Policy + Audit](/airai/policy-audit) — the shared control layer that gates every money action.
 - [Canonical flows: spend mandate](/airai/concepts/canonical-flows#spend-mandate) — end-to-end sequence for graduated agent spending.

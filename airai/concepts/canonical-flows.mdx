@@ -1,19 +1,23 @@
 ---
 title: "Canonical flows"
-description: "End-to-end sequences for Butler (Holiday Agent), Concierge (age-gated purchase), Platform (proof handoff), and spend mandate flows."
+description: "End-to-end sequences for Butler (Holiday Agent), Concierge (age-gated purchase), proof handoff, and spend mandate flows — each mapped to the five-stage lifecycle."
 ---
 
-These are the canonical end-to-end flows that exercise the full AIR AI stack — Agent Tools, Authorization Flows, Agentic Identity, Agentic Money, Policy + Audit, AIR Kit, and external partners.
+These are the canonical end-to-end flows that exercise the full AIR AI stack — Agent Tools, Authorization Flows, AIR Identity (Agentic), AIR Money (Agentic), Policy + Audit, AIR Kit, and external partners.
 
-Each flow follows the same architectural invariant:
+Each flow follows the same [five-stage lifecycle](/airai/how-it-works):
 
-> Agent request → AIR Agent Tools → AIR Policy + Audit decision → AIR Authorization Flow / signer action if required → AIR Agentic Identity or AIR Agentic Money execution through AIR Kit → External system / rail / verifier → audit receipt.
+> **Intent → Permission → Authorize → Execute → Settle**, with AIR Audit / Receipts capturing an event at every stage.
 
 ## Flow A — Butler / Holiday Agent
 
 A user-owned travel assistant plans and books a trip on the user's behalf.
 
-**Trigger.** "Book me a four-day trip to Tokyo next month within $3,000, using my airline loyalty where possible."
+**Trigger.** "Book me a four-day trip to Tokyo next month within \$3,000, using my airline loyalty where possible."
+
+<Tip>
+This is the **status-match** pattern: an identity proof (loyalty tier) unlocks a price that brings a purchase inside the user's money budget. See the [worked example](/airai/how-it-works#worked-example-status-matched-checkout) — a \$920 fare that a Gold tier proof drops to \$782, under an \$800 ceiling.
+</Tip>
 
 ```mermaid
 sequenceDiagram
@@ -22,8 +26,8 @@ sequenceDiagram
   participant Tools as AIR Agent Tools
   participant Policy as AIR Policy + Audit
   participant Auth as AIR Authorization Flow
-  participant Identity as AIR Agentic Identity
-  participant Money as AIR Agentic Money
+  participant Identity as AIR Identity (Agentic)
+  participant Money as AIR Money (Agentic)
   participant Kit as AIR Kit
   participant Partner as Travel Partner
 
@@ -81,8 +85,8 @@ sequenceDiagram
   participant Tools as AIR Agent Tools
   participant Policy as AIR Policy + Audit
   participant Auth as AIR Authorization Flow
-  participant Identity as AIR Agentic Identity
-  participant Money as AIR Agentic Money
+  participant Identity as AIR Identity (Agentic)
+  participant Money as AIR Money (Agentic)
   participant Merchant
   participant Rail as Payment Rail
 
@@ -114,24 +118,24 @@ sequenceDiagram
 
 - Merchant-bound payment request, amount confirmation, rail selection, receipt, refund / dispute reference.
 
-## Flow C — Platform agent / proof handoff
+## Flow C — Proof handoff
 
-A platform verifies the user once and passes a signed proof or attestation to a merchant or service provider — without exposing raw user data and without requiring a new verification flow.
+An agent verifies the user once and passes a signed proof or attestation to a merchant or service provider — without exposing raw user data and without requiring a new verification flow. Either a Butler or a Concierge agent can drive this; proof handoff is a capability, not an agent type.
 
 **Trigger.** A merchant needs to know the user satisfies a requirement, but should not receive raw user data.
 
 ```mermaid
 sequenceDiagram
   participant User
-  participant Platform as Platform agent
+  participant Agent as Agent (Butler / Concierge)
   participant Merchant
   participant Tools as AIR Agent Tools
   participant Policy as AIR Policy + Audit
-  participant Identity as AIR Agentic Identity
+  participant Identity as AIR Identity (Agentic)
   participant Proof as Credential / Proof Service
 
-  Platform->>Tools: requestProofHandoff
-  Tools->>Policy: Check platform binding + purpose
+  Agent->>Tools: requestProofHandoff
+  Tools->>Policy: Check agent binding + purpose
   Policy->>User: Request approval if needed
   User-->>Policy: Approve / deny / modify
   Policy->>Identity: Generate or retrieve proof
@@ -141,7 +145,7 @@ sequenceDiagram
   Merchant-->>Identity: Verification result
   Identity-->>Policy: Handoff result
   Policy-->>User: Receipt
-  Policy-->>Platform: Machine-readable status
+  Policy-->>Agent: Machine-readable status
 ```
 
 **Identity actions**
@@ -170,7 +174,7 @@ sequenceDiagram
   participant Tools as AIR Agent Tools
   participant Auth as AIR Authorization Flow
   participant Policy as AIR Policy + Audit
-  participant Money as AIR Agentic Money
+  participant Money as AIR Money (Agentic)
   participant Kit as AIR Kit Wallet / Payments
   participant Merchant
 
@@ -220,7 +224,7 @@ sequenceDiagram
 
 ## Cross-flow audit events
 
-Every flow produces machine-readable audit evidence. See [AIR Policy + Audit](/airai/services/policy-and-audit) for the full event model.
+Every flow produces machine-readable audit evidence. See [AIR Policy + Audit](/airai/policy-audit) for the full event model.
 
 ## Next
 
