@@ -85,7 +85,6 @@ async function issueLoyaltyCredential({ userEmail, tier, totalPoints, memberSinc
       issuerDid: process.env.ISSUER_DID,          // Dashboard → Accounts → General
       credentialId: process.env.LOYALTY_CRED_ID,  // Dashboard → Issuer → Programs
       credentialSubject: { tier, totalPoints, memberSince, brandId: process.env.BRAND_ID },
-      onDuplicate: 'revoke',  // upgrade tier by revoking old credential, issuing new one
     }),
   });
 

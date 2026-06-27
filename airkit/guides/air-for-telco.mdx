@@ -133,7 +133,6 @@ async function issueSubscriberCredential({ userEmail, activation }) {
         isOver18: activation.age >= 18,
         countryCode: activation.countryCode,    // e.g. "AU", "SG"
       },
-      onDuplicate: 'revoke', // re-issue if subscriber upgrades plan / re-verifies
     }),
   });
 
@@ -171,7 +170,6 @@ async function issueLoyaltyTierIfEligible({ userEmail, tenureMonths }) {
         tenureMonths,
         memberSince: getMemberSinceDate(userEmail),
       },
-      onDuplicate: 'revoke', // always replace with updated tier
     }),
   });
 }

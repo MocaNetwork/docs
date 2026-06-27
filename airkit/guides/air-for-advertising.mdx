@@ -142,7 +142,6 @@ async function issueAudienceCredential({ userEmail, profile }) {
         interestSegments: profile.iabSegments,       // e.g. ['IAB19', 'IAB9-30']
         verifiedAt: new Date().toISOString(),
       },
-      onDuplicate: 'revoke', // refresh when profile or interests update
     }),
   });
 
@@ -191,7 +190,6 @@ async function issueConsentCredential({ userEmail, consentRecord }) {
         consentedAt: new Date().toISOString(),
         expiresAt: expiresAt.toISOString(),
       },
-      onDuplicate: 'revoke', // replace on re-consent or withdrawal
     }),
   });
 }

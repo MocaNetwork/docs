@@ -46,7 +46,7 @@
                   "location": "United States",
                   "isMember": true
                 },
-                "onDuplicate": "revoke"
+                "onDuplicate": "ignore"
               }
             }
           }
