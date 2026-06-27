@@ -94,7 +94,6 @@ async function issueAchievement({ playerEmail, achievement }) {
         earnedAt: new Date().toISOString(),
         season: 'Season 3',
       },
-      onDuplicate: 'ignore', // achievements are one-time — don't re-issue
     }),
   });
 

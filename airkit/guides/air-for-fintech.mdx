@@ -100,7 +100,6 @@ async function issueKycCredential({ userEmail, kycResult }) {
         isOver18: kycResult.age >= 18,
         isOver21: kycResult.age >= 21,
       },
-      onDuplicate: 'revoke', // re-issue if KYC level upgrades
     }),
   });
 

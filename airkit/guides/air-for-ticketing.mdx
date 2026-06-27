@@ -97,7 +97,6 @@ async function issueAttendanceCredential({ fanEmail, eventDetails }) {
         ticketTier: eventDetails.ticketTier,   // "General" | "VIP" | "Backstage"
         organizerId: process.env.ORGANIZER_ID,
       },
-      onDuplicate: 'ignore', // one credential per event per fan
     }),
   });
 

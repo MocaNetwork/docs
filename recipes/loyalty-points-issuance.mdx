@@ -34,6 +34,10 @@ See [Schema Creation](/airkit/usage/credential/schema-creation) for full setup i
 
 When your loyalty engine determines a user has crossed a tier boundary, call Issue on Behalf with `onDuplicate: "revoke"` to replace the previous tier credential.
 
+<Warning>
+The `email` claim must be the **individual target recipient's** AIR Account email — the person who should receive this specific credential. It is the routing key that determines which account the credential lands in. Never reuse a partner, service, admin, or static email, and never reuse one email across multiple recipients: every credential signed with that email will be issued to that one account.
+</Warning>
+
 ```js
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -41,17 +45,18 @@ const fs = require("fs");
 const privateKey = fs.readFileSync("path/to/private.key");
 const BASE_URL = process.env.API_BASE_URL || "https://api.sandbox.mocachain.org/v1";
 
-function getPartnerJwt(email) {
+function getPartnerJwt(recipientEmail) {
   const now = Math.floor(Date.now() / 1000);
   return jwt.sign(
-    { partnerId: process.env.PARTNER_ID, scope: "issue", email, iat: now, exp: now + 300 },
+    // email MUST be the individual recipient's AIR Account email — never reuse across recipients
+    { partnerId: process.env.PARTNER_ID, scope: "issue", email: recipientEmail, iat: now, exp: now + 300 },
     privateKey,
     { algorithm: "RS256", header: { kid: process.env.KEY_ID, typ: "JWT" } }
   );
 }
 
-async function issueLoyaltyCredential(userEmail, tierData) {
-  const token = getPartnerJwt(userEmail);
+async function issueLoyaltyCredential(recipientEmail, tierData) {
+  const token = getPartnerJwt(recipientEmail);
 
   const res = await fetch(`${BASE_URL}/credentials/issue-on-behalf`, {
     method: "POST",
@@ -65,7 +70,6 @@ async function issueLoyaltyCredential(userEmail, tierData) {
         memberSince: tierData.memberSince,
         upgradedAt: new Date().toISOString(),
       },
-      onDuplicate: "revoke",
     }),
   });
 

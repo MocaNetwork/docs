@@ -40,12 +40,19 @@ For [Issue on Behalf (API)](/airkit/usage/credential/issue-on-behalf), use a Par
 
 | Category | Required fields | Notes |
 | --- | --- | --- |
-| Claims | `partnerId`, `scope: "issue on-behalf"`, `email` | `email` must be the target user's AIR Account email |
+| Claims | `partnerId`, `scope: "issue on-behalf"`, `email` | `email` must be the **individual target recipient's** AIR Account email — unique per recipient |
 | Header | `kid`, `typ: "JWT"` | `kid` identifies which key in your JWKS is used |
 | Algorithm | `RS256` or `ES256` | Keep consistent with your JWKS key type |
 | Expiry | `exp` (recommended 5 minutes) | Short-lived token recommended |
 
-JWKS rules ([endpoint reachability, registration, `kid` matching](/airkit/usage/jwks-setup)) apply identically to Issue on Behalf — there is no separate JWKS configuration for the on-behalf flow.
+<Warning>
+The `email` claim must be the **individual target recipient's** AIR Account email — the person who should receive this specific credential. It is the routing key that determines which account the credential lands in. Never reuse a partner, service, admin, or static email, and never reuse one email across multiple recipients: every credential signed with that email will be issued to that one account.
+</Warning>
+
+JWKS reminders for Issue on Behalf:
+
+- `kid` in JWT header must match a key ID exposed by your JWKS endpoint
+- JWKS endpoint must be publicly reachable by AIR Kit
 
 Focused Node.js example (payload + header shape):
 
@@ -56,10 +63,13 @@ const fs = require("fs");
 const privateKey = fs.readFileSync("path/to/private.key");
 const now = Math.floor(Date.now() / 1000);
 
+// MUST be the individual recipient's AIR Account email — never reuse across recipients
+const recipientEmail = "user@example.com";
+
 const payload = {
   partnerId: "your-partner-id",
   scope: "issue on-behalf",
-  email: "user@example.com",
+  email: recipientEmail,
   iat: now,
   exp: now + 5 * 60
 };
