@@ -3,6 +3,76 @@ title: "Release Notes"
 description: "AIR Kit SDK release notes — version history, new features, breaking changes, deprecations, and migration notes for partners upgrading their integration."
 ---
 
+## **Version 1.10.0 (Released)**
+
+### ✨ **New Features**
+
+- Offchain credential issuance and verification options (`offchain`, `waitForOnchainCompletion`, `requireZkp`) — see [Issuing credentials](/airkit/usage/credential/issuing-credentials) and [Verifying credentials](/airkit/usage/credential/verify)
+- Selective and full data disclosure on verify (`fieldsToDisclose`) — see [Selective Disclosure](/airkit/early-access/selective-disclosure)
+- In-wallet Transfer and Receive UIs: `showTransferUI`, `showReceiveUI`
+- Agent key management: `getAgentKeys`, `registerAgentKey`, `removeAgentKey`
+- Streamlined PIN setup / confirmation / recovery and account recovery entry points (`startRecovery`)
+- Issue-on-behalf accept/reject flows for new and existing users — see [Issue on Behalf](/airkit/usage/credential/issue-on-behalf)
+- Login / `getUserInfo` payloads: optional `user.wallet` and `abstractAccountAddresses`
+
+### ➕ **Improvements**
+
+- More reliable recovery OTP and Forgot PIN flows (including Safari)
+
+### **⚠️ Breaking Changes**
+
+- Sandbox no longer accepts `credentialNetwork` — it is **Testnet-only**. Devnet opt-in is removed.
+- `CredentialNetwork` is now `"testnet" | "mainnet"` (no longer `"devnet" | "testnet"`)
+- Private Mainnet requires `buildEnv: BUILD_ENV.PRODUCTION` with `credentialNetwork: "mainnet"`
+- Credentials and programs issued on Devnet are not available on Testnet or Mainnet — re-issue on the target network
+
+### **📋 Migration Guide**
+
+**Sandbox (Testnet only):**
+
+```js
+import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
+
+const airService = new AirService({
+  partnerId: YOUR_PARTNER_ID
+});
+await airService.init({
+  buildEnv: BUILD_ENV.SANDBOX,
+  enableLogging: true
+});
+```
+
+**Private Mainnet (production):**
+
+```js
+await airService.init({
+  buildEnv: BUILD_ENV.PRODUCTION,
+  credentialNetwork: "mainnet",
+  enableLogging: true
+});
+```
+
+If you previously passed `credentialNetwork: "devnet"` (or any Sandbox `credentialNetwork`), remove it. Re-issue test credentials on Testnet or Mainnet as needed.
+
+Moca Chain Mainnet is currently private. For production launches, use the production AIR pages and contact Moca for mainnet access and \$MOCA gas tokens. See [Production mainnet access](/airkit/environments#production-mainnet-access).
+
+---
+
+## **Flutter SDK 1.6.0**
+
+### ✨ **New Features**
+
+- Credential issuance and verification (`issueCredential`, `verifyCredential`, `preloadCredential`)
+- Google and email passwordless login
+
+### ➕ **Improvements**
+
+- Credential stability improvements
+
+Install with `version: ^1.6.0` via OnePub — see [Flutter installation](/airkit/flutter/installation).
+
+---
+
 ## **Version 1.8.0 (Released)**
 
 ### ✨ **New Features**
@@ -13,7 +83,7 @@ description: "AIR Kit SDK release notes — version history, new features, break
 - Display currency configuration (USD, EUR, CNY, KRW, TRY)
 - New `air_accounts` RPC method to check account status across all supported chains
 - `wallet_sendCalls` RPC method for batch transaction execution
-- New `chainNetwork` option to temporarily use Devnet during migration
+- Temporary Devnet opt-in on Sandbox via `credentialNetwork: "devnet"` (removed in 1.10.0)
 
 ### ➕ **Improvements**
 
@@ -25,29 +95,28 @@ description: "AIR Kit SDK release notes — version history, new features, break
 
 - Sandbox environment now defaults to **Moca Chain Testnet** instead of Devnet
 - Credentials issued on Devnet will not be available on Testnet
-- Devnet support continues to be available alongside Testnet but will be deprecated later
+- Devnet support remained available via `credentialNetwork: "devnet"` until **1.10.0**, when it was removed
 
 ### **📋 Migration Guide**
 
-After upgrading to `1.8.0`, Sandbox will connect to Testnet by default. If your integration is not ready, you can temporarily stay on Devnet:
+After upgrading to `1.8.0`, Sandbox connects to Testnet by default. If your integration was not ready, you could temporarily stay on Devnet:
 
 ```js
-import { AirService, BUILD_ENV, CHAIN_NETWORK } from "@mocanetwork/airkit";
+import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
 
 const airService = new AirService({
   partnerId: YOUR_PARTNER_ID
 });
 await airService.init({
   buildEnv: BUILD_ENV.SANDBOX,
-  chainNetwork: CHAIN_NETWORK.DEVNET, // Stay on Devnet if needed
+  credentialNetwork: "devnet", // Temporary opt-in; removed in 1.10.0
   enableLogging: true
 });
 ```
 
-We recommend migrating to Testnet as soon as possible. Re-issue any test credentials on Testnet.
+We recommend migrating to Testnet as soon as possible. Re-issue any test credentials on Testnet. **As of 1.10.0, Devnet opt-in is removed** — see the 1.10.0 migration guide above.
 
 ---
-
 ## **Version 1.7.0 (Nov 18, 2025)**
 
 ### ✨ **New Features**
