@@ -7,7 +7,7 @@ description: "Install the AIR Kit Web SDK with npm — @mocanetwork/airkit, avai
 <Tab title="Web">
 
 <Info>
-**Latest version:** `1.9.0-beta.3` — install with `npm install @mocanetwork/airkit@1.9.0-beta.3`, or omit the version tag to get the latest release from npm. See [Release notes](/airkit/release-notes) for changes and migration guidance.
+**Latest version:** `1.10.0` — install with `npm install @mocanetwork/airkit@1.10.0`, or omit the version tag to get the latest release from npm. See [Release notes](/airkit/release-notes) for changes and migration guidance.
 </Info>
 
 ```bash
@@ -46,6 +46,10 @@ In case the `onepub` command is not recognized, adding following to your PATH sh
 `export PATH=$PATH:$HOME/.pub-cache/bin`
 </Warning>
 
+<Note>
+  For production mobile apps, keep the production AIR domain (`account.air3.com`) in your Android asset statements and iOS associated domains. Use `account.sandbox.air3.com` for Sandbox testing.
+</Note>
+
 
 
 To install the AirKit Flutter package, you have two options. You can either manually add the package in the `pubspec.yaml` file, or you can use the `onepub pub add` command.
@@ -56,7 +60,7 @@ Add `airkit` as a dependency to your `pubspec.yaml`.
 dependencies:
   airkit:
     hosted: https://onepub.dev/api/sxhddavuhn/
-    version: ^1.6.0-beta.1
+    version: ^1.6.0
 ```
 
 Add `airkit` using `onepub pub add` command.

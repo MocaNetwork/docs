@@ -11,6 +11,10 @@ icon: "download"
 - Android: `compileSdk` 34+, `minSdk` 26+ (see [Android setup](/airkit/flutter/android-setup))
 - iOS: platform 14.0+ in `Podfile` (see [iOS setup](/airkit/flutter/ios-setup))
 
+<Note>
+  Production mobile apps should use the production AIR pages and domains, including `account.air3.com` for passkey setup. Moca Chain Mainnet is private; see [Production mainnet access](/airkit/environments#production-mainnet-access) before requesting mainnet \$MOCA gas tokens.
+</Note>
+
 ## OnePub CLI
 
 ```bash
@@ -30,7 +34,7 @@ If `onepub` is not found, add Pub’s global bin directory to your PATH, for exa
 dependencies:
   airkit:
     hosted: https://onepub.dev/api/sxhddavuhn/
-    version: ^1.6.0-beta.1
+    version: ^1.6.0
 ```
 
 Use the version your team recommends; check [Release notes](/airkit/release-notes) for current Flutter SDK versions.

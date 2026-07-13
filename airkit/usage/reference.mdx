@@ -12,6 +12,10 @@ For server-side credential issuance without user presence, use the Issue on Beha
 - **Sandbox:** `https://api.sandbox.mocachain.org/v1`
 - **Production:** `https://mocachain-mainnet.api.air3.com/v1`
 
+<Note>
+  The production endpoint is for approved production partners on Moca Chain private Mainnet. See [Production mainnet access](/airkit/environments#production-mainnet-access) before requesting mainnet \$MOCA gas tokens.
+</Note>
+
 Authenticate with a Partner JWT in the `x-partner-auth` header. Full endpoint reference and implementation examples: [Issue on Behalf API & Examples](/airkit/usage/credential/issue-on-behalf-api).
 
 ---
@@ -25,14 +29,15 @@ Authenticate with a Partner JWT in the `x-partner-auth` header. Full endpoint re
 ```ts
 class AirService {
   constructor({ partnerId: string; });
-  get buildEnv(): BUILD_ENV_TYPE; // available env: SANDBOX
+  get buildEnv(): BUILD_ENV_TYPE;
   get isInitialized(): boolean;
   get isLoggedIn(): boolean;
   get isWalletInitialized(): boolean;
   get provider(): EIP1193Provider;
   init({
     buildEnv: BUILD_ENV_TYPE;
-    credentialNetwork?: CredentialNetwork;
+    // Only when buildEnv is PRODUCTION:
+    credentialNetwork?: "testnet" | "mainnet";
     enableLogging: boolean;
     skipRehydration: boolean;
     preloadWallet: boolean;
@@ -54,22 +59,35 @@ class AirService {
     initialFromToken?: string;
     fallbackFromToken?: string;
     initialToToken?: string;
+    defaultSlippage?: number;
   }): Promise<{ txHash: `0x${string}` }>;
   showOnRampUI(options: {
     displayCurrencyCode: string;
     targetCurrencyCode?: string;
   }): Promise<void>;
+  showTransferUI(options?: ShowTransferUIOptions): Promise<ShowTransferUIResult>;
+  showReceiveUI(): Promise<void>;
+  getAgentKeys(): Promise<AgentPublicKey[]>;
+  registerAgentKey(publicKey: string): Promise<AgentPublicKey>;
+  removeAgentKey(id: string): Promise<void>;
+  startRecovery(payload?: unknown): Promise<void>;
   issueCredential({
     authToken: string;
     issuerDid: string;
     credentialId: string;
     credentialSubject: Record<string, unknown>;
     curve?: "secp256r1" | "secp256k1";
+    waitForOnchainCompletion?: boolean;
+    legacy?: boolean;
   }): Promise<{ cakPublicKey?: string }>;
   verifyCredential({
     authToken: string;
     programId: string;
     redirectUrl?: string;
+    fieldsToDisclose?: "*" | string[];
+    offchain?: boolean;
+    legacy?: boolean;
+    requireZkp?: boolean;
   }): Promise<CredentialVerificationResult>;
   logout(): Promise<void>;
   cleanUp(): Promise<void>;
@@ -78,6 +96,8 @@ class AirService {
   clearEventListeners(): void;
 }
 ```
+
+`fieldsToDisclose` is documented in [Selective Disclosure](/airkit/early-access/selective-disclosure).
 
 ### Types
 
@@ -91,6 +111,11 @@ export type AirIdDetails = {
   imageUrl?: string;
 };
 
+export type AbstractAccountAddressEntry = {
+  readonly address: string;
+  readonly chainIds: readonly string[];
+};
+
 export type AirUserDetails = {
   partnerId?: string;
   partnerUserId?: string;
@@ -99,6 +124,7 @@ export type AirUserDetails = {
     id: string;
     abstractAccountAddress?: string;
     email?: string;
+    wallet?: string;
     isMFASetup: boolean;
   };
 };
@@ -111,6 +137,7 @@ export type AirLoginResult = {
   isLoggedIn: boolean;
   id: string;
   abstractAccountAddress?: string;
+  abstractAccountAddresses?: readonly AbstractAccountAddressEntry[];
   token: string;
   isMFASetup: boolean;
 };
@@ -118,6 +145,29 @@ export type AirLoginResult = {
 export type AirWalletInitializedResult = {
   abstractAccountAddress: string | null;
   isMFASetup: boolean;
+};
+
+export type AgentPublicKey = {
+  id: string;
+  publicKey: string;
+  createdAt: string;
+};
+
+export type ShowTransferUIOptions = {
+  tokenSymbol?: string;
+  chainId?: number;
+  recipientAddress?: string;
+  amount?: string;
+};
+
+export type ShowTransferUIResult = {
+  txHash: `0x${string}`;
+  symbol: string;
+  chainId: number;
+  decimals: number;
+  address: `0x${string}`;
+  recipientAddress: string;
+  amount: string;
 };
 
 export type CredentialVerificationResult =
@@ -179,7 +229,7 @@ export type AirEventData =
 
 export type AirEventListener = (data: AirEventData) => void;
 
-export type CredentialNetwork = "devnet" | "testnet";
+export type CredentialNetwork = "testnet" | "mainnet";
 
 export type SupportedCurrencyCode = "EUR" | "USD" | "CNY" | "KRW" | "TRY";
 
@@ -192,10 +242,12 @@ export type ClaimAirIdOptions =
   | {
       token?: string;
       background?: false;
+      offchain?: boolean;
     }
   | {
       token: string;
       background: true;
+      offchain?: boolean;
     };
 ```
 
@@ -221,18 +273,39 @@ class AirService {
     Environment env = Environment.production,
     required GlobalKey<NavigatorState> navigatorKey,
     bool enableLogging = false,
+    SessionConfig? sessionConfig,
   });
 
   Future<LoginResult> login({
-    required String authToken,
-    OnOtpRequest? onOtpRequest,
+    String? authToken,
   });
 
   Future<LoginResult> rehydrate();
 
   Future<UserInfo> getUserInfo();
 
+  Future<SessionConfig> updateSessionConfig({
+    String? locale,
+    String? currency,
+  });
+
   Future<void> preloadWallet();
+
+  Future<void> preloadCredential();
+
+  Future<CredentialIssuanceResult> issueCredential({
+    required String authToken,
+    required String issuerDid,
+    required String credentialId,
+    required Map<String, dynamic> credentialSubject,
+    String? curve,
+  });
+
+  Future<CredentialVerificationResult> verifyCredential({
+    required String authToken,
+    required String programId,
+    String? redirectUrl,
+  });
 
   Future<String?> getAbstractAccountAddress();
 
@@ -271,14 +344,19 @@ class AirService {
   Future<void> logout();
 
   void cleanup();
+}
 ```
 
 ### Models
 
 ```dart
-
 enum Environment { staging, uat, sandbox, production }
-​
+
+class SessionConfig {
+  final String? locale;
+  final String? currency;
+}
+
 class LoginResult {
   final bool isLoggedIn;
   final String? id;
@@ -286,12 +364,12 @@ class LoginResult {
   final String? token;
   final bool? isMFASetup;
 }
-​
+
 enum AirIdStatus {
   minting,
   minted,
 }
-​
+
 class AirId {
   final String id;
   final String name;
@@ -300,21 +378,25 @@ class AirId {
   final int? chainId;
   final String? imageUrl;
 }
-​
+
 class UserInfo {
   final AirId? airId;
   final String? partnerUserId;
   final String? partnerId;
   final User? user;
 }
-​
+
 class User {
   final String id;
   final String? abstractAccountAddress;
   final String? email;
   final bool isMFASetup;
 }
-​
+
+class CredentialIssuanceResult {
+  final String? cakPublicKey;
+}
+
 class EthereumRpcRequest {
   final String method;
   final List<dynamic> params;

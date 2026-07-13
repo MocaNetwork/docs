@@ -1,51 +1,62 @@
 ---
 title: "Development Environments"
-description: "Switch between AIR Kit Sandbox and Production environments — Sandbox defaults to Moca Chain Testnet starting with AirKit 1.8.0-beta."
+description: "Switch between AIR Kit Sandbox and Production environments — Sandbox is Moca Chain Testnet; Production supports Testnet or private Mainnet via credentialNetwork."
 ---
 
 <Warning>
-**Breaking Change: Sandbox Now Defaults to Testnet**
-
-Starting with **AirKit 1.8.0-beta**, the Sandbox environment defaults to **Moca Chain Testnet**.
+Sandbox always uses **Moca Chain Testnet**. Passing `credentialNetwork` with `BUILD_ENV.SANDBOX` is no longer needed.
 </Warning>
 
 <Tip>
 Make sure you're selecting the correct chain when using different build environment. Otherwise, your app may hit unexpected errors
 </Tip>
 
-| Environment       | Moca Chain                           | Purpose                                  | Developer Dashboard                         |
+| Environment | Moca Chain | Purpose | Developer Dashboard |
 | ----------------- | ------------------------------------ | ---------------------------------------- | ------------------------------------------- |
-| Sandbox (Testnet) | Testnet                              | For development & testing                | https://developers.sandbox.air3.com/dashboard |
+| Development + Testing | Testnet (222888) | Partners still on Testnet credentials | https://developers.sandbox.air3.com/dashboard |
+| Production + `credentialNetwork: "mainnet"` | Private Mainnet (2288) | Approved production launches | https://developers.air3.com/dashboard |
 
+> Credentials, schemas, and programs are network-specific. Credentials issued on Testnet are not available on Mainnet (and Devnet-issued credentials are not available on either). Re-issue on the target network when you migrate. Issuance schemas and programs _may_ need to be recreated; Issuer and Verifier DIDs may also differ per network.
 
-> Once Mainnet is available, Production credentials will be validated against Mainnet and hence previously issued credentials on Testnet will need to be re-issued. Issuance Schemas and Programs _may_ be migrated. Your Issuer and Verifier DID may also change.
+## Production mainnet access
+
+Moca Chain Mainnet is currently a private mainnet. Approved production launches should use the production AIR pages, including the [production Developer Dashboard](https://developers.air3.com/dashboard), and configure AIR Kit with `BUILD_ENV.PRODUCTION`.
+
+You can include the mainnet URLs in production configuration when you have access. See [Moca Chain network information](/mocachain/using-moca-chain/network-information) for RPC and explorer URLs.
+
+<Card
+  title="Need private mainnet tokens?"
+  icon="coins"
+  href="https://mocanetwork.typeform.com/joinmocaeco?typeform-source=air3.com"
+  cta="Reach out to us for tokens"
+>
+  Contact Moca before launching on production mainnet so we can enable access and provide the required \$MOCA gas tokens.
+</Card>
 
 ## Sandbox Environment Changes
 
-Starting with **AirKit 1.8.0-beta**, the Sandbox environment defaults to **Moca Chain Testnet** instead of Devnet. Both Testnet and Devnet remain available for development, with Testnet being the recommended choice to align with Production.
+Starting with **AirKit 1.10.0**, Sandbox is Testnet-only — the temporary `credentialNetwork: "devnet"` opt-in is removed.
 
 ### What's Changed
 
-| Before (< 1.8.0)                               | After (1.8.0-beta+)                                    |
-| ---------------------------------------------- | ------------------------------------------------------ |
-| Sandbox → Devnet (Chain ID: 5151)              | Sandbox → Testnet (Chain ID: 222888)                   |
-| Dashboard: https://developers.sandbox.air3.com | Dashboard: https://developers.sandbox.air3.com |
+| Before (< 1.8.0) | 1.8.0–1.9.x | 1.10.0+ |
+| ---------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------ |
+| Sandbox → Devnet (Chain ID: 5151) | Sandbox → Testnet by default; optional `credentialNetwork: "devnet"` | Sandbox → Testnet only; no `credentialNetwork` on Sandbox |
+| Dashboard: https://developers.sandbox.air3.com | Dashboard: https://developers.sandbox.air3.com | Dashboard: https://developers.sandbox.air3.com |
 
 ### Impact
 
-- Credentials issued on Devnet are **not** available on Testnet
+- Credentials issued on Devnet are **not** available on Testnet or Mainnet
 - Smart Account addresses remain the same across networks
-- You will need to re-issue test credentials on Testnet
-
-<Tip>
-We recommend migrating to Testnet as soon as possible to align with production.
-</Tip>
+- Re-issue test credentials on Testnet, or on private Mainnet for approved production launches
 
 ### Initializing AirService with the correct Environment
 
 <Tabs>
 
 <Tab title="Web">
+
+**Sandbox (Testnet):**
 
 ```js
 import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
@@ -54,31 +65,44 @@ const airService = new AirService({
   partnerId: YOUR_PARTNER_ID
 });
 await airService.init({
-  buildEnv: BUILD_ENV.SANDBOX, // BUILD_ENV.PRODUCTION
+  buildEnv: BUILD_ENV.SANDBOX,
   enableLogging: true
 });
 ```
+
+**Private Mainnet (production):**
+
+```js
+await airService.init({
+  buildEnv: BUILD_ENV.PRODUCTION,
+  credentialNetwork: "mainnet",
+  enableLogging: true
+});
+```
+
+`credentialNetwork` is only accepted when `buildEnv` is `BUILD_ENV.PRODUCTION`. Values: `"testnet"` | `"mainnet"`.
 
 </Tab>
 
 <Tab title="Flutter">
 
 ```dart
-Future<void> initialize({
-  YOUR_PARTNER_ID,
-  navigatorKey,
-  Environment.sandbox, // Environment.production
-  true,
-})
+await airService.initialize(
+  partnerId: 'YOUR_PARTNER_ID',
+  navigatorKey: navigatorKey,
+  env: Environment.sandbox, // or Environment.production
+  enableLogging: true,
+);
 ```
-
 
 </Tab>
 </Tabs>
 
 ## Chains
 
-| Chain   | Chain ID | RPC                               | Explorer                           |
-| ------- | -------- | --------------------------------- | ---------------------------------- |
-| Testnet | 222888   | https://testnet-rpc.mocachain.org | https://testnet-scan.mocachain.org |
-| Mainnet | 2288     | `coming soon`                     | `coming soon`                      |
+| Chain           | Chain ID | RPC                               | Explorer                           |
+| --------------- | -------- | --------------------------------- | ---------------------------------- |
+| Testnet         | 222888   | https://testnet-rpc.mocachain.org | https://testnet-scan.mocachain.org |
+| Private Mainnet | 2288     | https://rpc.mocachain.org         | https://scan.mocachain.org         |
+
+Mainnet EVM RPC access may require an API key — see [Moca Chain network information](/mocachain/using-moca-chain/network-information).
