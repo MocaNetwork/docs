@@ -12,21 +12,21 @@ The default AIR Kit integration stores the minimum data necessary:
 | Data type | Stored by Moca? | Notes |
 | --- | --- | --- |
 | User email | Yes (hashed identifier) | Used as the AIR Account identifier for cross-partner portability |
-| Credential claims | On-chain proof only | Raw claim data is not stored on-chain unless CAK is enabled |
+| Credential claims | Encrypted envelope in DStorage | Payloads are encrypted to the holder; AIR stores opaque ciphertext and metadata, never plaintext |
 | Private keys | No | Keys are split via MPC; no single party holds a full key |
-| Transaction data | On-chain | Standard blockchain transaction visibility |
+| Verification records | Off-chain by default | Recorded on-chain only when a program requires on-chain verification |
 | PII (ID photos, biometrics) | Only if CAK is enabled | Encrypted in dStorage, accessible only with user consent |
 
 ## Who can access what
 
-### Without CAK (default)
+### Standard flow (all credentials)
 
-In the default zero-knowledge flow:
+Every credential is signed by the issuer and encrypted to the holder before storage:
 
-- **Issuers** know the data they put into the credential (they are the source of truth).
-- **Verifiers** receive only boolean ZK proof results. They never see raw claim data.
-- **Moca Network** sees on-chain proof hashes. It cannot reconstruct credential content.
-- **Users** hold the credential in their AIR Account and control when and to whom it is presented.
+- **Issuers** know the data they put into the credential (they are the source of truth) and hold their own signing keys.
+- **Verifiers** receive a Verifiable Presentation containing only the claims the program requests. They never see undisclosed claim data.
+- **AIR** stores encrypted credential objects and metadata as a blind facilitator. It cannot reconstruct credential content.
+- **Users** hold the encrypted credential in their AIR Account and control when and to whom it is presented.
 
 ### With CAK enabled
 
@@ -41,8 +41,8 @@ See [Privacy & Compliance (CAK)](/learn/advanced-topics/privacy-and-compliance) 
 
 ## Data residency
 
-- **On-chain data** (proofs, state anchors, transaction records) lives on Moca Chain and is globally replicated across validators.
-- **Encrypted payloads** (CAK) are stored in decentralized storage (dStorage) on Moca Chain.
+- **Encrypted credential payloads** are stored in decentralized storage (DStorage) on Moca Chain as opaque ciphertext.
+- **On-chain data** (optional proof records, state anchors) lives on Moca Chain and is globally replicated across validators, and is written only when a program requires on-chain verification.
 - **Session tokens and MPC key shards** are stored on the user's device and in secure execution environments. They are not centrally stored.
 
 ## User control

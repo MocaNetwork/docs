@@ -9,13 +9,14 @@ This recipe walks through issuing a portable loyalty credential that users carry
 
 1. A credential schema that encodes loyalty tier, lifetime points, and membership date.
 2. A backend function that issues (or upgrades) the credential when a user crosses a tier boundary.
-3. Status polling to confirm on-chain issuance.
+3. Issuer-signed, holder-encrypted credentials stored in DStorage.
 
 ## Prerequisites
 
 - [Issue on Behalf](/airkit/usage/credential/issue-on-behalf) enabled for your partner account
 - A published issuance program with a loyalty schema
 - [Partner JWT](/airkit/usage/partner-authentication) signing configured
+- Issuer signing keys available to your backend
 
 ## Step 1: Design the credential schema
 
@@ -32,7 +33,7 @@ See [Schema Creation](/airkit/usage/credential/schema-creation) for full setup i
 
 ## Step 2: Issue on tier upgrade
 
-When your loyalty engine determines a user has crossed a tier boundary, call Issue on Behalf with `onDuplicate: "revoke"` to replace the previous tier credential.
+When your loyalty engine determines a user has crossed a tier boundary, resolve the recipient, then build, sign, encrypt, and store a fresh tier credential. Dedupe by recipient email + program ID and revoke the previous tier credential before reissuing.
 
 <Warning>
 The `email` claim must be the **individual target recipient's** AIR Account email — the person who should receive this specific credential. It is the routing key that determines which account the credential lands in. Never reuse a partner, service, admin, or static email, and never reuse one email across multiple recipients: every credential signed with that email will be issued to that one account.
@@ -41,6 +42,8 @@ The `email` claim must be the **individual target recipient's** AIR Account emai
 ```js
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
+// issuer-controlled helpers backed by your signing keys
+const { buildVc, signVc, encryptToHolder } = require("./lib/credential");
 
 const privateKey = fs.readFileSync("path/to/private.key");
 const BASE_URL = process.env.API_BASE_URL || "https://api.sandbox.mocachain.org/v1";
@@ -58,23 +61,37 @@ function getPartnerJwt(recipientEmail) {
 async function issueLoyaltyCredential(recipientEmail, tierData) {
   const token = getPartnerJwt(recipientEmail);
 
-  const res = await fetch(`${BASE_URL}/credentials/issue-on-behalf`, {
+  // 1. Resolve or create the recipient's AIR Account
+  const initRes = await fetch(`${BASE_URL}/auth/initialize-user`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-partner-auth": token },
-    body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,
-      credentialId: process.env.LOYALTY_CREDENTIAL_ID,
-      credentialSubject: {
-        tier: tierData.tier,
-        lifetimePoints: tierData.lifetimePoints,
-        memberSince: tierData.memberSince,
-        upgradedAt: new Date().toISOString(),
-      },
-    }),
+    body: JSON.stringify({ email: recipientEmail }),
   });
+  if (!initRes.ok) throw new Error(`initialize-user failed: ${initRes.status}`);
+  const { did, publicKey } = await initRes.json();
 
-  if (!res.ok) throw new Error(`Issue failed: ${res.status}`);
-  return res.json();
+  // 2. Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  const schemaId = process.env.LOYALTY_CREDENTIAL_ID;
+  const vc = buildVc({
+    holderDid: did,
+    schemaId,
+    credentialSubject: {
+      tier: tierData.tier,
+      lifetimePoints: tierData.lifetimePoints,
+      memberSince: tierData.memberSince,
+      upgradedAt: new Date().toISOString(),
+    },
+  });
+  const envelope = encryptToHolder(signVc(vc), publicKey);
+
+  // 3. Store the encrypted envelope in DStorage
+  const storeRes = await fetch(`${BASE_URL}/dstorage/vcs`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-partner-auth": token },
+    body: JSON.stringify({ holderDid: did, schemaId, envelope, metadata: { programId: schemaId } }),
+  });
+  if (!storeRes.ok) throw new Error(`dstorage/vcs failed: ${storeRes.status}`);
+  return storeRes.json(); // { storagePath }
 }
 ```
 
@@ -94,7 +111,7 @@ async function onPurchaseComplete(userEmail, purchaseAmount) {
       lifetimePoints: newPoints,
       memberSince: user.memberSince,
     });
-    console.log(`Upgraded ${userEmail} to ${newTier}, hash: ${result.coreClaimHash}`);
+    console.log(`Upgraded ${userEmail} to ${newTier}, storagePath: ${result.storagePath}`);
   }
 
   await updateUserProfile(userEmail, { lifetimePoints: newPoints, currentTier: newTier });
@@ -107,10 +124,10 @@ Any partner in the ecosystem can verify the user's tier using [Credential Verifi
 
 ## Duplicate handling
 
-Use `onDuplicate: "revoke"` (default) to replace the old tier credential each time the user upgrades. Use `onDuplicate: "ignore"` only if you want to keep the existing credential unchanged (e.g. for one-time membership issuance).
+Dedupe by recipient email + program ID before issuing so an event replay can't fan out duplicate credentials. When a user upgrades tiers, revoke the previous tier credential before storing the new one. For one-time membership issuance, skip reissuance if a credential already exists for the user + schema.
 
 ## Next steps
 
 - [AIR for Loyalty](/airkit/guides/air-for-loyalty) for a broader integration guide
-- [Issue on Behalf API reference](/api-reference/introduction) for endpoint details
+- [Issuance API Reference](/airkit/usage/credential/issue-on-behalf-api) for endpoint details
 - [Credential Verification](/airkit/usage/credential/verify) to set up cross-partner verification

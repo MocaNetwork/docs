@@ -22,9 +22,9 @@ Use this checklist when integrating AIR Kit to ensure your implementation follow
 
 ## Credential issuance
 
-- [ ] Validate `credentialSubject` data on your backend before calling the Issue on Behalf API. Do not trust client-supplied values.
-- [ ] Use `onDuplicate: "revoke"` when credential data changes (e.g. tier upgrades). Use `"ignore"` only for idempotent operations.
-- [ ] Poll the [status endpoint](/api-reference/introduction) to confirm credentials reach `ONCHAIN` before treating them as issued.
+- [ ] Validate credential data on your backend before signing and issuing. Do not trust client-supplied values.
+- [ ] Dedupe issuance by recipient email + program ID; revoke the existing credential before reissuing when data changes (e.g. tier upgrades).
+- [ ] Confirm issuance returned a `storagePath` before treating a credential as issued.
 - [ ] If handling regulated data, enable [CAK encryption](/learn/advanced-topics/privacy-and-compliance).
 
 ## API security
@@ -50,5 +50,4 @@ Use this checklist when integrating AIR Kit to ensure your implementation follow
 
 - [ ] Set up alerts for failed authentication attempts.
 - [ ] Monitor credential issuance volumes for anomalies.
-- [ ] Track `WAIT_ONCHAIN` durations — prolonged waits may indicate chain congestion or issues.
 - [ ] Log user consent events (CAK authorizations) for audit compliance.

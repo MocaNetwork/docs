@@ -73,32 +73,45 @@ graph TD
 ```javascript
 // game-server.js
 const { getPartnerJwt } = require('./lib/jwt');
+// issuer-controlled helpers backed by your signing keys
+const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
+
+const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
 
 async function issueAchievement({ playerEmail, achievement }) {
   const token = await getPartnerJwt(playerEmail);
 
-  const res = await fetch('https://api.sandbox.mocachain.org/v1/credentials/issue-on-behalf', {
+  // Resolve the player's AIR Account
+  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-partner-auth': token,
-    },
-    body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,
-      credentialId: process.env.ACHIEVEMENT_CREDENTIAL_ID,
-      credentialSubject: {
-        gameId: process.env.GAME_ID,
-        achievementId: achievement.id,
-        achievementName: achievement.name,
-        tier: achievement.tier,
-        earnedAt: new Date().toISOString(),
-        season: 'Season 3',
-      },
-    }),
-  });
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ email: playerEmail }),
+  }).then((r) => r.json());
 
+  // Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  const schemaId = process.env.ACHIEVEMENT_CREDENTIAL_ID;
+  const vc = buildVc({
+    holderDid: init.did,
+    schemaId,
+    credentialSubject: {
+      gameId: process.env.GAME_ID,
+      achievementId: achievement.id,
+      achievementName: achievement.name,
+      tier: achievement.tier,
+      earnedAt: new Date().toISOString(),
+      season: 'Season 3',
+    },
+  });
+  const envelope = encryptToHolder(signVc(vc), init.publicKey);
+
+  // Store the encrypted envelope in DStorage
+  const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ holderDid: init.did, schemaId, envelope, metadata: { programId: schemaId } }),
+  });
   if (!res.ok) throw new Error(`Achievement issuance failed: ${res.status}`);
-  return res.json();
+  return res.json(); // { storagePath }
 }
 
 // Wire into your game's rank-up event system
@@ -158,22 +171,17 @@ const user = await airService.getUserInfo();
 
 ### Step 4 — Bot-resistant airdrop gating
 
-Only distribute tokens to players who provably hold a real game achievement — filtered on-chain.
+Only distribute tokens to players who provably hold a real game achievement — filtered by verifiable credentials.
 
 ```javascript
 // airdrop.js  (server-side)
 async function getEligiblePlayers(allPlayers) {
   const eligible = [];
   for (const { email } of allPlayers) {
-    const token = await getPartnerJwt(email);
-    // Use your verifier program to check credential status per player
-    // In production, batch this with your own DB query first to reduce API calls
-    const res = await fetch(
-      `https://api.sandbox.mocachain.org/v1/credentials/status?...`,
-      { headers: { 'x-partner-auth': token } }
-    );
-    const { vcStatus } = await res.json();
-    if (vcStatus === 'ONCHAIN') eligible.push(email);
+    // Verify each player against your achievement verification program.
+    // In production, batch this with your own DB query first to reduce calls.
+    const result = await verifyPlayer(email, process.env.ACHIEVEMENT_VERIFY_PROGRAM_ID);
+    if (result.status === 'Compliant') eligible.push(email);
   }
   return eligible;
 }

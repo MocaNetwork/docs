@@ -108,36 +108,48 @@ Your activation system already fires an event when a subscriber passes KYC and a
 ```javascript
 // activation-handler.js
 const { getPartnerJwt } = require('./lib/jwt');
+// issuer-controlled helpers backed by your signing keys
+const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
 
 const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
+
+// Resolve the recipient, then build, sign, encrypt, and store the credential in DStorage
+async function issueEncryptedCredential({ recipientEmail, schemaId, credentialSubject }) {
+  const token = await getPartnerJwt(recipientEmail);
+
+  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ email: recipientEmail }),
+  }).then((r) => r.json());
+
+  const vc = buildVc({ holderDid: init.did, schemaId, credentialSubject });
+  const envelope = encryptToHolder(signVc(vc), init.publicKey); // BJJ_SIG_2021, encrypted to holder
+
+  const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ holderDid: init.did, schemaId, envelope, metadata: { programId: schemaId } }),
+  });
+  if (!res.ok) throw new Error(`Issuance failed: ${res.status}`);
+  return res.json(); // { storagePath }
+}
 
 async function issueSubscriberCredential({ userEmail, activation }) {
   if (activation.kycStatus !== 'APPROVED') return;
 
-  const token = await getPartnerJwt(userEmail);
-
-  const res = await fetch(`${BASE_URL}/credentials/issue-on-behalf`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-partner-auth': token,
+  return issueEncryptedCredential({
+    recipientEmail: userEmail,
+    schemaId: process.env.SUBSCRIBER_CREDENTIAL_ID,
+    credentialSubject: {
+      carrierId: process.env.CARRIER_ID,
+      planType: activation.planType,          // "prepaid" | "postpaid" | "business"
+      kycLevel: activation.kycLevel,          // "basic" | "enhanced" | "full"
+      activatedAt: new Date().toISOString(),
+      isOver18: activation.age >= 18,
+      countryCode: activation.countryCode,    // e.g. "AU", "SG"
     },
-    body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,
-      credentialId: process.env.SUBSCRIBER_CREDENTIAL_ID,
-      credentialSubject: {
-        carrierId: process.env.CARRIER_ID,
-        planType: activation.planType,          // "prepaid" | "postpaid" | "business"
-        kycLevel: activation.kycLevel,          // "basic" | "enhanced" | "full"
-        activatedAt: new Date().toISOString(),
-        isOver18: activation.age >= 18,
-        countryCode: activation.countryCode,    // e.g. "AU", "SG"
-      },
-    }),
   });
-
-  if (!res.ok) throw new Error(`Subscriber credential issuance failed: ${res.status}`);
-  return res.json();
 }
 
 // Hook into your existing activation pipeline
@@ -156,21 +168,15 @@ async function issueLoyaltyTierIfEligible({ userEmail, tenureMonths }) {
     tenureMonths >= 24 ? 'Gold' :
     tenureMonths >= 12 ? 'Silver' : 'Standard';
 
-  const token = await getPartnerJwt(userEmail);
-
-  await fetch(`${BASE_URL}/credentials/issue-on-behalf`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
-    body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,
-      credentialId: process.env.LOYALTY_TIER_CREDENTIAL_ID,
-      credentialSubject: {
-        carrierId: process.env.CARRIER_ID,
-        tier,
-        tenureMonths,
-        memberSince: getMemberSinceDate(userEmail),
-      },
-    }),
+  await issueEncryptedCredential({
+    recipientEmail: userEmail,
+    schemaId: process.env.LOYALTY_TIER_CREDENTIAL_ID,
+    credentialSubject: {
+      carrierId: process.env.CARRIER_ID,
+      tier,
+      tenureMonths,
+      memberSince: getMemberSinceDate(userEmail),
+    },
   });
 }
 
@@ -226,12 +232,12 @@ if (!allowed) showAgeVerificationPrompt();
 
 ## Key Patterns
 
-| Pattern | `onDuplicate` | When to Use |
+| Pattern | Reissue behavior | When to Use |
 |---------|:-------------:|-------------|
-| Initial activation | `"ignore"` | Issue once at first activation; don't re-issue if user reinstalls |
-| Plan upgrade / re-KYC | `"revoke"` | Always reissue with updated `kycLevel` or `planType` |
-| Loyalty tier update | `"revoke"` | Monthly billing cycle refresh |
-| Device credential | `"ignore"` | One credential per device — immutable proof of ownership |
+| Initial activation | Skip if exists | Issue once at first activation; don't re-issue if user reinstalls |
+| Plan upgrade / re-KYC | Revoke + reissue | Always reissue with updated `kycLevel` or `planType` |
+| Loyalty tier update | Revoke + reissue | Monthly billing cycle refresh |
+| Device credential | Skip if exists | One credential per device — immutable proof of ownership |
 
 ## Privacy Guarantee
 

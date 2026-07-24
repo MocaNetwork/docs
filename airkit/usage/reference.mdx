@@ -1,14 +1,14 @@
 ---
 title: "AIR Kit SDK and REST API reference"
-description: "AIR Kit API reference — Web SDK and Flutter SDK methods for AIR Account login, smart accounts, credentials, and the Issue on Behalf REST API."
+description: "AIR Kit API reference — Web SDK and Flutter SDK methods for AIR Account login, smart accounts, credentials, and the credential issuance REST API."
 ---
 
 ## REST API
 
-For server-side credential issuance without user presence, use the Issue on Behalf API:
+For server-side credential issuance without user presence, resolve the user and store an encrypted credential in DStorage:
 
-- **Endpoint:** `POST /v1/credentials/issue-on-behalf`
-- **Status check:** `GET /v1/credentials/status?coreClaimHash={hash}`
+- **Resolve user:** `POST /v1/auth/initialize-user`
+- **Store encrypted VC:** `POST /v1/dstorage/vcs`
 - **Sandbox:** `https://api.sandbox.mocachain.org/v1`
 - **Production:** `https://mocachain-mainnet.api.air3.com/v1`
 
@@ -16,7 +16,7 @@ For server-side credential issuance without user presence, use the Issue on Beha
   The production endpoint is for approved production partners on Moca Chain private Mainnet. See [Production mainnet access](/airkit/environments#production-mainnet-access) before requesting mainnet \$MOCA gas tokens.
 </Note>
 
-Authenticate with a Partner JWT in the `x-partner-auth` header. Full endpoint reference and implementation examples: [Issue on Behalf API & Examples](/airkit/usage/credential/issue-on-behalf-api).
+Authenticate with a Partner JWT in the `x-partner-auth` header. Full endpoint reference and implementation examples: [Issuance API Reference](/airkit/usage/credential/issue-on-behalf-api).
 
 ---
 
@@ -77,17 +77,12 @@ class AirService {
     credentialId: string;
     credentialSubject: Record<string, unknown>;
     curve?: "secp256r1" | "secp256k1";
-    waitForOnchainCompletion?: boolean;
-    legacy?: boolean;
   }): Promise<{ cakPublicKey?: string }>;
   verifyCredential({
     authToken: string;
     programId: string;
     redirectUrl?: string;
     fieldsToDisclose?: "*" | string[];
-    offchain?: boolean;
-    legacy?: boolean;
-    requireZkp?: boolean;
   }): Promise<CredentialVerificationResult>;
   logout(): Promise<void>;
   cleanUp(): Promise<void>;

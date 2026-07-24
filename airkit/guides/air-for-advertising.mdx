@@ -118,35 +118,47 @@ graph TD
 ```javascript
 // profile-complete-handler.js
 const { getPartnerJwt } = require('./lib/jwt');
+// issuer-controlled helpers backed by your signing keys
+const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
 
 const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
 
-async function issueAudienceCredential({ userEmail, profile }) {
-  const token = await getPartnerJwt(userEmail);
+// Resolve the recipient, then build, sign, encrypt, and store the credential in DStorage
+async function issueEncryptedCredential({ recipientEmail, schemaId, credentialSubject }) {
+  const token = await getPartnerJwt(recipientEmail);
 
-  const res = await fetch(`${BASE_URL}/credentials/issue-on-behalf`, {
+  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-partner-auth': token,
-    },
-    body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,
-      credentialId: process.env.AUDIENCE_CREDENTIAL_ID,
-      credentialSubject: {
-        publisherId: process.env.PUBLISHER_ID,
-        ageRange: getAgeRange(profile.birthYear),    // "25-34" — NOT the DOB
-        isOver18: profile.age >= 18,
-        isOver21: profile.age >= 21,
-        countryCode: profile.countryCode,
-        interestSegments: profile.iabSegments,       // e.g. ['IAB19', 'IAB9-30']
-        verifiedAt: new Date().toISOString(),
-      },
-    }),
-  });
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ email: recipientEmail }),
+  }).then((r) => r.json());
 
-  if (!res.ok) throw new Error(`Audience credential issuance failed: ${res.status}`);
-  return res.json();
+  const vc = buildVc({ holderDid: init.did, schemaId, credentialSubject });
+  const envelope = encryptToHolder(signVc(vc), init.publicKey); // BJJ_SIG_2021, encrypted to holder
+
+  const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ holderDid: init.did, schemaId, envelope, metadata: { programId: schemaId } }),
+  });
+  if (!res.ok) throw new Error(`Issuance failed: ${res.status}`);
+  return res.json(); // { storagePath }
+}
+
+async function issueAudienceCredential({ userEmail, profile }) {
+  return issueEncryptedCredential({
+    recipientEmail: userEmail,
+    schemaId: process.env.AUDIENCE_CREDENTIAL_ID,
+    credentialSubject: {
+      publisherId: process.env.PUBLISHER_ID,
+      ageRange: getAgeRange(profile.birthYear),    // "25-34" — NOT the DOB
+      isOver18: profile.age >= 18,
+      isOver21: profile.age >= 21,
+      countryCode: profile.countryCode,
+      interestSegments: profile.iabSegments,       // e.g. ['IAB19', 'IAB9-30']
+      verifiedAt: new Date().toISOString(),
+    },
+  });
 }
 
 function getAgeRange(birthYear) {
@@ -172,25 +184,19 @@ userEvents.on('interests:updated', ({ userEmail, profile }) =>
 ```javascript
 // consent-handler.js
 async function issueConsentCredential({ userEmail, consentRecord }) {
-  const token = await getPartnerJwt(userEmail);
-
   const expiresAt = new Date();
   expiresAt.setFullYear(expiresAt.getFullYear() + 1); // 1-year consent window
 
-  await fetch(`${BASE_URL}/credentials/issue-on-behalf`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
-    body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,
-      credentialId: process.env.CONSENT_CREDENTIAL_ID,
-      credentialSubject: {
-        publisherId: process.env.PUBLISHER_ID,
-        consentedTo: consentRecord.purposes,       // ["personalised_ads", ...]
-        consentVersion: consentRecord.policyVersion,
-        consentedAt: new Date().toISOString(),
-        expiresAt: expiresAt.toISOString(),
-      },
-    }),
+  await issueEncryptedCredential({
+    recipientEmail: userEmail,
+    schemaId: process.env.CONSENT_CREDENTIAL_ID,
+    credentialSubject: {
+      publisherId: process.env.PUBLISHER_ID,
+      consentedTo: consentRecord.purposes,       // ["personalised_ads", ...]
+      consentVersion: consentRecord.policyVersion,
+      consentedAt: new Date().toISOString(),
+      expiresAt: expiresAt.toISOString(),
+    },
   });
 }
 
@@ -287,13 +293,13 @@ async function verifyAudienceForPartner() {
 
 ## Key Patterns
 
-| Pattern | `onDuplicate` | When to Use |
+| Pattern | Reissue behavior | When to Use |
 |---------|:-------------:|-------------|
-| Initial audience credential | `"ignore"` | Issue once on first profile completion |
-| Interest segment refresh | `"revoke"` | Monthly or on significant interest drift |
-| Consent granted | `"revoke"` | Always replace with latest consent record |
-| Consent withdrawn | Revoke via API | Immediately invalidate consent credential |
-| KYC-backed audience | `"revoke"` | Re-issue when KYC result updates |
+| Initial audience credential | Skip if exists | Issue once on first profile completion |
+| Interest segment refresh | Revoke + reissue | Monthly or on significant interest drift |
+| Consent granted | Revoke + reissue | Always replace with latest consent record |
+| Consent withdrawn | Revoke | Immediately invalidate consent credential |
+| KYC-backed audience | Revoke + reissue | Re-issue when KYC result updates |
 
 ## Privacy Guarantee
 

@@ -3,7 +3,7 @@ title: "API Reference"
 description: "Moca Network REST API reference — server-to-server endpoints for credential issuance, issuance status, catalog browsing, and partner operations."
 ---
 
-The Moca Network REST API enables server-to-server operations that do not require user presence. Use it for backend automation, bulk credential issuance, programmatic status checks, and browsing the credential catalog.
+The Moca Network REST API enables server-to-server operations that do not require user presence. Use it for backend automation, credential issuance into encrypted DStorage, programmatic status checks, and browsing the credential catalog. Issuers sign credentials with their own keys and encrypt them to the holder; AIR stores and routes opaque ciphertext and metadata only.
 
 ## Base URLs
 
@@ -33,14 +33,7 @@ For full setup instructions, key generation, and code examples see [Partner Auth
 
 ## Credentials
 
-<CardGroup cols={2}>
-  <Card title="Issue credential on behalf" icon="certificate" href="/api-reference/credentials/issue-credential-on-behalf">
-    Submit server-side credential issuance for a user without requiring their active session.
-  </Card>
-  <Card title="Check issuance status" icon="circle-check" href="/api-reference/credentials/get-credential-status">
-    Poll the status of an asynchronous credential issuance until it is confirmed on-chain.
-  </Card>
-</CardGroup>
+Server-side credential issuance resolves the recipient and stores an issuer-signed, holder-encrypted credential in DStorage. See the [Issuance API Reference](/airkit/usage/credential/issue-on-behalf-api) for the `initialize-user` and `dstorage/vcs` endpoints, request and response details, and code examples.
 
 ## Catalog
 

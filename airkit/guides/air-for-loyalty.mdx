@@ -69,39 +69,50 @@ Use **Issue on Behalf** to issue silently when a backend event fires. The user's
 ```javascript
 // loyalty-engine.js
 const { getPartnerJwt } = require('./lib/jwt'); // see Partner Authentication
+// issuer-controlled helpers backed by your signing keys
+const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
 
 const BASE_URL = 'https://api.sandbox.mocachain.org/v1'; // swap for prod URL on launch
 
 async function issueLoyaltyCredential({ userEmail, tier, totalPoints, memberSince }) {
-  const token = await getPartnerJwt(userEmail); // JWT must include scope: "issue on-behalf"
+  const token = await getPartnerJwt(userEmail); // JWT must include scope: "issue"
 
-  const res = await fetch(`${BASE_URL}/credentials/issue-on-behalf`, {
+  // Resolve the member's AIR Account
+  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-partner-auth': token,
-    },
-    body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,          // Dashboard → Accounts → General
-      credentialId: process.env.LOYALTY_CRED_ID,  // Dashboard → Issuer → Programs
-      credentialSubject: { tier, totalPoints, memberSince, brandId: process.env.BRAND_ID },
-    }),
-  });
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ email: userEmail }),
+  }).then((r) => r.json());
 
+  // Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  const schemaId = process.env.LOYALTY_CRED_ID; // Dashboard → Issuer → Programs
+  const vc = buildVc({
+    holderDid: init.did,
+    schemaId,
+    credentialSubject: { tier, totalPoints, memberSince, brandId: process.env.BRAND_ID },
+  });
+  const envelope = encryptToHolder(signVc(vc), init.publicKey);
+
+  // Store the encrypted envelope in DStorage
+  const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ holderDid: init.did, schemaId, envelope, metadata: { programId: schemaId } }),
+  });
   if (!res.ok) throw new Error(`Issuance failed: ${res.status}`);
-  const { coreClaimHash } = await res.json();
-  return coreClaimHash;
+  const { storagePath } = await res.json();
+  return storagePath;
 }
 
 // Hook into your existing loyalty event pipeline
 loyaltyEngine.on('tier:upgrade', async ({ userEmail, newTier, totalPoints }) => {
-  const hash = await issueLoyaltyCredential({
+  const storagePath = await issueLoyaltyCredential({
     userEmail,
     tier: newTier,
     totalPoints,
     memberSince: new Date().toISOString().split('T')[0],
   });
-  console.log(`Loyalty credential issued: ${hash}`);
+  console.log(`Loyalty credential issued: ${storagePath}`);
 });
 ```
 
@@ -136,32 +147,16 @@ if (hasGoldStatus) {
 
 ## Key Patterns
 
-| Pattern | `onDuplicate` value | When to Use |
+| Pattern | Reissue behavior | When to Use |
 |---------|:-------------------:|-------------|
-| Tier upgrade | `"revoke"` | Always revoke old credential and issue new one |
-| One-time milestone badge | `"ignore"` | Don't re-issue if credential already held |
+| Tier upgrade | Revoke + reissue | Always revoke old credential and issue new one |
+| One-time milestone badge | Skip if exists | Don't re-issue if credential already held |
 | Time-boxed VIP | Set `expirationDate` in subject | Seasonal or campaign-based access |
 | Retroactive bulk issuance | Loop `issueLoyaltyCredential` | Migrating existing loyalty members |
 
-## Status Polling (optional)
+## Issuance result
 
-Issuance is asynchronous. Poll until `ONCHAIN` before showing a confirmation to the user.
-
-```javascript
-async function waitForOnchain(userEmail, coreClaimHash, maxAttempts = 10) {
-  const token = await getPartnerJwt(userEmail);
-  for (let i = 0; i < maxAttempts; i++) {
-    const res = await fetch(
-      `${BASE_URL}/credentials/status?coreClaimHash=${encodeURIComponent(coreClaimHash)}`,
-      { headers: { 'x-partner-auth': token } }
-    );
-    const { vcStatus } = await res.json();
-    if (vcStatus === 'ONCHAIN') return true;
-    await new Promise(r => setTimeout(r, 2000)); // wait 2 s between polls
-  }
-  return false;
-}
-```
+Issuance completes in ~1–4 seconds and returns a `storagePath` once the encrypted credential is stored in DStorage. Use that result to confirm success to the user — no status polling required. The credential is immediately available for the member to present at any verifier.
 
 ## Examples
 

@@ -13,7 +13,7 @@ These errors apply to the AIR Kit REST API (e.g. [Issue on Behalf](/api-referenc
 | 401 | Invalid or expired Partner JWT | Verify the JWT is not expired (`exp`), the signature matches your JWKS key, `kid` in the header maps to the correct key, and `typ: "JWT"` is set. |
 | 403 | Feature not enabled or schema not allowed | Confirm the feature (e.g. Issue on Behalf) is enabled for your partner account in the Developer Dashboard. Check that your `issuerDid` owns the schema. |
 | 404 | Unknown issuer DID or program ID | Double-check `issuerDid` and `credentialId` values against the Developer Dashboard. |
-| 409 | User consent rejected or duplicate conflict | The user has denied consent for credentials issued on their behalf, or a duplicate credential exists with `onDuplicate: "ignore"`. |
+| 409 | User consent rejected or duplicate conflict | The user has denied consent for credentials issued on their behalf, or a duplicate credential already exists for this user + schema. Dedupe before reissuing. |
 | 500 | Server-side failure | Retry with exponential backoff. If persistent, check the [Moca Network status page](https://discord.gg/mocaversenft) or contact support. |
 
 ## JWT and JWKS errors

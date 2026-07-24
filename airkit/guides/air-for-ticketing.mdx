@@ -71,46 +71,59 @@ graph TD
 
 ### Step 1 — Issue attendance credential at check-in
 
-Your venue scanner calls your backend on each valid scan. The backend issues via Issue on Behalf — the fan does nothing, no wallet open, no UX friction at the door.
+Your venue scanner calls your backend on each valid scan. The backend issues the credential server-side — the fan does nothing, no wallet open, no UX friction at the door.
 
 ```javascript
 // venue-checkin.js
 const { getPartnerJwt } = require('./lib/jwt');
+// issuer-controlled helpers backed by your signing keys
+const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
+
+const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
 
 async function issueAttendanceCredential({ fanEmail, eventDetails }) {
   const token = await getPartnerJwt(fanEmail);
 
-  const res = await fetch('https://api.sandbox.mocachain.org/v1/credentials/issue-on-behalf', {
+  // Resolve the fan's AIR Account
+  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-partner-auth': token,
-    },
-    body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,
-      credentialId: process.env.ATTENDANCE_CREDENTIAL_ID,
-      credentialSubject: {
-        eventId: eventDetails.id,
-        eventName: eventDetails.name,
-        venue: eventDetails.venue,
-        attendedAt: new Date().toISOString(),
-        ticketTier: eventDetails.ticketTier,   // "General" | "VIP" | "Backstage"
-        organizerId: process.env.ORGANIZER_ID,
-      },
-    }),
-  });
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ email: fanEmail }),
+  }).then((r) => r.json());
 
+  // Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  const schemaId = process.env.ATTENDANCE_CREDENTIAL_ID;
+  const vc = buildVc({
+    holderDid: init.did,
+    schemaId,
+    credentialSubject: {
+      eventId: eventDetails.id,
+      eventName: eventDetails.name,
+      venue: eventDetails.venue,
+      attendedAt: new Date().toISOString(),
+      ticketTier: eventDetails.ticketTier,   // "General" | "VIP" | "Backstage"
+      organizerId: process.env.ORGANIZER_ID,
+    },
+  });
+  const envelope = encryptToHolder(signVc(vc), init.publicKey);
+
+  // Store the encrypted envelope in DStorage
+  const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ holderDid: init.did, schemaId, envelope, metadata: { programId: schemaId } }),
+  });
   if (!res.ok) throw new Error(`Attendance issuance failed: ${res.status}`);
-  const { coreClaimHash } = await res.json();
-  return coreClaimHash;
+  const { storagePath } = await res.json();
+  return storagePath;
 }
 
 // Called by your ticketing system on each valid scan
 app.post('/api/checkin', async (req, res) => {
   const { fanEmail, eventId } = req.body;
   const event = await getEventDetails(eventId);
-  const hash = await issueAttendanceCredential({ fanEmail, eventDetails: event });
-  res.json({ success: true, coreClaimHash: hash });
+  const storagePath = await issueAttendanceCredential({ fanEmail, eventDetails: event });
+  res.json({ success: true, storagePath });
 });
 ```
 

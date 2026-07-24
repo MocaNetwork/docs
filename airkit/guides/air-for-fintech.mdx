@@ -77,34 +77,47 @@ graph TD
 ```javascript
 // kyc-webhook.js  — called when your KYC provider sends a completion event
 const { getPartnerJwt } = require('./lib/jwt');
+// issuer-controlled helpers backed by your signing keys
+const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
+
+const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
 
 async function issueKycCredential({ userEmail, kycResult }) {
   if (kycResult.status !== 'APPROVED') return; // only issue on success
 
   const token = await getPartnerJwt(userEmail);
 
-  const res = await fetch('https://api.sandbox.mocachain.org/v1/credentials/issue-on-behalf', {
+  // Resolve the user's AIR Account
+  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-partner-auth': token,
-    },
-    body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,
-      credentialId: process.env.KYC_CREDENTIAL_ID,
-      credentialSubject: {
-        kycLevel: kycResult.level,             // "basic" | "enhanced" | "institutional"
-        kycProvider: 'YourKYCProvider',
-        verifiedAt: new Date().toISOString(),
-        countryCode: kycResult.countryCode,    // e.g. "US", "GB"
-        isOver18: kycResult.age >= 18,
-        isOver21: kycResult.age >= 21,
-      },
-    }),
-  });
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ email: userEmail }),
+  }).then((r) => r.json());
 
+  // Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  const schemaId = process.env.KYC_CREDENTIAL_ID;
+  const vc = buildVc({
+    holderDid: init.did,
+    schemaId,
+    credentialSubject: {
+      kycLevel: kycResult.level,             // "basic" | "enhanced" | "institutional"
+      kycProvider: 'YourKYCProvider',
+      verifiedAt: new Date().toISOString(),
+      countryCode: kycResult.countryCode,    // e.g. "US", "GB"
+      isOver18: kycResult.age >= 18,
+      isOver21: kycResult.age >= 21,
+    },
+  });
+  const envelope = encryptToHolder(signVc(vc), init.publicKey);
+
+  // Store the encrypted envelope in DStorage
+  const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ holderDid: init.did, schemaId, envelope, metadata: { programId: schemaId } }),
+  });
   if (!res.ok) throw new Error(`KYC credential issuance failed: ${res.status}`);
-  return res.json();
+  return res.json(); // { storagePath }
 }
 
 // Express webhook endpoint
