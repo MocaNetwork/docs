@@ -9,7 +9,7 @@ These errors apply to the AIR Kit REST API (e.g. [Direct Issuance](/airkit/usage
 
 | HTTP status | Likely cause | How to fix |
 | --- | --- | --- |
-| 400 | Missing or invalid request fields | Verify `holderDid`, `schemaId`, and the encrypted `envelope` are present and correctly typed, and that the credential data matches your schema. |
+| 400 | Missing or invalid request fields | Verify `holderDid`, `schemaId`, `expiresAt`, `data`, `iv`, `authTag`, `encryptedKey`, and `externalId` are present and correctly typed, and that the credential data matches your schema. |
 | 401 | Invalid or expired Partner JWT | Verify the JWT is not expired (`exp`), the signature matches your JWKS key, `kid` in the header maps to the correct key, and `typ: "JWT"` is set. |
 | 403 | Feature not enabled or schema not allowed | Confirm the feature (e.g. Direct Issuance) is enabled for your partner account in the Developer Dashboard. Check that your `issuerDid` owns the schema. |
 | 404 | Unknown issuer DID or program ID | Double-check `issuerDid` and `credentialId` values against the Developer Dashboard. |

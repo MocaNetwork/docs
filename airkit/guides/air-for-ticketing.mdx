@@ -105,13 +105,22 @@ async function issueAttendanceCredential({ fanEmail, eventDetails }) {
       organizerId: process.env.ORGANIZER_ID,
     },
   });
-  const envelope = encryptToHolder(signVc(vc), init.publicKey);
+  const encrypted = encryptToHolder(signVc(vc), init.publicKey);
 
   // Store the encrypted envelope in DStorage
   const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
-    body: JSON.stringify({ holderDid: init.did, schemaId, envelope, metadata: { programId: schemaId } }),
+    body: JSON.stringify({
+      holderDid: init.did,
+      schemaId,
+      expiresAt: vc.expirationDate,
+      data: encrypted.encryptedData,
+      iv: encrypted.iv,
+      authTag: encrypted.authTag,
+      encryptedKey: encrypted.dataEncPublicKey,
+      externalId: vc.id,
+    }),
   });
   if (!res.ok) throw new Error(`Attendance issuance failed: ${res.status}`);
   const { storagePath } = await res.json();

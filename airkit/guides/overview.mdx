@@ -110,7 +110,7 @@ sequenceDiagram
     participant DS as Encrypted DStorage
 
     Event->>Server: KYC passed / purchase confirmed / check-in scanned
-    Server->>Server: Sign Partner JWT (scope:"issue", email: user)
+    Server->>Server: Sign Partner JWT (scope:"issue")
     Server->>API: POST /auth/initialize-user { email }
     API-->>Server: { did, publicKey }
     Server->>Server: Build VC, sign with issuer key, encrypt to holder

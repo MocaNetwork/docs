@@ -82,13 +82,22 @@ async function issueLoyaltyCredential(recipientEmail, tierData) {
       upgradedAt: new Date().toISOString(),
     },
   });
-  const envelope = encryptToHolder(signVc(vc), publicKey);
+  const encrypted = encryptToHolder(signVc(vc), publicKey);
 
   // 3. Store the encrypted envelope in DStorage
   const storeRes = await fetch(`${BASE_URL}/dstorage/vcs`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-partner-auth": token },
-    body: JSON.stringify({ holderDid: did, schemaId, envelope, metadata: { programId: schemaId } }),
+    body: JSON.stringify({
+      holderDid: did,
+      schemaId,
+      expiresAt: vc.expirationDate,
+      data: encrypted.encryptedData,
+      iv: encrypted.iv,
+      authTag: encrypted.authTag,
+      encryptedKey: encrypted.dataEncPublicKey,
+      externalId: vc.id,
+    }),
   });
   if (!storeRes.ok) throw new Error(`dstorage/vcs failed: ${storeRes.status}`);
   return storeRes.json(); // { storagePath }

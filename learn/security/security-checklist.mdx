@@ -15,7 +15,7 @@ Use this checklist when integrating AIR Kit to ensure your implementation follow
 
 ## Authentication
 
-- [ ] Use [Partner JWT](/airkit/usage/partner-authentication) for all SDK and API operations.
+- [ ] Use the authentication required by each surface: [Partner JWT](/airkit/usage/partner-authentication) for SDK and direct AIR API operations, `x-api-key` for issuer-hosted endpoints, and `x-admin-api-key` for self-hosted admin endpoints.
 - [ ] If using Custom Auth (BYO), verify the user's identity in your own system before issuing the Partner JWT.
 - [ ] Enable [MFA](/airkit/usage/user-management) for high-value operations (credential issuance, large transactions).
 - [ ] Set `skipRehydration: true` if your security model requires login on every session.
@@ -24,7 +24,7 @@ Use this checklist when integrating AIR Kit to ensure your implementation follow
 
 - [ ] Validate credential data on your backend before signing and issuing. Do not trust client-supplied values.
 - [ ] Dedupe issuance by recipient email + program ID; revoke the existing credential before reissuing when data changes (e.g. tier upgrades).
-- [ ] Confirm issuance returned a `storagePath` before treating a credential as issued.
+- [ ] For direct issuance, confirm DStorage returned a `storagePath`. For hosted issuance, confirm `POST /issue-vc` succeeded and the issuer persisted its DStorage result.
 - [ ] If handling regulated data, enable [CAK encryption](/learn/advanced-topics/privacy-and-compliance).
 
 ## API security
