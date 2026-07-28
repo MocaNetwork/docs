@@ -18,7 +18,7 @@ Loyalty programs today are siloed — a user's Gold status with one brand is inv
 ```mermaid
 graph TD
     A["User Action\ne.g. purchase, referral, check-in"] --> B[Your Loyalty Engine]
-    B -->|Milestone reached| C[Issue on Behalf API]
+    B -->|Milestone reached| C[Direct Issuance]
     C --> D[AIR Kit / Moca Chain]
     D --> E[Loyalty Credential in User's AIR Account]
 
@@ -64,7 +64,7 @@ Create this schema in the [AIR Kit Dashboard](https://developers.sandbox.air3.co
 
 ### Step 1 — Issue a loyalty credential on milestone
 
-Use **Issue on Behalf** to issue silently when a backend event fires. The user's session is not required.
+Use **Direct Issuance** to issue silently when a backend event fires. The user's session is not required.
 
 ```javascript
 // loyalty-engine.js
@@ -75,7 +75,7 @@ const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
 const BASE_URL = 'https://api.sandbox.mocachain.org/v1'; // swap for prod URL on launch
 
 async function issueLoyaltyCredential({ userEmail, tier, totalPoints, memberSince }) {
-  const token = await getPartnerJwt(userEmail); // JWT must include scope: "issue"
+  const token = await getPartnerJwt(); // JWT must include scope: "issue"
 
   // Resolve the member's AIR Account
   const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
@@ -172,10 +172,10 @@ Issuance completes in ~1–4 seconds and returns a `storagePath` once the encryp
 ## Next Steps
 
 <Columns cols={2}>
-  <Card title="Issue on Behalf — Concepts" icon="book" href="/airkit/usage/credential/issue-on-behalf">
+  <Card title="Direct Issuance — Concepts" icon="book" href="/airkit/usage/credential/direct-issuance">
     Understand when and why to use server-side issuance.
   </Card>
-  <Card title="Issue on Behalf — API" icon="code" href="/airkit/usage/credential/issue-on-behalf-api">
+  <Card title="Direct Issuance — API" icon="code" href="/airkit/usage/credential/issuance-api">
     Full endpoint reference with error codes.
   </Card>
   <Card title="Schema Use Cases" icon="list" href="/airkit/usage/credential/schema-use-cases">

@@ -20,7 +20,7 @@ Post-cookie advertising is broken in one specific way: every replacement (contex
 ```mermaid
 graph TD
     A["User completes profile / KYC\non your platform"] --> B[Your Backend]
-    B -->|Issue on Behalf API| C[AIR Kit / Moca Chain]
+    B -->|Direct Issuance| C[AIR Kit / Moca Chain]
     C --> D["Audience Credentials\nin User's AIR Account"]
 
     D --> E{Ad serve request}
@@ -125,7 +125,7 @@ const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
 
 // Resolve the recipient, then build, sign, encrypt, and store the credential in DStorage
 async function issueEncryptedCredential({ recipientEmail, schemaId, credentialSubject }) {
-  const token = await getPartnerJwt(recipientEmail);
+  const token = await getPartnerJwt();
 
   const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
     method: 'POST',
@@ -211,7 +211,7 @@ cmp.on('consent:granted', ({ userEmail, purposes, policyVersion }) =>
 // Revoke consent credential on withdrawal
 cmp.on('consent:withdrawn', async ({ userEmail }) => {
   // Issue credential with empty consentedTo to effectively invalidate
-  // Or call the revoke endpoint directly — see Issue on Behalf API reference
+  // Or call the revoke endpoint directly — see Issuance API Reference
 });
 ```
 
@@ -337,10 +337,10 @@ The repo uses a venue check-in and merch store; the same event-triggered pattern
 ## Next Steps
 
 <Columns cols={2}>
-  <Card title="Issue on Behalf — Concepts" icon="book" href="/airkit/usage/credential/issue-on-behalf">
+  <Card title="Direct Issuance — Concepts" icon="book" href="/airkit/usage/credential/direct-issuance">
     Server-side issuance without user presence.
   </Card>
-  <Card title="Issue on Behalf — API" icon="code" href="/airkit/usage/credential/issue-on-behalf-api">
+  <Card title="Direct Issuance — API" icon="code" href="/airkit/usage/credential/issuance-api">
     Full endpoint reference with error codes.
   </Card>
   <Card title="AIR for Fintech & Payments" icon="credit-card" href="/airkit/guides/air-for-fintech">

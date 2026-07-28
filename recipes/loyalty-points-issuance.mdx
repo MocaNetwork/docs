@@ -13,7 +13,7 @@ This recipe walks through issuing a portable loyalty credential that users carry
 
 ## Prerequisites
 
-- [Issue on Behalf](/airkit/usage/credential/issue-on-behalf) enabled for your partner account
+- [Direct Issuance](/airkit/usage/credential/direct-issuance) enabled for your partner account
 - A published issuance program with a loyalty schema
 - [Partner JWT](/airkit/usage/partner-authentication) signing configured
 - Issuer signing keys available to your backend
@@ -36,7 +36,7 @@ See [Schema Creation](/airkit/usage/credential/schema-creation) for full setup i
 When your loyalty engine determines a user has crossed a tier boundary, resolve the recipient, then build, sign, encrypt, and store a fresh tier credential. Dedupe by recipient email + program ID and revoke the previous tier credential before reissuing.
 
 <Warning>
-The `email` claim must be the **individual target recipient's** AIR Account email — the person who should receive this specific credential. It is the routing key that determines which account the credential lands in. Never reuse a partner, service, admin, or static email, and never reuse one email across multiple recipients: every credential signed with that email will be issued to that one account.
+The recipient's email (passed to `initialize-user`) is the routing key that determines which AIR Account the credential lands in. Resolve it from the triggering event, and never reuse a partner, service, admin, or static email across recipients — every credential issued against that email lands in the same account.
 </Warning>
 
 ```js
@@ -48,18 +48,18 @@ const { buildVc, signVc, encryptToHolder } = require("./lib/credential");
 const privateKey = fs.readFileSync("path/to/private.key");
 const BASE_URL = process.env.API_BASE_URL || "https://api.sandbox.mocachain.org/v1";
 
-function getPartnerJwt(recipientEmail) {
+function getPartnerJwt() {
   const now = Math.floor(Date.now() / 1000);
   return jwt.sign(
-    // email MUST be the individual recipient's AIR Account email — never reuse across recipients
-    { partnerId: process.env.PARTNER_ID, scope: "issue", email: recipientEmail, iat: now, exp: now + 300 },
+    // No email claim — the recipient is passed to initialize-user, not the JWT
+    { partnerId: process.env.PARTNER_ID, scope: "issue", iat: now, exp: now + 300 },
     privateKey,
     { algorithm: "RS256", header: { kid: process.env.KEY_ID, typ: "JWT" } }
   );
 }
 
 async function issueLoyaltyCredential(recipientEmail, tierData) {
-  const token = getPartnerJwt(recipientEmail);
+  const token = getPartnerJwt();
 
   // 1. Resolve or create the recipient's AIR Account
   const initRes = await fetch(`${BASE_URL}/auth/initialize-user`, {
@@ -129,5 +129,5 @@ Dedupe by recipient email + program ID before issuing so an event replay can't f
 ## Next steps
 
 - [AIR for Loyalty](/airkit/guides/air-for-loyalty) for a broader integration guide
-- [Issuance API Reference](/airkit/usage/credential/issue-on-behalf-api) for endpoint details
+- [Issuance API Reference](/airkit/usage/credential/issuance-api) for endpoint details
 - [Credential Verification](/airkit/usage/credential/verify) to set up cross-partner verification

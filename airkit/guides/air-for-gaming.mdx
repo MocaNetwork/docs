@@ -19,7 +19,7 @@ In gaming, players rebuild their reputation from zero every time they switch tit
 ```mermaid
 graph TD
     A["In-game event\ne.g. rank achieved, raid completed"] --> B[Game Server]
-    B -->|Issue on Behalf API| C[AIR Kit / Moca Chain]
+    B -->|Direct Issuance| C[AIR Kit / Moca Chain]
     C --> D[Achievement Credential in Player's AIR Account]
 
     D --> E{Player uses credential}
@@ -79,7 +79,7 @@ const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
 const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
 
 async function issueAchievement({ playerEmail, achievement }) {
-  const token = await getPartnerJwt(playerEmail);
+  const token = await getPartnerJwt();
 
   // Resolve the player's AIR Account
   const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
@@ -201,7 +201,7 @@ async function getEligiblePlayers(allPlayers) {
 ## Next Steps
 
 <Columns cols={2}>
-  <Card title="Issue on Behalf API" icon="code" href="/airkit/usage/credential/issue-on-behalf-api">
+  <Card title="Direct Issuance" icon="code" href="/airkit/usage/credential/issuance-api">
     Full endpoint reference and error codes.
   </Card>
   <Card title="Issuing Credentials (SDK)" icon="badge-check" href="/airkit/usage/credential/issuing-credentials">

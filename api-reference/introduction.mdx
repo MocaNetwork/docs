@@ -20,7 +20,7 @@ The Moca Network REST API enables server-to-server operations that do not requir
 | --- | --- | --- |
 | `partnerId` | Yes | Your Partner ID from the Developer Dashboard |
 | `email` | Yes | Target user's email address |
-| `scope` | Yes | Operation scope (e.g. `"issue on-behalf"`) |
+| `scope` | Yes | Operation scope (e.g. `"issue"` or `"verify"`) |
 | `exp` | Yes | Expiration timestamp (recommended: 5 minutes) |
 
 The JWT header must include `kid` (Key ID) matching a key in your JWKS endpoint and `typ: "JWT"`.
@@ -33,7 +33,7 @@ For full setup instructions, key generation, and code examples see [Partner Auth
 
 ## Credentials
 
-Server-side credential issuance resolves the recipient and stores an issuer-signed, holder-encrypted credential in DStorage. See the [Issuance API Reference](/airkit/usage/credential/issue-on-behalf-api) for the `initialize-user` and `dstorage/vcs` endpoints, request and response details, and code examples.
+Server-side credential issuance resolves the recipient and stores an issuer-signed, holder-encrypted credential in DStorage. See the [Issuance API Reference](/airkit/usage/credential/issuance-api) for the `initialize-user` and `dstorage/vcs` endpoints, request and response details, and code examples.
 
 ## Catalog
 
@@ -64,4 +64,4 @@ Server-side credential issuance resolves the recipient and stores an issuer-sign
 
 ## Code examples
 
-For end-to-end integration examples including issue-and-poll flows, webhook-driven issuance, and retry logic, see [Issue on Behalf API & Examples](/airkit/usage/credential/issue-on-behalf-api).
+For end-to-end integration examples including issue-and-poll flows, webhook-driven issuance, and retry logic, see [Issuance API Reference](/airkit/usage/credential/issuance-api).

@@ -98,7 +98,7 @@ sequenceDiagram
     App-->>U: Access granted or denied
 ```
 
-## Issue on Behalf Flow (Server-Side)
+## Direct Issuance Flow (Server-Side)
 
 Use this path when a **backend event** should trigger issuance without the user being present.
 
@@ -133,7 +133,7 @@ graph LR
     end
 
     subgraph AIR["AIR Kit Integration Layer"]
-      IB[Issue on Behalf API]
+      IB[Direct Issuance]
       SDK2[Web / Flutter SDK]
     end
 
@@ -162,7 +162,7 @@ Account Services and Credential Services are decoupled — integrate one, both, 
 | Gas sponsorship (Paymaster) | ✓ | — | — |
 | Wagmi connector | ✓ | — | — |
 | Issue credentials (user-initiated) | — | ✓ | ✓ user must be logged in |
-| Issue on Behalf (server-side) | — | ✓ | — |
+| Direct Issuance (server-side) | — | ✓ | — |
 | Verify credentials | — | ✓ | — |
 
 ## Next Steps
@@ -177,7 +177,7 @@ Account Services and Credential Services are decoupled — integrate one, both, 
   <Card title="Quickstart: Issue Credentials" icon="badge-check" href="/airkit/quickstart/issue-credentials">
     Step-by-step credential issuance walkthrough.
   </Card>
-  <Card title="Issue on Behalf" icon="server" href="/airkit/usage/credential/issue-on-behalf">
+  <Card title="Direct Issuance" icon="server" href="/airkit/usage/credential/direct-issuance">
     Server-side issuance without user presence.
   </Card>
 </Columns>

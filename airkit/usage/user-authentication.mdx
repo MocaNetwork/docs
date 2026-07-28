@@ -11,6 +11,10 @@ By default, we provide the following methods for users:
 - Passwordless Email Login
 - Wallet Login (EOA wallet support)
 
+<Warning>
+**Google sign-in redirect on recent Apple OSes.** On **iOS 26.5.2 and above (any browser)** and **macOS 26.5.2 with Safari**, Google sign-in completes through a full-page redirect instead of a popup. Single-page apps — or any app whose state is not fully represented by the URL — must persist and restore their page state across the redirect so the user returns to where they left off after authenticating.
+</Warning>
+
 
 <Tabs>
 <Tab title="Web">
