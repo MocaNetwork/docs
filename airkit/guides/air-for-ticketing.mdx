@@ -19,7 +19,7 @@ Traditional event tickets are one-time-use and forgotten after the show. AIR Kit
 ```mermaid
 graph TD
     A[Fan arrives at venue] --> B["Venue scanner / check-in system"]
-    B -->|"Scan detects fan's AIR Account email"| C[Issue on Behalf API]
+    B -->|"Scan detects fan's AIR Account email"| C[Direct Issuance]
     C --> D["Attendance Credential\nin Fan's AIR Account"]
 
     D --> E{Fan uses credential later}
@@ -71,46 +71,68 @@ graph TD
 
 ### Step 1 — Issue attendance credential at check-in
 
-Your venue scanner calls your backend on each valid scan. The backend issues via Issue on Behalf — the fan does nothing, no wallet open, no UX friction at the door.
+Your venue scanner calls your backend on each valid scan. The backend issues the credential server-side — the fan does nothing, no wallet open, no UX friction at the door.
 
 ```javascript
 // venue-checkin.js
 const { getPartnerJwt } = require('./lib/jwt');
+// issuer-controlled helpers backed by your signing keys
+const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
+
+const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
 
 async function issueAttendanceCredential({ fanEmail, eventDetails }) {
-  const token = await getPartnerJwt(fanEmail);
+  const token = await getPartnerJwt();
 
-  const res = await fetch('https://api.sandbox.mocachain.org/v1/credentials/issue-on-behalf', {
+  // Resolve the fan's AIR Account
+  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-partner-auth': token,
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ email: fanEmail }),
+  }).then((r) => r.json());
+
+  // Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  const schemaId = process.env.ATTENDANCE_CREDENTIAL_ID;
+  const vc = buildVc({
+    holderDid: init.did,
+    schemaId,
+    credentialSubject: {
+      eventId: eventDetails.id,
+      eventName: eventDetails.name,
+      venue: eventDetails.venue,
+      attendedAt: new Date().toISOString(),
+      ticketTier: eventDetails.ticketTier,   // "General" | "VIP" | "Backstage"
+      organizerId: process.env.ORGANIZER_ID,
     },
+  });
+  const encrypted = encryptToHolder(signVc(vc), init.publicKey);
+
+  // Store the encrypted envelope in DStorage
+  const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
     body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,
-      credentialId: process.env.ATTENDANCE_CREDENTIAL_ID,
-      credentialSubject: {
-        eventId: eventDetails.id,
-        eventName: eventDetails.name,
-        venue: eventDetails.venue,
-        attendedAt: new Date().toISOString(),
-        ticketTier: eventDetails.ticketTier,   // "General" | "VIP" | "Backstage"
-        organizerId: process.env.ORGANIZER_ID,
-      },
+      holderDid: init.did,
+      schemaId,
+      expiresAt: vc.expirationDate,
+      data: encrypted.encryptedData,
+      iv: encrypted.iv,
+      authTag: encrypted.authTag,
+      encryptedKey: encrypted.dataEncPublicKey,
+      externalId: vc.id,
     }),
   });
-
   if (!res.ok) throw new Error(`Attendance issuance failed: ${res.status}`);
-  const { coreClaimHash } = await res.json();
-  return coreClaimHash;
+  const { storagePath } = await res.json();
+  return storagePath;
 }
 
 // Called by your ticketing system on each valid scan
 app.post('/api/checkin', async (req, res) => {
   const { fanEmail, eventId } = req.body;
   const event = await getEventDetails(eventId);
-  const hash = await issueAttendanceCredential({ fanEmail, eventDetails: event });
-  res.json({ success: true, coreClaimHash: hash });
+  const storagePath = await issueAttendanceCredential({ fanEmail, eventDetails: event });
+  res.json({ success: true, storagePath });
 });
 ```
 
@@ -153,7 +175,7 @@ async function checkAndIssueLoyaltyTier(fanEmail) {
   if (attendedCount === 20) await issueLoyaltyTier({ fanEmail, tier: 'Super Fan' });
 }
 
-// issueLoyaltyTier uses the same Issue on Behalf pattern — see AIR for Loyalty guide
+// issueLoyaltyTier uses the same Direct Issuance pattern — see AIR for Loyalty guide
 ```
 
 ## Zero-Friction Fan UX
@@ -165,7 +187,7 @@ The key advantage for events: **fans never interact with the credential system a
     No app to open, no wallet prompt. Exactly the same experience as today.
   </Step>
   <Step title="Your backend issues the attendance credential">
-    Issue on Behalf fires silently. The fan's AIR Account receives the credential on-chain.
+    Direct Issuance fires silently. The fan's AIR Account receives the credential on-chain.
   </Step>
   <Step title="Fan opens the app the next day">
     Sees a notification: "You earned a Verified Attendee credential for Coachella 2025."
@@ -198,10 +220,10 @@ The key advantage for events: **fans never interact with the credential system a
   <Card title="AIR for Loyalty & Rewards" icon="gift" href="/airkit/guides/air-for-loyalty">
     Build tier-based loyalty on top of attendance credentials.
   </Card>
-  <Card title="Issue on Behalf — API" icon="code" href="/airkit/usage/credential/issue-on-behalf-api">
+  <Card title="Direct Issuance — API" icon="code" href="/airkit/usage/credential/issuance-api">
     Full endpoint reference and error handling.
   </Card>
-  <Card title="Issue on Behalf — Concepts" icon="book" href="/airkit/usage/credential/issue-on-behalf">
+  <Card title="Direct Issuance — Concepts" icon="book" href="/airkit/usage/credential/direct-issuance">
     When to use server-side vs. user-initiated issuance.
   </Card>
   <Card title="Architecture & Data Flow" icon="diagram-project" href="/airkit/guides/overview">

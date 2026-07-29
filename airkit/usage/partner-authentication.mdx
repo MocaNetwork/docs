@@ -1,6 +1,6 @@
 ---
 title: "SDK Authentication (Partner JWT)"
-description: "Sign a Partner JWT from your backend to authenticate AIR Kit operations — supported algorithms, required claims, JWKS setup, and Issue on Behalf scope."
+description: "Sign a Partner JWT from your backend to authenticate AIR Kit operations — supported algorithms, required claims, and JWKS setup."
 ---
 
 import JwksBlockingWarning from "/snippets/jwks-blocking-warning.mdx";
@@ -12,7 +12,7 @@ You need to generate and use the JWT when:
 - Authenticating a User
 - Performing credentials-related operations such as issuing or verifying credentials
 
-For **Issue on Behalf** (server-side credential issuance without user presence), the JWT must include `scope: "issue on-behalf"`, `typ: "JWT"`, and the target user's `email` claim. See [Issue on Behalf](/airkit/usage/credential/issue-on-behalf) for concepts and [Issue on Behalf API & Examples](/airkit/usage/credential/issue-on-behalf-api) for endpoint usage.
+For **server-side (direct) issuance** without user presence, sign a Partner JWT with `scope: "issue"` and `typ: "JWT"`. The JWT no longer carries an `email` claim — the credential recipient is identified when you call `initialize-user` (the email is passed in the request body), not through a JWT claim. See [Direct Issuance](/airkit/usage/credential/direct-issuance) for concepts and [Issuance API Reference](/airkit/usage/credential/issuance-api) for endpoint usage.
 
 **JWT Details**
 
@@ -26,7 +26,7 @@ To learn more about JWT, visit [jwt.io](https://www.jwt.io).
 
 ## JWKS endpoint (required for all credential SDK operations)
 
-`issueCredential`, `verifyCredential`, and Issue on Behalf all rely on the same Partner JWT trust model — AIR Kit fetches your registered JWKS URL and validates every JWT against it. The endpoint must be:
+`issueCredential`, `verifyCredential`, and server-side issuance all rely on the same Partner JWT trust model — AIR Kit fetches your registered JWKS URL and validates every JWT against it. The endpoint must be:
 
 - A **public HTTPS URL** reachable from AIR servers (localhost is not enough).
 - Registered in **Dashboard → Account → General Settings → JWKS URL** as the full URL your app actually serves.
@@ -34,22 +34,18 @@ To learn more about JWT, visit [jwt.io](https://www.jwt.io).
 
 The canonical Next.js route is `app/api/.well-known/jwks/route.ts`, used by every issuer and verifier in [`air-examples`](https://github.com/MocaNetwork/air-examples). For implementation, dashboard registration, local HTTPS tunnels, and the `kid` rule, see the [JWKS endpoint setup](/airkit/usage/jwks-setup) page.
 
-## Issue-on-Behalf JWT specifics
+## Server-side issuance JWT
 
-For [Issue on Behalf (API)](/airkit/usage/credential/issue-on-behalf), use a Partner JWT with these fields:
+For [Direct Issuance](/airkit/usage/credential/direct-issuance), use a Partner JWT with these fields. The recipient is resolved through the `initialize-user` call, so **no `email` claim is required in the JWT**.
 
 | Category | Required fields | Notes |
 | --- | --- | --- |
-| Claims | `partnerId`, `scope: "issue on-behalf"`, `email` | `email` must be the **individual target recipient's** AIR Account email — unique per recipient |
+| Claims | `partnerId`, `scope: "issue"` | No `email` claim — the recipient is passed to `initialize-user`, not the JWT |
 | Header | `kid`, `typ: "JWT"` | `kid` identifies which key in your JWKS is used |
 | Algorithm | `RS256` or `ES256` | Keep consistent with your JWKS key type |
 | Expiry | `exp` (recommended 5 minutes) | Short-lived token recommended |
 
-<Warning>
-The `email` claim must be the **individual target recipient's** AIR Account email — the person who should receive this specific credential. It is the routing key that determines which account the credential lands in. Never reuse a partner, service, admin, or static email, and never reuse one email across multiple recipients: every credential signed with that email will be issued to that one account.
-</Warning>
-
-JWKS reminders for Issue on Behalf:
+JWKS reminders for server-side issuance:
 
 - `kid` in JWT header must match a key ID exposed by your JWKS endpoint
 - JWKS endpoint must be publicly reachable by AIR Kit
@@ -63,13 +59,9 @@ const fs = require("fs");
 const privateKey = fs.readFileSync("path/to/private.key");
 const now = Math.floor(Date.now() / 1000);
 
-// MUST be the individual recipient's AIR Account email — never reuse across recipients
-const recipientEmail = "user@example.com";
-
 const payload = {
   partnerId: "your-partner-id",
-  scope: "issue on-behalf",
-  email: recipientEmail,
+  scope: "issue",
   iat: now,
   exp: now + 5 * 60
 };

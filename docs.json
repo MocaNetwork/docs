@@ -261,8 +261,8 @@
                 "group": "Credential Issuance",
                 "pages": [
                   "airkit/usage/credential/issuing-credentials",
-                  "airkit/usage/credential/issue-on-behalf",
-                  "airkit/usage/credential/issue-on-behalf-api"
+                  "airkit/usage/credential/direct-issuance",
+                  "airkit/usage/credential/issuance-api"
                 ]
               },
               {

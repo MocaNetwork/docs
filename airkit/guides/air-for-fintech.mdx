@@ -20,7 +20,7 @@ Traditional KYC and compliance verification requires every platform to collect, 
 graph TD
     A["User completes KYC\nwith your KYC provider"] --> B["KYC Provider webhook / callback"]
     B --> C[Your Backend]
-    C -->|Issue on Behalf API| D[AIR Kit / Moca Chain]
+    C -->|Direct Issuance| D[AIR Kit / Moca Chain]
     D --> E[KYC Credential in User's AIR Account]
 
     E --> F{User accesses financial product}
@@ -77,34 +77,56 @@ graph TD
 ```javascript
 // kyc-webhook.js  — called when your KYC provider sends a completion event
 const { getPartnerJwt } = require('./lib/jwt');
+// issuer-controlled helpers backed by your signing keys
+const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
+
+const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
 
 async function issueKycCredential({ userEmail, kycResult }) {
   if (kycResult.status !== 'APPROVED') return; // only issue on success
 
-  const token = await getPartnerJwt(userEmail);
+  const token = await getPartnerJwt();
 
-  const res = await fetch('https://api.sandbox.mocachain.org/v1/credentials/issue-on-behalf', {
+  // Resolve the user's AIR Account
+  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-partner-auth': token,
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ email: userEmail }),
+  }).then((r) => r.json());
+
+  // Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  const schemaId = process.env.KYC_CREDENTIAL_ID;
+  const vc = buildVc({
+    holderDid: init.did,
+    schemaId,
+    credentialSubject: {
+      kycLevel: kycResult.level,             // "basic" | "enhanced" | "institutional"
+      kycProvider: 'YourKYCProvider',
+      verifiedAt: new Date().toISOString(),
+      countryCode: kycResult.countryCode,    // e.g. "US", "GB"
+      isOver18: kycResult.age >= 18,
+      isOver21: kycResult.age >= 21,
     },
+  });
+  const encrypted = encryptToHolder(signVc(vc), init.publicKey);
+
+  // Store the encrypted envelope in DStorage
+  const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
     body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,
-      credentialId: process.env.KYC_CREDENTIAL_ID,
-      credentialSubject: {
-        kycLevel: kycResult.level,             // "basic" | "enhanced" | "institutional"
-        kycProvider: 'YourKYCProvider',
-        verifiedAt: new Date().toISOString(),
-        countryCode: kycResult.countryCode,    // e.g. "US", "GB"
-        isOver18: kycResult.age >= 18,
-        isOver21: kycResult.age >= 21,
-      },
+      holderDid: init.did,
+      schemaId,
+      expiresAt: vc.expirationDate,
+      data: encrypted.encryptedData,
+      iv: encrypted.iv,
+      authTag: encrypted.authTag,
+      encryptedKey: encrypted.dataEncPublicKey,
+      externalId: vc.id,
     }),
   });
-
   if (!res.ok) throw new Error(`KYC credential issuance failed: ${res.status}`);
-  return res.json();
+  return res.json(); // { storagePath }
 }
 
 // Express webhook endpoint
@@ -192,7 +214,7 @@ The ZK proof flow means the verifier receives **only a boolean result**. No raw 
 ## Next Steps
 
 <Columns cols={2}>
-  <Card title="Issue on Behalf — Concepts" icon="book" href="/airkit/usage/credential/issue-on-behalf">
+  <Card title="Direct Issuance — Concepts" icon="book" href="/airkit/usage/credential/direct-issuance">
     Server-side issuance without user presence.
   </Card>
   <Card title="Architecture & Data Flow" icon="diagram-project" href="/airkit/guides/overview">

@@ -65,15 +65,16 @@ sequenceDiagram
     participant U as User
     participant App as Your App (Issuer)
     participant SDK as AIR Kit SDK
-    participant Chain as Moca Chain
+    participant Iss as Issuer Backend
+    participant DS as Encrypted DStorage
 
     U->>App: Triggers credential claim
-    App->>SDK: airService.issueCredential(credentialId, subject)
-    SDK->>U: Prompt user to sign consent
-    U->>SDK: Signs with AIR Account
-    SDK->>Chain: Submit issuance transaction
-    Chain->>Chain: Identity Oracle verifies & anchors hash
-    Chain-->>SDK: coreClaimHash
+    App->>SDK: Load issuance program
+    SDK->>Iss: Request available credential
+    Iss->>Iss: Build VC, sign with issuer key, encrypt to holder
+    Iss->>DS: Store encrypted VC envelope
+    DS-->>Iss: storagePath
+    Iss-->>SDK: Issuance result
     SDK-->>App: Issuance confirmed
     App-->>U: Credential delivered to AIR Account
 ```
@@ -85,20 +86,19 @@ sequenceDiagram
     participant U as User (Holder)
     participant App as Your App (Verifier)
     participant SDK as AIR Kit SDK
-    participant Chain as Moca Chain
+    participant DS as Encrypted DStorage
 
     U->>App: Requests access / action
-    App->>SDK: airService.verifyCredential(programId)
-    SDK->>U: Prompt user to select credential
-    U->>SDK: Presents credential (ZK proof generated client-side)
-    SDK->>Chain: Submit ZK proof for verification
-    Chain->>Chain: Oracle validates proof on-chain
-    Chain-->>SDK: COMPLIANT / NON_COMPLIANT
-    SDK-->>App: Verification result
+    App->>SDK: verifyCredential(programId)
+    SDK->>DS: Load matching encrypted credential
+    SDK->>U: Prompt consent + select credential
+    U->>SDK: Generate signature-based proof (ZKP if program requires)
+    SDK->>SDK: Check proof against program settings (off-chain by default)
+    SDK-->>App: Verifiable Presentation / result
     App-->>U: Access granted or denied
 ```
 
-## Issue on Behalf Flow (Server-Side, No User Session)
+## Direct Issuance Flow (Server-Side)
 
 Use this path when a **backend event** should trigger issuance without the user being present.
 
@@ -106,18 +106,17 @@ Use this path when a **backend event** should trigger issuance without the user 
 sequenceDiagram
     participant Event as Backend Event
     participant Server as Your Server
-    participant API as AIR Kit API
-    participant Chain as Moca Chain
+    participant API as AIR API
+    participant DS as Encrypted DStorage
 
     Event->>Server: KYC passed / purchase confirmed / check-in scanned
-    Server->>Server: Sign Partner JWT (scope:"issue on-behalf", email: user)
-    Server->>API: POST /v1/credentials/issue-on-behalf
-    API->>Chain: Queue credential for on-chain processing
-    Chain-->>API: coreClaimHash
-    API-->>Server: { coreClaimHash }
-    Server->>API: GET /v1/credentials/status?coreClaimHash=...
-    API-->>Server: { vcStatus: "ONCHAIN" }
-    Note over Chain: User receives credential in AIR Account silently
+    Server->>Server: Sign Partner JWT (scope:"issue")
+    Server->>API: POST /auth/initialize-user { email }
+    API-->>Server: { did, publicKey }
+    Server->>Server: Build VC, sign with issuer key, encrypt to holder
+    Server->>DS: POST /dstorage/vcs (encrypted envelope)
+    DS-->>Server: 201 { storagePath }
+    Note over DS: User receives credential in AIR Account silently
 ```
 
 ## Multi-Vendor Stack Integration
@@ -134,7 +133,7 @@ graph LR
     end
 
     subgraph AIR["AIR Kit Integration Layer"]
-      IB[Issue on Behalf API]
+      IB[Direct Issuance]
       SDK2[Web / Flutter SDK]
     end
 
@@ -163,7 +162,7 @@ Account Services and Credential Services are decoupled — integrate one, both, 
 | Gas sponsorship (Paymaster) | ✓ | — | — |
 | Wagmi connector | ✓ | — | — |
 | Issue credentials (user-initiated) | — | ✓ | ✓ user must be logged in |
-| Issue on Behalf (server-side) | — | ✓ | — |
+| Direct Issuance (server-side) | — | ✓ | — |
 | Verify credentials | — | ✓ | — |
 
 ## Next Steps
@@ -178,7 +177,7 @@ Account Services and Credential Services are decoupled — integrate one, both, 
   <Card title="Quickstart: Issue Credentials" icon="badge-check" href="/airkit/quickstart/issue-credentials">
     Step-by-step credential issuance walkthrough.
   </Card>
-  <Card title="Issue on Behalf" icon="server" href="/airkit/usage/credential/issue-on-behalf">
+  <Card title="Direct Issuance" icon="server" href="/airkit/usage/credential/direct-issuance">
     Server-side issuance without user presence.
   </Card>
 </Columns>

@@ -3,7 +3,7 @@ title: "API Reference"
 description: "Moca Network REST API reference — server-to-server endpoints for credential issuance, issuance status, catalog browsing, and partner operations."
 ---
 
-The Moca Network REST API enables server-to-server operations that do not require user presence. Use it for backend automation, bulk credential issuance, programmatic status checks, and browsing the credential catalog.
+The Moca Network REST API enables server-to-server operations that do not require user presence. Use it for backend automation, credential issuance into encrypted DStorage, programmatic status checks, and browsing the credential catalog. Issuers sign credentials with their own keys and encrypt them to the holder; AIR stores and routes opaque ciphertext and metadata only.
 
 ## Base URLs
 
@@ -14,14 +14,22 @@ The Moca Network REST API enables server-to-server operations that do not requir
 
 ## Authentication
 
-**Credential endpoints** require a **Partner JWT** passed in the `x-partner-auth` header. The JWT must be signed with your private key (RS256 or ES256) and include:
+Authentication depends on the credential surface:
+
+- Direct AIR endpoints (`initialize-user` and `dstorage/vcs`) use a **Partner JWT** in `x-partner-auth`.
+- AIR calls issuer-hosted `available-vc` and `issue-vc` endpoints with `x-api-key`.
+- Public credential-status endpoints do not require authentication.
+- Self-hosted admin endpoints use `x-admin-api-key`.
+
+For direct AIR endpoints, sign the Partner JWT with your private key (RS256 or ES256) and include:
 
 | Claim | Required | Description |
 | --- | --- | --- |
 | `partnerId` | Yes | Your Partner ID from the Developer Dashboard |
-| `email` | Yes | Target user's email address |
-| `scope` | Yes | Operation scope (e.g. `"issue on-behalf"`) |
+| `scope` | Yes | Operation scope (e.g. `"issue"` or `"verify"`) |
 | `exp` | Yes | Expiration timestamp (recommended: 5 minutes) |
+
+For direct issuance, do not put the recipient email in the v1 Partner JWT. Send it in the `POST /auth/initialize-user` request body instead. Other operations, such as custom user authentication, have their own claim requirements.
 
 The JWT header must include `kid` (Key ID) matching a key in your JWKS endpoint and `typ: "JWT"`.
 
@@ -33,14 +41,7 @@ For full setup instructions, key generation, and code examples see [Partner Auth
 
 ## Credentials
 
-<CardGroup cols={2}>
-  <Card title="Issue credential on behalf" icon="certificate" href="/api-reference/credentials/issue-credential-on-behalf">
-    Submit server-side credential issuance for a user without requiring their active session.
-  </Card>
-  <Card title="Check issuance status" icon="circle-check" href="/api-reference/credentials/get-credential-status">
-    Poll the status of an asynchronous credential issuance until it is confirmed on-chain.
-  </Card>
-</CardGroup>
+Server-side credential issuance resolves the recipient and stores an issuer-signed, holder-encrypted credential in DStorage. See the [Issuance API Reference](/airkit/usage/credential/issuance-api) for the `initialize-user` and `dstorage/vcs` endpoints, request and response details, and code examples.
 
 ## Catalog
 
@@ -71,4 +72,4 @@ For full setup instructions, key generation, and code examples see [Partner Auth
 
 ## Code examples
 
-For end-to-end integration examples including issue-and-poll flows, webhook-driven issuance, and retry logic, see [Issue on Behalf API & Examples](/airkit/usage/credential/issue-on-behalf-api).
+For end-to-end integration examples including issue-and-poll flows, webhook-driven issuance, and retry logic, see [Issuance API Reference](/airkit/usage/credential/issuance-api).

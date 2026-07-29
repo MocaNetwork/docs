@@ -20,7 +20,7 @@ Carriers run identity verification for every new subscriber, but that verified s
 ```mermaid
 graph TD
     A["User activates SIM / subscription"] --> B[Your Activation Backend]
-    B -->|KYC pass + activation event| C[Issue on Behalf API]
+    B -->|KYC pass + activation event| C[Direct Issuance]
     C --> D[Subscriber Credential in User's AIR Account]
 
     D --> E{User accesses partner service}
@@ -103,41 +103,62 @@ graph TD
 
 ### Step 1 — Issue subscriber credential at activation
 
-Your activation system already fires an event when a subscriber passes KYC and activates. Add one Issue on Behalf call to that event handler.
+Your activation system already fires an event when a subscriber passes KYC and activates. Add one Direct Issuance call to that event handler.
 
 ```javascript
 // activation-handler.js
 const { getPartnerJwt } = require('./lib/jwt');
+// issuer-controlled helpers backed by your signing keys
+const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
 
 const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
+
+// Resolve the recipient, then build, sign, encrypt, and store the credential in DStorage
+async function issueEncryptedCredential({ recipientEmail, schemaId, credentialSubject }) {
+  const token = await getPartnerJwt();
+
+  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({ email: recipientEmail }),
+  }).then((r) => r.json());
+
+  const vc = buildVc({ holderDid: init.did, schemaId, credentialSubject });
+  const encrypted = encryptToHolder(signVc(vc), init.publicKey); // BJJ_SIG_2021, encrypted to holder
+
+  const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
+    body: JSON.stringify({
+      holderDid: init.did,
+      schemaId,
+      expiresAt: vc.expirationDate,
+      data: encrypted.encryptedData,
+      iv: encrypted.iv,
+      authTag: encrypted.authTag,
+      encryptedKey: encrypted.dataEncPublicKey,
+      externalId: vc.id,
+    }),
+  });
+  if (!res.ok) throw new Error(`Issuance failed: ${res.status}`);
+  return res.json(); // { storagePath }
+}
 
 async function issueSubscriberCredential({ userEmail, activation }) {
   if (activation.kycStatus !== 'APPROVED') return;
 
-  const token = await getPartnerJwt(userEmail);
-
-  const res = await fetch(`${BASE_URL}/credentials/issue-on-behalf`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-partner-auth': token,
+  return issueEncryptedCredential({
+    recipientEmail: userEmail,
+    schemaId: process.env.SUBSCRIBER_CREDENTIAL_ID,
+    credentialSubject: {
+      carrierId: process.env.CARRIER_ID,
+      planType: activation.planType,          // "prepaid" | "postpaid" | "business"
+      kycLevel: activation.kycLevel,          // "basic" | "enhanced" | "full"
+      activatedAt: new Date().toISOString(),
+      isOver18: activation.age >= 18,
+      countryCode: activation.countryCode,    // e.g. "AU", "SG"
     },
-    body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,
-      credentialId: process.env.SUBSCRIBER_CREDENTIAL_ID,
-      credentialSubject: {
-        carrierId: process.env.CARRIER_ID,
-        planType: activation.planType,          // "prepaid" | "postpaid" | "business"
-        kycLevel: activation.kycLevel,          // "basic" | "enhanced" | "full"
-        activatedAt: new Date().toISOString(),
-        isOver18: activation.age >= 18,
-        countryCode: activation.countryCode,    // e.g. "AU", "SG"
-      },
-    }),
   });
-
-  if (!res.ok) throw new Error(`Subscriber credential issuance failed: ${res.status}`);
-  return res.json();
 }
 
 // Hook into your existing activation pipeline
@@ -156,21 +177,15 @@ async function issueLoyaltyTierIfEligible({ userEmail, tenureMonths }) {
     tenureMonths >= 24 ? 'Gold' :
     tenureMonths >= 12 ? 'Silver' : 'Standard';
 
-  const token = await getPartnerJwt(userEmail);
-
-  await fetch(`${BASE_URL}/credentials/issue-on-behalf`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
-    body: JSON.stringify({
-      issuerDid: process.env.ISSUER_DID,
-      credentialId: process.env.LOYALTY_TIER_CREDENTIAL_ID,
-      credentialSubject: {
-        carrierId: process.env.CARRIER_ID,
-        tier,
-        tenureMonths,
-        memberSince: getMemberSinceDate(userEmail),
-      },
-    }),
+  await issueEncryptedCredential({
+    recipientEmail: userEmail,
+    schemaId: process.env.LOYALTY_TIER_CREDENTIAL_ID,
+    credentialSubject: {
+      carrierId: process.env.CARRIER_ID,
+      tier,
+      tenureMonths,
+      memberSince: getMemberSinceDate(userEmail),
+    },
   });
 }
 
@@ -226,12 +241,12 @@ if (!allowed) showAgeVerificationPrompt();
 
 ## Key Patterns
 
-| Pattern | `onDuplicate` | When to Use |
+| Pattern | Reissue behavior | When to Use |
 |---------|:-------------:|-------------|
-| Initial activation | `"ignore"` | Issue once at first activation; don't re-issue if user reinstalls |
-| Plan upgrade / re-KYC | `"revoke"` | Always reissue with updated `kycLevel` or `planType` |
-| Loyalty tier update | `"revoke"` | Monthly billing cycle refresh |
-| Device credential | `"ignore"` | One credential per device — immutable proof of ownership |
+| Initial activation | Skip if exists | Issue once at first activation; don't re-issue if user reinstalls |
+| Plan upgrade / re-KYC | Revoke + reissue | Always reissue with updated `kycLevel` or `planType` |
+| Loyalty tier update | Revoke + reissue | Monthly billing cycle refresh |
+| Device credential | Skip if exists | One credential per device — immutable proof of ownership |
 
 ## Privacy Guarantee
 
@@ -267,10 +282,10 @@ The repo uses fintech and loyalty app names (KYC provider, lending platform, air
 ## Next Steps
 
 <Columns cols={2}>
-  <Card title="Issue on Behalf — Concepts" icon="book" href="/airkit/usage/credential/issue-on-behalf">
+  <Card title="Direct Issuance — Concepts" icon="book" href="/airkit/usage/credential/direct-issuance">
     Server-side issuance without user presence.
   </Card>
-  <Card title="Issue on Behalf — API" icon="code" href="/airkit/usage/credential/issue-on-behalf-api">
+  <Card title="Direct Issuance — API" icon="code" href="/airkit/usage/credential/issuance-api">
     Full endpoint reference with error codes.
   </Card>
   <Card title="AIR for Fintech & Payments" icon="credit-card" href="/airkit/guides/air-for-fintech">

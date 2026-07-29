@@ -25,153 +25,37 @@
     }
   ],
   "paths": {
-    "/credentials/issue-on-behalf": {
-      "post": {
-        "operationId": "issueCredentialOnBehalf",
-        "summary": "Issue credential on behalf",
-        "description": "Initiates credential issuance for a user without requiring their active session. If the user does not exist, they are automatically created. Issuance is asynchronous — use the status endpoint to confirm the credential is on-chain.",
-        "tags": ["Credentials"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/IssueOnBehalfRequest"
-              },
-              "example": {
-                "issuerDid": "did:air:id:test:5P44fsVUhPctDTWH2Nz26pZJFsg6CqyiAELTGeVQDB",
-                "credentialId": "c21s70g0i54sn0023172Cv",
-                "credentialSubject": {
-                  "age": 25,
-                  "location": "United States",
-                  "isMember": true
-                },
-                "onDuplicate": "ignore"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Credential issuance submitted. Use the `coreClaimHash` to poll for on-chain status.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IssueOnBehalfResponse"
-                },
-                "example": {
-                  "coreClaimHash": "239704895d0c4693d33ee7ab9e37c6eb295f178d80074a32d4ace53b1a779c44",
-                  "credentialId": "c21s70g0i54sn0023172Cv",
-                  "userUuid": "7f01c42c-02cf-4325-96ed-ba034700f724"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Missing or invalid request fields.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "error": 400,
-                  "message": "Missing required field: issuerDid"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid or expired Partner JWT, or JWKS mismatch.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "error": 401,
-                  "message": "Invalid or expired Partner JWT, or JWKS mismatch."
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Feature not enabled or schema not allowed for this partner.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "error": 403,
-                  "message": "Feature not enabled or schema not allowed for this partner."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Unknown issuer DID or issuance program.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "error": 404,
-                  "message": "Unknown issuer DID or issuance program."
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Consent rejected by user or duplicate conflict.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "error": 409,
-                  "message": "Consent rejected by user or duplicate conflict."
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server-side failure. Retry with exponential backoff.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "error": 500,
-                  "message": "Server-side failure. Retry with exponential backoff."
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/catalog/schemas": {
       "get": {
         "operationId": "listSchemas",
         "summary": "Browse schemas",
         "description": "Returns a paginated list of credential schemas with their credential count and number of distinct issuers (providers). Only schemas marked as discoverable and enabled are included. Results are sortable by `created_at`, `credential_count`, `provider_count`, or `title` (default `created_at`).",
-        "tags": ["Catalog"],
+        "tags": [
+          "Catalog"
+        ],
         "security": [],
         "servers": [
-          { "url": "https://credential-testnet.api.sandbox.air3.com", "description": "Credential API sandbox (catalog)" }
+          {
+            "url": "https://credential-testnet.api.sandbox.air3.com",
+            "description": "Credential API sandbox (catalog)"
+          }
         ],
         "x-mint": {
-          "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
+          "content": "<Warning>\n**Pilot API** \u2014 Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
         },
         "parameters": [
-          { "$ref": "#/components/parameters/Page" },
-          { "$ref": "#/components/parameters/Limit" },
-          { "$ref": "#/components/parameters/SortBy" },
-          { "$ref": "#/components/parameters/SortOrder" }
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/SortBy"
+          },
+          {
+            "$ref": "#/components/parameters/SortOrder"
+          }
         ],
         "responses": {
           "200": {
@@ -211,14 +95,19 @@
       "get": {
         "operationId": "getSchemaDetail",
         "summary": "Schema detail",
-        "description": "Returns a single schema together with every discoverable credential built on it. Each credential includes issuer info and traction metrics (holder count, issuance count, and demand count — the number of verification programs that accept it).",
-        "tags": ["Catalog"],
+        "description": "Returns a single schema together with every discoverable credential built on it. Each credential includes issuer info and traction metrics (holder count, issuance count, and demand count \u2014 the number of verification programs that accept it).",
+        "tags": [
+          "Catalog"
+        ],
         "security": [],
         "servers": [
-          { "url": "https://credential-testnet.api.sandbox.air3.com", "description": "Credential API sandbox (catalog)" }
+          {
+            "url": "https://credential-testnet.api.sandbox.air3.com",
+            "description": "Credential API sandbox (catalog)"
+          }
         ],
         "x-mint": {
-          "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
+          "content": "<Warning>\n**Pilot API** \u2014 Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
         },
         "parameters": [
           {
@@ -226,7 +115,9 @@
             "in": "path",
             "required": true,
             "description": "Schema ID.",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "sch_01HX"
           }
         ],
@@ -250,8 +141,15 @@
                         "credentialId": "c21s70g0i54sn0023172Cv",
                         "name": "Age Verification",
                         "category": "identity",
-                        "issuer": { "issuerId": "iss_01", "name": "Acme Corp" },
-                        "traction": { "holderCount": 120, "issuanceCount": 200, "demandCount": 50 },
+                        "issuer": {
+                          "issuerId": "iss_01",
+                          "name": "Acme Corp"
+                        },
+                        "traction": {
+                          "holderCount": 120,
+                          "issuanceCount": 200,
+                          "demandCount": 50
+                        },
                         "createdAt": "2026-01-15T10:30:00Z"
                       }
                     ]
@@ -265,8 +163,13 @@
             "description": "Schema not found.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
-                "example": { "error": 404, "message": "Schema not found" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": 404,
+                  "message": "Schema not found"
+                }
               }
             }
           }
@@ -278,13 +181,18 @@
         "operationId": "getCredentialDetail",
         "summary": "Credential detail",
         "description": "Returns a single credential with its full profile: the schema-defined data points (field name, type, required flag), issuer identity (name, DID, origin), traction metrics (unique holders, total issuances, total verifications), linked verification programs, and availability window (accessible start/end, expiration duration, first/last issuance timestamps).",
-        "tags": ["Catalog"],
+        "tags": [
+          "Catalog"
+        ],
         "security": [],
         "servers": [
-          { "url": "https://api.sandbox.mocachain.org/v1", "description": "Sandbox (only environment available during pilot)" }
+          {
+            "url": "https://api.sandbox.mocachain.org/v1",
+            "description": "Sandbox (only environment available during pilot)"
+          }
         ],
         "x-mint": {
-          "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
+          "content": "<Warning>\n**Pilot API** \u2014 Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
         },
         "parameters": [
           {
@@ -292,7 +200,9 @@
             "in": "path",
             "required": true,
             "description": "Credential ID.",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "c21s70g0i54sn0023172Cv"
           }
         ],
@@ -331,7 +241,11 @@
                       "title": "KYC Identity",
                       "description": "Basic identity verification schema"
                     },
-                    "traction": { "holderCount": 120, "issuanceCount": 200, "verificationCount": 85 },
+                    "traction": {
+                      "holderCount": 120,
+                      "issuanceCount": 200,
+                      "verificationCount": 85
+                    },
                     "programs": [
                       {
                         "programId": "prg_01",
@@ -351,8 +265,13 @@
             "description": "Credential not found.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
-                "example": { "error": 404, "message": "Credential not found" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": 404,
+                  "message": "Credential not found"
+                }
               }
             }
           }
@@ -364,19 +283,32 @@
         "operationId": "listPrograms",
         "summary": "Browse programs",
         "description": "Returns a paginated list of verification programs with their total verification count and the number of distinct credential types they accept. Only programs marked as discoverable are included. Results are sortable by `created_at`, `verification_count`, `credential_count`, or `name` (default `created_at`).",
-        "tags": ["Catalog"],
+        "tags": [
+          "Catalog"
+        ],
         "security": [],
         "servers": [
-          { "url": "https://api.sandbox.mocachain.org/v1", "description": "Sandbox (only environment available during pilot)" }
+          {
+            "url": "https://api.sandbox.mocachain.org/v1",
+            "description": "Sandbox (only environment available during pilot)"
+          }
         ],
         "x-mint": {
-          "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
+          "content": "<Warning>\n**Pilot API** \u2014 Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
         },
         "parameters": [
-          { "$ref": "#/components/parameters/Page" },
-          { "$ref": "#/components/parameters/Limit" },
-          { "$ref": "#/components/parameters/SortBy" },
-          { "$ref": "#/components/parameters/SortOrder" }
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/SortBy"
+          },
+          {
+            "$ref": "#/components/parameters/SortOrder"
+          }
         ],
         "responses": {
           "200": {
@@ -418,13 +350,18 @@
         "operationId": "getProgramDetail",
         "summary": "Program detail",
         "description": "Returns a single verification program with the verifier's identity, pricing model, the full list of accepted credentials (each with holder/issuance counts), and the zero-knowledge verification conditions required for each credential (e.g. `age >= 18`).",
-        "tags": ["Catalog"],
+        "tags": [
+          "Catalog"
+        ],
         "security": [],
         "servers": [
-          { "url": "https://api.sandbox.mocachain.org/v1", "description": "Sandbox (only environment available during pilot)" }
+          {
+            "url": "https://api.sandbox.mocachain.org/v1",
+            "description": "Sandbox (only environment available during pilot)"
+          }
         ],
         "x-mint": {
-          "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
+          "content": "<Warning>\n**Pilot API** \u2014 Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
         },
         "parameters": [
           {
@@ -432,7 +369,9 @@
             "in": "path",
             "required": true,
             "description": "Program ID.",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "prg_01"
           }
         ],
@@ -458,7 +397,9 @@
                         "category": "identity",
                         "holderCount": 120,
                         "issuanceCount": 200,
-                        "verificationConditions": ["age >= 18"]
+                        "verificationConditions": [
+                          "age >= 18"
+                        ]
                       }
                     ],
                     "verifierInfo": {
@@ -466,7 +407,9 @@
                       "name": "Verify Inc",
                       "verifierDid": "did:air:id:test:7Q33abcDEF"
                     },
-                    "traction": { "verificationCount": 85 },
+                    "traction": {
+                      "verificationCount": 85
+                    },
                     "pricingModel": "per-verification",
                     "createdAt": "2026-02-01T08:00:00Z"
                   },
@@ -479,8 +422,13 @@
             "description": "Program not found.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
-                "example": { "error": 404, "message": "Program not found" }
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": 404,
+                  "message": "Program not found"
+                }
               }
             }
           }
@@ -491,14 +439,19 @@
       "get": {
         "operationId": "searchCatalog",
         "summary": "Search catalog",
-        "description": "Performs a MySQL full-text search (natural language mode) across three entity types in parallel — credentials (matched on ID, name, category, and schema), issuers (matched on name and short name), and verification programs (matched on program name). Returns grouped results with relevance scores, paginated independently per group.",
-        "tags": ["Catalog"],
+        "description": "Performs a MySQL full-text search (natural language mode) across three entity types in parallel \u2014 credentials (matched on ID, name, category, and schema), issuers (matched on name and short name), and verification programs (matched on program name). Returns grouped results with relevance scores, paginated independently per group.",
+        "tags": [
+          "Catalog"
+        ],
         "security": [],
         "servers": [
-          { "url": "https://api.sandbox.mocachain.org/v1", "description": "Sandbox (only environment available during pilot)" }
+          {
+            "url": "https://api.sandbox.mocachain.org/v1",
+            "description": "Sandbox (only environment available during pilot)"
+          }
         ],
         "x-mint": {
-          "content": "<Warning>\n**Pilot API** — Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
+          "content": "<Warning>\n**Pilot API** \u2014 Available on **Sandbox only** at this stage. Endpoint is under active development and may change without notice. Not yet available in production.\n</Warning>"
         },
         "parameters": [
           {
@@ -506,16 +459,26 @@
             "in": "query",
             "required": true,
             "description": "Search query string.",
-            "schema": { "type": "string", "maxLength": 200 },
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
             "example": "age"
           },
-          { "$ref": "#/components/parameters/Page" },
+          {
+            "$ref": "#/components/parameters/Page"
+          },
           {
             "name": "limit",
             "in": "query",
             "required": false,
             "description": "Results per group (default 10, max 50).",
-            "schema": { "type": "integer", "minimum": 1, "maximum": 50, "default": 10 }
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
           }
         ],
         "responses": {
@@ -537,12 +500,18 @@
                           "name": "Age Verification",
                           "category": "identity",
                           "relevance": 0.95,
-                          "issuer": { "issuerId": "iss_01", "name": "Acme Corp" }
+                          "issuer": {
+                            "issuerId": "iss_01",
+                            "name": "Acme Corp"
+                          }
                         }
                       ],
                       "total": 1
                     },
-                    "issuers": { "items": [], "total": 0 },
+                    "issuers": {
+                      "items": [],
+                      "total": 0
+                    },
                     "programs": {
                       "items": [
                         {
@@ -554,76 +523,12 @@
                       ],
                       "total": 1
                     },
-                    "meta": { "query": "age", "totalResults": 2 }
+                    "meta": {
+                      "query": "age",
+                      "totalResults": 2
+                    }
                   },
                   "timestamp": 1772530828000
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/credentials/status": {
-      "get": {
-        "operationId": "getCredentialStatus",
-        "summary": "Check issuance status",
-        "description": "Returns the current status of a credential issuance. Poll this endpoint after calling Issue on Behalf until `vcStatus` is `ONCHAIN`.",
-        "tags": ["Credentials"],
-        "parameters": [
-          {
-            "name": "coreClaimHash",
-            "in": "query",
-            "required": true,
-            "description": "The unique hash returned by the issue endpoint.",
-            "schema": {
-              "type": "string"
-            },
-            "example": "239704895d0c4693d33ee7ab9e37c6eb295f178d80074a32d4ace53b1a779c44"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Current issuance status.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CredentialStatus"
-                },
-                "example": {
-                  "coreClaimHash": "239704895d0c4693d33ee7ab9e37c6eb295f178d80074a32d4ace53b1a779c44",
-                  "issuanceDate": "2026-01-19 07:18:45",
-                  "issuerDid": "did:air:id:test:5P44fsVUhPctDTWH2Nz26pZJFsg6CqyiAELTGeVQDB",
-                  "vcId": "c28t30c048pe502a3713w0",
-                  "vcStatus": "ONCHAIN"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid or expired Partner JWT.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "error": 401,
-                  "message": "Invalid or expired Partner JWT."
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No credential found for the given hash.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "error": 404,
-                  "message": "No credential found for the given hash."
                 }
               }
             }
@@ -639,28 +544,46 @@
         "in": "query",
         "required": false,
         "description": "Page number (starts from 1).",
-        "schema": { "type": "integer", "minimum": 1, "default": 1 }
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        }
       },
       "Limit": {
         "name": "limit",
         "in": "query",
         "required": false,
         "description": "Results per page (max 100).",
-        "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 10 }
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10
+        }
       },
       "SortBy": {
         "name": "sortBy",
         "in": "query",
         "required": false,
         "description": "Field to sort by.",
-        "schema": { "type": "string" }
+        "schema": {
+          "type": "string"
+        }
       },
       "SortOrder": {
         "name": "sortOrder",
         "in": "query",
         "required": false,
         "description": "Sort direction.",
-        "schema": { "type": "string", "enum": ["ASC", "DESC"], "default": "DESC" }
+        "schema": {
+          "type": "string",
+          "enum": [
+            "ASC",
+            "DESC"
+          ],
+          "default": "DESC"
+        }
       }
     },
     "securitySchemes": {
@@ -672,98 +595,6 @@
       }
     },
     "schemas": {
-      "IssueOnBehalfRequest": {
-        "type": "object",
-        "required": ["issuerDid", "credentialId", "credentialSubject"],
-        "properties": {
-          "issuerDid": {
-            "type": "string",
-            "description": "Your Issuer DID from the Developer Dashboard."
-          },
-          "credentialId": {
-            "type": "string",
-            "description": "The Issuance Program ID."
-          },
-          "credentialSubject": {
-            "type": "object",
-            "description": "Credential data matching your schema definition. Add your own key-value pairs.",
-            "additionalProperties": {
-              "oneOf": [
-                { "type": "string" },
-                { "type": "integer" },
-                { "type": "boolean" },
-                { "type": "object" }
-              ]
-            }
-          },
-          "onDuplicate": {
-            "type": "string",
-            "enum": ["ignore", "revoke"],
-            "default": "revoke",
-            "description": "`ignore` returns the existing credential. `revoke` revokes the old credential and issues a new one."
-          }
-        }
-      },
-      "IssueOnBehalfResponse": {
-        "type": "object",
-        "properties": {
-          "coreClaimHash": {
-            "type": "string",
-            "description": "Unique issuance identifier. Use this to poll the status endpoint."
-          },
-          "credentialId": {
-            "type": "string",
-            "description": "The Issuance Program ID (echoed from request)."
-          },
-          "userUuid": {
-            "type": "string",
-            "format": "uuid",
-            "description": "UUID of the user who received the credential."
-          }
-        }
-      },
-      "CredentialStatus": {
-        "type": "object",
-        "properties": {
-          "coreClaimHash": {
-            "type": "string",
-            "description": "The issuance identifier."
-          },
-          "issuanceDate": {
-            "type": "string",
-            "description": "Timestamp when the credential was issued."
-          },
-          "expirationDate": {
-            "type": "string",
-            "description": "Timestamp when the credential expires."
-          },
-          "issuerDid": {
-            "type": "string",
-            "description": "DID of the issuer."
-          },
-          "issuerId": {
-            "type": "string",
-            "description": "Internal issuer identifier."
-          },
-          "schemeId": {
-            "type": "string",
-            "description": "Schema identifier for the credential."
-          },
-          "vcId": {
-            "type": "string",
-            "description": "Verifiable credential identifier."
-          },
-          "vcDstorageId": {
-            "type": "string",
-            "description": "Decentralized storage identifier for the credential."
-          },
-          "vcStatus": {
-            "type": "string",
-            "enum": ["WAIT_ONCHAIN", "ONCHAIN"],
-            "description": "`WAIT_ONCHAIN` — issuance in progress. `ONCHAIN` — credential is confirmed on-chain."
-          }
-        }
-      },
       "CatalogApiResponse": {
         "type": "object",
         "description": "Standard API response envelope used by all Catalog endpoints.",
