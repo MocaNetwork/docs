@@ -1,3 +1,7 @@
 <Warning>
-  **BLOCKING — Partner JWKS endpoint required.** `issueCredential`, `verifyCredential`, and Direct Issuance all fail until you (1) host a **public HTTPS JWKS URL**, (2) register it in **Dashboard → Account → General → JWKS URL**, and (3) sign your Partner JWT with a `kid` that matches a key in that JWKS. Localhost is not reachable from AIR servers — use an HTTPS tunnel (ngrok, cloudflared) or deploy. See [JWKS endpoint setup](/airkit/usage/jwks-setup).
+  **BLOCKING — Partner JWKS endpoint required.** `issueCredential`, `verifyCredential`, and Direct Issuance all fail until you:<br/> 
+  - Host a **public HTTPS JWKS URL**
+  - Register it in **Dashboard → Account → General → JWKS URL**
+  - Sign your Partner JWT with a `kid` that matches a key in that JWKS. 
+  Localhost is not reachable from AIR servers — use an HTTPS tunnel (ngrok, cloudflared) or deploy. See [JWKS endpoint setup](/airkit/usage/jwks-setup).
 </Warning>

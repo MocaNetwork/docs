@@ -34,9 +34,12 @@ To learn more about JWT, visit [jwt.io](https://www.jwt.io).
 
 The canonical Next.js route is `app/api/.well-known/jwks/route.ts`, used by every issuer and verifier in [`air-examples`](https://github.com/MocaNetwork/air-examples). For implementation, dashboard registration, local HTTPS tunnels, and the `kid` rule, see the [JWKS endpoint setup](/airkit/usage/jwks-setup) page.
 
-## Server-side issuance JWT
+## Issuance JWT
 
-For [Direct Issuance](/airkit/usage/credential/direct-issuance), use a Partner JWT with these fields. The recipient is resolved through the `initialize-user` call, so **no `email` claim is required in the JWT**.
+For AIR Kit `issueCredential` and [Direct
+Issuance](/airkit/usage/credential/direct-issuance), use a Partner JWT with
+these fields. For Direct Issuance, the recipient is resolved through the
+`initialize-user` call, so **no `email` claim is required in the JWT**.
 
 | Category | Required fields | Notes |
 | --- | --- | --- |
@@ -45,35 +48,76 @@ For [Direct Issuance](/airkit/usage/credential/direct-issuance), use a Partner J
 | Algorithm | `RS256` or `ES256` | Keep consistent with your JWKS key type |
 | Expiry | `exp` (recommended 5 minutes) | Short-lived token recommended |
 
-JWKS reminders for server-side issuance:
+JWKS reminders for issuance:
 
 - `kid` in JWT header must match a key ID exposed by your JWKS endpoint
 - JWKS endpoint must be publicly reachable by AIR Kit
 
-Focused Node.js example (payload + header shape):
+### Next.js Partner JWT endpoint
 
-```js
-const jwt = require("jsonwebtoken");
-const fs = require("fs");
+Install `jose`:
 
-const privateKey = fs.readFileSync("path/to/private.key");
-const now = Math.floor(Date.now() / 1000);
-
-const payload = {
-  partnerId: "your-partner-id",
-  scope: "issue",
-  iat: now,
-  exp: now + 5 * 60
-};
-
-const token = jwt.sign(payload, privateKey, {
-  algorithm: "RS256",
-  header: {
-    kid: "your-partner-id",
-    typ: "JWT"
-  }
-});
+```bash
+pnpm add jose
 ```
+
+Create a server-only endpoint that returns a five-minute issuance token:
+
+```ts app/api/partner-jwt/route.ts
+import { NextResponse } from "next/server";
+import * as jose from "jose";
+
+function wrapPrivateKeyPem(body: string): string {
+  const trimmed = body.trim();
+  if (trimmed.includes("BEGIN")) return trimmed;
+
+  return `-----BEGIN PRIVATE KEY-----\n${trimmed}\n-----END PRIVATE KEY-----`;
+}
+
+export async function POST() {
+  try {
+    const privateKeyBody = process.env.PARTNER_PRIVATE_KEY;
+    const algorithm = process.env.SIGNING_ALGORITHM;
+    const partnerId = process.env.NEXT_PUBLIC_PARTNER_ID;
+
+    if (!privateKeyBody || !algorithm || !partnerId) {
+      return NextResponse.json(
+        { error: "Missing Partner JWT configuration" },
+        { status: 500 },
+      );
+    }
+
+    const privateKey = await jose.importPKCS8(
+      wrapPrivateKeyPem(privateKeyBody),
+      algorithm,
+    );
+    const now = Math.floor(Date.now() / 1000);
+
+    const token = await new jose.SignJWT({
+      partnerId,
+      scope: "issue",
+    })
+      .setProtectedHeader({
+        alg: algorithm,
+        kid: partnerId,
+        typ: "JWT",
+      })
+      .setIssuedAt(now)
+      .setExpirationTime(now + 5 * 60)
+      .sign(privateKey);
+
+    return NextResponse.json({ token });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to sign Partner JWT" },
+      { status: 500 },
+    );
+  }
+}
+```
+
+Keep `PARTNER_PRIVATE_KEY` server-only. The JWT `kid` must match a key in the
+JWKS registered for the Partner ID.
 
 ## Generating Partner JWTs
 
