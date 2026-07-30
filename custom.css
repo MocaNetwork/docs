@@ -6,6 +6,12 @@ a[data-slot="context-menu-trigger"] {
    }
 }
 
+.nav-logo {
+    width: 230px;
+    height: 40px;
+    object-fit: cover;
+}
+
 .card {
     background: 
     /* Inner background color (clipped to padding-box) */
