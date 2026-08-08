@@ -1,0 +1,85 @@
+---
+title: "AIR AI Studio"
+description: "The builder-facing product line for making agents, AI products, apps, and workflows AIR-capable. Agent Tools, Authorization Flows, and AI Integration Assets."
+---
+
+AIR AI Studio is the builder-facing product line for making agents, AI products, apps, and workflows AIR-capable. It packages AIR capabilities into agent-callable tools, embeddable authorization flows, and AI integration assets that are added into the broader AIR Developer Platform.
+
+<Info>
+**Positioning.** AIR AI Studio lets builders add AIR-powered identity, money, consent, policy, and audit flows into agents, chatbots, apps, plugins, and agentic surfaces — without rebuilding AIR's underlying identity, wallet, credential, or payment stack.
+</Info>
+
+## Why this layer exists
+
+Developers building agents and AI products face the same integration problem on every project:
+
+1. **Identity integration** — How does the agent verify who the user is, what the user is eligible for, and what the agent is allowed to know or prove?
+2. **Money integration** — How does the agent request payment authorization, spend within limits, receive receipts, or route settlement?
+3. **Consent and policy integration** — How does the user approve, limit, revoke, and audit what the agent can do?
+4. **Developer integration** — How does a developer add all of this into an agent, app, workflow, MCP server, or plugin without rebuilding the full AIR stack?
+
+AIR AI Studio answers these by packaging AIR's existing capabilities into agent-native surfaces.
+
+## Three layers
+
+<CardGroup cols={3}>
+  <Card title="AIR Agent Tools" icon="screwdriver-wrench" href="/airai/studio/agent-tools">
+    Agent-callable AIR capabilities — MCP tools and servers, agent-callable APIs, plugin interfaces, tool schemas, sandbox actions.
+  </Card>
+  <Card title="AIR Authorization Flows" icon="hand-back-fist" href="/airai/studio/authorization-flows">
+    Embeddable user approval and control — data-access approval, proof-sharing approval, spend mandate approval, payment confirmation, revocation, receipts.
+  </Card>
+  <Card title="AI Integration Assets" icon="book-open" href="/airai/studio/integration-assets">
+    Added into the existing AIR Developer Platform — AI-consumable docs, tool schemas, recipes, reference apps, sandbox, CLI / SDK wrappers.
+  </Card>
+</CardGroup>
+
+## What AIR AI Studio packages, by surface
+
+| Builder surface | Who builds it | What they need | AIR AI Studio role |
+| --- | --- | --- | --- |
+| **Agent products** | AI app developers, agent builders, consumer AI products. | Identity proofs, data access, payment authorization, audit receipts. | MCP tools, plugins, agent-callable APIs, user authorization flows. |
+| **Merchant / enterprise agent surfaces** | Enterprises, merchants, service providers, commerce platforms. | Verify user eligibility, request scoped data, collect payment safely. | Embeddable verification, proof handoff, payment authorization, merchant-facing receipt and audit. |
+| **Platform agent surfaces** | AI products, marketplaces, aggregators, wallet apps, super-apps, payment networks. | Proof handoff between parties, payment intent routing, freshness / revocation checks. | Agent tools, proof handoff APIs, freshness / revocation checks, payment authorization, policy and audit interfaces. |
+| **Developer tools / automation** | Framework builders, internal tools teams, agent workflow developers. | Quick path to install, test, and call AIR capabilities. | CLI, SDK wrappers, docs, example apps, sandbox, local testing. |
+
+## How Studio relates to AIR AI Services and AIR Kit
+
+| Layer | Role | Simple distinction |
+| --- | --- | --- |
+| **AIR AI Services** | User-facing permission model. | Defines what agents are *allowed to do* with identity, money, consent, policy, and audit. |
+| **AIR AI Studio** | Builder-facing packaging. | Makes those capabilities *callable and embeddable* by agents, AI products, apps, and workflows. |
+| **AIR Kit** | Base SDK / infrastructure. | Provides the *underlying* auth, credential, wallet, payment, loyalty, and API operations. |
+
+<Note>
+AIR AI Studio is **not an agent framework**. It plugs into existing agents, apps, and frameworks rather than replacing them.
+</Note>
+
+## What you can build with Studio
+
+<AccordionGroup>
+  <Accordion title="Add an MCP server to your agent so it can request AIR identity proofs">
+    The agent calls an MCP tool such as `request_age_proof`. AIR Policy + Audit checks the request, AIR Authorization Flows shows the user the approval prompt, and AIR Agentic Identity returns a verifiable proof to the merchant.
+  </Accordion>
+  <Accordion title="Embed AIR's spend mandate flow in a partner app">
+    Drop in an Authorization Flow component. The user approves an amount, merchant scope, category, and expiry. AIR Agentic Money creates the mandate; the agent transacts within it.
+  </Accordion>
+  <Accordion title="Pass an AIR-issued proof from your platform to a merchant">
+    Use AIR Agent Tools to request a proof handoff. The platform receives a verifiable presentation it can route to the merchant — without ever holding raw user data.
+  </Accordion>
+  <Accordion title="Show users a complete record of what your agent did">
+    Embed the receipt and audit-trail UI from AIR Authorization Flows. Users see every identity disclosure, payment, mandate, and revocation in one place.
+  </Accordion>
+</AccordionGroup>
+
+## Out of scope
+
+- **Building AI agents or agent wrappers.** AIR AI Studio integrates into yours.
+- **Building agent frameworks.** Studio plugs into existing frameworks.
+- **Generic automation or orchestration.** Studio is the AIR integration layer for identity, money, consent, policy, and audit — not a workflow engine.
+
+## Next
+
+- [AIR Agent Tools](/airai/studio/agent-tools) — agent-callable surfaces.
+- [AIR Authorization Flows](/airai/studio/authorization-flows) — embeddable user approval and control.
+- [AI Integration Assets](/airai/studio/integration-assets) — what gets added into the existing AIR Developer Platform.

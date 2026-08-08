@@ -1,0 +1,48 @@
+---
+title: "Agent taxonomy"
+description: "Butler, Concierge, and Platform agents — three relationship types AIR's permission layer applies to. AIR Identity proof handoff is a capability all three can use."
+---
+
+AIR supports three external agent relationships. They differ in **who owns the agent** and **what data and authority the agent should receive** — not in which AIR capabilities they can call.
+
+| Relationship | Who owns it | Examples |
+| --- | --- | --- |
+| **Butler agent** | User-owned / user-operated | Personal AI assistant, personal travel agent, ChatGPT or Claude acting with the user's approved AIR permissions. |
+| **Concierge agent** | Merchant-owned / enterprise-owned | Alcohol store concierge, hotel booking concierge, airline support agent, ticketing chatbot, enterprise customer-service agent. |
+| **Platform agent** | Platform-, app-, or network-owned | ChatGPT or Claude as a platform-hosted surface, marketplace assistant, wallet app agent, payment-network agent, super-app agent. |
+
+<Note>
+**A product like ChatGPT or Claude is not automatically one category.** It depends on context: acting for the user with delegated AIR permissions makes it behave like a Butler; embedded by a merchant to sell a product makes it a Concierge; operated as a platform-owned surface routing proofs or payment context between parties makes it a Platform agent.
+</Note>
+
+## How each agent uses AIR
+
+| Relationship | Stream 1: data the agent gets about the user | Stream 2: data / proofs shared onward | AIR's role |
+| --- | --- | --- | --- |
+| **Butler** | Rich, persistent context: preferences, profile, habits, addresses, loyalty, travel history, payment rules. | Passport details for a booking, payment authorization, delivery details, identity proof, loyalty proof. | Persistent user vault, act-as-me delegation, scoped sharing, spend limits, audit trail, revocation. |
+| **Concierge** | Limited and service-specific: account profile, booking context, merchant history, preferences relevant to that offering. | Age proof, passport details, delivery address, KYC status, payment authorization. Stores only when relevant and consented. | Consent prompt, selective disclosure, purpose-bound data release, eligibility proofs, payment authorization, merchant-facing receipt. |
+| **Platform** | Platform context: user session, request, routing context, app state, marketplace context, wallet context. | Should usually avoid raw user data — use proof handoff: proofs, attestations, encrypted payloads, freshness checks, revocation status, payment authorization. | AIR Identity proof handoff, scoped verification, platform-safe data release, agent-blind data sharing, policy, audit. |
+
+The same data sits in either stream depending on the relationship:
+
+- A **Butler** may keep passport details in persistent memory because the user wants the agent to reuse them.
+- A **Concierge** may collect passport details for one booking and only retain them if the user consents.
+- A **Platform agent** ideally never sees passport details — it uses AIR Identity's proof handoff or encrypted payload capability to pass only what the recipient needs.
+
+## AIR Identity proof handoff is a capability, not an agent type
+
+<Warning>
+**Common confusion:** "Platform agent" is an *ownership / operating model*, not the name of AIR's verification capability.
+</Warning>
+
+AIR Identity's **proof handoff / verification** capability lets an agent pass a signed proof, attestation, encrypted payload, freshness check, or revocation status from one party to another without exposing raw user data. **Butler, Concierge, and Platform agents can all use it.**
+
+It is the most common pattern for Platform agents (because they should minimize raw data exposure) but it is not exclusive to them.
+
+## Quick way to remember
+
+- **External agent / app surface** = the broad bucket: anything outside AIR that calls AIR.
+- **Butler / Concierge / Platform agent** = relationship types inside that bucket, based on owner and role.
+- **AIR Identity proof handoff** = an AIR capability any of those agent types can use.
+
+Continue to [AIR AI Services](/airai/services/index) to see the user-facing permission model that applies across all three relationships.

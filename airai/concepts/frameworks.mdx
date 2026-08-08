@@ -1,0 +1,61 @@
+---
+title: "Existing frameworks"
+description: "How AIR Agentic Identity and AIR Agentic Money map to x402, AP2, Stripe ACP / SPT, Visa TAP, Mastercard Agent Pay / KYA, MPP / Tempo, Ledger Keychain Protocol, and Open Wallet Standard."
+---
+
+AIR does not build new payment rails or commerce protocols. It composes with existing frameworks by mapping AIR Agentic Identity, AIR Agentic Money, and the user-controlled signer / wallet layer into whatever each framework expects.
+
+<Info>
+**The integration stance.** Each framework solves part of the agent commerce problem. AIR provides the identity, money, policy, and audit layer above them — adding what they don't natively cover and connecting them through one permission model.
+</Info>
+
+## Payment frameworks
+
+| Framework | AIR Agentic Identity role | AIR Agentic Money role |
+| --- | --- | --- |
+| **x402** | Adds identity / credential requirements that x402 does not provide natively. | Acts as payment facilitator and policy-gated stablecoin payment source. |
+| **AP2** | Acts as credential provider and mandate / proof layer. | Provides payment instrument and policy checks for payment mandates. |
+| **Stripe ACP / SPT** | Adds user identity, eligibility, and credential verification before checkout. | Issues or maps to a shared payment token under policy. |
+| **Visa TAP** | Complements agent authentication with user-level authorization and delegation. | Issues a policy-bound burner card or tokenized payment instrument. |
+| **Mastercard Agent Pay / KYA** | Provides user / agent credentials for Digital Agent Passport-style flows. | Issues burner cards or agentic payment tokens under policy. |
+| **MPP / Tempo** | Provides user authority and proof layer before settlement. | Uses sub-account / co-signer style payment execution and on-chain settlement. |
+
+## Wallet and signing standards
+
+| Standard | AIR Agentic Identity role | AIR Agentic Money role |
+| --- | --- | --- |
+| **Ledger Keychain Protocol** | Sits in the user-controlled signer boundary for high-assurance signing, delegated signing, key-control policy, and user-approved credential or proof presentation. | Authorizes spend mandates, payment approvals, and transaction intents before AIR Kit or a rail adapter executes the money action. |
+| **Open Wallet Standard** | Sits in the wallet / credential interoperability boundary for portable user authority, credential presentation, proof handoff, and wallet-mediated authorization. | Represents payment authorization and transaction intent in a portable format before execution through AIR Kit, partner wallets, or external payment rails. |
+
+<Note>
+Ledger Keychain Protocol and Open Wallet Standard sit in the **user-controlled signer / wallet authority boundary** — not the same architectural bucket as payment rails. They are ways for the user, wallet, or delegated signer to approve, sign, present credentials, or hand off transaction intent before AIR Kit executes against credentials, wallets, payments, or external rails.
+</Note>
+
+## What AIR adds when integrating
+
+Every framework in this list solves part of the agent commerce problem. AIR is consistently responsible for the same set of capabilities on top:
+
+<CardGroup cols={2}>
+  <Card title="User-level authorization" icon="user-check">
+    User approval and delegation — not just agent-level authentication.
+  </Card>
+  <Card title="Identity and credentials" icon="id-badge">
+    Eligibility proofs, credential verification, selective disclosure, freshness and revocation checks.
+  </Card>
+  <Card title="Policy and budgets" icon="scale-balanced">
+    Spend mandates, merchant scope, category allowlists, expiry, approval thresholds.
+  </Card>
+  <Card title="Audit and receipts" icon="receipt">
+    User-visible and machine-readable evidence for every identity and money action.
+  </Card>
+</CardGroup>
+
+## Where this fits in the architecture
+
+In the [reference architecture](/airai/concepts/architecture), these frameworks are **external systems and rails** — the layer AIR integrates with through framework adapters in AIR Kit, governed by AIR Policy + Audit. The user-controlled signer / wallet layer (Ledger, Open Wallet Standard) sits between AIR AI Services and AIR Kit, gating every signing and authorization step.
+
+## Next
+
+- [Reference architecture](/airai/concepts/architecture) — see where each framework plugs into the layered system.
+- [Canonical flows](/airai/concepts/canonical-flows) — examples that show identity and money composing with these frameworks end-to-end.
+- [AIR Agentic Money](/airai/services/agentic-money) — the transaction authority that drives rail integration.
