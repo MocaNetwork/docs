@@ -53,7 +53,7 @@ To configure locale and currency settings, pass `sessionConfig` to the `init()` 
 
 Instead of using AIR Kit as your authentication provider, AIR Kit supports users that have been already authenticated by your system to skip logging in again when using AIR Kit.
 
-To achieve this, pass in additional properties in the [Partner JWT](/airkit/usage/partner-authentication) during login() , specifically `email` and `partnerUserId` .
+To achieve this, pass in additional properties in the [Partner JWT](/airkit/usage/partner-authentication) during login() , specifically `email`.
 
 When an email is provided, we will verify via a one-time password sent to the specified email since it is used as an identifier in the AIR ecosystem.
 
@@ -62,7 +62,6 @@ An example JWT looks like following:
 ```json
 {
   "partnerId": "YOUR PARTNER ID",
-  "partnerUserId": "YOUR USER ID", // optional
   "email": "YOUR USER EMAIL", // optional
   "exp": 1728973684,
   "iat": 1728970084
@@ -78,7 +77,6 @@ After successful login, an `AirLoginResult` object will be returned, which also 
   sub: string,
   abstractAccountAddress: string,
   partnerId: string,
-  partnerUserId?: string,
   sourcePartnerId?: string
 }
 ```
