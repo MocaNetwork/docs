@@ -1,7 +1,7 @@
 ---
 title: "JWKS endpoint (required for credential issue and verify)"
-description: "Set up the public HTTPS JWKS endpoint AIR Kit requires for issueCredential, verifyCredential, and Direct Issuance, and register it in the Dashboard."
-keywords: ["jwks", "partner jwt", "issueCredential", "verifyCredential", "kid", "direct issuance", "blocking", "prerequisite", "well-known"]
+description: "Set up the public HTTPS JWKS endpoint AIR Kit requires for issueCredential, verifyCredential, and server-side issuance, and register it in the Dashboard."
+keywords: ["jwks", "partner jwt", "issueCredential", "verifyCredential", "kid", "server-side issuance", "blocking", "prerequisite", "well-known"]
 ---
 
 import JwksBlockingWarning from "/snippets/jwks-blocking-warning.mdx";
@@ -16,7 +16,7 @@ JWKS URL is a **mandatory dashboard account field** — peer-tier with Partner I
 | --- | --- | --- |
 | `airService.issueCredential` | Client SDK | **Yes** |
 | `airService.verifyCredential` | Client SDK | **Yes** |
-| Direct Issuance (REST) | Server-to-server | **Yes** |
+| Server-side issuance (REST) | Server-to-server | **Yes** |
 | `airService.login` (account only) | Client SDK | Only when you use [bring your own auth](/airkit/usage/user-authentication#custom-auth-bring-your-own-auth) |
 
 All credential operations share the same Partner JWT trust model — so a single JWKS setup unblocks all of them.

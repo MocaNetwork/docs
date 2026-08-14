@@ -12,7 +12,7 @@ You need to generate and use the JWT when:
 - Authenticating a User
 - Performing credentials-related operations such as issuing or verifying credentials
 
-For **server-side (direct) issuance** without user presence, sign a Partner JWT with `scope: "issue"` and `typ: "JWT"`. The JWT no longer carries an `email` claim — the credential recipient is identified when you call `initialize-user` (the email is passed in the request body), not through a JWT claim. See [Direct Issuance](/airkit/usage/credential/direct-issuance) for concepts and [Issuance API Reference](/airkit/usage/credential/issuance-api) for endpoint usage.
+For **server-side issuance** without user presence, sign a Partner JWT with `scope: "issue"` and `typ: "JWT"`. The JWT no longer carries an `email` claim — the credential recipient is identified when you call `initialize-user` (the email is passed in the request body), not through a JWT claim. See [Issuing Credentials](/airkit/usage/credential/issuing-credentials#server-side-issuance) for concepts and [Issuance API Reference](/airkit/usage/credential/issuance-api) for endpoint usage.
 
 **JWT Details**
 
@@ -26,7 +26,7 @@ To learn more about JWT, visit [jwt.io](https://www.jwt.io).
 
 ## JWKS endpoint (required for all credential SDK operations)
 
-`issueCredential`, `verifyCredential`, and server-side issuance all rely on the same Partner JWT trust model — AIR Kit fetches your registered JWKS URL and validates every JWT against it. The endpoint must be:
+`issueCredential`, `verifyCredential`, and on-demand issuance all rely on the same Partner JWT trust model — AIR Kit fetches your registered JWKS URL and validates every JWT against it. The endpoint must be:
 
 - A **public HTTPS URL** reachable from AIR servers (localhost is not enough).
 - Registered in **Dashboard → Account → General Settings → JWKS URL** as the full URL your app actually serves.
@@ -36,9 +36,9 @@ The canonical Next.js route is `app/api/.well-known/jwks/route.ts`, used by ever
 
 ## Issuance JWT
 
-For AIR Kit `issueCredential` and [Direct
-Issuance](/airkit/usage/credential/direct-issuance), use a Partner JWT with
-these fields. For Direct Issuance, the recipient is resolved through the
+For AIR Kit `issueCredential` and
+[On-demand issuance](/airkit/usage/credential/issuing-credentials#on-demand-issuance), use a Partner JWT with
+these fields. For on-demand issuance, the recipient is resolved through the
 `initialize-user` call, so **no `email` claim is required in the JWT**.
 
 | Category | Required fields | Notes |

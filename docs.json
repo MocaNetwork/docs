@@ -261,7 +261,6 @@
                 "group": "Credential Issuance",
                 "pages": [
                   "airkit/usage/credential/issuing-credentials",
-                  "airkit/usage/credential/direct-issuance",
                   "airkit/usage/credential/issuance-api"
                 ]
               },
@@ -403,5 +402,11 @@
         ]
       }
     ]
-  }
+  },
+  "redirects": [
+    {
+      "source": "/airkit/usage/credential/direct-issuance",
+      "destination": "/airkit/usage/credential/issuing-credentials"
+    }
+  ]
 }

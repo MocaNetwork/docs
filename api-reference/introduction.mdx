@@ -17,7 +17,7 @@ The Moca Network REST API enables server-to-server operations that do not requir
 Authentication depends on the credential surface:
 
 - Direct AIR endpoints (`initialize-user` and `dstorage/vcs`) use a **Partner JWT** in `x-partner-auth`.
-- AIR calls issuer-hosted `available-vc` and `issue-vc` endpoints with `x-api-key`.
+- Your issuer backend protects `available-vc` and `issue-vc` with `x-api-key`.
 - Public credential-status endpoints do not require authentication.
 - Self-hosted admin endpoints use `x-admin-api-key`.
 
@@ -29,7 +29,7 @@ For direct AIR endpoints, sign the Partner JWT with your private key (RS256 or E
 | `scope` | Yes | Operation scope (e.g. `"issue"` or `"verify"`) |
 | `exp` | Yes | Expiration timestamp (recommended: 5 minutes) |
 
-For direct issuance, do not put the recipient email in the v1 Partner JWT. Send it in the `POST /auth/initialize-user` request body instead. Other operations, such as custom user authentication, have their own claim requirements.
+For on-demand issuance, do not put the recipient email in the v1 Partner JWT. Send it in the `POST /auth/initialize-user` request body instead. Other operations, such as custom user authentication, have their own claim requirements.
 
 The JWT header must include `kid` (Key ID) matching a key in your JWKS endpoint and `typ: "JWT"`.
 
@@ -41,7 +41,7 @@ For full setup instructions, key generation, and code examples see [Partner Auth
 
 ## Credentials
 
-Server-side credential issuance resolves the recipient and stores an issuer-signed, holder-encrypted credential in DStorage. See the [Issuance API Reference](/airkit/usage/credential/issuance-api) for the `initialize-user` and `dstorage/vcs` endpoints, request and response details, and code examples.
+On-demand credential issuance resolves the recipient and stores an issuer-signed, holder-encrypted credential in DStorage. See the [Issuance API Reference](/airkit/usage/credential/issuance-api) for the `initialize-user` and `dstorage/vcs` endpoints, request and response details, and code examples.
 
 ## Catalog
 

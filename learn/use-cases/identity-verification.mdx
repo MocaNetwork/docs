@@ -14,7 +14,7 @@ AIR Kit offers a privacy-first alternative: **issue a verifiable credential once
 | User submits passport / ID to every platform | User verifies once, carries credential |
 | Platform stores PII — becomes a breach target | Platform sees only a ZK proof result: `COMPLIANT / NON_COMPLIANT` |
 | Re-KYC at every new service | Portable credential accepted by any verifier in the ecosystem |
-| Verification takes hours to days | Credential issued instantly on KYC pass via Direct Issuance |
+| Verification takes hours to days | Credential issued instantly on KYC pass via on-demand issuance |
 | GDPR / data breach liability for every platform | No PII stored — reduced data breach liability |
 
 ## How It Works
@@ -24,7 +24,7 @@ AIR Kit offers a privacy-first alternative: **issue a verifiable credential once
     User goes through your KYC provider (Jumio, Onfido, Persona, etc.) as normal.
   </Step>
   <Step title="Your backend issues a KYC credential">
-    The moment the KYC provider sends a pass result, your server calls the Direct Issuance. No user action required.
+    The moment the KYC provider sends a pass result, your server calls on-demand issuance. No user action required.
   </Step>
   <Step title="Credential lands in the user's AIR Account">
     The user now owns a verifiable, on-chain attestation of their identity — not the raw data, just the proof.

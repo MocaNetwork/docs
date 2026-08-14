@@ -98,14 +98,14 @@ sequenceDiagram
     App-->>U: Access granted or denied
 ```
 
-## Direct Issuance Flow (Server-Side)
+## On-demand Issuance Flow
 
-Use this path when a **backend event** should trigger issuance without the user being present.
+Use this path when a **backend event** should trigger issuance without the user being present. Your issuer backend resolves the holder and calls its own `issue-vc` — the end user does not interact with AIR.
 
 ```mermaid
 sequenceDiagram
     participant Event as Backend Event
-    participant Server as Your Server
+    participant Server as Your Issuer Backend
     participant API as AIR API
     participant DS as Encrypted DStorage
 
@@ -113,7 +113,7 @@ sequenceDiagram
     Server->>Server: Sign Partner JWT (scope:"issue")
     Server->>API: POST /auth/initialize-user { email }
     API-->>Server: { did, publicKey }
-    Server->>Server: Build VC, sign with issuer key, encrypt to holder
+    Server->>Server: POST /issue-vc (build, sign, encrypt)
     Server->>DS: POST /dstorage/vcs (encrypted envelope)
     DS-->>Server: 201 { storagePath }
     Note over DS: User receives credential in AIR Account silently
@@ -133,7 +133,7 @@ graph LR
     end
 
     subgraph AIR["AIR Kit Integration Layer"]
-      IB[Direct Issuance]
+      IB[On-demand issuance]
       SDK2[Web / Flutter SDK]
     end
 
@@ -162,7 +162,7 @@ Account Services and Credential Services are decoupled — integrate one, both, 
 | Gas sponsorship (Paymaster) | ✓ | — | — |
 | Wagmi connector | ✓ | — | — |
 | Issue credentials (user-initiated) | — | ✓ | ✓ user must be logged in |
-| Direct Issuance (server-side) | — | ✓ | — |
+| On-demand issuance | — | ✓ | — |
 | Verify credentials | — | ✓ | — |
 
 ## Next Steps
@@ -177,7 +177,7 @@ Account Services and Credential Services are decoupled — integrate one, both, 
   <Card title="Quickstart: Issue Credentials" icon="badge-check" href="/airkit/quickstart/issue-credentials">
     Step-by-step credential issuance walkthrough.
   </Card>
-  <Card title="Direct Issuance" icon="server" href="/airkit/usage/credential/direct-issuance">
-    Server-side issuance without user presence.
+  <Card title="On-demand Issuance" icon="server" href="/airkit/usage/credential/issuing-credentials#on-demand-issuance">
+    On-demand issuance without user presence.
   </Card>
 </Columns>

@@ -19,7 +19,7 @@ In gaming, players rebuild their reputation from zero every time they switch tit
 ```mermaid
 graph TD
     A["In-game event\ne.g. rank achieved, raid completed"] --> B[Game Server]
-    B -->|Direct Issuance| C[AIR Kit / Moca Chain]
+    B -->|On-demand issuance| C[AIR Kit / Moca Chain]
     C --> D[Achievement Credential in Player's AIR Account]
 
     D --> E{Player uses credential}
@@ -210,7 +210,7 @@ async function getEligiblePlayers(allPlayers) {
 ## Next Steps
 
 <Columns cols={2}>
-  <Card title="Direct Issuance" icon="code" href="/airkit/usage/credential/issuance-api">
+  <Card title="On-demand Issuance" icon="code" href="/airkit/usage/credential/issuance-api">
     Full endpoint reference and error codes.
   </Card>
   <Card title="Issuing Credentials (SDK)" icon="badge-check" href="/airkit/usage/credential/issuing-credentials">

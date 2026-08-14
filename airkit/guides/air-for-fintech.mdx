@@ -20,7 +20,7 @@ Traditional KYC and compliance verification requires every platform to collect, 
 graph TD
     A["User completes KYC\nwith your KYC provider"] --> B["KYC Provider webhook / callback"]
     B --> C[Your Backend]
-    C -->|Direct Issuance| D[AIR Kit / Moca Chain]
+    C -->|On-demand issuance| D[AIR Kit / Moca Chain]
     D --> E[KYC Credential in User's AIR Account]
 
     E --> F{User accesses financial product}
@@ -214,8 +214,8 @@ The ZK proof flow means the verifier receives **only a boolean result**. No raw 
 ## Next Steps
 
 <Columns cols={2}>
-  <Card title="Direct Issuance — Concepts" icon="book" href="/airkit/usage/credential/direct-issuance">
-    Server-side issuance without user presence.
+  <Card title="On-demand Issuance — Concepts" icon="book" href="/airkit/usage/credential/issuing-credentials#on-demand-issuance">
+    On-demand issuance without user presence.
   </Card>
   <Card title="Architecture & Data Flow" icon="diagram-project" href="/airkit/guides/overview">
     ZK proof flow end-to-end.

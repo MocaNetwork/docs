@@ -24,7 +24,7 @@ Use this checklist when integrating AIR Kit to ensure your implementation follow
 
 - [ ] Validate credential data on your backend before signing and issuing. Do not trust client-supplied values.
 - [ ] Dedupe issuance by recipient email + program ID; revoke the existing credential before reissuing when data changes (e.g. tier upgrades).
-- [ ] For direct issuance, confirm DStorage returned a `storagePath`. For hosted issuance, confirm `POST /issue-vc` succeeded and the issuer persisted its DStorage result.
+- [ ] For on-demand issuance, confirm DStorage returned a `storagePath` or that `POST /issue-vc` succeeded and the issuer persisted its DStorage result.
 - [ ] If handling regulated data, enable [CAK encryption](/learn/advanced-topics/privacy-and-compliance).
 
 ## API security

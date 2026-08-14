@@ -41,7 +41,7 @@ The industry has accepted this as the cost of compliance. It isn't.
     Your existing flow. Your existing KYC provider. Nothing changes for the user or your team at this step.
   </Step>
   <Step title="Your backend issues a KYC credential">
-    The moment your KYC provider returns a pass result, your backend calls the AIR Kit Direct Issuance. One call. The credential issues silently — no user action needed.
+    The moment your KYC provider returns a pass result, your backend calls on-demand issuance. One call. The credential issues silently — no user action needed.
   </Step>
   <Step title="Credential lands in the user's AIR Account">
     The user now holds a verifiable, on-chain attestation of their identity status. Not a copy of their passport — a cryptographic proof that they passed.
@@ -76,7 +76,7 @@ Only your KYC provider — the same as today. AIR Kit never sees raw documents. 
 The dispute process stays entirely with your KYC provider, as it does today. You revoke or re-issue the AIR Kit credential once the dispute resolves.
 
 **Does AIR Kit have access to our users' data?**
-No. AIR Kit never receives PII. The Direct Issuance call contains only the credential attributes you define — derived facts, not raw documents.
+No. AIR Kit never receives PII. The On-demand issuance call contains only the credential attributes you define — derived facts, not raw documents.
 
 ## Integration at a Glance
 
