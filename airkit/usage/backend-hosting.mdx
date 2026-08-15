@@ -12,7 +12,7 @@ This guide gets a small **issuer backend** and **PostgreSQL** online for AIR Kit
 | Component | What it stores / does | What it is not |
 | --- | --- | --- |
 | **Issuer backend** | Serves `available-vc`, `issue-vc`, credential status, and Partner JWT–related APIs | Not the AIR Kit client SDK |
-| **Partner PostgreSQL** | Issuer app state (migrations, issuance history) and your source data for eligibility / claims | Not where AIR stores encrypted credentials |
+| **PostgreSQL** | Issuer app state (migrations, issuance history) and your source data for eligibility / claims | Not where AIR stores encrypted credentials |
 | **AIR DStorage** | Encrypted credential envelopes on Moca Chain | Not a replacement for your Postgres |
 
 Your database supports **Your** issuer application. Credential payloads remain encrypted and stored in [DStorage](/learn/security/credential-security#credential-storage).
