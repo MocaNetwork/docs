@@ -195,6 +195,7 @@
             "pages": [
               "airkit/usage/getting-started",
               "airkit/usage/jwks-setup",
+              "airkit/usage/backend-hosting",
               "airkit/usage/installation",
               "airkit/usage/initialization"
             ]

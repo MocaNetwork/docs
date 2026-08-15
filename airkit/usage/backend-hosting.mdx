@@ -1,0 +1,210 @@
+---
+title: "Host an issuer backend and database"
+description: "A quick guide for hosting the AIR issuer backend and PostgreSQL database"
+sidebarTitle: "Backend and database hosting"
+keywords: ["issuer backend", "database", "postgresql", "railway", "neon", "supabase", "render", "koyeb", "hosting", "sandbox", "DATABASE_URL"]
+---
+
+This guide gets a small **issuer backend** and **PostgreSQL** online for AIR Kit sandbox work. It is for partners who need a quick place to run and test the [AIR issuer service](https://github.com/MocaNetwork/air-issuer-service) before they continue with [credential issuance](/airkit/quickstart/issue-credentials).
+
+## What you are hosting
+
+| Component | What it stores / does | What it is not |
+| --- | --- | --- |
+| **Issuer backend** | Serves `available-vc`, `issue-vc`, credential status, and Partner JWT–related APIs | Not the AIR Kit client SDK |
+| **Partner PostgreSQL** | Issuer app state (migrations, issuance history) and your source data for eligibility / claims | Not where AIR stores encrypted credentials |
+| **AIR DStorage** | Encrypted credential envelopes on Moca Chain | Not a replacement for your Postgres |
+
+Your database supports **Your** issuer application. Credential payloads remain encrypted and stored in [DStorage](/learn/security/credential-security#credential-storage).
+
+## Choose a path
+
+| Need | Recommended free path | Notes |
+| --- | --- | --- |
+| **Backend + PostgreSQL** | [Railway Free](https://docs.railway.com/pricing/plans) | Fastest single-project setup. New accounts get a \$5 / 30-day trial, then $1 of monthly usage credit on Free. Workloads stop when credit is exhausted. |
+| **Database only** | [Neon Free](https://neon.com/docs/introduction/plans) or [Supabase Free](https://supabase.com/docs/guides/platform/billing-on-supabase) | Neon: 0.5 GB storage, scales to zero after 5 minutes idle. Supabase Free: projects pause after ~7 days of low activity. |
+| **Backend only** | [Koyeb Free](https://www.koyeb.com/docs/faqs/pricing) or [Render Free](https://render.com/docs/free) | Both sleep on idle (cold starts). Render Free Postgres expires after 30 days — prefer Neon/Supabase if you need a longer-lived free database. |
+
+
+## Prerequisites
+
+- A GitHub account (to deploy [`air-issuer-service`](https://github.com/MocaNetwork/air-issuer-service))
+- An [AIR Developer Dashboard](https://developers.sandbox.air3.com/dashboard) Partner ID
+- Issuer secrets ready (or generate them during setup): `SEED`, Partner JWT private key, `API_KEY`, `ADMIN_API_KEY` — see [Partner authentication](/airkit/usage/partner-authentication) and the issuance quickstart
+
+## Recommended path: Railway (backend + Postgres)
+
+<Steps>
+  <Step title="Create a Railway project">
+    Sign up at [railway.com](https://railway.com) and create a new project.
+  </Step>
+
+  <Step title="Deploy the issuer service">
+    In the project canvas, click **+ New** → **GitHub Repo** and deploy [`Forked Air Issuer Service`](https://github.com/MocaNetwork/air-issuer-service).
+
+    Set the service commands under **Settings → Deploy**:
+
+    | Setting | Value |
+    | --- | --- |
+    | Build command | `pnpm install && pnpm run build` |
+    | Start command | `pnpm run start:prod` |
+    | Pre-deploy command | `npx mikro-orm migration:up` |
+
+    The pre-deploy command applies MikroORM migrations before each new version starts. See Railway's [pre-deploy command](https://docs.railway.com/deployments/pre-deploy-command) docs.
+  </Step>
+
+  <Step title="Add PostgreSQL">
+    Click **+ New** → **Database** → **PostgreSQL**. Railway provisions the database in the same project.
+  </Step>
+
+  <Step title="Wire DATABASE_URL">
+    On the issuer service, open **Variables** and add a [reference variable](https://docs.railway.com/variables#referencing-another-services-variable):
+
+    ```bash
+    DATABASE_URL=${{Postgres.DATABASE_URL}}
+    ```
+
+    Use the exact Postgres service name shown in your project if it differs from `Postgres`.
+  </Step>
+
+  <Step title="Configure issuer secrets">
+    Add the remaining server-side variables on the issuer service:
+
+    ```bash
+    # Public origin of this issuer service — set after you generate the domain (next step)
+    ISSUER_ORIGIN=https://<your-railway-domain>
+
+    AIR_API_ORIGIN=https://air.api.sandbox.air3.com
+    MOCA_CHAIN_API_ORIGIN=https://api.sandbox.mocachain.org
+
+    SEED=0x<64-hex-characters>
+    IDEN3_METHOD=air
+    IDEN3_BLOCKCHAIN=id
+    IDEN3_NETWORK_ID=testnet
+
+    PARTNER_ID=<dashboard-partner-id>
+    PARTNER_PRIVATE_KEY_KID=<dashboard-partner-id>
+    PARTNER_PRIVATE_KEY_ALG=RS256
+    PARTNER_PRIVATE_KEY_DER=<pkcs8-private-key-body-without-pem-markers>
+    SD_JWT_HASH_ALG=sha-256
+
+    API_KEY=<generated-api-key>
+    ADMIN_API_KEY=<generated-admin-api-key>
+    ```
+
+    Railway injects `PORT` automatically. The NestJS service must listen on `process.env.PORT` (the starter already does).
+
+    Store secrets in Railway Variables or a secrets manager — never commit them. See the [security checklist](/learn/security/security-checklist).
+  </Step>
+
+  <Step title="Generate a public HTTPS domain">
+    On the issuer service, open **Settings → Networking → Public Networking** and click **Generate Domain**.
+
+    Copy the `https://…up.railway.app` URL (or your custom domain) and set:
+
+    ```bash
+    ISSUER_ORIGIN=https://<your-railway-domain>
+    ```
+
+    No trailing slash. `ISSUER_ORIGIN` is embedded in credential status URLs, so it must match the public origin that serves `/credential-status/:nonce`.
+  </Step>
+
+  <Step title="Verify the deployment">
+    After the deploy succeeds:
+
+    ```bash
+    curl -s https://<your-railway-domain>/ready | jq .
+    ```
+
+    Expect HTTP `200` with healthy checks:
+
+    ```json
+    {
+      "status": "ready",
+      "checks": {
+        "database": { "status": "ok" },
+        "migrations": { "status": "ok", "pending": [] },
+        "issuer": { "status": "ok", "did": "did:air:..." }
+      }
+    }
+    ```
+
+    Then fetch the issuer DID:
+
+    ```bash
+    curl -s https://<your-railway-domain>/.well-known/issuer-did | jq .
+    ```
+  </Step>
+</Steps>
+
+<Check>
+  When `/ready` reports `status: "ready"` over public HTTPS, your sandbox backend and database are hosted. Continue with issuer activation and schema setup in [Quickstart 2: Credential issuance](/airkit/quickstart/issue-credentials).
+</Check>
+
+### Railway Free plan caveats
+
+- After the trial, Free includes **$1 of usage credit per month** (does not roll over). If usage exceeds the credit, Railway stops workloads until the next monthly reset — you may need to redeploy manually.
+- Free plan caps are small (for example, 0.5 GB RAM / 1 vCPU per service). Keep the issuer lean for sandbox.
+- Official references: [Railway plans](https://docs.railway.com/pricing/plans), [Free Trial](https://docs.railway.com/pricing/free-trial).
+
+## Alternatives
+
+### Database only
+
+Use these when you already have a place to run the NestJS process (or a tunnel for local development) and only need Postgres.
+
+| Provider | Free sandbox notes | Get started |
+| --- | --- | --- |
+| **Neon** | $0 Free plan: 0.5 GB storage per project, 100 CU-hours/project/month, scales to zero after 5 minutes idle | [Neon plans](https://neon.com/docs/introduction/plans) |
+| **Supabase** | Free Plan includes two active projects; Free projects pause after ~7 days of low activity | [Supabase billing](https://supabase.com/docs/guides/platform/billing-on-supabase), [project pausing](https://supabase.com/docs/guides/platform/free-project-pausing) |
+
+Copy the Postgres connection string into `DATABASE_URL` on your issuer backend, then run migrations:
+
+```bash
+npx mikro-orm migration:up
+```
+
+### Backend only
+
+Use these when Postgres already lives elsewhere (for example Neon or Supabase).
+
+| Provider | Free sandbox notes | Get started |
+| --- | --- | --- |
+| **Koyeb** | One free web service (512 MB RAM / 0.1 vCPU). Free Postgres is limited (5 hours active compute / month, 1 GB storage) and is preview-only — prefer Neon/Supabase for the database | [Koyeb pricing FAQ](https://www.koyeb.com/docs/faqs/pricing) |
+| **Render** | Free web services spin down after 15 minutes idle (~1 minute cold start). Free Postgres expires 30 days after creation | [Deploy for free](https://render.com/docs/free) |
+
+Point `DATABASE_URL` at your external Postgres, set `ISSUER_ORIGIN` to the public HTTPS hostname the host assigns, and use the same build / start / migrate commands as the Railway walkthrough.
+
+## After hosting: AIR readiness checklist
+
+Hosting the backend is not enough for credential flows. Complete these next:
+
+1. **Register the issuer with AIR** — Issuer DID, `API_KEY`, and Partner ID. See [issuing credentials](/airkit/usage/credential/issuing-credentials) and the [issuance quickstart](/airkit/quickstart/issue-credentials#step-3-register-the-issuer-with-air).
+2. **Publish JWKS over HTTPS** — Required for `issueCredential` / `verifyCredential`. Often hosted on your web app (Vercel, Netlify, etc.), not necessarily on the issuer service. See [JWKS endpoint setup](/airkit/usage/jwks-setup).
+3. **Keep secrets server-side** — Partner private key, `SEED`, and API keys never ship to the browser. See [Partner authentication](/airkit/usage/partner-authentication) and the [security checklist](/learn/security/security-checklist).
+4. **Whitelist domains** — Add your web app origin in the Developer Dashboard under **Account → Domains**.
+
+## Local development
+
+For local work, run Postgres on your machine (or use Neon/Supabase) and expose the issuer with an HTTPS tunnel so AIR can reach status endpoints and JWKS:
+
+- [ngrok](https://ngrok.com), [zrok](https://zrok.io/) or [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/) — full procedure on [JWKS endpoint setup](/airkit/usage/jwks-setup#local-development-https-tunnel)
+
+Set `ISSUER_ORIGIN` to the tunnel HTTPS origin while testing.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Credential issuance quickstart" icon="badge-check" href="/airkit/quickstart/issue-credentials">
+    Configure schemas, Partner JWT, and the SDK issuance flow.
+  </Card>
+  <Card title="JWKS endpoint setup" icon="key" href="/airkit/usage/jwks-setup">
+    Publish and register the public JWKS URL credential calls require.
+  </Card>
+  <Card title="Issuing credentials" icon="server" href="/airkit/usage/credential/issuing-credentials">
+    Issuer backend model and server-side issuance.
+  </Card>
+  <Card title="Security checklist" icon="shield-check" href="/learn/security/security-checklist">
+    JWT, secrets, and API hardening for partner integrations.
+  </Card>
+</Columns>

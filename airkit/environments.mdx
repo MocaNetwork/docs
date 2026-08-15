@@ -4,7 +4,7 @@ description: "Switch between AIR Kit Sandbox and Production environments — San
 ---
 
 <Warning>
-Sandbox always uses **Moca Chain Testnet**. Passing `credentialNetwork` with `BUILD_ENV.SANDBOX` is no longer needed.
+Sandbox always uses **Moca Chain Testnet**.
 </Warning>
 
 <Tip>
@@ -14,13 +14,13 @@ Make sure you're selecting the correct chain when using different build environm
 | Environment | Moca Chain | Purpose | Developer Dashboard |
 | ----------------- | ------------------------------------ | ---------------------------------------- | ------------------------------------------- |
 | Development + Testing | Testnet (222888) | Partners still on Testnet credentials | https://developers.sandbox.air3.com/dashboard |
-| Production + `credentialNetwork: "mainnet"` | Private Mainnet (2288) | Approved production launches | https://developers.air3.com/dashboard |
+| Production + `credentialNetwork: "mainnet"` | Private Mainnet (2288) | Approved production launches | https://developers-mainnet.air3.com/dashboard |
 
 > Credentials, schemas, and programs are network-specific. Credentials issued on Testnet are not available on Mainnet (and Devnet-issued credentials are not available on either). Re-issue on the target network when you migrate. Issuance schemas and programs _may_ need to be recreated; Issuer and Verifier DIDs may also differ per network.
 
 ## Production mainnet access
 
-Moca Chain Mainnet is currently a private mainnet. Approved production launches should use the production AIR pages, including the [production Developer Dashboard](https://developers.air3.com/dashboard), and configure AIR Kit with `BUILD_ENV.PRODUCTION`.
+Moca Chain Mainnet is currently a private mainnet. Approved production launches should use the production AIR pages, including the [production Developer Dashboard](https://developers-mainnet.air3.com/dashboard), and configure AIR Kit with `BUILD_ENV.PRODUCTION`.
 
 You can include the mainnet URLs in production configuration when you have access. See [Moca Chain network information](/mocachain/using-moca-chain/network-information) for RPC and explorer URLs.
 
