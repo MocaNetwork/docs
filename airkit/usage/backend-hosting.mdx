@@ -17,6 +17,10 @@ This guide gets a small **issuer backend** and **PostgreSQL** online for AIR Kit
 
 Your database supports **Your** issuer application. Credential payloads remain encrypted and stored in [DStorage](/learn/security/credential-security#credential-storage).
 
+<Note>
+  Running Postgres yourself is optional. The issuer service needs a connection string for `DATABASE_URL` in order to store responses.
+</Note>
+
 ## Choose a path
 
 | Need | Recommended free path | Notes |
@@ -78,10 +82,8 @@ Your database supports **Your** issuer application. Credential payloads remain e
     MOCA_CHAIN_API_ORIGIN=https://api.sandbox.mocachain.org
 
     SEED=0x<64-hex-characters>
-    IDEN3_METHOD=air
-    IDEN3_BLOCKCHAIN=id
-    IDEN3_NETWORK_ID=testnet
 
+    NODE_ENV=sandbox | mainnet
     PARTNER_ID=<dashboard-partner-id>
     PARTNER_PRIVATE_KEY_KID=<dashboard-partner-id>
     PARTNER_PRIVATE_KEY_ALG=RS256
