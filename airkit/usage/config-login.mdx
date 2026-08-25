@@ -10,27 +10,50 @@ Control which authentication methods are available on the login screen:
 ```tsx
 type LoginMethod =
   | "passwordless" // Email-based passwordless login
+  | "passwordlessToggle" // Email input revealed behind a link
+  | "passwordlessPhone" // Phone-based passwordless login
+  | "passwordlessPhoneToggle" // Phone input revealed behind a link
+  | "passwordlessEmailPhone" // One input accepting email or phone
   | "google" // Google OAuth login
-  | "wallet"; // Wallet connection login
+  | "wallet" // Wallet connection login
+  | "passkey"; // Passkey login
 ```
 
 **Available Options:**
 
-- **`passwordless`**: Enables email-based passwordless authentication
-- **`google`**: Enables Google OAuth login integration
-- **`wallet`**: Enables wallet-based authentication
+- **`passwordless`**: Email-based passwordless authentication, with the email input shown up front
+- **`passwordlessToggle`**: Same as `passwordless`, but the input starts collapsed behind a link and appears once the user taps it. Useful when you want social or wallet login to be the visually dominant option
+- **`passwordlessPhone`**: Phone-number passwordless authentication via SMS one-time password
+- **`passwordlessPhoneToggle`**: Same as `passwordlessPhone`, with the input collapsed behind a link
+- **`passwordlessEmailPhone`**: A single input that accepts either an email address or a phone number, letting the user choose without an explicit switch
+- **`google`**: Google OAuth login integration
+- **`wallet`**: Wallet-based authentication
+- **`passkey`**: Passkey login
+
+<Info>
+  Phone number login (`passwordlessPhone`, `passwordlessPhoneToggle`, `passwordlessEmailPhone`) requires AIR Kit `1.11.0` or later.
+</Info>
 
 **Example Configuration:**
 
 ```tsx
-// Enable only email login
+// Email and Google
 loginMethods: ["passwordless", "google"];
 
-// Enable all login methods
-loginMethods: ["passwordless", "google", "wallet"];
+// Phone-first, with Google as an alternative
+loginMethods: ["passwordlessPhone", "google"];
+
+// Let the user enter either an email or a phone number
+loginMethods: ["passwordlessEmailPhone", "google", "wallet"];
 ```
 
 **Note:** The order in the array determines the display order in the UI (top to bottom).
+
+**Defaults and automatic adjustments:**
+
+- If `loginMethods` is omitted or empty, AIR Kit falls back to `["passwordless", "google"]`.
+- Inside webviews, `google` is dropped automatically, since Google blocks OAuth in embedded browsers. If neither `passwordless` nor `passwordlessToggle` was configured, AIR Kit adds `passwordless` so users are never left without a way to sign in — including when your configuration listed only a phone variant.
+- Unknown and duplicated values are ignored.
 
 ### Wallet Login Methods (`walletLoginMethods`)
 

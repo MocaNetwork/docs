@@ -16,6 +16,66 @@ These errors apply to the AIR Kit REST API (e.g. [Issuance API](/airkit/usage/cr
 | 409 | User consent rejected or duplicate conflict | The user has denied consent for credentials issued on their behalf, or a duplicate credential already exists for this user + schema. Dedupe before reissuing. |
 | 500 | Server-side failure | Retry with exponential backoff. If persistent, check the [Moca Network status page](https://discord.gg/mocaversenft) or contact support. |
 
+## SDK error names
+
+Errors thrown by the SDK are `AirError` instances carrying a stable, machine-readable `name`. Branch on `name` rather than matching on the message, which is not part of the API contract.
+
+```js
+try {
+  await airService.login();
+} catch (err) {
+  if (err.name === "USER_CANCELLED") return; // expected, not a failure
+  console.error(err.name, err.message);
+}
+```
+
+**Client and user errors**
+
+| Name | Meaning | How to handle |
+| --- | --- | --- |
+| `USER_CANCELLED` | The user closed or dismissed an AIR Kit flow | Expected control flow — return quietly rather than surfacing an error |
+| `USER_REJECTED` | The user declined a specific request, such as signing or consent | Leave the user where they were and let them retry |
+| `CONFIG_ERROR` | Invalid AIR Kit configuration | Check your `partnerId`, `BUILD_ENV`, and `init()` options |
+| `PERMISSION_NOT_ENABLED` | The feature is not enabled for your partner account | Enable it in the Developer Dashboard, or contact support |
+| `ACCOUNT_DELETION_PENDING` | The account has a pending deletion request | Prompt the user to cancel deletion before continuing |
+| `WINDOW_BLOCKED` | The browser blocked a popup AIR Kit needed | Trigger the call directly from a user gesture so the popup is not blocked |
+| `WINDOW_CLOSED` | The user closed the AIR Kit popup before it finished | Treat like a cancellation |
+
+**Authentication and token errors**
+
+| Name | Meaning | How to handle |
+| --- | --- | --- |
+| `PARTNER_TOKEN_EXPIRED` | The Partner JWT you passed is past its `exp` | Mint a fresh JWT and retry. See [Partner authentication](/airkit/usage/partner-authentication) |
+| `PARTNER_ACCESS_TOKEN_INVALID` | The Partner JWT failed validation | Check signing key, `kid`, and payload — see [JWT and JWKS errors](#jwt-and-jwks-errors) below |
+| `USER_MISMATCH` | The token identifies a different user than the active session | Log out before switching users |
+| `TOKEN_EXPIRED` / `INVALID_TOKEN` / `UNAUTHORIZED` | The AIR session token is expired or rejected | Re-run `login()` |
+
+**Passwordless and OTP errors**
+
+| Name | Meaning | How to handle |
+| --- | --- | --- |
+| `PASSWORDLESS_INVALID_CODE` | Wrong one-time password entered | Let the user retype it |
+| `PASSWORDLESS_CODE_EXPIRED` | The one-time password expired | Request a new code |
+| `PASSWORDLESS_MAX_ATTEMPTS` | Too many incorrect attempts | Ask the user to request a new code |
+| `PASSWORDLESS_HOURLY_LIMIT` / `PASSWORDLESS_LOCK_EXCEEDED` | Rate limit reached for this identifier | Ask the user to try again later |
+
+**Phone and SMS errors** (AIR Kit `1.11.0`+)
+
+| Name | Meaning | How to handle |
+| --- | --- | --- |
+| `SMS_DELIVERY_FAILED` | The one-time password SMS could not be delivered | Ask the user to confirm the number, or offer email login as a fallback |
+| `SMS_VERIFICATION_FAILED` | The submitted SMS one-time password could not be verified | Let the user retry or request a new code |
+| `LINK_PHONE_ALREADY_LINKED` | The number is already linked to this account | No action needed — treat as already done |
+| `LINK_PHONE_LINKED_OTHER_ACCOUNT` | The number is linked to a different AIR account | Ask the user for a different number, or to sign in with the account that owns it |
+
+**Linking errors**
+
+| Name | Meaning | How to handle |
+| --- | --- | --- |
+| `LINK_WALLET_ALREADY_LINKED` | The wallet is already linked to this account | No action needed |
+| `LINK_WALLET_LINKED_OTHER_ACCOUNT` | The wallet belongs to a different AIR account | Ask for a different wallet |
+| `LINK_EMAIL_LINKED_OTHER_ACCOUNT` | The email belongs to a different AIR account | Ask for a different email |
+
 ## JWT and JWKS errors
 
 ### "Invalid signature" or "JWT verification failed"
