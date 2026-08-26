@@ -55,12 +55,12 @@ class AirService {
   goToPartner(partnerUrl: string): Promise<{ urlWithToken: string }>;
   getAccessToken(): Promise<{ token: string }>;
   updateSessionConfig(config: Partial<AirSessionConfig>): Promise<AirSessionConfig>;
-  showSwapUI(options?: {
-    initialFromToken?: string;
-    fallbackFromToken?: string;
-    initialToToken?: string;
-    defaultSlippage?: number;
-  }): Promise<{ txHash: `0x${string}` }>;
+  showSwapUI(options?: ShowSwapUIOptions): Promise<{
+    txHash: `0x${string}`;
+    /** `amount` is in base units — divide by 10 ** decimals to display. */
+    from: Token & { amount: string };
+    to: Token & { amount: string };
+  }>;
   showOnRampUI(options: {
     displayCurrencyCode: string;
     targetCurrencyCode?: string;
@@ -70,29 +70,33 @@ class AirService {
   getAgentKeys(): Promise<AgentPublicKey[]>;
   registerAgentKey(publicKey: string): Promise<AgentPublicKey>;
   removeAgentKey(id: string): Promise<void>;
-  startRecovery(payload?: unknown): Promise<void>;
+  claimAirId(options?: ClaimAirIdOptions): Promise<ClaimAirIdResult>;
+  startRecovery(payload?: StartRecoveryPayload): Promise<void>;
   issueCredential({
     authToken: string;
     issuerDid: string;
     credentialId: string;
     credentialSubject: Record<string, unknown>;
     curve?: "secp256r1" | "secp256k1";
+    waitForOnchainCompletion?: boolean;
   }): Promise<{ cakPublicKey?: string }>;
   verifyCredential({
     authToken: string;
     programId: string;
     redirectUrl?: string;
     fieldsToDisclose?: "*" | string[];
+    nonce?: string;
   }): Promise<CredentialVerificationResult>;
   logout(): Promise<void>;
   cleanUp(): Promise<void>;
   on(listener: AirEventListener): void;
   off(listener: AirEventListener): void;
-  clearEventListeners(): void;
 }
 ```
 
-`fieldsToDisclose` is documented in [Selective Disclosure](/airkit/early-access/selective-disclosure).
+`claimAirId` and the `show*UI` methods are experimental and may change in future releases.
+
+`fieldsToDisclose` is documented in [Selective Disclosure](/airkit/early-access/selective-disclosure). `fieldsToDisclose` and `nonce` are both required for `SD_JWT_VC` verification programs — see [Verifying credentials](/airkit/usage/credential/verify).
 
 ### Types
 
@@ -113,7 +117,6 @@ export type AbstractAccountAddressEntry = {
 
 export type AirUserDetails = {
   partnerId?: string;
-  partnerUserId?: string;
   airId?: AirIdDetails;
   user: {
     id: string;
@@ -148,10 +151,32 @@ export type AgentPublicKey = {
   createdAt: string;
 };
 
+export type TokenSymbol = {
+  symbol: string;
+  chainId: number;
+};
+
+export type Token = TokenSymbol & {
+  decimals: number;
+  address: `0x${string}`;
+};
+
+export type ShowSwapUIOptions = {
+  /** Preferred "from" token. Used when the user holds a balance and the token is supported. */
+  initialFromToken?: TokenSymbol;
+  /** "From" token to show when the user holds no assets. */
+  fallbackFromToken?: TokenSymbol;
+  /** Preferred "to" token. */
+  initialToToken?: TokenSymbol;
+  /** Slippage tolerance, in percent. Omitted or out-of-range values use automatic slippage. */
+  defaultSlippage?: number;
+};
+
 export type ShowTransferUIOptions = {
   tokenSymbol?: string;
   chainId?: number;
   recipientAddress?: string;
+  /** Display decimal string, e.g. "1.5" — not base units. */
   amount?: string;
 };
 
@@ -162,7 +187,76 @@ export type ShowTransferUIResult = {
   decimals: number;
   address: `0x${string}`;
   recipientAddress: string;
+  /** Display decimal string, as entered by the user. */
   amount: string;
+};
+
+export type CredentialProof = {
+  type: string;
+  coreClaim?: string;
+  issuerData?: Record<string, unknown>;
+  signature?: string;
+  /** Compact SD-JWT presentation string (SD-JWT VC proof type). */
+  jwt?: string;
+  mtp?: Record<string, unknown>;
+};
+
+/** @deprecated No longer populated. Read verifiablePresentation instead. */
+export type DisclosedCredentialData = {
+  credentialSubject: Record<string, unknown>;
+  credentialType: string;
+  issuerDid: string;
+  issuanceDate: string;
+  expirationDate: string;
+  proof?: CredentialProof[];
+};
+
+/** A credential embedded in a Verifiable Presentation. */
+export type PresentationVerifiableCredential = {
+  "@context": string[];
+  type: string[];
+  issuer: string;
+  issuanceDate: string;
+  expirationDate?: string;
+  /** Disclosed subject fields, respecting selective disclosure. */
+  credentialSubject: Record<string, unknown>;
+  proof?: CredentialProof[];
+};
+
+/**
+ * Presentation-level proof. Present only when the verification program
+ * requires a zero-knowledge proof.
+ */
+export type VerifiablePresentationProof = {
+  type: string;
+  proofPurpose: "authentication";
+  circuitId: string;
+  /** Present when the program has multiple ZK queries. */
+  zkQueryId?: string;
+  proofValue: {
+    pi_a: string[];
+    pi_b: string[][];
+    pi_c: string[];
+    protocol?: string;
+    curve?: string;
+  };
+  publicSignals: string[];
+  /** On-chain submission hash, for on-chain programs only. */
+  transactionHash?: string;
+};
+
+export type AirVerifiablePresentation = {
+  "@context": string[];
+  type: string[];
+  /** The holder DID. */
+  holder: string;
+  /**
+   * Embedded credentials. W3C VC objects for BJJ_SIG_2021 and IDEN3_MTP
+   * programs; a compact string for SD_JWT_VC programs.
+   */
+  verifiableCredential: Array<PresentationVerifiableCredential | string>;
+  /** Omitted when the program does not require a ZKP. */
+  proof?: VerifiablePresentationProof | VerifiablePresentationProof[];
 };
 
 export type CredentialVerificationResult =
@@ -177,13 +271,38 @@ export type CredentialVerificationResult =
     }
   | {
       status: "Compliant";
-      zkProofs: Record<string, string>;
-      transactionHash: string;
+      verifiablePresentation?: AirVerifiablePresentation;
       cakPrivateKey?: string;
+      /** @deprecated Not populated. Use verifiablePresentation.proof. */
+      zkProofs?: Record<string, string>;
+      /** @deprecated Not populated. Use verifiablePresentation.proof.transactionHash. */
+      transactionHash?: string;
+      /** @deprecated Not populated. Use verifiablePresentation.verifiableCredential. */
+      disclosedData?: DisclosedCredentialData;
     };
 
 export type ClaimAirIdResult = {
   airId: AirIdDetails;
+};
+
+export type StartRecoveryOptions = {
+  type?:
+    /** Delete the current user's account. Performs its own email step-up. */
+    | "delete"
+    /** Create or rotate the current user's recovery key. Requires a session. */
+    | "recovery_key_setup"
+    /** Recover an account when the user lost email access, then set a new PIN. */
+    | "email_recovery"
+    /** Recover an account when the user forgot their PIN but still controls their email. */
+    | "pin_recovery"
+    /** Update the current user's email address. Requires a session. */
+    | "update_email"
+    /** Update the current user's PIN. Requires a session. */
+    | "update_pin";
+};
+
+export type StartRecoveryPayload = {
+  options?: StartRecoveryOptions;
 };
 
 export type AirEventOnInitialized = {
@@ -376,7 +495,6 @@ class AirId {
 
 class UserInfo {
   final AirId? airId;
-  final String? partnerUserId;
   final String? partnerId;
   final User? user;
 }

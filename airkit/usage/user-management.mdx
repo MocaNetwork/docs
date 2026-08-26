@@ -20,12 +20,12 @@ public async getUserInfo(): Promise<AirUserDetails>
 ```ts
 {
   partnerId?: string;
-  partnerUserId?: string;
   airId?: AirIdDetails;
   user: {
     id: string;
     abstractAccountAddress?: string;
     email?: string;
+    wallet?: string;
     isMFASetup: boolean;
   };
 }

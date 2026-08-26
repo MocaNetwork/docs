@@ -106,35 +106,48 @@ Field names in `fieldsToDisclose` must match keys defined in the credential sche
 
 ## Response Shape
 
-When the verification result is `Compliant` and disclosure is requested, the response includes a `disclosedData` object alongside the standard verification fields.
+When the verification result is `Compliant`, disclosed fields are returned inside the W3C Verifiable Presentation on `verifiablePresentation`, as the `credentialSubject` of the embedded credential.
 
 ```ts
 type SelectiveDisclosureResult = {
   status: "Compliant";
-  zkProofs: Record<string, string>;
-  transactionHash: string;
-  disclosedData: {
-    credentialSubject: IssuedCredential;
-    credentialType: string;
-    issuerDid: string;
-    issuanceDate: string;
-    expirationDate: string;
-    proof: CredentialProof[];
+  verifiablePresentation?: {
+    "@context": string[];
+    type: string[];
+    holder: string;
+    verifiableCredential: Array<PresentationVerifiableCredential | string>;
+    proof?: VerifiablePresentationProof | VerifiablePresentationProof[];
   };
 };
 ```
 
-`IssuedCredential` is the same subject shape you defined when issuing the credential — selective disclosure simply mirrors back the fields your verifier requested.
+Read the disclosed fields off the embedded credential:
+
+```ts
+const vp = result.verifiablePresentation;
+const [credential] = vp?.verifiableCredential ?? [];
+
+if (credential && typeof credential !== "string") {
+  console.log(credential.credentialSubject); // your requested fields
+}
+```
+
+`credentialSubject` mirrors the subject shape you defined when issuing the credential, narrowed to the fields your verifier requested.
+
+<Note>
+  **Deprecated as of 1.11.** Disclosure used to be returned on a top-level `disclosedData` object alongside `zkProofs` and `transactionHash`. Those fields are no longer populated — read `verifiablePresentation` instead. See the [1.11.1 release notes](/airkit/release-notes).
+</Note>
 
 ## Behavior and Limits
 
-- `disclosedData` is only returned when `status === "Compliant"`. Non-compliant verifications never expose credential data.
-- If the Issuer has not enabled **Allow data disclosure** on the program, `fieldsToDisclose` is ignored and `disclosedData` is omitted from the response.
+- Disclosed fields are only returned when `status === "Compliant"`. Non-compliant verifications never expose credential data.
+- If the Issuer has not enabled **Allow data disclosure** on the program, `fieldsToDisclose` is ignored and no disclosed claims appear in the presentation.
 - Requesting fields that do not exist on the schema or were not enabled for disclosure does not fail the verification — those fields are simply absent.
-- The zero-knowledge proof in `zkProofs` is generated and validated regardless of which fields you disclose. Disclosure is additive, not a replacement for verification.
+- Disclosure is additive, not a replacement for verification. Where the program requires a zero-knowledge proof, that proof is generated and validated regardless of which fields you disclose, and is returned on `verifiablePresentation.proof`.
+- `fieldsToDisclose` is **required** for `SD_JWT_VC` programs — an empty array or an omitted value is rejected. For those programs `verifiableCredential[0]` is a compact string rather than an object, so type-check before reading `credentialSubject`.
 
 <Tip>
-Treat `disclosedData.credentialSubject` as user data: store it only as long as you need it for the downstream action (redemption, compliance review, fulfillment), and apply the same retention rules as any PII you receive directly from the user.
+Treat the disclosed `credentialSubject` as user data: store it only as long as you need it for the downstream action (redemption, compliance review, fulfillment), and apply the same retention rules as any PII you receive directly from the user.
 </Tip>
 
 ## Related

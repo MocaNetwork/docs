@@ -13,26 +13,65 @@ Opens the AIR Kit swap interface, allowing users to exchange tokens directly wit
 
 ```ts
 public async showSwapUI(options?: {
-  initialFromToken?: string;
-  fallbackFromToken?: string;
-  initialToToken?: string;
-}): Promise<{ txHash: `0x${string}` }>
+  initialFromToken?: TokenSymbol;
+  fallbackFromToken?: TokenSymbol;
+  initialToToken?: TokenSymbol;
+  defaultSlippage?: number;
+}): Promise<{
+  txHash: `0x${string}`;
+  from: Token & { amount: string };
+  to: Token & { amount: string };
+}>
 ```
+
+Each token is identified by symbol and chain, not by a bare string:
+
+```ts
+type TokenSymbol = { symbol: string; chainId: number };
+
+type Token = TokenSymbol & { decimals: number; address: `0x${string}` };
+```
+
+| Option | Description |
+| --- | --- |
+| `initialFromToken` | Preferred token to swap from. Applied when the user holds a balance and the token is supported; otherwise the user's highest-value asset is selected. |
+| `fallbackFromToken` | Token to show as the "from" side when the user holds no assets. |
+| `initialToToken` | Preferred token to swap to. |
+| `defaultSlippage` | Slippage tolerance in percent. Omitted or out-of-range values fall back to automatic slippage. |
 
 **Returns:**
 
 ```ts
 {
-  txHash: string; // The transaction hash of the swap transaction
+  txHash: `0x${string}`;              // Transaction hash of the swap
+  from: Token & { amount: string };   // Token sold, with the amount sold
+  to: Token & { amount: string };     // Token bought, with the amount received
 }
 ```
+
+`from.amount` is what the user sold and `to.amount` is what they received.
+
+<Warning>
+  Both amounts are **base-unit integer strings** (smallest denomination), not human-readable decimals. Divide by `10 ** decimals` before displaying — printing `amount` directly shows `1000000` for 1 USDC.
+</Warning>
 
 **Usage:**
 
 ```ts
+import { formatUnits } from "viem";
+
 try {
-  const result = await airService.showSwapUI();
+  const result = await airService.showSwapUI({
+    initialFromToken: { symbol: "USDC", chainId: 8453 },
+    defaultSlippage: 0.5,
+  });
+
+  const sold = formatUnits(BigInt(result.from.amount), result.from.decimals);
+  const received = formatUnits(BigInt(result.to.amount), result.to.decimals);
+
   console.log("Swap completed! Transaction hash:", result.txHash);
+  console.log(`Swapped ${sold} ${result.from.symbol}`);
+  console.log(`Received ${received} ${result.to.symbol}`);
 } catch (error) {
   console.error("Swap failed:", error);
 }

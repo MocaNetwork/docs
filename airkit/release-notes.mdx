@@ -3,7 +3,79 @@ title: "AIR Kit SDK release notes and changelog"
 description: "AIR Kit SDK release notes — version history, new features, breaking changes, deprecations, and migration notes for partners upgrading their integration."
 ---
 
-## **Version 1.10.0 (Released)**
+## **Version 1.11.1 (Aug 13, 2026)**
+
+<Note>
+`1.11.1` is a patch over `1.11.0` with no SDK behavior changes between them. Everything below landed in the 1.11 line — upgrade directly from `1.10.0` to `1.11.1`.
+</Note>
+
+### ✨ **New Features**
+
+- **W3C Verifiable Presentation on every compliant verification** — `verifyCredential` now returns the disclosed claims and any proof material on `verifiablePresentation` — see [Verifying credentials](/airkit/usage/credential/verify#response)
+- **SD-JWT VC verification** — verification programs can use the `SD_JWT_VC` proof type. These programs require both `fieldsToDisclose` and the new `nonce` parameter
+- **`IDEN3_MTP` proof type** available for verification programs alongside `BJJ_SIG_2021`
+- Verification programs with multiple ZK queries return one proof per query on `verifiablePresentation.proof`
+
+### ➕ **Improvements**
+
+- Google login now works in mobile in-app browsers and Android Custom Tabs via a server-side redirect fallback
+- The SDK removes its transient `airkit_handoff` and `airkit_login_error` parameters from your page URL after login, so a page refresh cannot replay a consumed one-time code
+- The partner linking confirmation screen is removed from login, reducing steps for new users
+- Improved session cleanup when a user requests account deletion
+- Package license changed from MIT to Apache 2.0
+
+### **⚠️ Breaking Changes**
+
+- **`AirUserDetails.partnerUserId` is removed.** AIR no longer stores partner-local user IDs — key off the AIR user UUID (`user.id`) and keep the join in your own system.
+- **`verifyCredential` no longer accepts `offchain`.** Off-chain versus on-chain mode is configured on the verification program in the Developer Dashboard.
+- **`zkProofs`, `transactionHash`, and `disclosedData` are deprecated and no longer populated** on compliant verification results. Read `verifiablePresentation` instead.
+
+### **📋 Migration Guide**
+
+**Reading verification results:**
+
+```js
+// Before (1.10.0 and earlier)
+if (result.status === "Compliant") {
+  console.log(result.transactionHash);
+  console.log(result.zkProofs);
+  console.log(result.disclosedData.credentialSubject);
+}
+
+// After (1.11.x)
+if (result.status === "Compliant") {
+  const vp = result.verifiablePresentation;
+
+  // Disclosed claims live on the embedded credential
+  const [credential] = vp?.verifiableCredential ?? [];
+  if (credential && typeof credential !== "string") {
+    console.log(credential.credentialSubject);
+  }
+
+  // proof is present only when the program requires a ZKP
+  const proof = Array.isArray(vp?.proof) ? vp.proof[0] : vp?.proof;
+  console.log(proof?.transactionHash); // on-chain programs only
+  console.log(proof?.proofValue);
+}
+```
+
+<Warning>
+When a verification program is not configured to require a zero-knowledge proof, the presentation has **no `proof` block** — it is unsigned and carries no cryptographic guarantee. In that case the verification session status is the only trust anchor. Ask the verifier owner to enable the ZKP requirement if you need an attested result.
+</Warning>
+
+For `SD_JWT_VC` programs, `verifiableCredential[0]` is a compact string rather than an object, and both `fieldsToDisclose` and `nonce` are required on the call. See [Verifying credentials](/airkit/usage/credential/verify).
+
+**Replacing `partnerUserId`:**
+
+```js
+const { user } = await airService.getUserInfo();
+// Persist the AIR user UUID against your own user record
+await db.users.update(localUserId, { airUserId: user.id });
+```
+
+---
+
+## **Version 1.10.0 (June 11, 2026)**
 
 ### ✨ **New Features**
 
@@ -73,7 +145,7 @@ Install with `version: ^1.6.0` via OnePub — see [Flutter installation](/airkit
 
 ---
 
-## **Version 1.8.0 (Released)**
+## **Version 1.8.0 (Feb 9, 2026)**
 
 ### ✨ **New Features**
 
