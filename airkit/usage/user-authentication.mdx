@@ -9,7 +9,6 @@ By default, we provide the following methods for users:
 
 - Google Login
 - Passwordless Email Login
-- Passwordless Phone Number Login (AIR Kit `1.11.0`+)
 - Wallet Login (EOA wallet support)
 
 <Warning>
@@ -49,29 +48,6 @@ See [Reference](/airkit/usage/reference) (Flutter tab) and [Flutter overview](/a
 
 To configure locale and currency settings, pass `sessionConfig` to the `init()` method. See [Language & Currency Configuration](/airkit/usage/config-language) for details.
 </Info>
-
-### Phone number login
-
-Users can sign in with a phone number instead of an email address. The user enters a number, receives a one-time password by SMS, and confirms it — the same shape as passwordless email login, so nothing changes in how you call `login()`.
-
-Enable it by including a phone variant in `loginMethods` when you initialize AIR Kit:
-
-```tsx
-// Phone number only
-loginMethods: ["passwordlessPhone", "google"];
-
-// One input that accepts either an email address or a phone number
-loginMethods: ["passwordlessEmailPhone", "google"];
-```
-
-See [Login configuration](/airkit/usage/config-login) for every available value, including the collapsed `Toggle` variants.
-
-Notes:
-
-- Requires AIR Kit `1.11.0` or later.
-- Phone numbers are handled in E.164 format (for example `+14155550123`).
-- A phone number belongs to one AIR account. Linking a number that is already attached to a different account fails with `LINK_PHONE_LINKED_OTHER_ACCOUNT`, mirroring the existing wallet and email linking behavior.
-- SMS delivery and verification surface dedicated errors: `SMS_DELIVERY_FAILED` and `SMS_VERIFICATION_FAILED`. See [Common errors](/airkit/troubleshooting/common-errors).
 
 ## Custom Auth (Bring your own Auth)
 

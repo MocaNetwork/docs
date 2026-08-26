@@ -59,15 +59,6 @@ try {
 | `PASSWORDLESS_MAX_ATTEMPTS` | Too many incorrect attempts | Ask the user to request a new code |
 | `PASSWORDLESS_HOURLY_LIMIT` / `PASSWORDLESS_LOCK_EXCEEDED` | Rate limit reached for this identifier | Ask the user to try again later |
 
-**Phone and SMS errors** (AIR Kit `1.11.0`+)
-
-| Name | Meaning | How to handle |
-| --- | --- | --- |
-| `SMS_DELIVERY_FAILED` | The one-time password SMS could not be delivered | Ask the user to confirm the number, or offer email login as a fallback |
-| `SMS_VERIFICATION_FAILED` | The submitted SMS one-time password could not be verified | Let the user retry or request a new code |
-| `LINK_PHONE_ALREADY_LINKED` | The number is already linked to this account | No action needed — treat as already done |
-| `LINK_PHONE_LINKED_OTHER_ACCOUNT` | The number is linked to a different AIR account | Ask the user for a different number, or to sign in with the account that owns it |
-
 **Linking errors**
 
 | Name | Meaning | How to handle |

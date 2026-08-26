@@ -14,7 +14,6 @@ description: "AIR Kit SDK release notes — version history, new features, break
 - **W3C Verifiable Presentation on every compliant verification** — `verifyCredential` now returns the disclosed claims and any proof material on `verifiablePresentation` — see [Verifying credentials](/airkit/usage/credential/verify#response)
 - **SD-JWT VC verification** — verification programs can use the `SD_JWT_VC` proof type. These programs require both `fieldsToDisclose` and the new `nonce` parameter
 - **`IDEN3_MTP` proof type** available for verification programs alongside `BJJ_SIG_2021`
-- **Phone number login** — new `loginMethods` values `passwordlessPhone`, `passwordlessPhoneToggle`, and `passwordlessEmailPhone` — see [Login configuration](/airkit/usage/config-login)
 - Verification programs with multiple ZK queries return one proof per query on `verifiablePresentation.proof`
 
 ### ➕ **Improvements**
@@ -73,8 +72,6 @@ const { user } = await airService.getUserInfo();
 // Persist the AIR user UUID against your own user record
 await db.users.update(localUserId, { airUserId: user.id });
 ```
-
-**New error codes:** `LINK_PHONE_ALREADY_LINKED`, `LINK_PHONE_LINKED_OTHER_ACCOUNT`, `SMS_DELIVERY_FAILED`, and `SMS_VERIFICATION_FAILED` — see [Common errors](/airkit/troubleshooting/common-errors).
 
 ---
 
