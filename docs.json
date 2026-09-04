@@ -1,6 +1,6 @@
 {
-  "name": "Moca Network",
-  "description": "AIR Kit — portable credentials, cross-platform loyalty, and privacy-preserving identity for enterprise partners and developers. Build on Moca Chain.",
+  "name": "AIR Kit",
+  "description": "AIR Kit \u2014 portable credentials, cross-platform loyalty, and privacy-preserving identity for enterprise partners and developers. Build on Moca Chain.",
   "api": {
     "playground": {
       "proxy": false
@@ -14,8 +14,8 @@
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg",
+    "light": "/images/air-logo.svg",
+    "dark": "/images/air-logo.svg",
     "href": "https://docs.moca.network"
   },
   "favicon": "/images/icon.png",
@@ -31,14 +31,23 @@
   },
   "fonts": {
     "heading": {
-      "family": "Adamina"
+      "family": "Poppins",
+      "weight": 500
     },
     "body": {
-      "family": "Outfit"
+      "family": "DM Sans",
+      "weight": 500
     }
   },
   "contextual": {
-    "options": ["copy", "chatgpt", "claude", "perplexity", "grok", "add-mcp"]
+    "options": [
+      "copy",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "grok",
+      "add-mcp"
+    ]
   },
   "social": {
     "x": "https://twitter.com/Moca_Network",
@@ -52,7 +61,7 @@
         "href": "https://github.com/MocaNetwork"
       },
       {
-        "label": "Partner with Us",
+        "label": "Partner with us",
         "href": "https://mocanetwork.typeform.com/joinmocaeco?typeform-source=air3.com"
       }
     ],
@@ -63,114 +72,11 @@
     }
   },
   "navigation": {
-    "pages": ["index"],
+    "pages": [
+      "index"
+    ],
     "tabs": [
-      {
-        "tab": "Moca Book",
-        "pages": [
-          "learn/integrating-using-ai",
-          {
-            "group": "Introduction",
-            "pages": [
-              "learn/index",
-              "learn/moca-chain",
-              "learn/moca-coin",
-              "learn/core-problems-addressed",
-              "learn/target-users-stakeholders"
-            ]
-          },
-          {
-            "group": "Why Moca Network?",
-            "pages": [
-              "learn/vision/index",
-              "learn/vision/comparison-with-centralized-identity-systems",
-              "learn/vision/ecosystem"
-            ]
-          },
-          {
-            "group": "Why Now",
-            "pages": [
-              "learn/why-now/index",
-              "learn/why-now/digital-identity",
-              "learn/why-now/privacy-security",
-              "learn/why-now/regulatory-landscape"
-            ]
-          },
-          {
-            "group": "Build on Moca Network",
-            "pages": [
-              "learn/build-on-moca",
-              "learn/airkit/about-airkit",
-              "learn/airkit/key-features",
-              "learn/airkit/credentials",
-              "learn/airkit/integration-workflow",
-              "learn/airkit/features-developer-benefits",
-              "learn/programs-events"
-            ]
-          },
-          {
-            "group": "Use Cases",
-            "pages": [
-              "learn/use-cases/identity-verification"
-            ]
-          },
-          {
-            "group": "Advanced Topics",
-            "pages": [
-              "learn/advanced-topics/zktls",
-              "learn/advanced-topics/privacy-and-compliance"
-            ]
-          },
-          {
-            "group": "Security & Trust",
-            "icon": "shield-check",
-            "pages": [
-              "learn/security/overview",
-              "learn/security/credential-security",
-              "learn/security/data-privacy",
-              "learn/security/security-checklist"
-            ]
-          },
-          {
-            "group": "Help",
-            "pages": ["learn/help/faq"]
-          }
-        ]
-      },
-      {
-        "tab": "Solutions",
-        "groups": [
-          {
-            "group": "Start Here",
-            "pages": [
-              "solutions/index",
-              "solutions/partner-economics",
-              "solutions/compliance-faq"
-            ]
-          },
-          {
-            "group": "By Vertical",
-            "pages": [
-              "solutions/loyalty",
-              "solutions/identity",
-              "solutions/fintech",
-              "solutions/gaming",
-              "solutions/telco",
-              "solutions/advertising"
-            ]
-          },
-          {
-            "group": "KYC (Veriff powered by zkMe)",
-            "pages": [
-              "kyc/index",
-              "kyc/how-it-works",
-              "kyc/data-collection-and-sharing",
-              "kyc/zkme-security-architecture",
-              "kyc/pricing-and-faq"
-            ]
-          }
-        ]
-      },
+      
       {
         "tab": "AIR Kit",
         "pages": [
@@ -216,7 +122,6 @@
           },
           {
             "group": "Authentication",
-            "icon": "lock",
             "pages": [
               "airkit/usage/partner-authentication",
               "airkit/usage/user-authentication",
@@ -234,7 +139,6 @@
           },
           {
             "group": "Integration Guides",
-            "icon": "puzzle-piece",
             "pages": [
               "airkit/guides/overview",
               "airkit/guides/air-for-loyalty",
@@ -296,7 +200,6 @@
           },
           {
             "group": "Recipes",
-            "icon": "book-open",
             "pages": [
               "recipes/index",
               "recipes/kyc-credential-on-event",
@@ -324,7 +227,6 @@
           },
           {
             "group": "Troubleshooting",
-            "icon": "wrench",
             "pages": [
               "airkit/troubleshooting/common-errors",
               "airkit/troubleshooting/sdk-issues",
@@ -337,6 +239,113 @@
               "airkit/usage/reference",
               "airkit/usage/migration-compatibility",
               "airkit/release-notes"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Solutions",
+        "groups": [
+          {
+            "group": "Start Here",
+            "pages": [
+              "solutions/index",
+              "solutions/partner-economics",
+              "solutions/compliance-faq"
+            ]
+          },
+          {
+            "group": "By Vertical",
+            "pages": [
+              "solutions/loyalty",
+              "solutions/identity",
+              "solutions/fintech",
+              "solutions/gaming",
+              "solutions/telco",
+              "solutions/advertising"
+            ]
+          },
+          {
+            "group": "KYC (Veriff powered by zkMe)",
+            "pages": [
+              "kyc/index",
+              "kyc/how-it-works",
+              "kyc/data-collection-and-sharing",
+              "kyc/zkme-security-architecture",
+              "kyc/pricing-and-faq"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Moca Book",
+        "pages": [
+          "learn/integrating-using-ai",
+          {
+            "group": "Introduction",
+            "pages": [
+              "learn/index",
+              "learn/moca-chain",
+              "learn/moca-coin",
+              "learn/core-problems-addressed",
+              "learn/target-users-stakeholders"
+            ]
+          },
+          {
+            "group": "Why Moca Network?",
+            "pages": [
+              "learn/vision/index",
+              "learn/vision/comparison-with-centralized-identity-systems",
+              "learn/vision/ecosystem"
+            ]
+          },
+          {
+            "group": "Why Now",
+            "pages": [
+              "learn/why-now/index",
+              "learn/why-now/digital-identity",
+              "learn/why-now/privacy-security",
+              "learn/why-now/regulatory-landscape"
+            ]
+          },
+          {
+            "group": "Build on Moca Network",
+            "pages": [
+              "learn/build-on-moca",
+              "learn/airkit/about-airkit",
+              "learn/airkit/key-features",
+              "learn/airkit/credentials",
+              "learn/airkit/integration-workflow",
+              "learn/airkit/features-developer-benefits",
+              "learn/programs-events"
+            ]
+          },
+          {
+            "group": "Use Cases",
+            "pages": [
+              "learn/use-cases/identity-verification"
+            ]
+          },
+          {
+            "group": "Advanced Topics",
+            "pages": [
+              "learn/advanced-topics/zktls",
+              "learn/advanced-topics/privacy-and-compliance"
+            ]
+          },
+          {
+            "group": "Security & Trust",
+            "pages": [
+              "learn/security/overview",
+              "learn/security/credential-security",
+              "learn/security/data-privacy",
+              "learn/security/security-checklist"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": [
+              "learn/help/faq"
             ]
           }
         ]
@@ -388,7 +397,10 @@
           },
           {
             "group": "Help",
-            "pages": ["mocachain/help/faq", "status"]
+            "pages": [
+              "mocachain/help/faq",
+              "status"
+            ]
           }
         ]
       },
@@ -398,7 +410,9 @@
         "groups": [
           {
             "group": "Overview",
-            "pages": ["api-reference/introduction"]
+            "pages": [
+              "api-reference/introduction"
+            ]
           }
         ]
       }
