@@ -3,7 +3,7 @@
 /* ── AIR tokens (from the design-system preview) ─────────────────────── */
 
 :root {
-  --docs-sidebar-width: 280px;
+  --docs-sidebar-width: 300px;
   --docs-header-height: 72px;
   --docs-tabs-height: 44px;
   --mintlify-slot-header-height: 116px;
@@ -229,7 +229,6 @@ nav-anchor:hover,
   justify-content: center !important;
   height: 32px !important;
   min-height: 32px !important;
-  width: 100px !important;
   padding: 0 12px !important;
   border: 1px solid var(--air-button-primary) !important;
   border-radius: var(--air-corner-button) !important;
@@ -249,13 +248,6 @@ nav-anchor:hover,
   color: var(--air-text-on-color) !important;
 }
 
-#topbar-cta-button > a > span.absolute {
-  display: none !important;
-}
-
-#topbar-cta-button svg {
-  display: none !important;
-}
 
 #topbar-cta-button > a:focus-visible {
   outline: 2px solid var(--air-outline-focus);
@@ -337,6 +329,9 @@ mobile-nav-tabs-item:focus-visible {
     min-width: var(--docs-sidebar-width);
     max-width: var(--docs-sidebar-width);
     padding: var(--air-spacing-2x-large) var(--air-spacing-large);
+  }
+  #navigation-items {
+    padding-left: 16px !important;
   }
 }
 
@@ -937,21 +932,6 @@ body:not(:has(.docs-landing)) #content :not(pre) > code {
   color: var(--air-text-primary);
   font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
   font-size: 0.875em;
-}
-
-body:not(:has(.docs-landing)) code-block,
-body:not(:has(.docs-landing)) #content-area pre,
-body:not(:has(.docs-landing)) #content pre,
-body:not(:has(.docs-landing)) #content-area [data-code-block],
-body:not(:has(.docs-landing)) #content-area .code-block {
-  overflow-x: auto;
-  border: 1px solid var(--air-border-divider);
-  border-radius: var(--air-corner-list-menu);
-  background: var(--air-container-secondary);
-  color: var(--air-text-primary);
-  font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
-  font-size: 0.8125rem;
-  line-height: 1.6;
 }
 
 body:not(:has(.docs-landing)) #content-area .callout,
