@@ -1,152 +1,192 @@
 ---
 title: "Moca Network Developer Docs"
-description: "Build with AIR Kit — the identity SDK for portable credentials, ZK-verified compliance, and seamless user onboarding across any platform."
+description: "Issue portable credentials, verify users without storing PII, and plug into Moca Network with a few lines of code."
 mode: "custom"
 ---
 
-<div class="hero--wrapper">
-  <img class="hero--image" src="/images/landing/hero.png" />
-  <div class="hero--content">
-    <div
-      class="hero--chip"
-    >
-      AIR Kit SDK · Moca Chain · Identity Infrastructure
+<div class="docs-landing">
+  <div class="content">
+    <div class="content-inner">
+
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__copy">
+          <h1 id="hero-title">One SDK for identity, money and loyalty</h1>
+          <p class="hero__lead">
+            Issue portable credentials, verify users without storing PII, and plug into Moca Network with a few lines of code.
+          </p>
+          <div class="hero__actions">
+            <a href="/airkit/usage/installation" className="air-btn air-btn--primary air-btn--large">Quick setup</a>
+            <a href="/airkit/guides/overview" className="air-btn air-btn--outlined air-btn--large">View architecture</a>
+          </div>
+        </div>
+
+        <div class="hero__visual">
+          <section className="quickstart" aria-label="SDK quick start">
+            <div className="quickstart__header">
+              <div className="quickstart__tabs">
+                <div className="air-tabs-track" role="tablist" aria-label="SDK language">
+                  <div className="air-tabs-indicator" aria-hidden="true" />
+                  <button type="button" role="tab" id="landing-tab-javascript" aria-controls="landing-panel-javascript" aria-selected="true" tabIndex={0}>JavaScript</button>
+                  <button type="button" role="tab" id="landing-tab-swift" aria-controls="landing-panel-swift" aria-selected="false" tabIndex={-1}>Swift</button>
+                  <button type="button" role="tab" id="landing-tab-kotlin" aria-controls="landing-panel-kotlin" aria-selected="false" tabIndex={-1}>Kotlin</button>
+                  <button type="button" role="tab" id="landing-tab-flutter" aria-controls="landing-panel-flutter" aria-selected="false" tabIndex={-1}>Flutter</button>
+                </div>
+              </div>
+            </div>
+            <div className="quickstart__body">
+              <div id="landing-panel-javascript" className="quickstart__code" role="tabpanel" aria-labelledby="landing-tab-javascript"></div>
+              <div id="landing-panel-swift" className="quickstart__code" role="tabpanel" aria-labelledby="landing-tab-swift" hidden="hidden"></div>
+              <div id="landing-panel-kotlin" className="quickstart__code" role="tabpanel" aria-labelledby="landing-tab-kotlin" hidden="hidden"></div>
+              <div id="landing-panel-flutter" className="quickstart__code" role="tabpanel" aria-labelledby="landing-tab-flutter" hidden="hidden"></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="get-started-title">
+        <div class="section__header">
+          <h2 id="get-started-title">Get started</h2>
+        </div>
+
+        <div class="card-grid">
+          <a className="doc-card" href="/solutions/index">
+            <span class="doc-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 5.5h7v13H4z" /><path d="M13 8h7v10.5h-7z" /><path d="M7 9h1M7 12h1M7 15h1M16 12h1M16 15h1" /></svg>
+            </span>
+            <h3>I am a business partner</h3>
+            <p>Explore AIR Kit by vertical: loyalty, fintech, gaming, telco, and more.</p>
+          </a>
+          <a className="doc-card" href="/airkit/usage/getting-started">
+            <span class="doc-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z" /><path d="m8 10 3 2-3 2" /><path d="M13 15h3" /></svg>
+            </span>
+            <h3>I am a developer</h3>
+            <p>Install the SDK, authenticate users, and issue your first credential.</p>
+          </a>
+          <a className="doc-card" href="/mocachain/index">
+            <span class="doc-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M9.5 8.5h5a3.5 3.5 0 0 1 0 7h-5a3.5 3.5 0 0 1 0-7Z" /><path d="M10 12h4" /></svg>
+            </span>
+            <h3>I am building on Moca Chain</h3>
+            <p>Connect to the L1, deploy contracts, and explore EVM-compatible tooling.</p>
+          </a>
+          <a className="doc-card" href="/learn/index">
+            <span class="doc-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M9 18h6" /><path d="M10 22h4" /><path d="M8 14a6 6 0 1 1 8 0c-.9.8-1 1.7-1 2H9c0-.3-.1-1.2-1-2Z" /></svg>
+            </span>
+            <h3>I want to understand Moca Network</h3>
+            <p>Learn the architecture and why portable identity matters for users and partners.</p>
+          </a>
+        </div>
+      </section>
+
+      <section class="section section--use-cases" aria-labelledby="use-cases-title">
+        <div class="section__header use-case-banner">
+          <div class="use-case-banner__copy">
+            <h2 id="use-cases-title">Verify once. Reuse across.</h2>
+            <p>One IDV/KYC check becomes an AIR Credential on Moca Chain. No repeat verification, no multi-party DPAs.</p>
+          </div>
+          <div class="section__actions">
+            <a href="/kyc/index" className="air-btn air-btn--ghost air-btn--small">Explore on-chain IDV/KYC</a>
+            <a href="/kyc/how-it-works" className="air-btn air-btn--ghost air-btn--small">How it works</a>
+          </div>
+        </div>
+
+        <div class="section__header">
+          <h2>Start with your use case</h2>
+        </div>
+
+        <div class="card-grid">
+          <a className="doc-card" href="/kyc/index">
+            <span class="doc-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 7h16v10H4z" /><path d="M7 11h3" /><path d="M14 11h3" /><path d="M7 14h6" /></svg>
+            </span>
+            <h3>On-chain IDV / KYC</h3>
+            <p>Veriff powered by zkMe issues a reusable AIR Credential on Moca Chain: verify once, reuse across every partner without pairwise DPAs.</p>
+          </a>
+          <a className="doc-card" href="/airkit/guides/air-for-loyalty">
+            <span class="doc-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 9h14v11H5z" /><path d="M12 9v11" /><path d="M4 5.5h16V9H4z" /><path d="M8.5 5.5a2 2 0 1 1 3.5-1.3v1.3" /><path d="M15.5 5.5A2 2 0 1 0 12 4.2v1.3" /></svg>
+            </span>
+            <h3>Loyalty programs</h3>
+            <p>Trigger verifiable loyalty credentials from your backend. Let users carry tier status across brands.</p>
+          </a>
+          <a className="doc-card" href="/airkit/guides/air-for-gaming">
+            <span class="doc-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M7 8h10l2 5-3 5H8l-3-5z" /><path d="M9 12h.01M15 12h.01" /><path d="M11 15h2" /></svg>
+            </span>
+            <h3>Gaming</h3>
+            <p>Issue achievement credentials and portable player identities. Cross-game SSO with a single AIR Account.</p>
+          </a>
+          <a className="doc-card" href="/airkit/guides/air-for-ticketing">
+            <span class="doc-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 7h14v10H5z" /><path d="M8 7v10" /><path d="M16 7v10" /><path d="M11 12h2" /></svg>
+            </span>
+            <h3>Live events &amp; ticketing</h3>
+            <p>Issue attendance credentials at check-in. Gate VIP presales and loyalty tiers to verified fans.</p>
+          </a>
+          <a className="doc-card" href="/api-reference/introduction">
+            <span class="doc-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 4v4" /><path d="M12 16v4" /><path d="M4 12h4" /><path d="M16 12h4" /><path d="M8 8h.01" /><path d="M16 8h.01" /><path d="M8 16h.01" /><path d="M16 16h.01" /></svg>
+            </span>
+            <h3>API Reference</h3>
+            <p>Server-to-server REST API for credential issuance, status tracking, and partner operations.</p>
+          </a>
+          <a className="doc-card" href="/airkit/guides/overview">
+            <span class="doc-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 5h5v5H5z" /><path d="M14 5h5v5h-5z" /><path d="M14 14h5v5h-5z" /><path d="M10 7.5h4" /><path d="M16.5 10v4" /></svg>
+            </span>
+            <h3>Architecture overview</h3>
+            <p>Data flow, service independence, and technical reference for decision-makers.</p>
+          </a>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="why-air-title">
+        <div class="section__header">
+          <h2 id="why-air-title">Why AIR Kit</h2>
+          <p>AIR Kit keeps high-trust flows clear for users and practical for partner teams.</p>
+        </div>
+
+        <div class="feature-list">
+          <div class="feature">
+            <div class="feature__visual">
+              <img src="/images/landing/why-air-credential.png" alt="" width="744" height="746" loading="lazy" />
+            </div>
+            <div class="feature__copy">
+              <strong>One credential</strong>
+              <p>One credential, any verifier in the ecosystem. No re-KYC, no re-registration.</p>
+            </div>
+          </div>
+          <div class="feature">
+            <div class="feature__visual">
+              <img src="/images/landing/why-air-credential-reuse.png" alt="" width="744" height="746" loading="lazy" />
+            </div>
+            <div class="feature__copy">
+              <strong>Backend issuance</strong>
+              <p>Issue credentials silently from your backend — no user action required.</p>
+            </div>
+          </div>
+          <div class="feature">
+            <div class="feature__visual">
+              <img src="/images/landing/why-air-paymaster.png" alt="" width="744" height="746" loading="lazy" />
+            </div>
+            <div class="feature__copy">
+              <strong>Gas covered</strong>
+              <p>Paymaster covers all on-chain costs — users never touch gas tokens.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer-links" aria-label="External links">
+        <a href="https://developers.sandbox.air3.com/dashboard">Dashboard ↗</a>
+        <a href="/status">Status ↗</a>
+        <a href="https://github.com/MocaNetwork">GitHub ↗</a>
+        <a href="https://discord.gg/mocaversenft">Discord ↗</a>
+        <a href="https://twitter.com/Moca_Network">X / Twitter ↗</a>
+      </footer>
+
     </div>
-
-    <h1 class="hero--title">
-      <span class="hero--title-accent">The Identity Layer<br /></span> for the Open Internet
-    </h1>
-
-    <p class="hero--subtitle">
-      Issue portable credentials, verify users without storing PII, and plug into
-      700M+ addressable users — all with a few lines of code.
-    </p>
-
-    <div class="hero--cta-row">
-      <a href="/airkit/usage/installation" class="hero--cta-primary">
-        Quick Setup →
-      </a>
-      <a href="/airkit/guides/overview" class="hero--cta-secondary">
-        View Architecture
-      </a>
-    </div>
   </div>
-</div>
-
-
-<div class="page--content">
-
-{/* ─── GET STARTED — ROLE-BASED ROUTING ─────────────────────────────── */}
-<div class="section--block">
-  <p class="section--heading">
-    Get started
-  </p>
-
-<div class="get-started-row">
-<CardGroup cols={2}>
-  <Card title="I'm a Partner or Business" icon="building-memo" href="/solutions/index">
-    Explore AIR Kit solutions by vertical — loyalty, fintech, gaming, telco, and more. Understand partner economics and compliance.
-  </Card>
-  <Card title="I'm a developer" icon="rectangle-terminal" href="/airkit/usage/getting-started">
-    Install the SDK, authenticate users, and issue your first credential in under 30 minutes.
-  </Card>
-  <Card title="I'm building on Moca Chain" icon="link-simple" href="/mocachain/index">
-    Connect to the L1, run a node, deploy contracts, and explore EVM-compatible tooling on Moca Chain.
-  </Card>
-  <Card title="I want to understand Moca Network" icon="lightbulb" href="/learn/index">
-    Learn about the vision, architecture, and why portable identity matters for the open internet.
-  </Card>
-</CardGroup>
-</div>
-</div>
-
-{/* ─── ON-CHAIN IDV/KYC HIGHLIGHT ─────────────────────────────────────── */}
-<div class="spotlight">
-  <div class="hero--chip">
-    On-chain IDV / KYC · Veriff powered by zkMe
-  </div>
-  <h2 class="spotlight--title">
-    <span class="hero--title-accent">Verify once.</span> Reuse across every partner.
-  </h2>
-  <p class="spotlight--subtitle">
-    One IDV/KYC check becomes an AIR Credential on Moca Chain — accepted by every other verifier in the ecosystem. No repeat verification, no multi-party DPAs.
-  </p>
-  <div class="hero--cta-row">
-    <a href="/kyc/index" class="hero--cta-primary">
-      Explore on-chain IDV/KYC →
-    </a>
-    <a href="/kyc/how-it-works" class="hero--cta-secondary">
-      How it works
-    </a>
-  </div>
-</div>
-
-{/* ─── USE CASE CARDS — 3 COL ────────────────────────────────────────── */}
-<div class="section--block-sm">
-  <p class="section--heading">
-    Start with your use case
-  </p>
-
-<CardGroup cols={3}>
-  <Card title="On-chain IDV / KYC" icon="id-card" href="/kyc/index">
-    Veriff powered by zkMe issues a reusable AIR Credential on Moca Chain — verify once, reuse across every partner without pairwise DPAs.
-  </Card>
-  <Card title="Loyalty programs" icon="gift" href="/airkit/guides/air-for-loyalty">
-    Trigger verifiable loyalty credentials from your backend. Let users carry tier status across brands.
-  </Card>
-  <Card title="Gaming" icon="gamepad-modern" href="/airkit/guides/air-for-gaming">
-    Issue achievement credentials and portable player identities. Cross-game SSO with a single AIR Account.
-  </Card>
-  <Card title="Live events & ticketing" icon="ticket-perforated" href="/airkit/guides/air-for-ticketing">
-    Issue attendance credentials at check-in. Gate VIP presales and loyalty tiers to verified fans.
-  </Card>
-  <Card title="API Reference" icon="diamonds-4" href="/api-reference/introduction">
-    Server-to-server REST API for credential issuance, status tracking, and partner operations.
-  </Card>
-  <Card title="Architecture overview" icon="diagram-project" href="/airkit/guides/overview">
-    Data flow, service independence, and technical reference for decision-makers.
-  </Card>
-</CardGroup>
-</div>
-
-{/* ─── FEATURE STRIP ────────────────────────────────────────────────── */}
-<div class="feature-strip">
-  <p class="feature-strip--heading">
-    Why <span class="hero--title-accent">AIR Kit</span>
-  </p>
-
-  <div class="airkit--footer">
-    <Columns cols={3}>
-      <Card img="/images/landing/cred.png">
-        One credential, any verifier in the ecosystem. No re-KYC, no re-registration.
-      </Card>
-      <Card img="/images/landing/lightning.png">
-        Issue credentials silently from your backend — no user action required.
-      </Card>
-      <Card img="/images/landing/gas.png">
-        Paymaster covers all on-chain costs — users never touch gas tokens.
-      </Card>
-    </Columns>
-  </div>
-</div>
-
-{/* ─── FOOTER LINKS ─────────────────────────────────────────────────── */}
-<div class="footer-links">
-  <a href="https://developers.sandbox.air3.com/dashboard" class="footer-links__link">
-    Dashboard ↗
-  </a>
-  <a href="/status" class="footer-links__link">
-    Status ↗
-  </a>
-  <a href="https://github.com/MocaNetwork" class="footer-links__link">
-    GitHub ↗
-  </a>
-  <a href="https://discord.gg/mocaversenft" class="footer-links__link">
-    Discord ↗
-  </a>
-  <a href="https://twitter.com/Moca_Network" class="footer-links__link">
-    X / Twitter ↗
-  </a>
-</div>
-
 </div>

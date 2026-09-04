@@ -1,0 +1,40 @@
+<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="air-squircle">
+      <rect width="60" height="60" rx="16"/>
+    </clipPath>
+    <linearGradient id="air-base" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E6ECF1"/>
+      <stop offset="0.45" stop-color="#E8D7E4"/>
+      <stop offset="1" stop-color="#F2CDB0"/>
+    </linearGradient>
+    <radialGradient id="air-glow-pink" cx="42" cy="36" r="26" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F2C6CE" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#F2C6CE" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="air-glow-lavender" cx="30" cy="22" r="22" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#CEC3DD" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#CEC3DD" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="air-glow-peach" cx="48" cy="50" r="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F2C79A" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#F2C79A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="air-glow-blue" cx="12" cy="14" r="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#D6E3EC" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#D6E3EC" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g clip-path="url(#air-squircle)">
+    <rect width="60" height="60" fill="url(#air-base)"/>
+    <rect width="60" height="60" fill="url(#air-glow-lavender)"/>
+    <rect width="60" height="60" fill="url(#air-glow-pink)"/>
+    <rect width="60" height="60" fill="url(#air-glow-peach)"/>
+    <rect width="60" height="60" fill="url(#air-glow-blue)"/>
+  </g>
+  <g transform="translate(14 14) scale(0.5333)">
+    <path fill-rule="evenodd" clip-rule="evenodd"
+      d="M0.659 24.875C3.496 30.213 14.684 29.8 25.659 23.975C36.634 18.138 43.222 9.088 40.397 3.75C37.559-1.587 26.372-1.175 15.397 4.65C4.409 10.488-2.179 19.538 0.659 24.875ZM49.059 52.438C55.097 52.438 59.997 42.363 59.997 29.938C59.997 17.513 55.097 7.438 49.059 7.438C43.022 7.438 38.122 17.513 38.122 29.938C38.122 42.363 43.022 52.438 49.059 52.438ZM25.684 36.025C14.709 30.188 3.521 29.788 0.684 35.125C-2.154 40.463 4.446 49.513 15.422 55.35C26.397 61.188 37.584 61.588 40.422 56.25C43.259 50.913 36.659 41.863 25.684 36.025Z"
+      fill="#0B0B0B"/>
+  </g>
+</svg>
