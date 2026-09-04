@@ -29,12 +29,19 @@
   --air-link-hover: #464646;
   --air-icon-primary: #002536;
   --air-icon-secondary: #798b95;
+  --air-status-success: #17b26a;
+  --air-status-success-5: #dcefeb;
+  --air-status-error: #ef4444;
+  --air-status-error-5: #fecdca;
+  --air-status-warning: #fec113;
+  --air-status-warning-5: #fbe8b7;
   --air-surface: #fafafa;
   --air-surface-dim: #e3e9ea;
   --air-container-primary: #f7f7f7;
   --air-container-secondary: #ffffff;
   --air-container-inverse: #000000;
   --air-decorative-blue: #9bd5ea;
+  --air-decorative-blue-5: #e6f5fa;
   --air-decorative-green-5: #dff5e6;
   --air-font-family: "DM Sans", sans-serif;
   --air-font-family-display: "Poppins", sans-serif;
@@ -940,19 +947,34 @@ body:not(:has(.docs-landing)) #content-area [data-callout-type] {
   padding: var(--air-spacing-large);
   border: 0;
   border-radius: var(--air-corner-list-menu);
-  background: var(--air-container-secondary);
   color: var(--air-text-primary);
   font: var(--air-type-body-2);
   box-shadow: none;
 }
 
+body:not(:has(.docs-landing)) #content-area [data-callout-type="note"] {
+  background: var(--air-container-primary);
+}
+
+body:not(:has(.docs-landing)) #content-area [data-callout-type="info"] {
+  background: var(--air-decorative-blue-5);
+}
+
 body:not(:has(.docs-landing)) #content-area [data-callout-type="tip"] {
-  background: color-mix(in srgb, var(--air-decorative-green-5) 72%, var(--air-container-secondary));
+  background: var(--air-decorative-green-5);
+}
+
+body:not(:has(.docs-landing)) #content-area [data-callout-type="check"] {
+  background: var(--air-status-success-5);
 }
 
 body:not(:has(.docs-landing)) #content-area [data-callout-type="warning"] {
   margin-bottom: var(--air-spacing-2x-large);
-  background: var(--air-container-secondary);
+  background: var(--air-status-warning-5);
+}
+
+body:not(:has(.docs-landing)) #content-area [data-callout-type="danger"] {
+  background: var(--air-status-error-5);
 }
 
 body:not(:has(.docs-landing)) #content-area [data-component-part="callout-content"] {
