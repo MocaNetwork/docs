@@ -1,0 +1,117 @@
+---
+title: "Glossary"
+description: "Canonical terminology for AIR AI — product terms, agent relationship types, permission verbs, core technical objects, and key / custody terms."
+---
+
+Canonical terminology used across the AIR AI documentation. Definitions here are kept short — for behavior, see the linked pages.
+
+## Product terms
+
+| Term | Definition |
+| --- | --- |
+| **AIR AI** | Umbrella strategy and market narrative for how AIR enables agents to use identity, money, consent, policy, and integrations safely. AIR AI is not a standalone product. |
+| **AIR AI Services** | User-and-agent-facing permission model for [AIR Identity (Agentic)](/airai/identity), [AIR Money (Agentic)](/airai/money), and [AIR Policy + Audit](/airai/policy-audit). |
+| **AIR AI Studio** | Builder-facing packaging that exposes AIR capabilities through [builder surfaces](/airai/builder-surfaces) — Account Binding, Agent Tools, Authorization Flows, and Integration Assets. |
+| **AIR Kit** | Base SDK / infrastructure for AIR auth, identity, credentials, wallet, payments, loyalty, APIs, and enterprise integrations. |
+| **AIR Identity (Agentic)** | Information authority for agents — controls what an agent can know, prove, collect, store, or share. |
+| **AIR Money (Agentic)** | Transaction authority for agents — controls what an agent can spend, authorize, hold, route, or settle. |
+| **AIR Policy + Audit** | Shared control layer that evaluates permissions, applies rules, records what happened, and produces evidence. |
+
+<Note>
+**Hierarchy.** **AIR AI** is the umbrella narrative. **AIR AI Services** is the user / agent-facing permission model. **AIR AI Studio** is the builder-facing packaging. **AIR Kit** is the base SDK / infrastructure layer.
+</Note>
+
+## Agent relationship types
+
+| Term | Definition | Owner | Examples |
+| --- | --- | --- | --- |
+| **External agent / app surface** | Broad category for any non-AIR agent, app, assistant, workflow, marketplace, wallet, or platform surface that calls AIR. | User, merchant, platform, enterprise, developer, or partner. | ChatGPT with an AIR tool, Claude using an AIR MCP server, a travel booking assistant, a merchant chatbot, a wallet app, a partner app. |
+| **Butler agent** | User-owned / user-operated external agent that acts primarily for the user. | User. | Personal AI assistant, personal travel agent, personal shopping assistant. |
+| **Concierge agent** | Merchant-owned or enterprise-owned external agent that serves the user inside a merchant or enterprise offering. | Merchant or enterprise. | Alcohol store concierge, hotel booking concierge, airline support agent, ticketing chatbot, enterprise customer-service agent. |
+
+See [Agent taxonomy](/airai/concepts/agent-taxonomy) for examples and how each type uses AIR.
+
+## Lifecycle stages
+
+The five stages every sensitive agent action flows through, with audit cross-cutting. See [How it works](/airai/how-it-works).
+
+| Stage | Meaning |
+| --- | --- |
+| **Intent** | The user starts a request; the agent calls AIR through a plugin and AIR AI Services normalizes it. |
+| **Permission** | AIR Policy + Audit decides allow / deny / revoke / require approval, escalating to HITL signers if not covered. |
+| **Authorize** | AIR Identity and / or AIR Money authorize against AIR Kit. |
+| **Execute** | AIR composes and adapts the request, then runs identity and / or money actions. |
+| **Settle** | External parties confirm — identity verification and fund settlement. |
+| **Audit / Receipts** | Cross-cutting. Every stage emits an event; records, receipts, and revocation history converge here. |
+
+## Permission verbs
+
+What an agent is asking AIR to allow.
+
+| Verb | Meaning | Example |
+| --- | --- | --- |
+| **Know** | Agent can access user context. | Read travel preferences or loyalty status. |
+| **Prove** | Agent can request or generate a proof / attestation. | Prove the user is 18+ without sharing date of birth. |
+| **Share** | Agent can disclose data or proof onward. | Send an encrypted traveler payload to an airline. |
+| **Collect** | Agent can collect data from the user or external party during the task. | Ask the user for missing passport expiry. |
+| **Store** | Agent, AIR, or a partner can retain data beyond one-time use. | Save a loyalty number for future bookings. |
+| **Spend** | Agent can use a bounded budget or payment authority. | Spend up to \$3,000 on flights and hotels. |
+| **Authorize** | Agent can request or initiate a payment action under policy. | Confirm a \$420 hotel booking. |
+| **Hold** | Agent / account / sub-account can hold delegated balance or reserved funds. | Reserve \$500 for a booking deposit. |
+| **Route** | Agent or platform can route a proof, payment intent, authorization, or settlement instruction. | Pass payment authorization from user to merchant through a platform. |
+| **Settle** | Value transfer is completed through a payment rail. | Complete card, stablecoin, or account-based settlement. |
+| **Revoke** | User or policy can remove access or invalidate a permission. | Cancel an agent's trip budget after the task ends. |
+
+## Core technical objects
+
+| Object | Canonical meaning | Should include |
+| --- | --- | --- |
+| **Permission object** | Canonical object describing what an agent is asking to know, prove, share, collect, store, spend, authorize, hold, route, or settle. | User, agent, agent relationship, action type, purpose, counterparty, scope, expiry, policy result, audit requirement. |
+| **Consent record** | Evidence that the user approved, denied, modified, revoked, or allowed a permission under a defined scope. | User, permission, timestamp, scope, expiry, approval method, revocation status. |
+| **Agent binding** | Binding between AIR, the user, the external agent, and the allowed scope of action. | Agent ID, owner, relationship type, user, scope, session / task, key or verification metadata, expiry. |
+| **AIR Account Binding** | The scoped grant that connects a user's AIR account to an external agent, recording owner, relationship type, and allowed actions. | Agent ID, owner, relationship type, scope, expiry, revocation. |
+| **Status match** | Pattern where an identity proof (e.g. a loyalty tier) unlocks pricing or access that brings a purchase within the user's money budget or policy. | Proof / credential, unlocked benefit, resulting price, budget / policy check. |
+| **Delegation grant** | Permission for an agent to act on behalf of a user for a bounded purpose. | Delegator, delegate, task, permissions, expiry, revocation, approval evidence. |
+| **Key handle** | Reference to a key or signing capability without exposing raw private key material. | Key ID, boundary type, allowed operations, policy, issuer / wallet / device reference. |
+| **User data object** | User-owned context or task data used by an agent or shared with another party. | Data type, source, sensitivity, consent, retention rule, sharing rule. |
+| **Proof request** | Request to prove a claim or credential requirement without necessarily exposing raw data. | Verifier, claim, required format, freshness, revocation, purpose, presentation constraints. |
+| **Proof handoff** | Controlled delivery of a proof, attestation, verifiable presentation, freshness check, or revocation status to another party. | Recipient, proof type, claim, expiry, verification method, audit event. |
+| **Encrypted payload** | Data package encrypted for a specific recipient so the intermediary agent does not need raw access. | Recipient, encrypted fields, purpose, expiry, delivery status, audit event. |
+| **Spend mandate** | Bounded transaction authority granted to an agent. | Amount cap, currency, merchant / category scope, approval threshold, expiry, rail preference, revocation. |
+| **Payment authorization** | Policy-approved authorization to initiate or complete payment through a rail or payment provider. | Amount, counterparty, rail, payment instrument, policy decision, receipt reference. |
+| **Receipt** | User-visible and / or machine-readable evidence of an identity, money, policy, or external-system action. | Action, actor, time, result, policy decision, proof / payment references, revocation state. |
+| **Revocation status** | Current validity state of a permission, credential, proof, mandate, or agent binding. | Object ID, status, timestamp, revoker, reason, effective time. |
+
+## Key and custody terms
+
+| Term | Definition |
+| --- | --- |
+| **Custody boundary** | The system, wallet, device, hardware, KMS, HSM, TEE, or provider boundary where a key or sensitive credential is stored and used. |
+| **Signing boundary** | The place where signing is allowed to happen after policy and authorization checks. |
+| **Ledger-backed approval** | High-assurance user approval or signing flow mediated through Ledger / Ledger Keychain Protocol. |
+| **Open Wallet Standard-compatible interaction** | Wallet / credential interaction designed to interoperate with non-AIR wallet surfaces. |
+| **Agent-blind data sharing** | Pattern where the agent triggers a data or proof transfer but does not see the raw sensitive data. |
+| **HITL signers** | External, partner-owned signing surfaces (Ledger, Open Wallet Standard, P256 / passkeys) that hold final approval for high-risk or out-of-scope actions. AIR Policy handles in-scope actions; anything above thresholds escalates here. |
+
+## Framework and rail terms
+
+| Term | Meaning in AIR architecture |
+| --- | --- |
+| **x402** | Payment protocol AIR enriches with identity / credential verification and policy-gated payment authority. |
+| **AP2** | Agent payments protocol where AIR provides credentials, mandates, and user-authorized payment instruments. |
+| **Stripe ACP / SPT** | Stripe agent commerce / shared payment token patterns where AIR adds identity, eligibility, policy, and spend authority. |
+| **Visa TAP** | Visa agent / payment framework where AIR provides user-level authorization, delegation, and tokenized payment instruments. |
+| **Mastercard Agent Pay / KYA** | Mastercard agent identity / payment framework where AIR provides credentials, Digital Agent Passport-style claims, and payment tokens. |
+| **MPP / Tempo** | Machine payment / settlement protocol where AIR provides identity, policy, sub-account, and co-signer-style execution. |
+| **Ledger Keychain Protocol** | Keychain / hardware-backed trust boundary for user-controlled keys, high-assurance signing, and delegated approval. |
+| **Open Wallet Standard** | Wallet interoperability standard for portable wallet connection, credential, proof, and transaction-intent flows. |
+
+See [Existing frameworks](/airai/concepts/frameworks) for the integration mapping.
+
+## Naming conventions
+
+- Use **AIR Identity proof handoff / verification** for the AIR capability that lets agents pass proofs or attestations onward — it is a capability, not an agent type.
+- Use **AIR Identity (Agentic)** when discussing what an agent can know, prove, or share.
+- Use **AIR Money (Agentic)** when discussing what an agent can spend, authorize, or settle.
+- Use **AIR Policy + Audit** when discussing decisions, boundaries, receipts, revocation, and evidence.
+- Use **AIR Kit** for base SDK / infrastructure capabilities, not for the agent-specific permission model.

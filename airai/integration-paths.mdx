@@ -1,0 +1,110 @@
+---
+title: "Integration paths"
+description: "How a builder makes an agent AIR-capable — a lightweight Skill / Plugin for a Butler agent, or the full AIR AI SDK for a Concierge agent — plus the sandbox-to-production timeline and common questions."
+---
+
+import AirAiAlphaAccess from "/snippets/airai-alpha-access.mdx";
+
+<AirAiAlphaAccess />
+
+The user already has an **AIR account** — their identity, wallet, and permission rules
+— set up once through [AIR Kit](/airkit/index) inside the apps they already use. AIR AI
+is what *you* add to an **agent** so it can act on that account. It ships as
+install-and-go packages; which one you pick depends on who owns the agent.
+
+## Two ways in
+
+<CardGroup cols={2}>
+  <Card title="Butler agent → AIR Skill / Plugin" icon="plug">
+    For agents that act **on behalf of the user** (personal assistant, travel agent,
+    a ChatGPT or Claude acting with the user's approved AIR permissions). A lightweight,
+    installable skill — think `npm install` or a one-click MCP plugin — that drops into
+    the agent so it can use the user's AIR identity and money right away.
+  </Card>
+  <Card title="Concierge agent → AIR AI SDK" icon="cube">
+    For agents **owned by a merchant or enterprise** (a checkout concierge, booking
+    agent, support bot). A fuller developer kit — in the spirit of the Vercel AI SDK —
+    that you build into your own service to request proofs, take payments, and enforce
+    the user's rules.
+  </Card>
+</CardGroup>
+
+| Agent type | Package | What it is |
+| --- | --- | --- |
+| **Butler** *(acts for the user)* | **AIR Skill / Plugin** | Lightweight, installable skill — `npm install` or a one-click MCP plugin. |
+| **Concierge** *(merchant / enterprise-owned)* | **AIR AI SDK** | Fuller developer kit built into your own service. |
+
+Both packages expose the same capabilities — [builder surfaces](/airai/builder-surfaces)
+(Agent Tools, Authorization Flows, Integration Assets) over the same plumbing:
+[AIR Identity (Agentic)](/airai/identity), [AIR Money (Agentic)](/airai/money), and
+[AIR Policy + Audit](/airai/policy-audit), with a tamper-proof log on
+[Moca Chain](/mocachain/index).
+
+<Note>
+**Not sure which?** A product like ChatGPT or Claude isn't automatically one category —
+it depends on context. Acting *for the user* with delegated AIR permissions makes it a
+Butler; embedded *by a merchant* to sell something makes it a Concierge. See
+[Agent taxonomy](/airai/concepts/agent-taxonomy).
+</Note>
+
+## A typical integration timeline
+
+<Steps>
+  <Step title="Request alpha access">
+    AIR AI is in alpha — the sandbox, SDKs, and integration assets are access-gated.
+    [Partner with us](https://mocanetwork.typeform.com/joinmocaeco?typeform-source=air3.com)
+    to scope your use case and get credentials.
+  </Step>
+  <Step title="Read the overview">
+    Start with [What AIR AI is](/airai/index) and [How it works](/airai/how-it-works) to
+    understand the model.
+  </Step>
+  <Step title="Pick a path and a recipe">
+    Choose Skill / Plugin (Butler) or AIR AI SDK (Concierge), then an integration recipe that
+    matches your use case. Recipes ship as [Integration Assets](/airai/builder-surfaces#integration-assets).
+  </Step>
+  <Step title="Scaffold via CLI">
+    Use the CLI to install AIR Kit, configure your [agent binding](/airai/builder-surfaces#air-account-binding),
+    and pull a reference integration.
+  </Step>
+  <Step title="Run end-to-end in the sandbox">
+    Walk an identity, money, and audit flow end-to-end against mock partners.
+  </Step>
+  <Step title="Wire in your agent">
+    Replace the mock agent with your real one. Authorization Flows and the audit trail
+    work without modification.
+  </Step>
+  <Step title="Go live">
+    Move from sandbox to production credentials and start running real flows.
+  </Step>
+</Steps>
+
+## Common questions
+
+**Do our users need a crypto wallet?**
+No. The AIR account is a smart account — users authenticate with email, social login,
+or passkey. The blockchain layer is invisible to them.
+
+**How long does integration take?**
+The core integration is small: install the package, bind the agent, wire Authorization
+Flows. Most of the effort is mapping your existing flows to AIR capabilities, which the
+sandbox and recipes are built to shortcut.
+
+**Do we keep our existing KYC, payment rails, and wallet?**
+Yes. AIR composes with them — it doesn't replace them. See
+[Existing frameworks](/airai/concepts/frameworks).
+
+**Where does our customer data go?**
+AIR minimizes raw data exposure by default — proof-only disclosure, selective
+disclosure, and encrypted payloads mean the agent (and often the recipient) never sees
+raw fields. See [AIR Identity (Agentic)](/airai/identity).
+
+**What does the agent actually receive?**
+Scoped capabilities, never raw secrets — permission grants, proofs, encrypted payloads,
+spend mandates, payment authorizations, and receipts. See [builder surfaces](/airai/builder-surfaces).
+
+## Next
+
+- [Builder surfaces](/airai/builder-surfaces) — the agent-callable tools, approval flows, and assets you integrate with.
+- [How you can work with AIR AI](/airai/fit) — confirm the plug-in point, whether you already know what you're building or are still exploring.
+- [Canonical flows](/airai/concepts/canonical-flows) — model your integration on an end-to-end sequence.

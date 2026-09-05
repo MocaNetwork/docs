@@ -1,0 +1,233 @@
+---
+title: "Canonical flows"
+description: "End-to-end sequences for Butler (Holiday Agent), Concierge (age-gated purchase), proof handoff, and spend mandate flows — each mapped to the five-stage lifecycle."
+---
+
+These are the canonical end-to-end flows that exercise the full AIR AI stack — Agent Tools, Authorization Flows, AIR Identity (Agentic), AIR Money (Agentic), Policy + Audit, AIR Kit, and external partners.
+
+Each flow follows the same [five-stage lifecycle](/airai/how-it-works):
+
+> **Intent → Permission → Authorize → Execute → Settle**, with AIR Audit / Receipts capturing an event at every stage.
+
+## Flow A — Butler / Holiday Agent
+
+A user-owned travel assistant plans and books a trip on the user's behalf.
+
+**Trigger.** "Book me a four-day trip to Tokyo next month within \$3,000, using my airline loyalty where possible."
+
+<Tip>
+This is the **status-match** pattern: an identity proof (loyalty tier) unlocks a price that brings a purchase inside the user's money budget. See the [worked example](/airai/how-it-works#worked-example-status-matched-checkout) — a \$920 fare that a Gold tier proof drops to \$782, under an \$800 ceiling.
+</Tip>
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Agent as Butler Agent
+  participant Tools as AIR Agent Tools
+  participant Policy as AIR Policy + Audit
+  participant Auth as AIR Authorization Flow
+  participant Identity as AIR Identity (Agentic)
+  participant Money as AIR Money (Agentic)
+  participant Kit as AIR Kit
+  participant Partner as Travel Partner
+
+  User->>Agent: Request trip planning / booking
+  Agent->>Tools: requestTripPlanningPermission
+  Tools->>Policy: Create permission object
+  Policy->>Auth: Ask user to approve data + budget scope
+  Auth->>User: Show requested data, proofs, budget, expiry
+  User-->>Auth: Approve / modify / deny
+  Auth-->>Policy: Consent grant
+  Policy->>Identity: Retrieve approved context / proofs
+  Identity->>Kit: Fetch profile, loyalty, eligibility, traveler data
+  Kit-->>Identity: Scoped data / proof result
+  Policy->>Money: Create spend mandate
+  Money->>Kit: Bind budget to wallet / account / payment instrument
+  Kit-->>Money: Spend mandate / payment authorization
+  Identity-->>Partner: Share required proof or encrypted traveler payload
+  Money-->>Partner: Send payment authorization if booking accepted
+  Partner-->>Money: Booking / payment result
+  Money-->>Policy: Payment result + receipt reference
+  Policy-->>User: User receipt + revocation controls
+  Policy-->>Agent: Machine-readable result
+```
+
+**Identity actions**
+
+| Action | Example | Preferred disclosure mode |
+| --- | --- | --- |
+| Know | Travel preferences, loyalty memberships, preferred airports. | Permissioned context access. |
+| Collect | Missing passport number, traveler date of birth, visa details. | User-entered via Authorization Flow. |
+| Prove | Loyalty status, eligibility, KYC / age / residency if needed. | Proof or attestation before raw data. |
+| Share | Traveler fields required by airline / hotel / insurance provider. | Encrypted payload or scoped field release. |
+| Store | Updated trip preference or loyalty number. | Only if user approves retention. |
+
+**Money actions**
+
+| Action | Pattern | Controls |
+| --- | --- | --- |
+| Spend | Trip budget mandate. | Amount cap, currency, merchant category, expiry. |
+| Authorize | Booking payment authorization. | Approval threshold, merchant binding, receipt requirement. |
+| Hold | Optional reservation / deposit hold. | Time limit, cancellation rule, release event. |
+| Route | Rail adapter or payment path. | Policy-controlled rail selection. |
+| Settle | External payment rail. | Receipt, refund, dispute path. |
+
+## Flow B — Concierge / age-gated purchase
+
+A merchant-owned alcohol concierge verifies the user is 18+ before selling alcohol.
+
+**Trigger.** User asks a merchant concierge to buy alcohol.
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Agent as Merchant Concierge
+  participant Tools as AIR Agent Tools
+  participant Policy as AIR Policy + Audit
+  participant Auth as AIR Authorization Flow
+  participant Identity as AIR Identity (Agentic)
+  participant Money as AIR Money (Agentic)
+  participant Merchant
+  participant Rail as Payment Rail
+
+  User->>Agent: Request alcohol purchase
+  Agent->>Tools: requestAgeProofAndPayment
+  Tools->>Policy: Create permission object
+  Policy->>Identity: Determine required proof
+  Policy->>Auth: Ask user to approve proof + payment
+  Auth->>User: Approve 18+ proof and payment amount
+  User-->>Auth: Approve
+  Identity-->>Merchant: Send 18+ proof / attestation
+  Merchant-->>Policy: Proof accepted
+  Policy->>Money: Authorize merchant-bound payment
+  Money-->>Rail: Execute / authorize payment
+  Rail-->>Money: Payment result
+  Money-->>Merchant: Payment confirmation
+  Policy-->>User: Receipt + revocation / dispute options
+  Policy-->>Agent: Purchase result
+```
+
+**Identity actions**
+
+- **Prove** the user is 18+.
+- **Share** a proof or attestation to the merchant.
+- **Avoid** sharing raw date of birth unless required.
+- **Store** only a compliance receipt or proof reference, not unnecessary identity data.
+
+**Money actions**
+
+- Merchant-bound payment request, amount confirmation, rail selection, receipt, refund / dispute reference.
+
+## Flow C — Proof handoff
+
+An agent verifies the user once and passes a signed proof or attestation to a merchant or service provider — without exposing raw user data and without requiring a new verification flow. Either a Butler or a Concierge agent can drive this; proof handoff is a capability, not an agent type.
+
+**Trigger.** A merchant needs to know the user satisfies a requirement, but should not receive raw user data.
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Agent as Agent (Butler / Concierge)
+  participant Merchant
+  participant Tools as AIR Agent Tools
+  participant Policy as AIR Policy + Audit
+  participant Identity as AIR Identity (Agentic)
+  participant Proof as Credential / Proof Service
+
+  Agent->>Tools: requestProofHandoff
+  Tools->>Policy: Check agent binding + purpose
+  Policy->>User: Request approval if needed
+  User-->>Policy: Approve / deny / modify
+  Policy->>Identity: Generate or retrieve proof
+  Identity->>Proof: Create / verify presentation
+  Proof-->>Identity: Proof + freshness / revocation status
+  Identity-->>Merchant: Send proof / attestation / encrypted payload
+  Merchant-->>Identity: Verification result
+  Identity-->>Policy: Handoff result
+  Policy-->>User: Receipt
+  Policy-->>Agent: Machine-readable status
+```
+
+**Identity actions**
+
+- **Prove** the user satisfies a requirement.
+- **Share** proof, attestation, encrypted payload, freshness, or revocation state.
+- **Avoid** raw data exposure unless explicitly required.
+- **Revoke** — user or policy can invalidate future reliance.
+
+**Money actions (optional)**
+
+Proof of payment capability, payment intent routing, escrow instructions, settlement metadata.
+
+<a id="spend-mandate" />
+
+## Flow D — Spend mandate
+
+A user grants an agent bounded spend authority and the agent transacts within that mandate.
+
+**Trigger.** Agent needs payment authority to complete a task.
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Agent
+  participant Tools as AIR Agent Tools
+  participant Auth as AIR Authorization Flow
+  participant Policy as AIR Policy + Audit
+  participant Money as AIR Money (Agentic)
+  participant Kit as AIR Kit Wallet / Payments
+  participant Merchant
+
+  Agent->>Tools: requestSpendMandate
+  Tools->>Policy: Create permission object
+  Policy->>Auth: Ask user to approve mandate
+  Auth->>User: Show amount, merchant, category, expiry, threshold
+  User-->>Auth: Approve / modify / deny
+  Auth-->>Policy: Consent grant
+  Policy->>Money: Create spend mandate
+  Money->>Kit: Bind mandate to account / wallet / payment instrument
+  Kit-->>Money: Mandate active
+  Agent->>Tools: requestPayment
+  Tools->>Policy: Check payment against mandate
+  Policy->>Money: Authorize if within scope
+  Money->>Kit: Execute or tokenize payment
+  Kit-->>Merchant: Payment authorization
+  Merchant-->>Kit: Payment result
+  Kit-->>Money: Result
+  Money-->>Policy: Receipt data
+  Policy-->>User: Receipt + revoke option
+  Policy-->>Agent: Payment result
+```
+
+**Policy checks at each request**
+
+- Is the mandate active?
+- Is the merchant allowed?
+- Is the category allowed?
+- Is the amount within cap?
+- Is the amount above approval threshold?
+- Is the mandate expired or revoked?
+- Is the rail allowed?
+- Is the payment credential protected from the agent?
+- Is a receipt produced?
+
+**Failure cases**
+
+| Failure | Expected behavior |
+| --- | --- |
+| User denies approval | No mandate created; agent receives denial reason. |
+| Amount exceeds cap | Deny or request additional approval. |
+| Merchant outside scope | Deny; optionally ask user to amend mandate. |
+| Expired / revoked mandate | Deny and return revocation / expiry status. |
+| Insufficient funds | Deny or request funding source update. |
+| Rail failure | Return failure receipt and retry / fallback option if policy permits. |
+
+## Cross-flow audit events
+
+Every flow produces machine-readable audit evidence. See [AIR Policy + Audit](/airai/policy-audit) for the full event model.
+
+## Next
+
+- [Reference architecture](/airai/concepts/architecture) — the layers these flows traverse.
+- [Existing frameworks](/airai/concepts/frameworks) — how identity and money map to x402, AP2, Stripe, Visa, Mastercard, MPP / Tempo, Ledger, and Open Wallet Standard.
+- [Glossary](/airai/concepts/glossary) — canonical terminology used across flows.

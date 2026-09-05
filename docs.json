@@ -62,6 +62,17 @@
       "href": "https://developers.sandbox.air3.com/dashboard"
     }
   },
+  "redirects": [
+    { "source": "/airai/agent-taxonomy", "destination": "/airai/concepts/agent-taxonomy" },
+    { "source": "/airai/services/index", "destination": "/airai/identity" },
+    { "source": "/airai/services/agentic-identity", "destination": "/airai/identity" },
+    { "source": "/airai/services/agentic-money", "destination": "/airai/money" },
+    { "source": "/airai/services/policy-and-audit", "destination": "/airai/policy-audit" },
+    { "source": "/airai/studio/index", "destination": "/airai/builder-surfaces" },
+    { "source": "/airai/studio/agent-tools", "destination": "/airai/builder-surfaces" },
+    { "source": "/airai/studio/authorization-flows", "destination": "/airai/builder-surfaces#authorization-flows" },
+    { "source": "/airai/studio/integration-assets", "destination": "/airai/builder-surfaces#integration-assets" }
+  ],
   "navigation": {
     "pages": ["index"],
     "tabs": [
@@ -389,6 +400,44 @@
           {
             "group": "Help",
             "pages": ["mocachain/help/faq", "status"]
+          }
+        ]
+      },
+      {
+        "tab": "AIR AI",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "airai/index",
+              "airai/how-it-works"
+            ]
+          },
+          {
+            "group": "Working with AIR AI",
+            "pages": [
+              "airai/fit",
+              "airai/integration-paths"
+            ]
+          },
+          {
+            "group": "Capabilities",
+            "pages": [
+              "airai/identity",
+              "airai/money",
+              "airai/policy-audit",
+              "airai/builder-surfaces"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "airai/concepts/architecture",
+              "airai/concepts/canonical-flows",
+              "airai/concepts/agent-taxonomy",
+              "airai/concepts/frameworks",
+              "airai/concepts/glossary"
+            ]
           }
         ]
       },

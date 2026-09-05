@@ -1,0 +1,80 @@
+---
+title: "Agent taxonomy"
+description: "Butler and Concierge agents — the two relationship types AIR's permission layer applies to, and how each uses AIR Identity and AIR Money. The canonical reference for the two-stream model."
+---
+
+AIR supports two external agent relationships. They differ in **who owns the agent** and
+**what data and authority the agent should receive** — not in which AIR capabilities they
+can call. This page is the canonical home for how the two relationships use AIR's identity
+and money streams; other pages link here rather than repeat it.
+
+| Relationship | Who owns it | Examples |
+| --- | --- | --- |
+| **Butler agent** | User-owned / user-operated | Personal AI assistant, personal travel agent, a ChatGPT or Claude acting with the user's approved AIR permissions. |
+| **Concierge agent** | Merchant-owned / enterprise-owned | Alcohol store concierge, hotel booking concierge, airline support agent, ticketing chatbot, enterprise customer-service agent. |
+
+<Note>
+**A product like ChatGPT or Claude is not automatically one category.** It depends on
+context: acting for the user with delegated AIR permissions makes it behave like a Butler;
+embedded by a merchant to sell a product makes it a Concierge.
+</Note>
+
+## The two-stream model
+
+Every agent uses identity in two directions — data it **gets about the user** (stream 1)
+and data or proofs it **shares onward** (stream 2). The same data sits in either stream
+depending on the relationship.
+
+| Relationship | Stream 1: data the agent gets about the user | Stream 2: data / proofs shared onward | AIR's role |
+| --- | --- | --- | --- |
+| **Butler** | Rich, persistent context: preferences, profile, habits, addresses, loyalty, travel history, payment rules. | Passport details for a booking, payment authorization, delivery details, identity proof, loyalty proof. | Persistent user vault, act-as-me delegation, scoped sharing, spend limits, audit trail, revocation. |
+| **Concierge** | Limited and service-specific: account profile, booking context, merchant history, preferences relevant to that offering. | Age proof, passport details, delivery address, KYC status, payment authorization. Stores only when relevant and consented. | Consent prompt, selective disclosure, purpose-bound data release, eligibility proofs, payment authorization, merchant-facing receipt. |
+
+The same data sits in either stream depending on the relationship:
+
+- A **Butler** may keep passport details in persistent memory because the user wants the agent to reuse them.
+- A **Concierge** may collect passport details for one booking and only retain them if the user consents.
+
+## How each relationship uses money
+
+| Relationship | Typical money pattern |
+| --- | --- |
+| **Butler** | Bounded spend mandates, delegated sub-accounts, persistent payment authority within budget. |
+| **Concierge** | Merchant-bound, single-purpose payment authorization for the merchant's product or service. |
+
+See [AIR Identity (Agentic)](/airai/identity) and [AIR Money (Agentic)](/airai/money) for
+the capability detail behind each pattern.
+
+## How each agent gets AIR
+
+A builder makes an agent AIR-capable by installing an AIR package. Which package depends
+on who owns the agent:
+
+| Agent type | Package delivered |
+| --- | --- |
+| **Butler** | **AIR Skill / Plugin** — a lightweight, installable skill (`npm install` or a one-click MCP plugin). |
+| **Concierge** | **AIR AI SDK** — a fuller developer kit, in the spirit of the Vercel AI SDK, built into the merchant's own service. |
+
+See [Integration paths](/airai/integration-paths) for the full packaging model.
+
+## AIR Identity proof handoff is a capability, not an agent type
+
+AIR Identity's **proof handoff / verification** capability lets an agent pass a signed
+proof, attestation, encrypted payload, freshness check, or revocation status from one
+party to another without exposing raw user data. **Both Butler and Concierge agents can
+use it.**
+
+It is most useful whenever raw data should be minimized — for example, a Concierge proving
+the user is 18+ to a merchant without ever receiving their date of birth.
+
+## Quick way to remember
+
+- **External agent / app surface** = the broad bucket: anything outside AIR that calls AIR.
+- **Butler / Concierge** = relationship types inside that bucket, based on owner and role.
+- **AIR Identity proof handoff** = an AIR capability either agent type can use.
+
+## Next
+
+- [AIR Identity (Agentic)](/airai/identity) — the information authority both relationships call.
+- [AIR Money (Agentic)](/airai/money) — the transaction authority both relationships call.
+- [Canonical flows](/airai/concepts/canonical-flows) — Butler, Concierge, and proof-handoff sequences end to end.

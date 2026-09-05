@@ -1,0 +1,103 @@
+---
+title: "What AIR AI is"
+description: "The identity, money, consent, policy, and audit layer for AI agents — so agents can act on behalf of users with the user staying sovereign over their data and delegation."
+---
+
+import AirAiAlphaAccess from "/snippets/airai-alpha-access.mdx";
+
+AIR AI is the layer that lets AI agents safely **act on behalf of users** — verifying
+identity, moving money, and accessing services — while the user stays sovereign over
+their data and delegation.
+
+We build **infrastructure**, not agents: plugins, MCP tools, and SDKs that any agent can
+integrate. The user keeps control; the agent becomes their trusted delegate. Every
+sensitive action is permissioned, provable, and revocable.
+
+<AirAiAlphaAccess />
+
+<Frame caption="How user-facing agents, AIR AI plugins, the AIR AI Services permission gate, the existing AIR Kit stack, and external rails compose — with HITL approval on the side. Click to zoom.">
+  <img src="/images/airai-architecture-horizontal.png" alt="AIR AI component architecture — external agent surfaces, AIR AI plugins, the AIR AI Services permission gate, AIR Kit, and external rails, with a HITL escalation lane" />
+</Frame>
+
+## The gaps we close
+
+AI agents won't scale until they can **act, be trusted, and interoperate**. Intelligence
+and memory are being solved by the AI labs. What's missing is the stack that lets agents
+safely carry identity, move money, and access data across the existing internet.
+
+<CardGroup cols={3}>
+  <Card title="Identity gap" icon="id-badge">
+    No portable standard for proving *who* an agent acts for and *what* it's authorized to do. Fragmented solutions (Visa TAP, Mastercard Agent Pay, Google AP2) — none interoperable.
+  </Card>
+  <Card title="Integration gap" icon="puzzle-piece">
+    The N×M integration problem. Brittle, doesn't scale. Every agent rebuilding identity, payment, and consent from scratch.
+  </Card>
+  <Card title="Finance gap" icon="coin">
+    Unbounded spend risks. No policy enforcement for agent transactions. No standard receipts, refunds, or revocation.
+  </Card>
+</CardGroup>
+
+## How AIR AI is put together
+
+AIR AI is a set of **capabilities your agent calls**, governed by **one policy and audit
+layer**, built on the existing [AIR Kit](/airkit/index) stack — not a new agent, rail, or
+commerce protocol.
+
+| Capability | What it controls |
+| --- | --- |
+| [AIR Identity (Agentic)](/airai/identity) | What an agent can know, prove, collect, store, or share. |
+| [AIR Money (Agentic)](/airai/money) | What an agent can spend, authorize, hold, route, or settle. |
+| [AIR Policy + Audit](/airai/policy-audit) | The boundary across both — consent, limits, revocation, and evidence for every action. |
+
+Builders reach these through [builder surfaces](/airai/builder-surfaces) — Account
+Binding, Agent Tools, Authorization Flows, and Integration Assets — delivered as a
+lightweight Skill / Plugin or a full AIR AI SDK. The user brings their AIR account (set up once
+via AIR Kit); a builder makes an agent AIR-capable by installing an AIR package.
+
+## What we build, and what we don't
+
+<Columns cols={2}>
+  <div>
+    <Check>**MCP servers, CLIs, and plugins**</Check>
+    <Check>**Flexible infrastructure** for one-to-many agent use cases</Check>
+    <Check>**Identity, money, and reputation capabilities**</Check>
+    <Check>**`npm install` today, no-code / 1-click later**</Check>
+    <Check>**A user permission surface** to approve, monitor, limit, and revoke agent access</Check>
+  </div>
+  <div>
+    <Warning>We don't build our own AI agents</Warning>
+    <Warning>We don't build our own agent frameworks</Warning>
+    <Warning>We don't build agent skills or execution logic — we ship plugins, not skills</Warning>
+    <Warning>We don't build agent orchestration or memory</Warning>
+  </div>
+</Columns>
+
+## Two ways into these docs
+
+<CardGroup cols={2}>
+  <Card title="Understand what AIR AI does" icon="compass" href="/airai/how-it-works">
+    Start with the five-stage lifecycle and a worked checkout, then see where your
+    agentic strategy fits.
+  </Card>
+  <Card title="Start building" icon="code" href="/airai/integration-paths">
+    Pick a delivery path — Skill / Plugin or AIR AI SDK — and integrate against AIR's builder
+    surfaces.
+  </Card>
+</CardGroup>
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="route" href="/airai/how-it-works">
+    The five-stage lifecycle every sensitive agent action follows, with a status-matched checkout example.
+  </Card>
+  <Card title="How you can work with AIR AI" icon="handshake" href="/airai/fit">
+    The ways to work with AIR — whether you already know what you're building or are still exploring — and what you bring vs. what AIR provides.
+  </Card>
+  <Card title="Agent taxonomy" icon="sitemap" href="/airai/concepts/agent-taxonomy">
+    Butler and Concierge agents — and how AIR's permission layer applies to each.
+  </Card>
+  <Card title="Reference architecture" icon="diagram-project" href="/airai/concepts/architecture">
+    The five-layer model from external agent surface down to external rails, and the invariant every sensitive action follows.
+  </Card>
+</CardGroup>

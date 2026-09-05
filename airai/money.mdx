@@ -1,0 +1,99 @@
+---
+title: "AIR Money (Agentic)"
+description: "Transaction authority for agents. What an agent can spend, authorize, hold, route, or settle on behalf of a user."
+---
+
+AIR Money (Agentic) is the transaction authority for agents. It controls what an agent
+can spend, authorize, hold, route, or settle on behalf of a user.
+
+<Info>
+**The core question.** Can the policy engine stop a \$5/day agent from spending on an
+out-of-scope merchant, while still letting it renew a subscription or top up a
+stablecoin balance?
+</Info>
+
+## Graduated autonomy
+
+AIR Money (Agentic) supports three levels of authority. Users move up the ladder as trust
+grows; partners and merchants pick the level appropriate to the task.
+
+<Steps>
+  <Step title="Full account operation — human in the loop">
+    The agent prepares the transaction, but every payment requires explicit user
+    confirmation. Used for first-time merchants, large amounts, or high-risk categories.
+  </Step>
+  <Step title="Sub-accounts with delegated budgets">
+    The user provisions a sub-account or burner card with a fixed balance. The agent
+    transacts freely within the sub-account; the main account is never touched.
+  </Step>
+  <Step title="Action-restricted spending — policy engine allowlists / denylists">
+    The agent transacts directly under a spend mandate. The policy engine evaluates each
+    request against budgets, merchant scope, category scope, expiry, and approval thresholds.
+  </Step>
+</Steps>
+
+## What AIR Money (Agentic) controls
+
+- **Spend mandate** — bounded transaction authority granted to an agent.
+- **Budget cap** — total amount cap, per-transaction cap, or recurring cap.
+- **Merchant scope** — allowlist of merchants the mandate applies to.
+- **Category scope** — allowlist of merchant categories (e.g. office supplies, travel, groceries).
+- **Expiry** — time-bound authority.
+- **Approval threshold** — amount above which user confirmation is required.
+- **Wallet / account reference** — which AIR Account & Money wallet, sub-account, or instrument funds the spend.
+- **Sub-account / burner card** — isolated balance or virtual card bound to the mandate.
+- **Payment authorization** — the policy-approved authorization to initiate a payment.
+- **Rail selection** — which payment rail or framework adapter is used.
+- **Receipt** — user-visible and machine-readable evidence.
+- **Refund / dispute** — the path for reversing a settled payment.
+
+## A spend mandate in plain terms
+
+A spend mandate is the contract between user and agent for what the agent is allowed to
+pay for. It might say:
+
+> Up to **\$50** with **`merchant_abc`**, in the **office supplies** category, expiring
+> **Friday at midnight**, with user approval required for any single charge above **\$25**.
+
+When the agent later requests a payment, AIR Policy + Audit checks the mandate, and AIR
+Money (Agentic) returns an authorization, denial, or "approval required" response — with
+a receipt for every outcome.
+
+## What an agent receives, and what it never receives
+
+<Columns cols={2}>
+  <div>
+    <Check>A spend mandate it can use within scope</Check>
+    <Check>A payment authorization for an in-scope request</Check>
+    <Check>A merchant-bound payment instrument or token</Check>
+    <Check>A receipt for every successful or failed payment</Check>
+    <Check>A refund or dispute reference if needed</Check>
+  </div>
+  <div>
+    <Warning>Wallet signing keys</Warning>
+    <Warning>Card numbers or rail credentials</Warning>
+    <Warning>Unrestricted account access</Warning>
+    <Warning>Authority outside the mandate scope</Warning>
+    <Warning>Persistent payment authority after expiry or revocation</Warning>
+  </div>
+</Columns>
+
+<Note>
+How a **Butler** (bounded mandates, delegated sub-accounts, persistent authority within
+budget) and a **Concierge** (merchant-bound, single-purpose authorization) use money
+differently is covered once in [Agent taxonomy](/airai/concepts/agent-taxonomy).
+</Note>
+
+## Working with rails and frameworks
+
+AIR Money (Agentic) does not replace existing payment rails. It composes with x402, AP2,
+Stripe ACP / SPT, Visa TAP, Mastercard Agent Pay / KYA, and MPP / Tempo through framework
+adapters in AIR Kit.
+
+See [Existing frameworks](/airai/concepts/frameworks) for the full mapping.
+
+## Next
+
+- [AIR Identity (Agentic)](/airai/identity) — the information authority that pairs with this transaction authority.
+- [AIR Policy + Audit](/airai/policy-audit) — the shared control layer that gates every money action.
+- [Canonical flows: spend mandate](/airai/concepts/canonical-flows#spend-mandate) — end-to-end sequence for graduated agent spending.
