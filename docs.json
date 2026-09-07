@@ -21,9 +21,15 @@
   "favicon": "/images/icon.png",
   "theme": "mint",
   "colors": {
-    "primary": "#000",
-    "light": "#000",
-    "dark": "#000"
+    "primary": "#002536",
+    "light": "#9BD5EA",
+    "dark": "#000000"
+  },
+  "background": {
+    "color": {
+      "light": "#FAFAFA",
+      "dark": "#000000"
+    }
   },
   "appearance": {
     "default": "light",
@@ -80,11 +86,11 @@
       {
         "tab": "AIR Kit",
         "pages": [
+          "airkit/index",
           "airkit/integrating-using-ai",
           {
             "group": "Overview",
             "pages": [
-              "airkit/index",
               "airkit/when-to-use-airkit",
               "airkit/environments",
               "airkit/platform-matrix"
