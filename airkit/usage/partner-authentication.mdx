@@ -1,57 +1,56 @@
 ---
-title: "SDK Authentication (Partner JWT)"
-description: "Sign a Partner JWT from your backend to authenticate AIR Kit SDK operations — covers supported signing algorithms, required claims, and JWKS hosting setup."
+title: "Partner Authentication (JWT)"
+description: "Use one Partner JWT trust model across Custom Auth, AIR Kit SDK operations, and authenticated backend API requests."
 ---
 
 import JwksBlockingWarning from "/snippets/jwks-blocking-warning.mdx";
 
 <JwksBlockingWarning />
 
-You need to generate and use the JWT when:
+AIR uses one **Partner JWT** trust model wherever a partner must authenticate to
+AIR. Your backend signs the token with the partner signing key, and AIR validates
+the signature against the public key in your registered JWKS. Custom Auth and
+credential API operations use this same mechanism; they are not different JWT
+types.
+
+You generate a Partner JWT when:
 
 - Authenticating a User
 - Performing credentials-related operations such as issuing or verifying credentials
 
-For **server-side issuance** without user presence, sign a Partner JWT with `scope: "issue"` and `typ: "JWT"`. The JWT no longer carries an `email` claim — the credential recipient is identified when you call `initialize-user` (the email is passed in the request body), not through a JWT claim. See [Issuing Credentials](/airkit/usage/credential/issuing-credentials#server-side-issuance) for concepts and [Issuance API Reference](/airkit/usage/credential/issuance-api) for endpoint usage.
-
-**JWT Details**
+## Partner JWT contract
 
 - **Signing algorithms supported:** ES256, RS256
 - **Expiry**: 5 min (recommended)
-- **Claims**: varies depending on the operation. You would always need to include your `partnerId` as one of the claims
+- **Claims**: include `partnerId` and normal JWT timing claims such as `iat` and `exp`. Add an operation-specific claim only when that operation documents it.
 - **Header**: You must include a `kid` (Key ID) header to indicate which key was used to sign the JWT. AIR Kit uses `kid` to select the matching key from your JWKS endpoint.
 - **JWKS URL**: AIR Kit validates your JWT using JWK standards ([RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517)). You must publish your public key at a JWKS URL and register it in the dashboard. See [JWKS endpoint setup](/airkit/usage/jwks-setup) for the full procedure.
 
 To learn more about JWT, visit [jwt.io](https://www.jwt.io).
 
+| Operation | Partner JWT claims | Data sent outside the JWT |
+| --- | --- | --- |
+| Custom Auth | `partnerId`, `email`, `iat`, `exp` | None. `email` identifies the already-authenticated user being brought into AIR. |
+| `POST /auth/initialize-user` | `partnerId`, `email`, `iss`, `iat`, `exp` | Send the signed Partner JWT as `partnerJwt` in the request body. `email` identifies the account to resolve. |
+| Other backend or SDK operations | `partnerId`, timing claims, and only the additional claims documented for that operation | Follow the endpoint or SDK method contract. Do not assume an issuance-wide scope claim. |
+
+<Note>
+  A claim such as `scope` does not create a different kind of JWT. If an
+  operation validates a scope, that requirement belongs in that operation's
+  reference documentation.
+</Note>
+
 ## JWKS endpoint (required for all credential SDK operations)
 
-`issueCredential`, `verifyCredential`, and on-demand issuance all rely on the same Partner JWT trust model — AIR Kit fetches your registered JWKS URL and validates every JWT against it. The endpoint must be:
+Custom Auth, `issueCredential`, `verifyCredential`, and direct API operations
+all rely on this trust model. AIR fetches your registered JWKS URL and validates
+each Partner JWT against it. The endpoint must be:
 
 - A **public HTTPS URL** reachable from AIR servers (localhost is not enough).
 - Registered in **Dashboard → Account → General Settings → JWKS URL** as the full URL your app actually serves.
 - Returning a JSON document whose `keys[].kid` matches the `kid` you set in your JWT header.
 
 The canonical Next.js route is `app/api/.well-known/jwks/route.ts`, used by every issuer and verifier in [`air-examples`](https://github.com/MocaNetwork/air-examples). For implementation, dashboard registration, local HTTPS tunnels, and the `kid` rule, see the [JWKS endpoint setup](/airkit/usage/jwks-setup) page.
-
-## Issuance JWT
-
-For AIR Kit `issueCredential` and
-[On-demand issuance](/airkit/usage/credential/issuing-credentials#on-demand-issuance), use a Partner JWT with
-these fields. For on-demand issuance, the recipient is resolved through the
-`initialize-user` call, so **no `email` claim is required in the JWT**.
-
-| Category | Required fields | Notes |
-| --- | --- | --- |
-| Claims | `partnerId`, `scope: "issue"` | No `email` claim — the recipient is passed to `initialize-user`, not the JWT |
-| Header | `kid`, `typ: "JWT"` | `kid` identifies which key in your JWKS is used |
-| Algorithm | `RS256` or `ES256` | Keep consistent with your JWKS key type |
-| Expiry | `exp` (recommended 5 minutes) | Short-lived token recommended |
-
-JWKS reminders for issuance:
-
-- `kid` in JWT header must match a key ID exposed by your JWKS endpoint
-- JWKS endpoint must be publicly reachable by AIR Kit
 
 ### Next.js Partner JWT endpoint
 
@@ -61,7 +60,9 @@ Install `jose`:
 pnpm add jose
 ```
 
-Create a server-only endpoint that returns a five-minute issuance token:
+Create a server-only helper that returns a five-minute Partner JWT. The base
+token contains the common claims; the caller supplies only claims required by
+its operation:
 
 ```ts app/api/partner-jwt/route.ts
 import { NextResponse } from "next/server";
@@ -74,17 +75,16 @@ function wrapPrivateKeyPem(body: string): string {
   return `-----BEGIN PRIVATE KEY-----\n${trimmed}\n-----END PRIVATE KEY-----`;
 }
 
-export async function POST() {
+async function signPartnerJwt(additionalClaims: Record<string, unknown> = {}) {
   try {
     const privateKeyBody = process.env.PARTNER_PRIVATE_KEY;
     const algorithm = process.env.SIGNING_ALGORITHM;
     const partnerId = process.env.NEXT_PUBLIC_PARTNER_ID;
+    const keyId = process.env.PARTNER_KEY_ID;
+    const issuer = process.env.ISSUER_ORIGIN;
 
-    if (!privateKeyBody || !algorithm || !partnerId) {
-      return NextResponse.json(
-        { error: "Missing Partner JWT configuration" },
-        { status: 500 },
-      );
+    if (!privateKeyBody || !algorithm || !partnerId || !keyId || !issuer) {
+      throw new Error("Missing Partner JWT configuration");
     }
 
     const privateKey = await jose.importPKCS8(
@@ -93,25 +93,29 @@ export async function POST() {
     );
     const now = Math.floor(Date.now() / 1000);
 
-    const token = await new jose.SignJWT({
-      partnerId,
-      scope: "issue",
-    })
+    return await new jose.SignJWT({ partnerId, ...additionalClaims })
       .setProtectedHeader({
         alg: algorithm,
-        kid: partnerId,
+        kid: keyId,
         typ: "JWT",
       })
+      .setIssuer(issuer)
       .setIssuedAt(now)
       .setExpirationTime(now + 5 * 60)
       .sign(privateKey);
+  } catch {
+    throw new Error("Failed to sign Partner JWT");
+  }
+}
 
+export async function POST() {
+  try {
+    // Resolve this value from your authenticated user or trusted backend event.
+    const email = "user@example.com";
+    const token = await signPartnerJwt({ email });
     return NextResponse.json({ token });
   } catch {
-    return NextResponse.json(
-      { error: "Failed to sign Partner JWT" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to sign Partner JWT" }, { status: 500 });
   }
 }
 ```

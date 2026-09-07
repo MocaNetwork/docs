@@ -111,27 +111,29 @@ const { getPartnerJwt } = require('./lib/jwt');
 // issuer-controlled helpers backed by your signing keys
 const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
 
-const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
+const AIR_API_URL = 'https://air.api.sandbox.air3.com/v2';
+const MOCA_CHAIN_API_URL = 'https://api.sandbox.mocachain.org/v1';
 
 // Resolve the recipient, then build, sign, encrypt, and store the credential in DStorage
 async function issueEncryptedCredential({ recipientEmail, schemaId, credentialSubject }) {
-  const token = await getPartnerJwt();
+  const token = await getPartnerJwt(recipientEmail);
 
-  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
+  const init = await fetch(`${AIR_API_URL}/auth/initialize-user`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
-    body: JSON.stringify({ email: recipientEmail }),
+    headers: { 'Content-Type': 'application/json', 'x-partner-id': process.env.PARTNER_ID },
+    body: JSON.stringify({ partnerJwt: token }),
   }).then((r) => r.json());
 
   const vc = buildVc({ holderDid: init.did, schemaId, credentialSubject });
   const encrypted = encryptToHolder(signVc(vc), init.publicKey); // BJJ_SIG_2021, encrypted to holder
 
-  const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
+  const res = await fetch(`${MOCA_CHAIN_API_URL}/dstorage/vcs`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
     body: JSON.stringify({
       holderDid: init.did,
       schemaId,
+      proofType: 'BJJ_SIG_2021',
       expiresAt: vc.expirationDate,
       data: encrypted.encryptedData,
       iv: encrypted.iv,

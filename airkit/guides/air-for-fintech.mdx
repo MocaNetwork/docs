@@ -80,21 +80,22 @@ const { getPartnerJwt } = require('./lib/jwt');
 // issuer-controlled helpers backed by your signing keys
 const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
 
-const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
+const AIR_API_URL = 'https://air.api.sandbox.air3.com/v2';
+const MOCA_CHAIN_API_URL = 'https://api.sandbox.mocachain.org/v1';
 
 async function issueKycCredential({ userEmail, kycResult }) {
   if (kycResult.status !== 'APPROVED') return; // only issue on success
 
-  const token = await getPartnerJwt();
+  const token = await getPartnerJwt(userEmail);
 
   // Resolve the user's AIR Account
-  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
+  const init = await fetch(`${AIR_API_URL}/auth/initialize-user`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
-    body: JSON.stringify({ email: userEmail }),
+    headers: { 'Content-Type': 'application/json', 'x-partner-id': process.env.PARTNER_ID },
+    body: JSON.stringify({ partnerJwt: token }),
   }).then((r) => r.json());
 
-  // Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  // Build, sign as BJJ_SIG_2021, and encrypt the credential to the holder
   const schemaId = process.env.KYC_CREDENTIAL_ID;
   const vc = buildVc({
     holderDid: init.did,
@@ -111,12 +112,13 @@ async function issueKycCredential({ userEmail, kycResult }) {
   const encrypted = encryptToHolder(signVc(vc), init.publicKey);
 
   // Store the encrypted envelope in DStorage
-  const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
+  const res = await fetch(`${MOCA_CHAIN_API_URL}/dstorage/vcs`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
     body: JSON.stringify({
       holderDid: init.did,
       schemaId,
+      proofType: 'BJJ_SIG_2021',
       expiresAt: vc.expirationDate,
       data: encrypted.encryptedData,
       iv: encrypted.iv,

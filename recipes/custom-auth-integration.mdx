@@ -10,11 +10,7 @@ If your app already authenticates users (via Firebase, Auth0, Supabase, or a cus
 1. Your app authenticates the user through your own system.
 2. Your backend signs a Partner JWT containing the user's `email`.
 3. Your frontend passes that JWT to `airService.login({ authToken })`.
-4. AIR Kit creates or loads the user's AIR Account, skipping the built-in login UI.
-
-<Note>
-When an email is provided in the JWT, AIR Kit verifies it with a one-time password the first time. After that initial verification, subsequent logins are seamless.
-</Note>
+4. AIR Kit creates or resolves the user's AIR Account and session, skipping the built-in login UI.
 
 ## Prerequisites
 

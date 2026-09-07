@@ -100,7 +100,7 @@ sequenceDiagram
 
 ## On-demand Issuance Flow
 
-Use this path when a **backend event** should trigger issuance without the user being present. Your issuer backend resolves the holder and calls its own `issue-vc` — the end user does not interact with AIR.
+Use this path when a **backend event** should trigger issuance without the user being present. Your issuer backend resolves the holder, signs and encrypts the credential, and stores it through DStorage — the end user does not interact with AIR.
 
 ```mermaid
 sequenceDiagram
@@ -110,10 +110,10 @@ sequenceDiagram
     participant DS as Encrypted DStorage
 
     Event->>Server: KYC passed / purchase confirmed / check-in scanned
-    Server->>Server: Sign Partner JWT (scope:"issue")
-    Server->>API: POST /auth/initialize-user { email }
+    Server->>Server: Sign Partner JWT { partnerId, email, ... }
+    Server->>API: POST /auth/initialize-user { partnerJwt }
     API-->>Server: { did, publicKey }
-    Server->>Server: POST /issue-vc (build, sign, encrypt)
+    Server->>Server: Build, sign, and encrypt credential
     Server->>DS: POST /dstorage/vcs (encrypted envelope)
     DS-->>Server: 201 { storagePath }
     Note over DS: User receives credential in AIR Account silently

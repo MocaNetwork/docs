@@ -1,24 +1,32 @@
 ---
-title: "Host an issuer backend and database"
-description: "Deploy the AIR issuer service and its PostgreSQL database on Railway, Neon, Supabase, Render, or Koyeb for AIR Kit sandbox credential issuance."
-sidebarTitle: "Backend and database hosting"
+title: "Host the reference issuer service"
+description: "Deploy the AIR reference issuer service for sandbox credential issuance, including its sample application stack and datastore."
+sidebarTitle: "Reference issuer hosting"
 keywords: ["issuer backend", "database", "postgresql", "railway", "neon", "supabase", "render", "koyeb", "hosting", "sandbox", "DATABASE_URL"]
 ---
 
-This guide gets a small **issuer backend** and **PostgreSQL** online for AIR Kit sandbox work. It is for partners who need a quick place to run and test the [AIR issuer service](https://github.com/MocaNetwork/air-issuer-service) before they continue with [credential issuance](/airkit/quickstart/issue-credentials).
+This guide deploys [`air-issuer-service`](https://github.com/MocaNetwork/air-issuer-service),
+one reference implementation of the issuer-backend contract, for AIR Kit
+sandbox testing. It does not define AIR architecture requirements, and you can
+implement the same public endpoint contract with another language, framework,
+or datastore.
+
+Our sample issuer service is built with TypeScript, NestJS, MikroORM, and PostgreSQL.
 
 ## What you are hosting
 
 | Component | What it stores / does | What it is not |
 | --- | --- | --- |
 | **Issuer backend** | Serves `available-vc`, `issue-vc`, credential status, and Partner JWT–related APIs | Not the AIR Kit client SDK |
-| **PostgreSQL** | Issuer app state (migrations, issuance history) and your source data for eligibility / claims | Not where AIR stores encrypted credentials |
+| **PostgreSQL (sample choice)** | State used by the reference service, including migrations and issuance history | Not an AIR platform requirement and not where AIR stores encrypted credentials |
 | **AIR DStorage** | Encrypted credential envelopes on Moca Chain | Not a replacement for your Postgres |
 
-Your database supports **Your** issuer application. Credential payloads remain encrypted and stored in [DStorage](/learn/security/credential-security#credential-storage).
+The database supports your issuer application. Credential payloads remain encrypted and stored in [DStorage](/learn/security/credential-security#credential-storage).
 
 <Note>
-  Running Postgres yourself is optional. The issuer service needs a connection string for `DATABASE_URL` in order to store responses.
+  AIR does not require PostgreSQL. This sample service uses it through
+  `DATABASE_URL`; a compatible issuer backend may use another persistence
+  design.
 </Note>
 
 ## Choose a path
@@ -32,9 +40,10 @@ Your database supports **Your** issuer application. Credential payloads remain e
 
 ## Prerequisites
 
+- An engineer who can develop and deploy a backend application
 - A GitHub account (to deploy [`air-issuer-service`](https://github.com/MocaNetwork/air-issuer-service))
 - An [AIR Developer Dashboard](https://developers.sandbox.air3.com/dashboard) Partner ID
-- Issuer secrets ready (or generate them during setup): `SEED`, Partner JWT private key, `API_KEY`, `ADMIN_API_KEY` — see [Partner authentication](/airkit/usage/partner-authentication) and the issuance quickstart
+- Issuer signing and Partner JWT keys, plus `API_KEY` and `ADMIN_API_KEY` — see [Partner authentication](/airkit/usage/partner-authentication) and the issuance quickstart
 
 ## Recommended path: Railway (backend + Postgres)
 
@@ -81,13 +90,12 @@ Your database supports **Your** issuer application. Credential payloads remain e
     AIR_API_ORIGIN=https://air.api.sandbox.air3.com
     MOCA_CHAIN_API_ORIGIN=https://api.sandbox.mocachain.org
 
-    SEED=0x<64-hex-characters>
-
     NODE_ENV=sandbox | mainnet
     PARTNER_ID=<dashboard-partner-id>
     PARTNER_PRIVATE_KEY_KID=<dashboard-partner-id>
-    PARTNER_PRIVATE_KEY_ALG=RS256
+    PARTNER_PRIVATE_KEY_ALG=ES256
     PARTNER_PRIVATE_KEY_DER=<pkcs8-private-key-body-without-pem-markers>
+    SD_JWT_JWKS='<public-jwks-json>'
     SD_JWT_HASH_ALG=sha-256
 
     API_KEY=<generated-api-key>
@@ -108,39 +116,34 @@ Your database supports **Your** issuer application. Credential payloads remain e
     ISSUER_ORIGIN=https://<your-railway-domain>
     ```
 
-    No trailing slash. `ISSUER_ORIGIN` is embedded in credential status URLs, so it must match the public origin that serves `/credential-status/:nonce`.
+    No trailing slash. For SD-JWT credentials, the reference service uses this
+    value as the `iss` claim and publishes it at
+    `/.well-known/jwt-vc-issuer`.
   </Step>
 
   <Step title="Verify the deployment">
     After the deploy succeeds:
 
     ```bash
-    curl -s https://<your-railway-domain>/ready | jq .
+    curl -fsS https://<your-railway-domain>/.well-known/jwt-vc-issuer | jq .
     ```
 
-    Expect HTTP `200` with healthy checks:
+    Expect HTTP `200` with the configured issuer and public JWKS:
 
     ```json
     {
-      "status": "ready",
-      "checks": {
-        "database": { "status": "ok" },
-        "migrations": { "status": "ok", "pending": [] },
-        "issuer": { "status": "ok", "did": "did:air:..." }
-      }
+      "issuer": "https://<your-railway-domain>",
+      "jwks": { "keys": [{ "kid": "...", "kty": "EC", "alg": "ES256" }] }
     }
-    ```
-
-    Then fetch the issuer DID:
-
-    ```bash
-    curl -s https://<your-railway-domain>/.well-known/issuer-did | jq .
     ```
   </Step>
 </Steps>
 
 <Check>
-  When `/ready` reports `status: "ready"` over public HTTPS, your sandbox backend and database are hosted. Continue with issuer activation and schema setup in [Quickstart 2: Credential issuance](/airkit/quickstart/issue-credentials).
+  When `/.well-known/jwt-vc-issuer` returns the expected issuer and JWKS over
+  public HTTPS, the reference service is reachable. Continue with Dashboard
+  configuration and the end-to-end test in [Quickstart 2: Credential
+  issuance](/airkit/quickstart/issue-credentials).
 </Check>
 
 ### Railway Free plan caveats
@@ -181,10 +184,12 @@ Point `DATABASE_URL` at your external Postgres, set `ISSUER_ORIGIN` to the publi
 
 Hosting the backend is not enough for credential flows. Complete these next:
 
-1. **Register the issuer with AIR** — Issuer DID, `API_KEY`, and Partner ID. See [issuing credentials](/airkit/usage/credential/issuing-credentials) and the [issuance quickstart](/airkit/quickstart/issue-credentials#step-3-register-the-issuer-with-air).
-2. **Publish JWKS over HTTPS** — Required for `issueCredential` / `verifyCredential`. Often hosted on your web app (Vercel, Netlify, etc.), not necessarily on the issuer service. See [JWKS endpoint setup](/airkit/usage/jwks-setup).
-3. **Keep secrets server-side** — Partner private key, `SEED`, and API keys never ship to the browser. See [Partner authentication](/airkit/usage/partner-authentication) and the [security checklist](/learn/security/security-checklist).
-4. **Whitelist domains** — Add your web app origin in the Developer Dashboard under **Account → Domains**.
+1. **Test public HTTPS access** — Verify `/.well-known/jwt-vc-issuer` from outside your network.
+2. **Configure the issuer backend in the Dashboard** — Open **Issuer → Settings**, enter the issuer identifier, Issuer Backend URL, full `/available-vc` and `/issue-vc` URLs, and `API_KEY`, then save. See [issuing credentials](/airkit/usage/credential/issuing-credentials) and the [issuance quickstart](/airkit/quickstart/issue-credentials#step-5-configure-the-issuer-backend-in-the-dashboard).
+3. **Publish Partner JWKS over HTTPS** — Required for Partner JWT validation. Register the exact URL in the Dashboard. See [JWKS endpoint setup](/airkit/usage/jwks-setup).
+4. **Keep secrets server-side** — Private signing keys and API keys never ship to the browser. See [Partner authentication](/airkit/usage/partner-authentication) and the [security checklist](/learn/security/security-checklist).
+5. **Whitelist domains** — Add your web app origin in the Developer Dashboard under **Account → Domains**.
+6. **Run an end-to-end test** — Start issuance in the frontend and confirm AIR calls both issuer endpoints.
 
 ## Local development
 

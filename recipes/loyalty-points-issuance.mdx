@@ -35,7 +35,9 @@ See [Schema Creation](/airkit/usage/credential/schema-creation) for full setup i
 When your loyalty engine determines a user has crossed a tier boundary, resolve the recipient, then build, sign, encrypt, and store a fresh tier credential. Dedupe by recipient email + program ID and revoke the previous tier credential before reissuing.
 
 <Warning>
-The recipient's email (passed to `initialize-user`) is the routing key that determines which AIR Account the credential lands in. Resolve it from the triggering event, and never reuse a partner, service, admin, or static email across recipients — every credential issued against that email lands in the same account.
+The Partner JWT's signed `email` claim is the routing key that determines which
+AIR Account the credential lands in. Resolve it from the triggering event, and
+never reuse a partner, service, admin, or static email across recipients.
 </Warning>
 
 ```js
@@ -45,31 +47,37 @@ const fs = require("fs");
 const { buildVc, signVc, encryptToHolder } = require("./lib/credential");
 
 const privateKey = fs.readFileSync("path/to/private.key");
-const BASE_URL = process.env.API_BASE_URL || "https://api.sandbox.mocachain.org/v1";
+const AIR_API_URL = process.env.AIR_API_URL || "https://air.api.sandbox.air3.com/v2";
+const MOCA_CHAIN_API_URL = process.env.MOCA_CHAIN_API_URL || "https://api.sandbox.mocachain.org/v1";
 
-function getPartnerJwt() {
+function getPartnerJwt(recipientEmail) {
   const now = Math.floor(Date.now() / 1000);
   return jwt.sign(
-    // No email claim — the recipient is passed to initialize-user, not the JWT
-    { partnerId: process.env.PARTNER_ID, scope: "issue", iat: now, exp: now + 300 },
+    {
+      partnerId: process.env.PARTNER_ID,
+      email: recipientEmail,
+      iss: process.env.ISSUER_ORIGIN,
+      iat: now,
+      exp: now + 300,
+    },
     privateKey,
     { algorithm: "RS256", header: { kid: process.env.KEY_ID, typ: "JWT" } }
   );
 }
 
 async function issueLoyaltyCredential(recipientEmail, tierData) {
-  const token = getPartnerJwt();
+  const token = getPartnerJwt(recipientEmail);
 
   // 1. Resolve or create the recipient's AIR Account
-  const initRes = await fetch(`${BASE_URL}/auth/initialize-user`, {
+  const initRes = await fetch(`${AIR_API_URL}/auth/initialize-user`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "x-partner-auth": token },
-    body: JSON.stringify({ email: recipientEmail }),
+    headers: { "Content-Type": "application/json", "x-partner-id": process.env.PARTNER_ID },
+    body: JSON.stringify({ partnerJwt: token }),
   });
   if (!initRes.ok) throw new Error(`initialize-user failed: ${initRes.status}`);
   const { did, publicKey } = await initRes.json();
 
-  // 2. Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  // 2. Build, sign, and encrypt the credential to the holder
   const schemaId = process.env.LOYALTY_CREDENTIAL_ID;
   const vc = buildVc({
     holderDid: did,
@@ -84,7 +92,7 @@ async function issueLoyaltyCredential(recipientEmail, tierData) {
   const encrypted = encryptToHolder(signVc(vc), publicKey);
 
   // 3. Store the encrypted envelope in DStorage
-  const storeRes = await fetch(`${BASE_URL}/dstorage/vcs`, {
+  const storeRes = await fetch(`${MOCA_CHAIN_API_URL}/dstorage/vcs`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-partner-auth": token },
     body: JSON.stringify({
