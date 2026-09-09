@@ -81,6 +81,10 @@ html {
   color-scheme: light;
 }
 
+::marker {
+  color: var(--air-text-primary) !important;
+}
+
 html,
 body {
   min-height: 100%;
@@ -913,8 +917,19 @@ body:not(:has(.docs-landing)) #content-area #header p {
   font-size: 19px;
 }
 
-#content-area div.mdx-content.prose>span[data-as=p]:last-child, #content-area div.mdx-content.prose-sm>span[data-as=p]:last-child, #content-area div.mdx-content .prose>span[data-as=p]:last-child, #content-area div.mdx-content .prose-sm>span[data-as=p]:last-child {
+#content-area .card span[data-as=p]:last-child {
   color: var(--air-text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+body:not(:has(.docs-landing)) card:hover, 
+body:not(:has(.docs-landing)) #content-area .card:hover, 
+body:not(:has(.docs-landing)) #content .card:hover {
+  border-top-color: var(--air-decorative-blue) !important;
+  border-right-color: var(--air-decorative-blue) !important;
+  border-bottom-color: var(--air-decorative-blue) !important;
+  border-left-color: var(--air-decorative-blue) !important;
 }
 
 body:not(:has(.docs-landing)) #content-area p + p,
@@ -925,7 +940,7 @@ body:not(:has(.docs-landing)) #content-area ol {
 
 body:not(:has(.docs-landing)) #content-area ul,
 body:not(:has(.docs-landing)) #content-area ol {
-  padding-left: var(--air-spacing-x-large);
+  padding-left: var(--air-spacing-medium);
 }
 
 body:not(:has(.docs-landing)) #content-area a,
@@ -1078,6 +1093,10 @@ nav[aria-label="Table of contents"] a {
 nav[aria-label="On this page"] a:hover,
 nav[aria-label="Table of contents"] a:hover {
   color: var(--air-link-hover);
+}
+
+div[data-component-part="step-indicator"] > div {
+  font-weight: 500 !important;
 }
 
 /* ── Motion ──────────────────────────────────────────────────────────── */
