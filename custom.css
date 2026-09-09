@@ -3,9 +3,13 @@
 /* ── AIR tokens (from the design-system preview) ─────────────────────── */
 
 :root {
-  --docs-sidebar-width: 300px;
+  --docs-sidebar-width: 280px;
+  --docs-article-width: 45rem;
+  --docs-toc-width: 220px;
   --docs-header-height: 72px;
   --docs-tabs-height: 44px;
+  --docs-chrome-height: 116px;
+  --docs-toc-offset: 148px;
   --mintlify-slot-header-height: 116px;
   --font-weight-body-custom: 400;
   --air-text-primary: #002536;
@@ -22,7 +26,7 @@
   --air-button-disabled: #d6e0e5;
   --air-button-outlined: #9fb3bf;
   --air-button-outlined-hover: #e3e9ea;
-  --air-border-divider: #d6e0e5;
+  --air-border-divider: #ECF0F2;
   --air-outline-default: #9fb3bf;
   --air-outline-focus: #002536;
   --air-link: #002536;
@@ -334,12 +338,22 @@ mobile-nav-tabs-item:focus-visible {
   border-right: 1px solid var(--air-border-divider);
 }
 
-@media (min-width: 1081px) {
-  #sidebar {
+@media (min-width: 1024px) {
+  body:not(:has(.docs-landing)) #sidebar {
     width: var(--docs-sidebar-width);
     min-width: var(--docs-sidebar-width);
     max-width: var(--docs-sidebar-width);
     padding: var(--air-spacing-2x-large) var(--air-spacing-large);
+    top: var(--docs-chrome-height);
+    height: calc(100vh - var(--docs-chrome-height));
+  }
+}
+
+@media (min-width: 1080px) {
+  #sidebar {
+    width: var(--docs-sidebar-width);
+    min-width: var(--docs-sidebar-width);
+    max-width: var(--docs-sidebar-width);
   }
   .peer-\[\.is-not-custom\]\:peer-\[\.is-not-center\]\:max-w-8xl:is(:where(.peer).is-not-custom~*):is(:where(.peer).is-not-center~*),
   .max-w-8xl {
@@ -867,7 +881,63 @@ mobile-nav-tabs-item:focus-visible {
   color: var(--air-text-primary);
 }
 
-/* ── Secondary reading pages (Moca Book) ─────────────────────────────── */
+/* ── Article page grid (not landing) ─────────────────────────────────── */
+/* 280 nav | leftover 720 article leftover | 64 gap | 220 TOC           */
+
+body:not(:has(.docs-landing)) #content-container > div:has(> #content-area) {
+  gap: var(--air-spacing-4x-large);
+  padding: var(--air-spacing-3x-large) var(--air-spacing-2x-large);
+  box-sizing: border-box;
+}
+
+@media (min-width: 1080px) {
+  body:not(:has(.docs-landing)) #content-side-layout {
+    display: flex !important;
+    flex: 0 0 var(--docs-toc-width);
+    align-self: flex-start;
+    width: var(--docs-toc-width) !important;
+    max-width: var(--docs-toc-width) !important;
+    top: var(--docs-toc-offset);
+    height: calc(100vh - var(--docs-toc-offset));
+  }
+
+  body:not(:has(.docs-landing)) #table-of-contents-layout {
+    display: flex !important;
+    width: var(--docs-toc-width) !important;
+    max-width: var(--docs-toc-width) !important;
+    padding-left: 0 !important;
+  }
+}
+
+body:not(:has(.docs-landing)) #content-area {
+  flex: 1 1 auto;
+  width: auto !important;
+  max-width: var(--docs-article-width);
+  min-width: 0;
+  margin-inline: auto;
+  margin-left: auto !important;
+  padding-inline: 0 !important;
+  padding-left: 0 !important;
+}
+
+body:not(:has(.docs-landing)) #content-area #content,
+body:not(:has(.docs-landing)) #content-area .mdx-content,
+body:not(:has(.docs-landing)) #content-area .prose {
+  max-width: none;
+  margin-inline: auto;
+}
+
+body:not(:has(.docs-landing)) #content-area [class*="--page-padding"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-inline: 0 !important;
+}
+
+body:not(:has(.docs-landing)) #content-area pre,
+body:not(:has(.docs-landing)) #content-area .code-block,
+body:not(:has(.docs-landing)) #content-area table {
+  max-width: 100%;
+}
 
 body:not(:has(.docs-landing)) #content-area,
 body:not(:has(.docs-landing)) #content {
@@ -1065,8 +1135,12 @@ body:not(:has(.docs-landing)) [data-component-part="card-title"] {
 toc,
 nav[aria-label="On this page"],
 nav[aria-label="Table of contents"] {
-  width: 220px !important;
-  max-width: 220px !important;
+  width: var(--docs-toc-width) !important;
+  max-width: var(--docs-toc-width) !important;
+}
+
+body:not(:has(.docs-landing)) #table-of-contents {
+  margin-top: 0 !important;
 }
 
 #table-of-contents h2,
@@ -1121,7 +1195,7 @@ div[data-component-part="step-indicator"] > div {
   }
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1079px) {
   .docs-landing .content {
     padding: var(--air-spacing-3x-large) var(--air-spacing-x-large);
   }
@@ -1139,17 +1213,44 @@ div[data-component-part="step-indicator"] > div {
     overflow-x: auto;
   }
 
+  body:not(:has(.docs-landing)) #content-container > div:has(> #content-area) {
+    padding: var(--air-spacing-3x-large) var(--air-spacing-x-large);
+  }
+
+  body:not(:has(.docs-landing)) #content-side-layout,
+  body:not(:has(.docs-landing)) #table-of-contents-layout,
   #table-of-contents,
   #table-of-contents-layout,
   nav[aria-label="On this page"],
   nav[aria-label="Table of contents"] {
-    display: none;
+    display: none !important;
   }
 }
 
 @media (max-width: 640px) {
   #navbar [class~="h-16"] {
     padding-inline: 16px !important;
+  }
+
+  body:not(:has(.docs-landing)) :has(> #content-container) {
+    padding-inline: 0 !important;
+    margin-inline: 0 !important;
+  }
+
+  body:not(:has(.docs-landing)) #content-container {
+    padding-inline: 0 !important;
+    margin-inline: 0 !important;
+    width: 100% !important;
+  }
+
+  body:not(:has(.docs-landing)) #content-container > div:has(> #content-area) {
+    padding: var(--air-spacing-2x-large) var(--air-spacing-large) !important;
+    padding-top: 150px !important;
+  }
+
+  body:not(:has(.docs-landing)) #content-area {
+    max-width: none;
+    padding-inline: 0 !important;
   }
 
   .docs-landing .content {
