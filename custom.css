@@ -95,13 +95,7 @@ body {
   color: var(--air-text-primary);
   font-family: var(--air-font-family);
   font-weight: 500;
-  background:
-    radial-gradient(
-      circle at top right,
-      color-mix(in srgb, var(--air-decorative-blue) 18%, transparent),
-      transparent 34rem
-    ),
-    var(--air-surface);
+  background: white;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -379,7 +373,7 @@ mobile-nav-tabs-item:focus-visible {
   display: block;
   padding: 7px 8px !important;
   border-radius: var(--air-corner-small) !important;
-  color: var(--air-text-secondary) !important;
+  color: #3B484F !important;
   font: var(--air-type-body-2) !important;
   background: transparent !important;
   text-decoration: none !important;
@@ -389,6 +383,11 @@ mobile-nav-tabs-item:focus-visible {
 #sidebar a:not(:has(img)):not(:has(.nav-logo)):hover {
   color: var(--air-text-primary) !important;
   background: var(--air-container-primary) !important;
+}
+
+#content-area div.mdx-content.prose>span[data-as=p], 
+#content-area div.mdx-content .prose>span[data-as=p] {
+  line-height: 28px;
 }
 
 #sidebar-content li[data-active] > a,
@@ -888,6 +887,8 @@ body:not(:has(.docs-landing)) #content-container > div:has(> #content-area) {
   gap: var(--air-spacing-4x-large);
   padding: var(--air-spacing-3x-large) var(--air-spacing-2x-large);
   box-sizing: border-box;
+  background: var(--air-surface);
+  
 }
 
 @media (min-width: 1080px) {
@@ -1172,6 +1173,7 @@ nav[aria-label="Table of contents"] a:hover {
 div[data-component-part="step-indicator"] > div {
   font-weight: 500 !important;
 }
+
 
 /* ── Motion ──────────────────────────────────────────────────────────── */
 
