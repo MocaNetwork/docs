@@ -1046,7 +1046,7 @@ body:not(:has(.docs-landing)) #content-area [data-callout-type] {
 }
 
 body:not(:has(.docs-landing)) #content-area [data-callout-type="note"] {
-  background: var(--air-container-primary);
+  background: #EEF8FB;
 }
 
 body:not(:has(.docs-landing)) #content-area [data-callout-type="info"] {
