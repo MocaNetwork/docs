@@ -718,7 +718,7 @@ mobile-nav-tabs-item:focus-visible {
   padding: var(--air-spacing-x-large);
   border: 2px solid transparent;
   border-radius: var(--air-corner-list-menu);
-  background: var(--air-container-secondary);
+  background: var(--air-container-primary);
   color: inherit;
   text-decoration: none;
   transition: border-color var(--air-motion-duration-fast) var(--air-motion-easing-standard);
@@ -994,13 +994,12 @@ body:not(:has(.docs-landing)) #content-area #header p {
   line-height: 1.5;
 }
 
-body:not(:has(.docs-landing)) card:hover, 
-body:not(:has(.docs-landing)) #content-area .card:hover, 
-body:not(:has(.docs-landing)) #content .card:hover {
-  border-top-color: var(--air-decorative-blue) !important;
-  border-right-color: var(--air-decorative-blue) !important;
-  border-bottom-color: var(--air-decorative-blue) !important;
-  border-left-color: var(--air-decorative-blue) !important;
+@layer utilities {
+  @media (hover: hover) {
+    body:not(:has(.docs-landing)) .hover\:border-primary\!:hover {
+      border-color: var(--air-decorative-blue) !important;
+    }
+  }
 }
 
 body:not(:has(.docs-landing)) #content-area p + p,
@@ -1268,11 +1267,13 @@ div[data-component-part="step-indicator"] > div {
     font: var(--air-type-body-1);
   }
 
-  .docs-landing .hero__actions {
-    flex-direction: column;
-  }
 
-  .docs-landing .hero__actions .air-btn,
+  .docs-landing .hero__actions{
+    width: 100%;
+    .air-btn {
+      flex: 1;
+    }
+  }
   .docs-landing .use-case-banner .section__actions,
   .docs-landing .use-case-banner .air-btn {
     width: 100%;
