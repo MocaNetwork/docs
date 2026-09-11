@@ -105,8 +105,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--air-outline-focus);
-  outline-offset: 2px;
+  outline: none;
 }
 
 /* ── Logo ────────────────────────────────────────────────────────────── */
@@ -283,11 +282,6 @@ nav-tabs {
 nav-tabs-item,
 .mobile-nav-tabs-item,
 mobile-nav-tabs-item {
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
   color: var(--air-text-secondary) !important;
   font: var(--air-type-body-2) !important;
   white-space: nowrap;
@@ -892,16 +886,6 @@ body:not(:has(.docs-landing)) #content-container > div:has(> #content-area) {
 }
 
 @media (min-width: 1080px) {
-  body:not(:has(.docs-landing)) #content-side-layout {
-    display: flex !important;
-    flex: 0 0 var(--docs-toc-width);
-    align-self: flex-start;
-    width: var(--docs-toc-width) !important;
-    max-width: var(--docs-toc-width) !important;
-    top: var(--docs-toc-offset);
-    height: calc(100vh - var(--docs-toc-offset));
-  }
-
   body:not(:has(.docs-landing)) #table-of-contents-layout {
     display: flex !important;
     width: var(--docs-toc-width) !important;
@@ -919,13 +903,6 @@ body:not(:has(.docs-landing)) #content-area {
   margin-left: auto !important;
   padding-inline: 0 !important;
   padding-left: 0 !important;
-}
-
-body:not(:has(.docs-landing)) #content-area #content,
-body:not(:has(.docs-landing)) #content-area .mdx-content,
-body:not(:has(.docs-landing)) #content-area .prose {
-  max-width: none;
-  margin-inline: auto;
 }
 
 body:not(:has(.docs-landing)) #content-area [class*="--page-padding"] {
@@ -1256,6 +1233,7 @@ div[data-component-part="step-indicator"] > div {
 
   .docs-landing .content {
     padding: var(--air-spacing-2x-large) var(--air-spacing-large);
+    padding-bottom: 50px;
   }
 
   .docs-landing .hero h1 {
