@@ -1,28 +1,33 @@
 const CODE_SAMPLES = {
-  javascript: `import { AirKit } from "@air3/airkit";
+  react: `import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
 
-const air = new AirKit({ partnerId: "pk_live_..." });
+const airService = new AirService({ partnerId: "YOUR_PARTNER_ID" });
+await airService.init({ buildEnv: BUILD_ENV.SANDBOX });
 
-const credential = await air.verify(user);
-// issued once · portable at every AIR3 partner`,
-  swift: `import AirKit
-
-let air = AirKit(partnerId: "pk_live_...")
-
-let credential = try await air.verify(user: user)
-// issued once · portable at every AIR3 partner`,
-  kotlin: `import com.air3.airkit.AirKit
-
-val air = AirKit(partnerId = "pk_live_...")
-
-val credential = air.verify(user)
-// issued once · portable at every AIR3 partner`,
+export function VerifyButton({ partnerJwt }) {
+  const verify = async () => {
+    await airService.login();
+    const { status } = await airService.verifyCredential({
+      authToken: partnerJwt, // Partner JWT, scope=verify
+      programId: "YOUR_PROGRAM_ID",
+    }); // "Compliant" → portable across AIR partners
+  };
+  return <button onClick={verify}>Verify credential</button>;
+}`,
   flutter: `import 'package:airkit/airkit.dart';
 
-final air = AirKit(partnerId: 'pk_live_...');
+final airService = AirService();
+await airService.initialize(
+  partnerId: 'YOUR_PARTNER_ID',
+  navigatorKey: navigatorKey,
+  env: Environment.sandbox,
+);
 
-final credential = await air.verify(user);
-// issued once · portable at every AIR3 partner`,
+await airService.login();
+final result = await airService.verifyCredential(
+  authToken: partnerJwt, // Partner JWT, scope=verify
+  programId: 'YOUR_PROGRAM_ID',
+); // Compliant → portable across AIR partners`,
 };
 
 function fillCodePanels(root) {
