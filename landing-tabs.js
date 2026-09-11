@@ -1,19 +1,14 @@
 const CODE_SAMPLES = {
-  react: `import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
+  javascript: `import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
 
 const airService = new AirService({ partnerId: "YOUR_PARTNER_ID" });
 await airService.init({ buildEnv: BUILD_ENV.SANDBOX });
+await airService.login();
 
-export function VerifyButton({ partnerJwt }) {
-  const verify = async () => {
-    await airService.login();
-    const { status } = await airService.verifyCredential({
-      authToken: partnerJwt, // Partner JWT, scope=verify
-      programId: "YOUR_PROGRAM_ID",
-    }); // "Compliant" → portable across AIR partners
-  };
-  return <button onClick={verify}>Verify credential</button>;
-}`,
+const { status } = await airService.verifyCredential({
+  authToken: partnerJwt, // Partner JWT, scope=verify
+  programId: "YOUR_PROGRAM_ID",
+}); // "Compliant" → portable across AIR partners`,
   flutter: `import 'package:airkit/airkit.dart';
 
 final airService = AirService();
