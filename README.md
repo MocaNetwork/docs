@@ -1,8 +1,8 @@
-![Moca Network Developer Docs](images/preview.png)
+![AIR Kit Developer Docs](images/preview.png)
 
-# Moca Network Developer Docs
+# AIR Kit Developer Docs
 
-This repository contains the source for the Moca Network developer documentation published at [docs.moca.network](https://docs.moca.network).
+This repository contains the source for the AIR Kit developer documentation published at [docs.air3.com](https://docs.air3.com).
 
 Use this README as the working contract for contributors: how the docs are organized, how to write content that fits the rest of the site, how to preview locally, and how to ship your change through a pull request on GitHub.
 
