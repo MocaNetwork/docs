@@ -159,7 +159,7 @@ In the PR description include:
   git rebase origin/main
   git push --force-with-lease
   ```
-- Once approved and CI is green, the PR is merged into `main` and Mintlify deploys the change to [docs.moca.network](https://docs.moca.network) automatically.
+- Once approved and CI is green, the PR is merged into `main` and Mintlify deploys the change to [docs.moca.network](https://docs.air3.com) automatically.
 
 ## Getting help
 

@@ -1,15 +1,13 @@
 ---
-title: "Use AI assistants to explore Moca Network docs"
-description: "Connect Moca Network documentation to AI tools via MCP for accurate, up-to-date answers about Moca Network, Moca Chain, and AIR Kit integration."
+title: "Use AI assistants to explore AIR Kit docs"
+description: "Connect AIR documentation to AI tools via MCP for accurate, up-to-date answers about Moca Network, Moca Chain, and AIR Kit integration."
 ---
-
-Connect Moca Network documentation to your AI tools to get contextual, up-to-date answers about Moca Network, Moca Chain, and AIR Kit. When you connect the MCP server, AI assistants can search the documentation directly instead of relying on training data.
 
 ## What is MCP?
 
 The Model Context Protocol (MCP) is an open protocol that creates standardized connections between AI applications and external services, like documentation. When an AI application connects to your documentation MCP server, it can search your documentation directly in response to your prompts instead of relying on information from its training data or making a generic web search.
 
-Your MCP server provides access to all indexed content on the Moca Network documentation site. AI applications determine when to use the search tool based on the context of the conversation and the relevance of the documentation.
+Your MCP server provides access to all indexed content on the AIR documentation site. AI applications determine when to use the search tool based on the context of the conversation and the relevance of the documentation.
 
 <Tip>
   You can also use the contextual menu on any page of the documentation to copy the MCP server URL or install it directly into Cursor or VS Code.
@@ -17,7 +15,7 @@ Your MCP server provides access to all indexed content on the Moca Network docum
 
 ## Connect to the MCP server
 
-Connect the Moca Network documentation MCP server to your preferred AI tool:
+Connect the AIR documentation MCP server to your preferred AI tool:
 
 import MCPConnectionTabs from "/snippets/mcp-connection-tabs.mdx";
 import IntegratingAiStaticAndClients from "/snippets/integrating-ai-static-and-clients.mdx";
@@ -26,12 +24,12 @@ import IntegratingAiStaticAndClients from "/snippets/integrating-ai-static-and-c
 
 ## Setup with other agents
 
-The Moca skill works with any tool that supports the [Agent Skills](https://agentskills.io/home) standard, including Cursor, VS Code Copilot, Gemini CLI, OpenAI Codex, and more.
+The AIR skill works with any tool that supports the [Agent Skills](https://agentskills.io/home) standard, including Cursor, VS Code Copilot, Gemini CLI, OpenAI Codex, and more.
 
 Run:
 
 ```bash
-npx skills add https://docs.moca.network
+npx skills add https://docs.air3.com
 ```
 
 The CLI detects your installed agents and places the skill in the correct directory for each one.
