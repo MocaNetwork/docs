@@ -3,6 +3,11 @@ title: "Identity & Compliance"
 description: "Issue a KYC credential once. Every partner in the ecosystem accepts it via zero-knowledge proof — no raw identity data ever transmitted."
 ---
 
+Every platform that needs to verify a user's identity runs its own KYC process and stores a copy of the result. AIR Kit lets you **issue a KYC credential once** that every partner in the ecosystem can verify via zero-knowledge proof, without raw identity data ever crossing the network.
+
+<Tabs>
+<Tab title="For business">
+
 ## The Problem
 
 Every platform that needs to verify a user's identity runs its own KYC process, stores a copy of the result, and takes on the liability for protecting it. The user goes through the same friction — passport upload, liveness check, waiting period — at every new service they join.
@@ -90,16 +95,36 @@ No. AIR Kit never receives PII. The On-demand issuance call contains only the cr
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Developer integration guide (Fintech & Identity)" icon="code" href="/airkit/guides/air-for-fintech">
-    KYC credential schemas, webhook code, and verification patterns.
-  </Card>
   <Card title="Full Compliance FAQ" icon="shield-check" href="/solutions/compliance-faq">
     GDPR, CCPA, data residency, and breach liability answers.
   </Card>
-  <Card title="Architecture & Data Flow" icon="diagram-project" href="/airkit/guides/overview">
+  <Card title="Architecture & Data Flow" icon="diagram-project" href="/learn/architecture">
     ZK proof flow explained end-to-end.
   </Card>
   <Card title="Talk to our team" icon="handshake" href="https://air3.com/partner-with-us">
     Start a partnership conversation.
   </Card>
 </CardGroup>
+
+</Tab>
+<Tab title="For developers">
+
+Identity credentials are issued and verified with the same AIR Kit flows used across every vertical. Start with the managed KYC service if you need identity verification out of the box, or wire your existing KYC provider into on-demand issuance.
+
+<CardGroup cols={2}>
+  <Card title="KYC (Veriff powered by zkMe)" icon="id-card" href="/kyc">
+    Managed identity verification that issues a KYC credential on pass. How it works, data handling, and pricing.
+  </Card>
+  <Card title="Issue a KYC credential on event" icon="code" href="/recipes/kyc-credential-on-event">
+    Recipe: convert your KYC provider's pass result into a portable credential from a backend webhook.
+  </Card>
+  <Card title="Quickstart: verify credentials" icon="shield-check" href="/airkit/quickstart/verify-credentials">
+    Verify a credential in your app and receive COMPLIANT / NON_COMPLIANT with no PII.
+  </Card>
+  <Card title="Fintech & Payments" icon="credit-card" href="/solutions/fintech">
+    KYC credential schema, webhook code, and verification patterns in the Fintech developer guide.
+  </Card>
+</CardGroup>
+
+</Tab>
+</Tabs>
