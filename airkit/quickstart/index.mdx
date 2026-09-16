@@ -1,13 +1,11 @@
 ---
-title: "Quickstart 1: Account Integration & User Onboarding"
+title: "Quickstart 1: Account integration and login"
 description: "Set up user onboarding, AIR Account login, and session management with the AIR Kit SDK — quickstart for Web3 authentication in your application."
 ---
 
 
-# Quickstart: Login & User Onboarding
-
-Account integration and user onboarding is the foundation of any application.  
-If you're here, your primary focus is **seamless onboarding, authentication, and session management**.
+Add AIR login and session management to your web app. You can use Account Services
+without integrating credential issuance or verification.
 
 With the AIR Kit, you can:
 
@@ -26,13 +24,23 @@ This guide will walk you through:
 If your app doesn’t require credential issuance or verification yet, this Quickstart alone is enough to get you up and running.
 </Tip>
 
+## Before you start
+
+- An AIR Developer Dashboard account and Partner ID
+- A web app running in the browser, with its origin registered in **Account → Domains**
+- A supported Node.js version for your framework and AIR Kit
+
+A database, issuer backend, and credential program are not required for the
+standard AIR login shown here. Partner JWT and JWKS setup is required when you
+add credential operations or use [partner authentication](/airkit/usage/partner-authentication).
+
 ## Step 1: Install the SDK
 
 ```bash
-npm install @mocanetwork/airkit
+npm install @mocanetwork/airkit@1.11.0
 ```
 
-## Step 2: Get Your Partner ID
+## Step 2: Get your Partner ID
 
 1. Go to the <a href="https://developers.sandbox.air3.com" target="_blank" rel="noreferrer">Developer Dashboard</a> and login with your EOA wallet.
 2. Connect your wallet.
@@ -41,44 +49,57 @@ npm install @mocanetwork/airkit
    ![Quickstart - get partner ID](/images/guides/get_partner_id.png)
 4. If you’re looking to customise the theme, login flow, or localization, please see the [relevant sections](/airkit/usage/config-theming) for more details.
 
-## Step 3: Import, Initialize & Login
+## Step 3: Initialize and log in
 
-**File:** `./useAirKit.ts`
+Create the service once in browser code. Call `loginToAir()` from a user action,
+such as a login button; do not run this helper during server rendering.
 
 ```ts
 import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
 
 const service = new AirService({
-  partnerId: YOUR_PARTNER_ID // Replace with your actual Partner ID
+  partnerId: "<your-partner-id>"
 });
 
-// Trigger the login flow
-await service.init({
-  buildEnv: BUILD_ENV.SANDBOX
-});
-const loggedInResult = await service.login();
+export async function loginToAir() {
+  if (!service.isInitialized) {
+    await service.init({ buildEnv: BUILD_ENV.SANDBOX });
+  }
+  if (!service.isLoggedIn) {
+    await service.login();
+  }
+  return service.isLoggedIn;
+}
 ```
 
-☑️ This will:
+This will:
 
 - Initialize the `AirService` within the [Sandbox Environment](/airkit/environments)
 - Present the SSO Login screen of AIR Kit for users to log in
 - Handle authentication and session setup
-- Enable Account Services (such as wallet functions), and Credential Services (such as credential verification) for your app after the user is logged in
+- Establish the user session used by Account Services and subsequent credential flows
 
-## What You Get After Login
+Login does not activate your partner's issuer or verifier functionality. Credential
+operations also require registered partner authentication, the appropriate
+Dashboard setup, and an active issuance or verification program.
 
-Once login is complete, you’ll have access to:
+## Session lifecycle
 
-- User UUID
-- Session token
-- User metadata
+Use `service.isLoggedIn` to check the current session. To sign the user out, call:
+
+```ts
+await service.logout();
+```
+
+Handle cancelled login and errors in your UI, and confirm that the user can sign
+out and log in again. See [User authentication](/airkit/usage/user-authentication)
+for login results and user details.
 
 <Note>
   Quickstarts 2 and 3 ([Issue Credentials](/airkit/quickstart/issue-credentials), [Verify Credentials](/airkit/quickstart/verify-credentials)) require a working public HTTPS JWKS endpoint registered in the Developer Dashboard. Set this up first — see [JWKS endpoint setup](/airkit/usage/jwks-setup).
 </Note>
 
-## Next Steps
+## Next steps
 
 Once you've set up account and sessions, you can optionally move on to [Issue Credentials](/airkit/quickstart/issue-credentials) and [Verify Credentials](/airkit/quickstart/verify-credentials) if your app needs credential-based access control.
 
