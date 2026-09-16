@@ -168,12 +168,12 @@ The shipped examples set both to your Partner ID. If you use a different convent
 
 ## Path matrix (do not blindly copy)
 
-Two MocaNetwork-published references ship JWKS at **different paths**. There is no single canonical URL — you must register the one your deployment actually serves.
+There is no single canonical JWKS URL — you must register the one your deployment actually serves. Different starting points expose it at different paths.
 
 | Source | Path served | Where it comes from |
 | --- | --- | --- |
 | [`air-examples`](https://github.com/MocaNetwork/air-examples) (Next.js apps) | `/api/.well-known/jwks` | `src/app/api/.well-known/jwks/route.ts` |
-| [Plug-and-play issuer template](/airkit/templates/plug-and-play-issuer) | `/jwks.json` | Generated at build time, served as a static asset |
+| Your own implementation | Whatever route you define | Common choices are `/.well-known/jwks.json` or `/api/jwks` |
 
 **Rule:** look at what your app actually exposes, then register that exact URL.
 
