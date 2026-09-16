@@ -80,16 +80,24 @@ function ConnectButton() {
 
 ## Step 4: Access AirService from the connector
 
-Once connected, you can access the underlying `AirService` for credential operations:
+Once connected, you can access the underlying `AirService` for credential operations. Verification takes a Partner JWT signed on your server with `scope: "verify"` and the verification program ID:
 
 ```ts
 const service = airWallet.airService;
 
-const verificationResult = await service.verifyCredentials({
-  verifierDid: "did:air:id:test:YOUR_VERIFIER_DID",
-  verificationId: "YOUR_VERIFICATION_PROGRAM_ID",
+const { token } = await fetch("/api/verification-token", { method: "POST" }).then((r) => r.json());
+
+const result = await service.verifyCredential({
+  authToken: token,
+  programId: process.env.NEXT_PUBLIC_VERIFY_PROGRAM_ID,
 });
+
+if (result.status === "COMPLIANT") {
+  // unlock the gated feature
+}
 ```
+
+See [Verify a credential in your app](/recipes/verify-credential-in-app) for the server endpoint and result handling.
 
 ## Step 5: Send a transaction
 
