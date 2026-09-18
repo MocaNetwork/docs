@@ -11,19 +11,19 @@ Answers to the questions legal and compliance teams ask when evaluating AIR Kit.
 
 **Does AIR Kit store our customers' personal data?**
 
-No. AIR Kit stores only cryptographic credential hashes on Moca Chain — the proof that a credential exists and is valid. The underlying personal data (name, passport number, date of birth, address) never leaves your systems or your KYC provider's systems.
+Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure. The issuer signs the credential and encrypts it to the holder's public key before storage. AIR stores and routes opaque ciphertext and metadata, not plaintext issuer data.
 
 **What does a credential actually contain?**
 
-Only the attributes you define when you create the credential schema. Best practice — and what every AIR Kit integration guide enforces — is to store only derived facts: `isOver18: true`, `kycLevel: "enhanced"`, `tier: "Gold"`. Not the raw data those facts were derived from.
+The credential contains the attributes defined by its schema. Prefer the minimum claims needed for the use case, such as `isOver18: true`, `kycLevel: "enhanced"`, or `tier: "Gold"`. These claims can still be personal data. The signed credential payload is encrypted before storage; it is not replaced by a hash or a boolean proof.
 
 **Can AIR Kit or Moca Network read our customers' credential data?**
 
-The credential attributes you define are visible to issuers and authorised verifiers. Moca Network does not access credential content for commercial purposes. The cryptographic design means even if the chain data were inspected, it reveals only hashes without the signing keys.
+Issuers know the source data and the claims they issue. AIR receives encrypted credential payloads and metadata without the holder's decryption key. Users control decryption and disclosure. Verifiers receive the claims requested by their Verification Program and approved by the user; a ZK proof can establish a condition without disclosing the underlying value. Optional CAK access has a separate consent flow for encrypted source data.
 
 **Where is data stored geographically?**
 
-Moca Chain is an EVM-compatible L1. Credential hashes are stored on-chain. For data residency requirements (EU, Australia, etc.), the critical question is whether personal data is stored — and it is not. Credential hashes are not personal data under GDPR Recital 26 as they cannot reasonably be used to identify a natural person without the corresponding keys.
+Source documents remain in issuer-controlled systems. Encrypted credential payloads may be stored with DStorage providers, alongside storage metadata. On-chain records and off-chain verification sessions are separate from those payloads. Confirm provider locations, metadata processing, and any regional commitments with the AIR team when assessing data residency. Encryption alone does not make identifiable data anonymous; see the [European Commission's GDPR guidance](https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/application-gdpr_en).
 
 ---
 
@@ -31,23 +31,23 @@ Moca Chain is an EVM-compatible L1. Credential hashes are stored on-chain. For d
 
 **Is this compliant with GDPR Article 5(1)(c) — data minimisation?**
 
-Yes. The credential contains only the minimum necessary attestation. This is enforced at schema design time — our integration guides explicitly prohibit including raw PII fields in `credentialSubject`.
+AIR Kit supports data minimisation through schema design, encryption, and program-controlled disclosure. Choose only the claims needed for your purpose and request only the fields your verifier needs. Compliance depends on your implementation and processing purposes; using derived claims or encryption does not establish it automatically.
 
 **How do we handle Article 17 data subject deletion requests?**
 
-Revoke the credential via one API call. Revocation is instant and on-chain. The credential becomes unverifiable immediately. The hash on-chain remains (the chain is immutable) but contains no personal data and is cryptographically inert.
+Revocation prevents a credential from passing subsequent checks that recognise its revoked status. It does not delete encrypted payloads, metadata, source records, or data already disclosed to verifiers. Handle erasure and retention separately across issuer systems, storage providers, and verifiers, including any applicable retention obligations. On-chain records cannot be removed by revoking a credential.
 
 **Does issuing credentials constitute international data transfer under GDPR Chapter V?**
 
-No personal data is transferred during credential issuance or verification. The ZK proof flow means verifiers receive only boolean results, not personal data. There are no SCCs or adequacy decision requirements.
+Assess the actual data flow: encrypted credential payloads and metadata may be stored outside the issuer's systems, and verifiers may receive user-approved claims or CAK-protected data. Review provider locations, recipients, and applicable transfer safeguards with your data protection team. Do not assume that encryption or ZK proofs remove transfer obligations.
 
 **Who is the data controller?**
 
-You are the data controller for your customers' personal data. AIR Kit acts as a data processor in the narrow sense that it processes the credential hash. The personal data underlying the credential remains within your data controller boundary.
+Issuers control their source data and signing keys. Verifiers determine how they use disclosed claims. Establish controller and processor roles for each processing activity in your agreements, including AIR's handling of ciphertext, metadata, and verification sessions. The storage architecture alone does not determine every party's legal role.
 
 **Does consent need to be obtained to issue credentials?**
 
-You are issuing credentials based on business events within your existing relationship with the user (loyalty programme membership, KYC completion, subscription activation). This typically falls within the legitimate interest or contractual necessity lawful basis. Review with your DPO for your specific context.
+Determine and document the lawful basis for issuance with your data protection team. User controls for decryption and disclosure, including explicit consent for CAK access, are separate from that legal assessment. Direct issuance does not remove your notice or lawful-basis requirements.
 
 ---
 
@@ -55,11 +55,11 @@ You are issuing credentials based on business events within your existing relati
 
 **Does issuing AIR Kit credentials constitute "selling" personal information under CCPA?**
 
-No personal information is transferred to AIR Kit or Moca Network. Credential verification by a partner transmits only boolean results — not personal information as defined under CCPA 1798.140.
+Assess your actual processing, disclosures, purposes, and contracts. Credential issuance and verification can involve encrypted personal information, metadata, and user-approved claims; it is not a blanket exemption from sale or sharing rules. See the [California Attorney General's CCPA guidance](https://www.oag.ca.gov/privacy/ccpa).
 
 **How do we handle opt-out requests?**
 
-Revoke the user's credentials. They become unverifiable across the ecosystem immediately.
+Apply the opt-out to the relevant processing and sharing activities. Revocation can stop future use of a credential, but it does not retract data already disclosed or replace your opt-out and deletion procedures.
 
 ---
 
@@ -67,15 +67,15 @@ Revoke the user's credentials. They become unverifiable across the ecosystem imm
 
 **What is the breach liability for verifiers accepting AIR Kit credentials?**
 
-Verifiers hold no personal data — they receive only COMPLIANT / NON_COMPLIANT signals. A breach of a verifier's systems exposes nothing about the credential holder's identity.
+A proof-only program can reduce the data a verifier receives. Successful verification returns a Verifiable Presentation that can contain user-approved claims and optional proof material. Verifiers must protect any disclosed claims, identifiers, session records, and CAK-decrypted data they retain. Exposure depends on the program and the verifier's data handling.
 
 **What is the breach liability for issuers?**
 
-As issuer, you hold the credential schema and the signed credential hashes. The underlying personal data (passport, KYC documents) remains with your KYC provider. A breach of AIR Kit's credential infrastructure would expose only hashes, which are computationally infeasible to reverse without the corresponding ZK keys.
+Issuers hold source data and signing keys and prepare the credential before encrypting it to the holder. AIR's storage and routing layer handles ciphertext and metadata. Assess exposure across source systems, issuer keys, encrypted storage, metadata, and any disclosed copies; encryption does not eliminate every breach risk or liability.
 
 **Is there an audit trail for credential issuance and verification?**
 
-Yes. Every issuance and verification event is recorded on Moca Chain with a timestamp and participant identifiers. The chain provides an immutable audit log.
+AIR Kit uses verification sessions for usage and reporting. Whether a verification proof is submitted on-chain depends on the Verification Program. Do not assume every issuance or verification event appears in a single on-chain audit log; confirm the records available for your integration.
 
 ---
 
@@ -83,11 +83,11 @@ Yes. Every issuance and verification event is recorded on Moca Chain with a time
 
 **How quickly does credential revocation take effect?**
 
-Revocation is on-chain and propagates within one block (~1 second on Moca Chain). Any verifier calling the SDK after that point will receive a NON_COMPLIANT result.
+Revocation is checked during verification. The effect depends on the issuer's revocation mechanism and when the updated status is available to the verifier. Do not assume a universal one-block or instant propagation guarantee.
 
 **What happens to credentials if a user closes their account?**
 
-Revoke all credentials associated with the user via the API. They become unverifiable immediately. If the user later re-onboards, new credentials are issued fresh.
+Include credential revocation in your account-closure process and handle source records, encrypted payloads, metadata, and previously disclosed data under your retention and deletion procedures. Account closure or revocation does not by itself erase all copies.
 
 **Can a user hold credentials from multiple issuers in one AIR Account?**
 
@@ -105,9 +105,9 @@ Yes. You set an `expirationDate` in the credential subject. After expiry, the cr
 
 CAK is an optional encryption framework within AIR Kit designed for regulated industries where verifiers need access to raw personal data (ID images, biometric photos). It adds user-consent-driven encryption at issuance and controlled decryption at verification, ensuring data sovereignty remains with the user at all times.
 
-**How does CAK differ from the standard ZK-based flow?**
+**How does CAK differ from standard credential verification?**
 
-In the standard flow, verifiers only receive boolean results ("Compliant" / "Non-Compliant") via zero-knowledge proofs — they never see the underlying data. With CAK enabled, verifiers can access the encrypted raw data after the user explicitly grants consent. CAK is designed for cases where regulatory requirements mandate that verifiers review actual identity documents.
+The Verification Program determines requested claims, whether a ZK proof is required, and whether verification is off-chain or on-chain. Successful verification returns a Verifiable Presentation with the approved disclosures and any required proof. CAK adds consent-controlled access to separately encrypted source data when a verifier needs to review identity documents or other underlying records.
 
 **Do I need to enable CAK?**
 

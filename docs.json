@@ -397,8 +397,7 @@
           {
             "group": "Native dApps",
             "pages": [
-              "mocachain/native-dapps/block-explorer",
-              "mocachain/native-dapps/airkit-dashboard"
+              "mocachain/native-dapps/block-explorer"
             ]
           },
           {

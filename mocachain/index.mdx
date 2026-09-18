@@ -25,9 +25,9 @@ CometBFT consensus with 1-second blocks and instant finality. Age checks, KYC ga
 
 EVM-compatible with transient storage (EIP-1153) and other Shanghai opcodes. Existing Solidity contracts port over with little to no rewrite, and standard Ethereum tooling (Hardhat, Foundry, Remix, MetaMask) works out of the box. Integration timelines move from quarters to days.
 
-## Storage without the liability (MCSP)
+## Decentralized credential storage (MCSP)
 
-The Moca Chain Storage Provider network (MCSP) gives partners S3-compatible decentralized storage, modeled after BNB Greenfield. Partners stop running their own credential databases, and users keep ownership of the underlying data.
+The Moca Chain Storage Provider network (MCSP) gives partners S3-compatible decentralized storage, modeled after BNB Greenfield. Issuers retain source records and signing keys, while encrypted credential payloads are stored with independent providers under holder-controlled decryption.
 
 - Payload data is stored by independent Storage Providers
 - Object metadata, payments, and permissions are recorded on-chain
@@ -36,7 +36,7 @@ The Moca Chain Storage Provider network (MCSP) gives partners S3-compatible dece
 
 ## Privacy by construction
 
-Zero-knowledge proofs use Circom circuits and Groth16, with selective disclosure defined at the schema level. Apps confirm a user is over 18, KYC'd, or accredited without ever seeing the underlying attributes. Raw data stays on the user's device, which materially reduces GDPR and CCPA exposure for partners.
+Zero-knowledge proofs use Circom circuits and Groth16. Verification Programs configure requested claims and whether a ZK proof is required. Apps can confirm age or eligibility without disclosing the underlying values. Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure.
 
 ## Verify once, recognized everywhere
 

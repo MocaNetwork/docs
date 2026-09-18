@@ -7,21 +7,21 @@ Moca Network is an identity infrastructure platform. Security is foundational to
 
 ## Trust model
 
-Moca Network uses a **split-trust architecture** where no single party holds enough information to compromise a user's identity or access their data:
+AIR Kit separates issuer source data and signing authority from encrypted credential storage and holder-controlled disclosure:
 
 | Party | What they hold | What they cannot do |
 | --- | --- | --- |
 | **User (Holder)** | Private keys, consent authority, credential wallet | Cannot forge credentials or bypass schema rules |
-| **Issuer** | Authority to issue credentials, CAK public key (if enabled) | Cannot read encrypted data after issuance, cannot impersonate users |
-| **Verifier** | Verification programs, ZK proof results | Cannot access raw data without user consent (CAK), cannot see data beyond what the proof reveals |
-| **Moca Chain** | On-chain credential proofs, state anchors | Cannot reconstruct private keys or decrypt stored data |
+| **Issuer** | Source data, issuer signing keys, CAK public key (if enabled) | Cannot decrypt holder-encrypted storage without the relevant key; retains access to its own source records |
+| **Verifier** | Verification programs, approved claims, optional ZK proofs | Cannot access undisclosed claims or CAK-protected data without user consent |
+| **Moca Chain** | Storage metadata, state records, optional on-chain verification proofs | Cannot reconstruct private keys or decrypt stored data |
 | **dStorage** | Encrypted credential payloads | Cannot decrypt without the user-consented key |
 
 ## Security layers
 
 ### Zero-knowledge proofs
 
-Credential verification uses ZK proofs by default. When a user presents a credential, the verifier receives a boolean result ("this claim is true") without accessing the underlying personal data. No PII crosses the wire during standard verification.
+The Verification Program determines the requested claims, whether ZK proofs are required, and whether verification is off-chain or on-chain. Successful verification returns a Verifiable Presentation with user-approved claims and any required proof. A ZK proof can confirm a condition without disclosing the underlying value.
 
 ### MPC-based key management
 
@@ -29,11 +29,11 @@ User accounts are backed by multi-party computation (MPC). Private keys are neve
 
 ### On-chain anchoring
 
-Credential proofs are anchored on Moca Chain. This provides tamper evidence — if a credential is modified after issuance, the on-chain proof will not match.
+The issuer's signature makes the credential tamper-evident. Programs that require on-chain verification can submit proofs to Moca Chain; other programs verify off-chain. DStorage object metadata is distinct from these optional verification records.
 
 ### Encrypted storage
 
-When the [Compliance Access Key (CAK)](/learn/advanced-topics/privacy-and-compliance) framework is enabled, raw data is encrypted with a user-controlled key and stored in decentralized storage. The data is unreadable at rest by all parties including Moca.
+Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure. Credential payloads are encrypted by default, independently of CAK. The optional [Compliance Access Key (CAK)](/learn/advanced-topics/privacy-and-compliance) framework adds consent-controlled access to separately encrypted source data.
 
 ### Account abstraction
 
@@ -43,7 +43,7 @@ User wallets use smart accounts (ERC-4337 account abstraction) with paymaster-sp
 
 <CardGroup cols={2}>
   <Card title="Credential security" icon="shield-check" href="/learn/security/credential-security">
-    How credentials are issued, anchored, and verified without exposing PII.
+    How credentials are signed, encrypted, and verified with user-controlled disclosure.
   </Card>
   <Card title="Data privacy" icon="lock" href="/learn/security/data-privacy">
     Where data lives, what is encrypted, and who can access it.

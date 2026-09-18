@@ -43,7 +43,9 @@ Partners should treat the credential and verification program as the **integrati
 
 ## What Moca Chain stores
 
-Moca Chain records **cryptographic commitments** for credentials — for example hashes, Merkle roots, and revocation state — not plaintext PII. That design lets verifiers trust a credential without every verifier inheriting a full document vault.
+Raw source documents remain with the issuer, which is zkMe for this KYC offering. Encrypted credential payloads may be stored in **DStorage**, while users control decryption and disclosure. AIR stores and routes ciphertext and metadata, not plaintext issuer data.
+
+Storage providers hold encrypted payloads; Moca Chain records storage metadata and state. Verification proofs are submitted on-chain when the Verification Program requires it. These records are distinct from the credential payloads and the issuer's source documents. Encryption does not automatically remove personal-data obligations; see the [Compliance FAQ](/solutions/compliance-faq).
 
 ---
 
