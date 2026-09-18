@@ -3,168 +3,161 @@ title: "Architecture & Data Flow"
 description: "End-to-end technical architecture of AIR Kit — SDK services, Moca Chain, credential lifecycle, and how data moves through the system."
 ---
 
-AIR Kit is a modular SDK that sits between your application and Moca Chain. It exposes two independent service surfaces — **Account Services** and **Credential Services** — that can be used together or independently.
+AIR Kit connects your application to AIR services and Moca Chain. It exposes **Account Services** for authentication and wallet operations and **Credential Services** for orchestrating issuance and verification. Your issuer backend owns credential authorization, source data, signing, encryption, and storage.
 
-## System Overview
+## System overview
 
 ```mermaid
 graph TD
-    subgraph YourApp["Your Application"]
-      A[Frontend / Mobile App]
-      B[Backend Server]
-    end
+    APP[Your application]
+    SDK[AIR Kit SDK]
+    API[AIR APIs]
+    ISS[Issuer backend and data source]
+    STORE[Encrypted dStorage]
+    EVM[Moca Chain EVM layer]
 
-    subgraph SDK["AIR Kit SDK"]
-      C[Account Services]
-      D[Credential Services]
-    end
-
-    subgraph Chain["Moca Chain"]
-      E[Identity Oracle]
-      F[EVM Layer]
-      G[Decentralized Storage - MCSP]
-    end
-
-    A -->|Web SDK / Flutter SDK| C
-    A -->|Web SDK / Flutter SDK| D
-    B -->|Partner JWT + REST API| D
-    C -->|Wallet & session management| F
-    D -->|Issue / Verify credentials| E
-    E -->|Anchors credential hash| F
-    F -->|Payload stored| G
+    APP -->|Web / Flutter SDK| SDK
+    SDK -->|Login, discovery, issuance, verification| API
+    API -->|Route issuer requests| ISS
+    ISS -->|Store signed and encrypted VCs| STORE
+    SDK -->|Fetch encrypted VCs| STORE
+    SDK -->|On-chain verification when configured| EVM
 ```
 
-## Account Services Flow
+The SDK manages user interaction and calls AIR APIs. AIR routes issuance requests to the registered issuer backend. The issuer backend owns authorization, source data, credential creation and signing, encryption, and storage. Credential storage and on-chain proof verification are separate operations. See [Account Services](/airkit/usage/user-authentication) for login and wallet details.
 
-Account Services handles user authentication, smart account creation, and wallet operations.
+## Issuance modes
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant App as Your App
-    participant SDK as AIR Kit SDK
-    participant Chain as Moca Chain
+| Mode | User presence | How it works |
+| --- | --- | --- |
+| **On-demand issuance** | User present | The user reviews available credentials and confirms issuance through the SDK. |
+| **Direct issuance** | Can run without the user present | The issuer creates and stores the credential; the user claims it when they log in to AIR. |
+| **Pre-issue** | Can run before the user logs in | Uses Direct Issuance to prepare credentials for the user to claim later. |
 
-    U->>App: Click "Login"
-    App->>SDK: airService.login()
-    SDK->>U: Show login UI (email / social / wallet)
-    U->>SDK: Authenticate
-    SDK->>Chain: Create / fetch smart account
-    Chain-->>SDK: Account address + session
-    SDK-->>App: User session + wallet provider
-    App-->>U: Logged in ✓
-```
+## On-demand issuance flow (user-initiated)
 
-## Credential Issuance Flow (User-Initiated)
+Your app calls `issueCredential()` with the issuance program/schema context and an optional identifier. This is the client-side entry point: the SDK ensures AIR login, discovers available credentials, obtains the user's confirmation, and requests issuance through AIR.
 
-The standard issuance path — the user is present and triggers the credential claim.
+The issuance program identifies the configured flow; the schema defines the credential's data structure. They are distinct identifiers. The sequence below describes the orchestration, rather than an SDK parameter signature.
 
 ```mermaid
 sequenceDiagram
     participant U as User
     participant App as Your App (Issuer)
     participant SDK as AIR Kit SDK
+    participant AIR as AIR APIs
     participant Iss as Issuer Backend
+    participant Data as Issuer Data Source
     participant DS as Encrypted DStorage
 
     U->>App: Triggers credential claim
-    App->>SDK: Load issuance program
-    SDK->>Iss: Request available credential
+    App->>SDK: issueCredential() with issuance context
+    SDK->>SDK: Load issuance program and schema
+    opt User is not logged in
+        SDK->>U: Show AIR login
+        U->>SDK: Authenticate
+        SDK->>AIR: Establish AIR session
+        AIR-->>SDK: Holder DID and public key
+    end
+    SDK->>AIR: GET /issuer/{issuerDidHash}/available-vc
+    AIR->>Iss: POST /available-vc (holder DID, public key, schema, identifier)
+    Iss->>Data: Check eligibility and load available claims
+    Data-->>Iss: Eligible credential data
+    Iss-->>AIR: Encrypted credential previews
+    AIR-->>SDK: Encrypted previews
+    SDK->>SDK: Decrypt previews
+    SDK->>U: Show available credentials for review
+    U->>SDK: Select credential and confirm issuance
+    SDK->>AIR: POST /issuer/{issuerDidHash}/issue-vc
+    AIR->>Iss: POST /issue-vc (holder DID, public key, schema, identifier)
+    Iss->>Iss: Authorize issuance
+    Iss->>Data: Retrieve source data
+    Data-->>Iss: Authoritative claims
     Iss->>Iss: Build VC, sign with issuer key, encrypt to holder
     Iss->>DS: Store encrypted VC envelope
     DS-->>Iss: storagePath
-    Iss-->>SDK: Issuance result
-    SDK-->>App: Issuance confirmed
+    Iss-->>AIR: Issuance result / reference
+    AIR-->>SDK: Issuance result / reference
+    SDK-->>App: Return issuance result / reference
     App-->>U: Credential delivered to AIR Account
 ```
 
-## Credential Verification Flow
+`available-vc` discovers credentials and returns encrypted previews. It does not issue a credential. The SDK calls `issue-vc` only after the user confirms. The issuer backend remains responsible for authorization, data retrieval, VC generation and signing, encryption, and storage; `issueCredential()` orchestrates these steps without creating or signing the VC itself.
 
-```mermaid
-sequenceDiagram
-    participant U as User (Holder)
-    participant App as Your App (Verifier)
-    participant SDK as AIR Kit SDK
-    participant DS as Encrypted DStorage
+## Credential verification flow
 
-    U->>App: Requests access / action
-    App->>SDK: verifyCredential(programId)
-    SDK->>DS: Load matching encrypted credential
-    SDK->>U: Prompt consent + select credential
-    U->>SDK: Generate signature-based proof (ZKP if program requires)
-    SDK->>SDK: Check proof against program settings (off-chain by default)
-    SDK-->>App: Verifiable Presentation / result
-    App-->>U: Access granted or denied
-```
+The SDK loads the verification program and ensures the user is logged in to AIR. It discovers matching credentials through AIR, fetches and decrypts the selected credential, and displays the requested data for consent. After the user agrees, the SDK records consent and generates the verifiable presentation and any required proof.
 
-## On-demand Issuance Flow
+<Steps>
+  <Step title="Start verification">
+    The partner app calls `verifyCredential()` with a verification program. The SDK loads the program and ensures the holder is logged in to AIR.
+  </Step>
+  <Step title="Find a matching credential">
+    The SDK requests matching credential metadata and dStorage paths. If no credential exists, the SDK can start the accepted issuer's on-demand issuance flow, including user confirmation.
+  </Step>
+  <Step title="Decrypt and review">
+    The SDK fetches the encrypted credential, decrypts it on the holder's device, and shows the requested claims.
+  </Step>
+  <Step title="Get consent and create the presentation">
+    The user consents to verification and sharing. The SDK records consent, generates the verifiable presentation, and creates any proof required by the program.
+  </Step>
+  <Step title="Verify and return the result">
+    The SDK runs the configured verification mode and returns the result and applicable presentation or proof material to the partner app.
+  </Step>
+</Steps>
 
-Use this path when a **backend event** should trigger issuance without the user being present. Your issuer backend resolves the holder and calls its own `issue-vc` — the end user does not interact with AIR.
+If the user declines consent, the flow stops before generating or sharing the presentation. If no matching credential can be issued, verification cannot proceed with that credential.
 
-```mermaid
-sequenceDiagram
-    participant Event as Backend Event
-    participant Server as Your Issuer Backend
-    participant API as AIR API
-    participant DS as Encrypted DStorage
+### Off-chain and on-chain verification
 
-    Event->>Server: KYC passed / purchase confirmed / check-in scanned
-    Server->>Server: Sign Partner JWT (scope:"issue")
-    Server->>API: POST /auth/initialize-user { email }
-    API-->>Server: { did, publicKey }
-    Server->>Server: POST /issue-vc (build, sign, encrypt)
-    Server->>DS: POST /dstorage/vcs (encrypted envelope)
-    DS-->>Server: 201 { storagePath }
-    Note over DS: User receives credential in AIR Account silently
-```
+The verification program selects the mode. Both paths use the credential discovery, decryption, and consent steps above.
 
-## Multi-Vendor Stack Integration
+| Mode | Where verification runs | What the app receives |
+| --- | --- | --- |
+| **Off-chain** | The proof or presentation is checked outside a blockchain transaction against the program's requirements. | Verification status and the presentation/proof material applicable to the program. |
+| **On-chain** | The proof is submitted for verification on-chain. This mode is available only for BJJ credentials. | The verification outcome and applicable on-chain transaction information. |
 
-AIR Kit is **additive** — it does not replace your existing infrastructure. The diagram below shows how it slots into a typical enterprise stack alongside loyalty platforms, KYC providers, ticketing systems, and payment processors.
+Using dStorage or anchoring issuer state does not, by itself, mean that verification runs on-chain. The verification mode describes where the proof is checked. The app uses the returned outcome to decide whether to grant access.
 
-```mermaid
-graph LR
-    subgraph Existing["Your Existing Stack"]
-      L[Loyalty Platform]
-      K[KYC Provider]
-      T[Ticketing System]
-      P[Payment Processor]
-    end
+{/* TODO: Confirm detailed proof-verification contracts and the consent-recording endpoint when the V2 integration specification defines them. */}
 
-    subgraph AIR["AIR Kit Integration Layer"]
-      IB[On-demand issuance]
-      SDK2[Web / Flutter SDK]
-    end
+## Direct issuance and pre-issue flow
 
-    subgraph MocaChain["Moca Chain"]
-      ORC[Identity Oracle]
-      STORE[Decentralized Storage]
-    end
+Use Direct Issuance when a backend event or batch job should issue a credential without requiring the user to be present. The issuer backend resolves the recipient's holder DID and public key, authorizes issuance, retrieves the source data, then builds, signs, encrypts, and stores the VC. The user claims the credential when they log in to AIR.
 
-    L -->|Milestone event| IB
-    K -->|Verification pass| IB
-    T -->|Scan / check-in| IB
-    P -->|Transaction event| IB
-    IB --> ORC
-    ORC --> STORE
-    SDK2 -->|Verify credential| ORC
-```
+**Pre-issue uses Direct Issuance** to prepare credentials ahead of that login and claim step.
 
-## Service Independence
+<Steps>
+  <Step title="Trigger issuance">
+    A backend event or batch job starts the flow, such as a completed KYC check, purchase, or check-in.
+  </Step>
+  <Step title="Resolve the recipient">
+    The issuer backend uses the AIR API to resolve or create the recipient's holder DID and public key. No active user session is required.
+  </Step>
+  <Step title="Create and store the credential">
+    The issuer authorizes issuance, retrieves source data, creates and signs the VC, encrypts it to the holder, and stores the encrypted envelope in dStorage.
+  </Step>
+  <Step title="Claim later">
+    The user logs in to AIR later and claims the credential. Pre-issue follows this same Direct Issuance path, ahead of the user's login.
+  </Step>
+</Steps>
 
-Account Services and Credential Services are decoupled — integrate one, both, or mix server-side and client-side patterns.
+## Integrating with existing systems
 
-| Feature | Account Services | Credential Services | Requires Both |
-|---------|:---:|:---:|:---:|
-| User login / SSO | ✓ | — | — |
-| Smart account / wallet | ✓ | — | — |
-| Gas sponsorship (Paymaster) | ✓ | — | — |
-| Wagmi connector | ✓ | — | — |
-| Issue credentials (user-initiated) | — | ✓ | ✓ user must be logged in |
-| On-demand issuance | — | ✓ | — |
-| Verify credentials | — | ✓ | — |
+Your issuer backend can connect to loyalty platforms, KYC providers, ticketing systems, and payment processors. Those systems can trigger Direct Issuance, while the SDK supports user-present issuance, later claims, and verification. See the [vertical integration guides](/airkit/guides/air-for-loyalty) for examples.
 
-## Next Steps
+## Service independence and login requirements
+
+Choose the service capabilities your app needs. An AIR login is required for the user-present credential flows below; it does not imply that your app must also integrate wallet operations, gas sponsorship, or other Account Services features.
+
+| Credential flow | Service | AIR login requirement |
+| --- | --- | --- |
+| On-demand issuance | Credential Services | User logs in before reviewing and confirming issuance. |
+| Direct issuance | Credential Services | No active user session required to issue; user logs in to claim later. |
+| Pre-issue | Credential Services, using Direct Issuance | No active user session required to pre-issue; user logs in to claim later. |
+| SDK verification | Credential Services | User logs in before reviewing the requested data and consenting. |
+
+## Next steps
 
 <Columns cols={2}>
   <Card title="Quick Setup" icon="bolt" href="/airkit/usage/getting-started">
@@ -176,7 +169,7 @@ Account Services and Credential Services are decoupled — integrate one, both, 
   <Card title="Quickstart: Issue Credentials" icon="badge-check" href="/airkit/quickstart/issue-credentials">
     Step-by-step credential issuance walkthrough.
   </Card>
-  <Card title="On-demand Issuance" icon="server" href="/airkit/usage/credential/issuing-credentials#on-demand-issuance">
-    On-demand issuance without user presence.
+  <Card title="Direct Issuance and Pre-issue" icon="server" href="/airkit/guides/overview#direct-issuance-and-pre-issue-flow">
+    Issue without an active user session; users claim credentials when they log in.
   </Card>
 </Columns>
