@@ -87,7 +87,7 @@ graph TD
     D --> E[KYC Credential in User's AIR Account]
 
     E --> F{User accesses financial product}
-    F -->|Your platform| G["Verify KYC credential\nNo PII stored or transferred"]
+    F -->|Your platform| G["Verify KYC credential\nUser-approved claims and proofs"]
     F -->|Partner DeFi protocol| H["ZK proof: user is KYC'd"]
     F -->|Cross-border service| I[Compliance check passed]
 ```
@@ -247,7 +247,7 @@ async function requireAgeVerification() {
 
 ## Privacy Guarantee
 
-The ZK proof flow means the verifier receives **only a boolean result**. No raw KYC data, no PII, no liability for the verifier to store sensitive documents.
+A program configured for a ZK eligibility check can avoid disclosing raw KYC documents. Successful verification returns a Verifiable Presentation with user-approved claims and any required proof. Verifiers remain responsible for data they request and retain.
 
 | What the Verifier Sees | What Stays Private |
 |-----------------------|--------------------|
@@ -270,7 +270,7 @@ The ZK proof flow means the verifier receives **only a boolean result**. No raw 
     Identity provider app: issues age credential; user proves 18+ without revealing date of birth.
   </Card>
   <Card title="ZK Age Verification — Verifier" icon="github" href="https://github.com/MocaNetwork/air-examples/tree/main/zk-age-verification/verifier">
-    iGaming platform app: verifies age-gate (e.g. 18+) via ZK proof; no PII received.
+    iGaming platform app: verifies age-gate (e.g. 18+) via ZK proof; no birthdate disclosure required.
   </Card>
 </CardGroup>
 

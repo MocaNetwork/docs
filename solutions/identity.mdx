@@ -3,7 +3,7 @@ title: "Identity & Compliance"
 description: "Issue portable KYC credentials with encrypted storage and user-controlled disclosure. Partners configure the claims and proofs needed for verification."
 ---
 
-Every platform that needs to verify a user's identity runs its own KYC process and stores a copy of the result. AIR Kit lets you **issue a KYC credential once** that every partner in the ecosystem can verify via zero-knowledge proof, without raw identity data ever crossing the network.
+Every platform that needs to verify a user's identity runs its own KYC process and stores a copy of the result. AIR Kit lets you **issue a KYC credential once** that partners can verify using their Verification Programs. ZK proofs can confirm eligibility without revealing underlying values; additional disclosure requires user approval.
 
 <Tabs>
 <Tab title="For business">
@@ -121,7 +121,7 @@ Identity credentials are issued and verified with the same AIR Kit flows used ac
     Recipe: convert your KYC provider's pass result into a portable credential from a backend webhook.
   </Card>
   <Card title="Quickstart: verify credentials" icon="shield-check" href="/airkit/quickstart/verify-credentials">
-    Verify a credential in your app and receive COMPLIANT / NON_COMPLIANT with no PII.
+    Verify a credential and handle a Verifiable Presentation with program-defined disclosures.
   </Card>
   <Card title="Fintech & Payments" icon="credit-card" href="/solutions/fintech">
     KYC credential schema, webhook code, and verification patterns in the Fintech developer guide.

@@ -87,7 +87,7 @@ Raw source documents remain with the issuer. Encrypted credential payloads may b
 - **Plan tier credentials** — Issue a "Premium" or "Business" tier badge that unlocks partner benefits automatically, with no bilateral API required
 - **Device ownership proofs** — Issue a verified device credential (IMEI-bound) for device insurance, warranty, and repair partner integrations
 - **Churn intervention** — Trigger a "Loyalty Reward" credential when a subscriber hits a retention milestone; partner services can verify and honour the benefit
-- **Roaming partner verification** — Let partner carriers verify a subscriber's KYC status via ZK proof; no PII crosses operator boundaries
+- **Roaming partner verification** — Let partner carriers verify a subscriber's KYC status via ZK proof without requesting subscriber documents
 - **Age-gated service access** — Gate adult content, gambling, or age-restricted add-ons behind an age credential without storing birthdates
 
 ## Architecture
@@ -99,7 +99,7 @@ graph TD
     C --> D[Subscriber Credential in User's AIR Account]
 
     D --> E{User accesses partner service}
-    E -->|Roaming carrier| F["Verify subscriber KYC\nNo PII transferred"]
+    E -->|Roaming carrier| F["Verify subscriber KYC\nUser-approved claims and proofs"]
     E -->|MVNO partner| G["Tier unlock\nno API integration required"]
     E -->|Device insurer| H["Device ownership proof"]
     E -->|Your retention offer| I["Loyalty reward gated by tenure credential"]
@@ -272,7 +272,7 @@ billingCycle.on('invoice:settled', async ({ userEmail, tenureMonths }) => {
 
 ### Step 3 — Verify subscriber KYC at a roaming partner
 
-The roaming partner integrates AIR Kit as a verifier. They call one SDK method — they never receive subscriber PII, only a COMPLIANT/NON_COMPLIANT result plus the KYC level.
+The roaming partner integrates AIR Kit as a verifier and selects a Verification Program. A successful SDK result includes a Verifiable Presentation with user-approved claims and any required proof. For this example, request KYC status without subscriber identifiers or documents.
 
 ```javascript
 // roaming-partner.js (frontend — partner carrier's app)
@@ -325,7 +325,7 @@ if (!allowed) showAgeVerificationPrompt();
 
 ## Privacy Guarantee
 
-The roaming partner or MVNO receives **only a boolean result** from the ZK proof. No MSISDN, no IMSI, no subscriber identity document data crosses operator boundaries.
+For this KYC-status check, configure the program to use a ZK proof without requesting MSISDN, IMSI, or subscriber documents. Successful verification returns a Verifiable Presentation with any approved claims and required proof; other programs may request additional disclosure.
 
 | What the Verifier Sees | What Stays Private |
 |------------------------|--------------------|
