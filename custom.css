@@ -335,6 +335,12 @@ mobile-nav-tabs-item:focus-visible {
     top: var(--docs-chrome-height);
     height: calc(100vh - var(--docs-chrome-height));
   }
+  .nav-tabs {
+    width: 100%;
+    & > :last-child {
+      margin-inline-start: auto;
+    }
+  }
 }
 
 @media (min-width: 1080px) {
@@ -364,7 +370,6 @@ mobile-nav-tabs-item:focus-visible {
 
 #sidebar-content a,
 #sidebar a:not(:has(img)):not(:has(.nav-logo)) {
-  display: block;
   padding: 7px 8px !important;
   border-radius: var(--air-corner-small) !important;
   color: #3B484F !important;

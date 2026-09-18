@@ -1,9 +1,48 @@
 ---
-title: "AIR for Ticketing & Events"
-description: "Issue tamper-proof attendance credentials at venue check-in. Fans carry verified event history as portable proofs for rewards, presales, and exclusive access."
+title: "Ticketing & Events"
+description: "Turn every venue scan into a portable attendance credential fans can reuse for rewards, presales, and partner access — with user-controlled disclosure to partners."
 ---
 
 Traditional event tickets are one-time-use and forgotten after the show. AIR Kit lets you transform every venue scan into a **permanent, portable attendance credential** — proof the fan was there, reusable for loyalty rewards, presale access, partner discounts, and cross-brand partnerships.
+
+<Tabs>
+<Tab title="For business">
+
+{/* TODO: Expand this business overview with problem framing, compliance Q&A, and an integration-at-a-glance table, matching the other verticals. Content below is derived from the developer guide. */}
+
+## What Changes With AIR Kit
+
+- **Every scan becomes a credential** — Venue check-in issues a verifiable "attended this event" proof into the fan's AIR Account. No app to open, no action from the fan
+- **Fan loyalty without a new program** — Fans who reach an attendance threshold can be upgraded to a "Loyal Fan" credential automatically
+- **Gated access that partners can trust** — VIP lounges, meet-and-greets, and presales unlock for verified attendees. The verifier learns only that the fan qualifies
+- **Cross-brand fan benefits** — Merchandise, hotel, and streaming partners accept the attendance credential directly. No bilateral API between you and each partner
+- **Anti-scalping** — Secondary ticket access can be gated behind an attendance credential from a prior event
+
+## What Your Fans Experience
+
+Nothing changes at the door. The fan scans in as they do today; the credential issues silently in the background.
+
+Later, at a partner or your own presale, the fan authenticates with their AIR Account and the benefit unlocks. No code to enter, no account linking.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Compliance FAQ" icon="shield-check" href="/solutions/compliance-faq">
+    GDPR, PII, and data residency answers.
+  </Card>
+  <Card title="Partner Economics" icon="coins" href="/solutions/partner-economics">
+    How the revenue model works for issuers and verifiers.
+  </Card>
+  <Card title="Loyalty & Rewards" icon="gift" href="/solutions/loyalty">
+    Build tier-based loyalty on top of attendance credentials.
+  </Card>
+  <Card title="Talk to our team" icon="handshake" href="https://air3.com/partner-with-us">
+    Start a partnership conversation.
+  </Card>
+</CardGroup>
+
+</Tab>
+<Tab title="For developers">
 
 ## What You Can Build
 
@@ -216,13 +255,16 @@ The key advantage for events: **fans never interact with the credential system a
 ## Next Steps
 
 <Columns cols={2}>
-  <Card title="AIR for Loyalty & Rewards" icon="gift" href="/airkit/guides/air-for-loyalty">
+  <Card title="AIR for Loyalty & Rewards" icon="gift" href="/solutions/loyalty">
     Build tier-based loyalty on top of attendance credentials.
   </Card>
   <Card title="On-demand Issuance — API" icon="code" href="/airkit/usage/credential/issuance-api">
     Full endpoint reference and error handling.
   </Card>
-  <Card title="Architecture & Data Flow" icon="diagram-project" href="/airkit/guides/overview">
+  <Card title="Architecture & Data Flow" icon="diagram-project" href="/learn/architecture">
     End-to-end system overview.
   </Card>
 </Columns>
+
+</Tab>
+</Tabs>

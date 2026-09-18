@@ -1,5 +1,6 @@
 ---
 title: "Moca Network Frequently Asked Questions"
+sidebarTitle: "FAQ"
 description: "Frequently asked questions about Moca Network and Moca Chain — covering credentials, identity, EVM compatibility, ZKPs, decentralized storage, and tokenomics."
 ---
 
@@ -8,6 +9,8 @@ Moca Chain is an EVM-compatible L1 purpose-built for decentralized identity. Moc
 </Accordion>
 
 <Accordion title="How are credentials issued and stored?">
+  The issuer signs the credential and encrypts it to the holder before storage. Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure.
+
   Read more about the credential issuance process <a href="/airkit/usage/credential/credentials-flow#issuer-process">here</a>
   <br />
   Read more about the credential verification process <a href="/airkit/usage/credential/credentials-flow#verifier-process">here</a>

@@ -1,5 +1,6 @@
 ---
 title: "Security Checklist"
+sidebarTitle: "Integration checklist"
 description: "Security checklist for AIR Kit integrations — Partner JWT key management, secrets handling, callback security, and credential issuance best practices."
 ---
 
@@ -25,7 +26,9 @@ Use this checklist when integrating AIR Kit to ensure your implementation follow
 - [ ] Validate credential data on your backend before signing and issuing. Do not trust client-supplied values.
 - [ ] Dedupe issuance by recipient email + program ID; revoke the existing credential before reissuing when data changes (e.g. tier upgrades).
 - [ ] For on-demand issuance, confirm DStorage returned a `storagePath` or that `POST /issue-vc` succeeded and the issuer persisted its DStorage result.
-- [ ] If handling regulated data, enable [CAK encryption](/learn/advanced-topics/privacy-and-compliance).
+- [ ] Sign credentials with issuer-controlled keys and encrypt them to the holder before DStorage upload. Keep raw source documents in issuer-controlled systems.
+- [ ] Configure requested claims and proof requirements in the Verification Program; require user approval for disclosure.
+- [ ] If verifiers need underlying source data, configure optional [CAK access](/learn/advanced-topics/privacy-and-compliance) with explicit user consent.
 
 ## API security
 
