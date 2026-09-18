@@ -3,7 +3,7 @@ title: "Advertising & Audiences"
 description: "Build verified, consent-based audience segments without third-party cookies. Advertisers buy access to cryptographically proven user attributes."
 ---
 
-Post-cookie advertising is broken in one specific way: every replacement (contextual, cohort, data clean rooms) still requires someone to hold raw user data and vouch for it. AIR Kit takes a different approach — **users hold their own verified attribute credentials**, and publishers verify them at ad-serve time via ZK proof. The advertiser gets a signal they can trust. No data broker in the middle. No raw data leaves the user's account.
+AIR Kit lets publishers issue verified audience credentials and configure programs that check audience eligibility using ZK proofs. Raw source records remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure to partners.
 
 <Tabs>
 <Tab title="For business">
@@ -16,7 +16,7 @@ Post-cookie advertising has a trust problem that no contextual or cohort-based r
 
 - **Users hold their own verified attributes** — Demographic and interest credentials are issued by your platform based on actual KYC and behaviour, not declared preferences. They're cryptographically signed
 - **Advertisers buy proof, not claims** — The DSP or SSP verifies the credential at serve time. They get COMPLIANT / NON_COMPLIANT — a ZK proof that the user is 25–34, verified, consented, and located in AU. No raw data in the bid request
-- **Consent travels cross-publisher** — A consent credential issued on your platform is verifiable by any partner publisher without a CMP re-prompt. User consented once; that consent is cryptographically provable
+- **Consent records are portable** — A credential can record consent collected by your CMP. Each publisher must still check that consent covers its purposes and recipients, and users control credential disclosure
 - **Age-restricted serving without storing DOB** — Prove `isOver18` at ad-serve time for gambling, alcohol, or adult categories. Regulatory requirements met without creating a DOB database
 
 ## How It Works
@@ -38,6 +38,8 @@ Post-cookie advertising has a trust problem that no contextual or cohort-based r
 
 ## What the Ad Server Actually Receives
 
+This example requests limited audience claims with user approval. The Verification Program determines the disclosed fields and whether a ZK proof is required.
+
 | What the Verifier Gets | What Stays Private |
 |------------------------|--------------------|
 | COMPLIANT / NON_COMPLIANT | Date of birth, exact age |
@@ -50,10 +52,10 @@ Post-cookie advertising has a trust problem that no contextual or cohort-based r
 ## What Compliance Will Ask
 
 **Does user consent need to be re-obtained?**
-The consent credential records the user's existing consent. If they have already consented on your platform, the credential reflects that. Cross-publisher use of the credential is designed to avoid introducing new data processing, but consult your legal team to confirm this applies in your jurisdiction.
+The credential records consent collected by your CMP. A new publisher or purpose may require additional consent; a portable credential does not extend the scope of the original permission. Separately, users approve credential disclosure during verification.
 
 **Can users withdraw consent?**
-Yes. Revoking the consent credential is one API call and takes effect immediately. The user's attributes become unverifiable across the ecosystem.
+Users can withdraw consent through your consent-management process and deny future disclosure requests. Revoke the consent credential so subsequent checks reject it once the updated status is available. Revocation does not retract data already disclosed; apply withdrawal to the relevant downstream processing as well.
 
 **Does this replace our CMP?**
 No. Your CMP continues to collect and record consent. AIR Kit converts that consent record into a portable, cryptographically verifiable credential.
@@ -313,7 +315,8 @@ async function getVerifiedAudienceSignal() {
   const ageResult = await airService.verifyCredential({
     programId: process.env.AGE_18_VERIFY_PROGRAM_ID,
     // Program rule: isOver18 === true
-    // Verifier receives only: COMPLIANT / NON_COMPLIANT
+    // Use a ZK age check without requesting the user's date of birth.
+    // Successful results include a Verifiable Presentation.
   });
 
   // Check consent for personalised ads
@@ -380,12 +383,12 @@ async function verifyAudienceForPartner() {
 | Initial audience credential | Skip if exists | Issue once on first profile completion |
 | Interest segment refresh | Revoke + reissue | Monthly or on significant interest drift |
 | Consent granted | Revoke + reissue | Always replace with latest consent record |
-| Consent withdrawn | Revoke | Immediately invalidate consent credential |
+| Consent withdrawn | Revoke | Reject future checks once revoked status is available; apply withdrawal to downstream processing |
 | KYC-backed audience | Revoke + reissue | Re-issue when KYC result updates |
 
-## Privacy Guarantee
+## Data disclosure
 
-No raw user data — no DOB, no email, no IP, no browsing history — is transmitted during ad verification. The ZK proof flow means the verifier (DSP, SSP, partner publisher) receives only boolean results.
+For this audience check, request only the necessary claims and use ZK proofs for conditions that do not require disclosing their underlying values. Successful verification returns a Verifiable Presentation with user-approved claims and any required proof. Configure the program to exclude DOB, email, IP address, and browsing history; the table below describes that limited-disclosure example.
 
 | What the Verifier Sees | What Stays Private |
 |------------------------|--------------------|
@@ -398,10 +401,7 @@ No raw user data — no DOB, no email, no IP, no browsing history — is transmi
 
 ## Regulatory Alignment
 
-- **GDPR Article 8** — Age verification without storing DOB satisfies child protection obligations
-- **CCPA / CPRA** — Consent credential provides an auditable, user-owned record of opt-in; revocation is instant and on-chain
-- **COPPA** — ZK age gate (isOver18 === false blocks serve) without collecting minor data
-- **TCF 2.2** — Consent credentials can encode TCF purpose IDs; verifiers check compliance without a centralised CMP dependency
+Credentials can record consent and support age or eligibility checks, but do not establish regulatory compliance on their own. Review the scope of consent, applicable age requirements, opt-out handling, and retention for each publisher and purpose. Your CMP remains responsible for collecting and managing consent. See the [Compliance FAQ](/solutions/compliance-faq) for storage and disclosure considerations.
 
 ## Examples
 

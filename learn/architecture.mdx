@@ -20,20 +20,26 @@ graph TD
       D[Credential Services]
     end
 
-    subgraph Chain["Moca Chain"]
-      E[Identity Oracle]
+    E[AIR Credential API]
+    I[Issuer Backend - source data and signing keys]
+
+    subgraph Chain["Moca Chain and storage providers"]
       F[EVM Layer]
-      G[Decentralized Storage - MCSP]
+      G[DStorage - encrypted credential payloads]
     end
 
     A -->|Web SDK / Flutter SDK| C
     A -->|Web SDK / Flutter SDK| D
-    B -->|Partner JWT + REST API| D
+    B -->|Trigger issuance| I
+    I -->|Signed and holder-encrypted credential| E
     C -->|Wallet & session management| F
     D -->|Issue / Verify credentials| E
-    E -->|Anchors credential hash| F
-    F -->|Payload stored| G
+    E -->|Store and route ciphertext and metadata| G
+    G -->|Object metadata| F
+    D -->|Verification proof when program requires| F
 ```
+
+Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure. Storage metadata and optional on-chain verification records are separate from the encrypted payloads.
 
 ## Account Services Flow
 
@@ -91,8 +97,10 @@ sequenceDiagram
     U->>App: Requests access / action
     App->>SDK: verifyCredential(programId)
     SDK->>DS: Load matching encrypted credential
+    SDK->>SDK: Decrypt locally
     SDK->>U: Prompt consent + select credential
-    U->>SDK: Generate signature-based proof (ZKP if program requires)
+    U->>SDK: Approve requested disclosure
+    SDK->>SDK: Generate presentation and optional ZKP
     SDK->>SDK: Check proof against program settings (off-chain by default)
     SDK-->>App: Verifiable Presentation / result
     App-->>U: Access granted or denied
@@ -133,22 +141,24 @@ graph LR
     end
 
     subgraph AIR["AIR Kit Integration Layer"]
-      IB[On-demand issuance]
+      IB[Issuer Backend - sign and encrypt]
       SDK2[Web / Flutter SDK]
     end
 
     subgraph MocaChain["Moca Chain"]
-      ORC[Identity Oracle]
-      STORE[Decentralized Storage]
+      STORE[DStorage - encrypted credentials]
     end
+
+    API[AIR Credential API]
 
     L -->|Milestone event| IB
     K -->|Verification pass| IB
     T -->|Scan / check-in| IB
     P -->|Transaction event| IB
-    IB --> ORC
-    ORC --> STORE
-    SDK2 -->|Verify credential| ORC
+    IB -->|Encrypted credential and metadata| API
+    API --> STORE
+    SDK2 -->|Discover matching credentials| API
+    SDK2 -->|Fetch encrypted credential| STORE
 ```
 
 ## Service Independence

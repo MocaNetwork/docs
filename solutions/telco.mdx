@@ -1,6 +1,6 @@
 ---
 title: "Telco & Subscriptions"
-description: "Issue subscriber credentials at activation. Roaming and MVNO partners verify KYC status without re-running identity checks or receiving subscriber PII."
+description: "Issue subscriber credentials at activation. Roaming and MVNO partners verify KYC status with program-defined claims and user-controlled disclosure."
 ---
 
 Carriers run identity verification for every new subscriber, but that verified status stays locked inside each operator's silo. A prepaid user who passes KYC at one carrier starts from zero at a roaming partner. AIR Kit lets you **issue a subscriber credential at activation** — so your KYC investment travels with the user across carriers, MVNOs, and partner services.
@@ -31,12 +31,14 @@ Carriers spend on KYC at activation, then that verified status expires at the ed
   <Step title="Subscriber accesses a partner service">
     At a roaming partner, MVNO, or retail service, the subscriber authenticates with their AIR Account — the same login they use with you.
   </Step>
-  <Step title="Partner verifies — no PII crosses">
-    The partner calls one SDK method. They receive COMPLIANT or NON_COMPLIANT, plus the KYC level. No MSISDN, no IMSI, no subscriber documents are transmitted.
+  <Step title="Partner verifies the requested claims">
+    The partner calls one SDK method. A successful result includes a Verifiable Presentation with user-approved claims and any required proof. Configure the program to request KYC status without subscriber identifiers or documents when those are unnecessary.
   </Step>
 </Steps>
 
 ## What Crosses the Network — and What Doesn't
+
+This example requests limited claims with user approval. The Verification Program determines which claims are disclosed and whether a ZK proof or CAK access is required.
 
 | What the Roaming Partner Receives | What Stays Private |
 |-----------------------------------|--------------------|
@@ -52,10 +54,10 @@ Carriers spend on KYC at activation, then that verified status expires at the ed
 The credential attests to the level of KYC completed at your platform. Roaming partners accepting it are verifying that fact — the underlying compliance obligation remains with the issuing carrier.
 
 **Is subscriber PII transmitted to roaming partners?**
-No. The ZK proof flow transmits only a boolean result and the credential attributes you choose to expose. MSISDN and subscriber identity documents never leave your systems.
+A ZK proof can confirm KYC status without disclosing MSISDN or subscriber documents. Verification Programs may also request claims with user approval, or CAK access when enabled. Limit disclosures to what the roaming partner needs.
 
 **GDPR: where is subscriber data stored?**
-On Moca Chain — a credential hash with no personal data. The raw subscriber PII stays in your systems and your KYC provider's systems, exactly as today.
+Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure. Subscriber claims and metadata can still be personal data; assess storage-provider locations and retention as part of your GDPR review.
 
 ## Integration at a Glance
 
@@ -85,7 +87,7 @@ On Moca Chain — a credential hash with no personal data. The raw subscriber PI
 - **Plan tier credentials** — Issue a "Premium" or "Business" tier badge that unlocks partner benefits automatically, with no bilateral API required
 - **Device ownership proofs** — Issue a verified device credential (IMEI-bound) for device insurance, warranty, and repair partner integrations
 - **Churn intervention** — Trigger a "Loyalty Reward" credential when a subscriber hits a retention milestone; partner services can verify and honour the benefit
-- **Roaming partner verification** — Let partner carriers verify a subscriber's KYC status via ZK proof; no PII crosses operator boundaries
+- **Roaming partner verification** — Let partner carriers verify a subscriber's KYC status via ZK proof without requesting subscriber documents
 - **Age-gated service access** — Gate adult content, gambling, or age-restricted add-ons behind an age credential without storing birthdates
 
 ## Architecture
@@ -97,7 +99,7 @@ graph TD
     C --> D[Subscriber Credential in User's AIR Account]
 
     D --> E{User accesses partner service}
-    E -->|Roaming carrier| F["Verify subscriber KYC\nNo PII transferred"]
+    E -->|Roaming carrier| F["Verify subscriber KYC\nUser-approved claims and proofs"]
     E -->|MVNO partner| G["Tier unlock\nno API integration required"]
     E -->|Device insurer| H["Device ownership proof"]
     E -->|Your retention offer| I["Loyalty reward gated by tenure credential"]
@@ -270,7 +272,7 @@ billingCycle.on('invoice:settled', async ({ userEmail, tenureMonths }) => {
 
 ### Step 3 — Verify subscriber KYC at a roaming partner
 
-The roaming partner integrates AIR Kit as a verifier. They call one SDK method — they never receive subscriber PII, only a COMPLIANT/NON_COMPLIANT result plus the KYC level.
+The roaming partner integrates AIR Kit as a verifier and selects a Verification Program. A successful SDK result includes a Verifiable Presentation with user-approved claims and any required proof. For this example, request KYC status without subscriber identifiers or documents.
 
 ```javascript
 // roaming-partner.js (frontend — partner carrier's app)
@@ -323,7 +325,7 @@ if (!allowed) showAgeVerificationPrompt();
 
 ## Privacy Guarantee
 
-The roaming partner or MVNO receives **only a boolean result** from the ZK proof. No MSISDN, no IMSI, no subscriber identity document data crosses operator boundaries.
+For this KYC-status check, configure the program to use a ZK proof without requesting MSISDN, IMSI, or subscriber documents. Successful verification returns a Verifiable Presentation with any approved claims and required proof; other programs may request additional disclosure.
 
 | What the Verifier Sees | What Stays Private |
 |------------------------|--------------------|

@@ -10,9 +10,9 @@ description: "Selective Disclosure lets verifiers read specific credential field
 Selective Disclosure is a new feature we are currently testing. It is only available in the Sandbox environment, and the API surface may change. It requires the latest AIR Kit SDK and an issuance program with disclosure explicitly enabled by the Issuer.
 </Warning>
 
-By default, AIR Kit credential verification only returns a **Compliant / Non-Compliant** result with a zero-knowledge proof — the Verifier never sees the underlying credential data.
+By default, AIR Kit credential verification follows the settings in your Verification Program, which define the requested claims and whether a zero-knowledge proof is required. Successful verification returns a Verifiable Presentation with user-approved claims and any required proof. A proof-only check can establish a condition without revealing its underlying value.
 
-**Selective Disclosure** lets the Issuer opt-in to data disclosure for a credential. Once enabled, a Verifier can request specific fields from the credential subject — or the entire credential subject — alongside the zero-knowledge proof. The Verifier still validates the credential cryptographically; disclosure is layered on top of that result.
+**Selective Disclosure** lets the Issuer opt-in to data disclosure for a credential. Once enabled, a Verifier can request specific fields from the credential subject — or the entire credential subject — with user approval. A zero-knowledge proof accompanies the result when required by the program. The Verifier still validates the credential cryptographically; disclosure is layered on top of that result.
 
 ## When to Use It
 

@@ -35,7 +35,7 @@ The result: $100B in unredeemed loyalty points sitting in silos. Customers who d
     At check-in, checkout, or app login at any partner in the ecosystem, the customer's credential is readable. No account linking. No API call to your platform.
   </Step>
   <Step title="The partner verifies — and gets only what they need">
-    The partner's system calls one SDK method. They receive a single answer: COMPLIANT or NON_COMPLIANT. They learn the tier level. They never see your customer's name, email, or account history.
+    The partner's system calls one SDK method. A successful result includes a Verifiable Presentation. Configure the program to request only the tier information needed for the benefit, with the user's approval.
   </Step>
 </Steps>
 
@@ -43,21 +43,21 @@ The result: $100B in unredeemed loyalty points sitting in silos. Customers who d
 
 Nothing changes at the point of earning. Your app, your UX, your branding. The credential issues silently in the background.
 
-At a partner: the customer authenticates with their AIR Account (the same login they use with you). The benefit unlocks automatically. No code to enter, no linking flow to complete.
+At a partner: the customer authenticates with their AIR Account (the same login they use with you). The customer approves the requested disclosure, and the benefit unlocks after successful verification. No code to enter, no linking flow to complete.
 
 ## What Compliance Will Ask
 
 **Do you store our customer data?**
-No. AIR Kit stores only the credential — a cryptographic attestation that your customer holds Gold status. Not their name, email, account history, or purchase data.
+Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure. Your schema determines the credential claims; for a tier check, include only the membership facts needed by partners.
 
 **What happens when a customer closes their account?**
-You revoke the credential instantly via one API call. It becomes unverifiable immediately.
+Revoke the credential so subsequent verification checks reject it once the revoked status is available. Handle deletion of source records, encrypted payloads, and previously disclosed data separately under your retention policy.
 
 **Can partners see who our customers are?**
-No. The verifier receives only tier status and an expiry date. The customer's identity is never exposed to the partner.
+Partners receive the claims requested by their Verification Program and approved by the user. Request only tier status and expiry if that is all you need; credential and account identifiers may still link the interaction to a customer.
 
 **Is this GDPR compliant?**
-Yes. No personal data is stored in the credential — only derived facts (tier, status). Data subject deletion requests are handled by revoking the credential.
+AIR Kit supports data minimisation through limited claims, encrypted storage, and user-controlled disclosure. Tier and status can still be personal data. Assess your implementation and handle deletion separately from revocation; see the [Compliance FAQ](/solutions/compliance-faq).
 
 ## Integration at a Glance
 

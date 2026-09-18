@@ -43,13 +43,13 @@ Nothing changes at the moment of earning. The credential issues silently. Player
 ## What Compliance Will Ask
 
 **What data does the credential contain?**
-Only game-specific identifiers and achievement facts: game ID, achievement name, tier, timestamp. No personal data, no real-world identity.
+Your schema defines the claims. This example uses game ID, achievement name, tier, and timestamp. These can still be personal data when linked to a player. Credential payloads are encrypted in DStorage, and users control decryption and disclosure.
 
 **Can players transfer or sell credentials?**
 Credentials are tied to the user's AIR Account. They are not transferable — which is precisely what makes them useful for anti-cheat and anti-bot purposes.
 
 **Do we need to change our terms of service?**
-You are issuing your own achievement data in a portable format. No new data processing category is introduced. Review with your legal team for your jurisdiction, but in most cases this falls within existing gameplay data handling.
+Review your terms and privacy notice for encrypted credential storage, cross-platform verification, and user-controlled disclosure. Confirm that the purposes, recipients, and retention of achievement data are covered by your agreements and applicable requirements.
 
 ## Integration at a Glance
 
@@ -270,7 +270,7 @@ async function getEligiblePlayers(allPlayers) {
     Identity provider app: issues age credential; user proves 18+ without revealing date of birth.
   </Card>
   <Card title="ZK Age Verification — Verifier" icon="github" href="https://github.com/MocaNetwork/air-examples/tree/main/zk-age-verification/verifier">
-    iGaming or age-gated app: verifies age via ZK proof and grants access; no PII received.
+    iGaming or age-gated app: verifies age via ZK proof and grants access; no birthdate disclosure required.
   </Card>
 </CardGroup>
 

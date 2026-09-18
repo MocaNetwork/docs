@@ -1,21 +1,21 @@
 ---
 title: "Identity Verification"
-description: "Privacy-preserving identity verification with AIR Kit — KYC, age gating, and regulatory compliance using verifiable credentials without storing user PII."
+description: "Privacy-preserving identity verification with AIR Kit — KYC, age gating, and regulatory compliance using encrypted credentials and user-controlled disclosure."
 ---
 
 Modern applications increasingly need to verify who their users are — for regulatory compliance, age gating, access control, and fraud prevention. Traditional identity verification requires every platform to collect, store, and protect sensitive personal data, creating liability, re-verification friction, and breach risk.
 
-AIR Kit offers a privacy-first alternative: **issue a verifiable credential once, verify it anywhere — without ever touching raw PII**.
+AIR Kit offers a privacy-first alternative: **issue a verifiable credential once and let users control its disclosure across partner services**. Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure.
 
 ## The Problem with Traditional Verification
 
 | Traditional Approach | AIR Kit Approach |
 |---------------------|-----------------|
 | User submits passport / ID to every platform | User verifies once, carries credential |
-| Platform stores PII — becomes a breach target | Platform sees only a ZK proof result: `COMPLIANT / NON_COMPLIANT` |
+| Platform stores PII — becomes a breach target | Program requests user-approved claims and optional ZK proofs |
 | Re-KYC at every new service | Portable credential accepted by any verifier in the ecosystem |
 | Verification takes hours to days | Credential issued instantly on KYC pass via on-demand issuance |
-| GDPR / data breach liability for every platform | No PII stored — reduced data breach liability |
+| GDPR / data breach liability for every platform | Minimise disclosed claims and protect any retained data |
 
 ## How It Works
 
@@ -27,10 +27,10 @@ AIR Kit offers a privacy-first alternative: **issue a verifiable credential once
     The moment the KYC provider sends a pass result, your server calls on-demand issuance. No user action required.
   </Step>
   <Step title="Credential lands in the user's AIR Account">
-    The user now owns a verifiable, on-chain attestation of their identity — not the raw data, just the proof.
+    The issuer signs the credential and encrypts it to the holder before storing it in DStorage. The user controls decryption and disclosure.
   </Step>
   <Step title="Any partner verifies the credential via ZK proof">
-    The verifier receives only `COMPLIANT` or `NON_COMPLIANT`. No PII is ever transmitted or stored by the verifier.
+    Successful verification returns a Verifiable Presentation with user-approved claims and any required proof. A ZK eligibility check can avoid disclosing the underlying identity documents.
   </Step>
 </Steps>
 
@@ -51,9 +51,9 @@ AIR Kit offers a privacy-first alternative: **issue a verifiable credential once
   </Card>
 </Columns>
 
-## Privacy Guarantee
+## Data disclosure
 
-The verifier **never receives raw identity data**. The ZK proof flow ensures only a boolean result passes between the credential holder and the verifier.
+The Verification Program determines which claims are requested and whether a ZK proof is required. The example below limits disclosure to KYC status and selected claims with user approval. Other programs may request additional fields or consent-controlled CAK access to source data.
 
 | What the Verifier Sees | What Stays Private |
 |-----------------------|--------------------|
