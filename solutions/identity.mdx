@@ -1,6 +1,6 @@
 ---
 title: "Identity & Compliance"
-description: "Issue a KYC credential once. Every partner in the ecosystem accepts it via zero-knowledge proof — no raw identity data ever transmitted."
+description: "Issue portable KYC credentials with encrypted storage and user-controlled disclosure. Partners configure the claims and proofs needed for verification."
 ---
 
 ## The Problem
@@ -12,9 +12,9 @@ The industry has accepted this as the cost of compliance. It isn't.
 ## What Changes With AIR Kit
 
 - **Your customer verifies once** — KYC passed at your platform issues a portable credential. Every partner in the ecosystem accepts it without running KYC again
-- **Verifiers receive nothing sensitive** — The ZK proof flow means a verifier gets a single answer: COMPLIANT or NON_COMPLIANT. No passport image, no national ID, no date of birth crosses the network
+- **Control what verifiers receive** — Programs can request ZK proofs of eligibility, specific claims with user approval, or consent-controlled CAK access when underlying documents are required
 - **Your KYC provider doesn't change** — You keep Jumio, Onfido, Persona, or whoever you use. AIR Kit converts their pass result into a portable credential. The verification itself stays with your provider
-- **Breach liability shrinks** — Verifiers who accept AIR Kit credentials store no PII. You as the issuer store only the credential hash. The only party holding raw identity data is your KYC provider — who already has it
+- **Limit copies of identity data** — Raw source documents remain with the issuer or its KYC provider. Encrypted credential payloads may be stored in DStorage, and users control decryption and disclosure. Verifiers remain responsible for protecting any data they receive
 
 ## Use Cases
 
@@ -43,14 +43,16 @@ The industry has accepted this as the cost of compliance. It isn't.
     The moment your KYC provider returns a pass result, your backend calls on-demand issuance. One call. The credential issues silently — no user action needed.
   </Step>
   <Step title="Credential lands in the user's AIR Account">
-    The user now holds a verifiable, on-chain attestation of their identity status. Not a copy of their passport — a cryptographic proof that they passed.
+    The user can access an issuer-signed credential encrypted to their public key and stored in DStorage. The issuer retains the source documents, while the user controls decryption and disclosure of the credential.
   </Step>
   <Step title="Any partner verifies via ZK proof">
-    At any partner service, the user presents their credential. The partner calls one SDK method and receives COMPLIANT or NON_COMPLIANT. No PII is transmitted or stored.
+    At a partner service, the user approves the requested disclosure. The partner receives a compliance result and, on success, a Verifiable Presentation containing the approved claims and any required proof.
   </Step>
 </Steps>
 
 ## What the Verifier Actually Sees
+
+The following example uses a program that requests KYC status and limited claims with user approval. Other programs can request different disclosures or CAK access.
 
 | What the Verifier Receives | What Stays Private |
 |----------------------------|--------------------|
@@ -63,19 +65,19 @@ The industry has accepted this as the cost of compliance. It isn't.
 ## What Compliance Will Ask
 
 **Is this GDPR Article 5(1)(c) compliant — data minimisation?**
-Yes. The credential contains only the minimum necessary attestation — the fact that KYC passed, the level, and the derived boolean `isOver18`. No underlying personal data is stored in the credential.
+Use the minimum claims needed for the check, such as KYC level and `isOver18`. These derived claims can still be personal data. Credential encryption and user-controlled disclosure support minimisation, but compliance depends on your implementation.
 
 **How do we handle data subject deletion requests?**
-Revoke the credential via one API call. Revocation is instant and on-chain. The user's attestation becomes unverifiable immediately.
+Revoke the credential to stop future successful checks once its revoked status is available. Handle deletion of source records, encrypted payloads, metadata, and disclosed copies separately. See the [Compliance FAQ](/solutions/compliance-faq).
 
 **Who has access to the underlying identity documents?**
-Only your KYC provider — the same as today. AIR Kit never sees raw documents. We store only the credential hash on Moca Chain.
+Raw source documents remain with the issuer or its KYC provider. AIR may store encrypted credential payloads in DStorage. If CAK is enabled for source-data access, a verifier can decrypt the separately encrypted data only after explicit user consent.
 
 **What if a user disputes their KYC result?**
 The dispute process stays entirely with your KYC provider, as it does today. You revoke or re-issue the AIR Kit credential once the dispute resolves.
 
 **Does AIR Kit have access to our users' data?**
-No. AIR Kit never receives PII. The On-demand issuance call contains only the credential attributes you define — derived facts, not raw documents.
+Your backend signs the credential and encrypts it to the holder before storage. AIR stores and routes ciphertext and metadata, not plaintext issuer data. The user controls decryption and disclosure; encrypted claims and metadata may still be personal data.
 
 ## Integration at a Glance
 

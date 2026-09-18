@@ -17,22 +17,22 @@ CometBFT consensus, 1-second blocks, instant finality. Age checks, KYC gates, an
 
 Moca Chain is fully EVM-compatible and supports transient storage (EIP-1153) along with other Shanghai opcodes. Existing Solidity contracts port over with little to no rewrite, and standard Ethereum tooling (Hardhat, Foundry, Remix, MetaMask) works as is. Integration moves from quarters to days.
 
-## Storage without the liability (MCSP)
+## Decentralized credential storage (MCSP)
 
 Moca Chain stores credentials in the Moca Chain Storage Provider network (MCSP), a decentralized storage layer with S3-compatible APIs:
 
 - Data availability tracks chain uptime
 - Storage is distributed across independent providers for resilience
-- Geolocation-specific storage supports data residency requirements
-- Partners stop running their own credential databases, and users keep ownership of the underlying data
+- Confirm provider locations and regional commitments for your data residency requirements
+- Issuers retain source records and signing keys, while encrypted credential payloads are stored with independent providers under holder-controlled decryption
 
 ## Privacy by construction
 
 Privacy is built into the protocol:
 
 - **Zero-knowledge proofs:** Verify claims without exposing data (e.g., prove you are over 18 without sharing your birthday). Moca Chain currently uses Circom circuits with Groth16.
-- **Selective disclosure at the schema level:** Apps confirm a user is over 18, KYC'd, or accredited without ever seeing the underlying attributes.
-- **Raw data stays on device:** Personal data never leaves the user's device, which materially reduces GDPR and CCPA exposure for partners.
+- **Program-controlled disclosure:** Verification Programs define requested claims and optional ZK proofs. Users approve what they disclose.
+- **Encrypted credential storage:** Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure.
 - **zkTLS:** Enables secure onboarding from web sources while keeping information encrypted and user-authorized.
 
 ## Verify once, recognized everywhere

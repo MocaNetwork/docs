@@ -335,6 +335,25 @@ mobile-nav-tabs-item:focus-visible {
     top: var(--docs-chrome-height);
     height: calc(100vh - var(--docs-chrome-height));
   }
+  .nav-tabs {
+    width: 100%;
+    & > :first-child {
+      position: relative;
+      font-size: 0 !important;
+      width: 30px !important;
+      svg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        translate: -50% -50%;
+        width: 16px !important;
+        height: 16px !important;
+      }
+    }
+    & > :last-child {
+      margin-inline-start: auto;
+    }
+  }
 }
 
 @media (min-width: 1080px) {

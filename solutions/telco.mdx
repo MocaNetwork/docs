@@ -1,6 +1,6 @@
 ---
 title: "Telco & Subscriptions"
-description: "Issue subscriber credentials at activation. Roaming and MVNO partners verify KYC status without re-running identity checks or receiving subscriber PII."
+description: "Issue subscriber credentials at activation. Roaming and MVNO partners verify KYC status with program-defined claims and user-controlled disclosure."
 ---
 
 ## The Problem
@@ -26,12 +26,14 @@ Carriers spend on KYC at activation, then that verified status expires at the ed
   <Step title="Subscriber accesses a partner service">
     At a roaming partner, MVNO, or retail service, the subscriber authenticates with their AIR Account — the same login they use with you.
   </Step>
-  <Step title="Partner verifies — no PII crosses">
-    The partner calls one SDK method. They receive COMPLIANT or NON_COMPLIANT, plus the KYC level. No MSISDN, no IMSI, no subscriber documents are transmitted.
+  <Step title="Partner verifies the requested claims">
+    The partner calls one SDK method. A successful result includes a Verifiable Presentation with user-approved claims and any required proof. Configure the program to request KYC status without subscriber identifiers or documents when those are unnecessary.
   </Step>
 </Steps>
 
 ## What Crosses the Network — and What Doesn't
+
+This example requests limited claims with user approval. The Verification Program determines which claims are disclosed and whether a ZK proof or CAK access is required.
 
 | What the Roaming Partner Receives | What Stays Private |
 |-----------------------------------|--------------------|
@@ -47,10 +49,10 @@ Carriers spend on KYC at activation, then that verified status expires at the ed
 The credential attests to the level of KYC completed at your platform. Roaming partners accepting it are verifying that fact — the underlying compliance obligation remains with the issuing carrier.
 
 **Is subscriber PII transmitted to roaming partners?**
-No. The ZK proof flow transmits only a boolean result and the credential attributes you choose to expose. MSISDN and subscriber identity documents never leave your systems.
+A ZK proof can confirm KYC status without disclosing MSISDN or subscriber documents. Verification Programs may also request claims with user approval, or CAK access when enabled. Limit disclosures to what the roaming partner needs.
 
 **GDPR: where is subscriber data stored?**
-On Moca Chain — a credential hash with no personal data. The raw subscriber PII stays in your systems and your KYC provider's systems, exactly as today.
+Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure. Subscriber claims and metadata can still be personal data; assess storage-provider locations and retention as part of your GDPR review.
 
 ## Integration at a Glance
 

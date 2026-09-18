@@ -11,7 +11,7 @@ Post-cookie advertising has a trust problem that no contextual or cohort-based r
 
 - **Users hold their own verified attributes** — Demographic and interest credentials are issued by your platform based on actual KYC and behaviour, not declared preferences. They're cryptographically signed
 - **Advertisers buy proof, not claims** — The DSP or SSP verifies the credential at serve time. They get COMPLIANT / NON_COMPLIANT — a ZK proof that the user is 25–34, verified, consented, and located in AU. No raw data in the bid request
-- **Consent travels cross-publisher** — A consent credential issued on your platform is verifiable by any partner publisher without a CMP re-prompt. User consented once; that consent is cryptographically provable
+- **Consent records are portable** — A credential can record consent collected by your CMP. Each publisher must still check that consent covers its purposes and recipients, and users control credential disclosure
 - **Age-restricted serving without storing DOB** — Prove `isOver18` at ad-serve time for gambling, alcohol, or adult categories. Regulatory requirements met without creating a DOB database
 
 ## How It Works
@@ -33,6 +33,8 @@ Post-cookie advertising has a trust problem that no contextual or cohort-based r
 
 ## What the Ad Server Actually Receives
 
+This example requests limited audience claims with user approval. The Verification Program determines the disclosed fields and whether a ZK proof is required.
+
 | What the Verifier Gets | What Stays Private |
 |------------------------|--------------------|
 | COMPLIANT / NON_COMPLIANT | Date of birth, exact age |
@@ -45,10 +47,10 @@ Post-cookie advertising has a trust problem that no contextual or cohort-based r
 ## What Compliance Will Ask
 
 **Does user consent need to be re-obtained?**
-The consent credential records the user's existing consent. If they have already consented on your platform, the credential reflects that. Cross-publisher use of the credential is designed to avoid introducing new data processing, but consult your legal team to confirm this applies in your jurisdiction.
+The credential records consent collected by your CMP. A new publisher or purpose may require additional consent; a portable credential does not extend the scope of the original permission. Separately, users approve credential disclosure during verification.
 
 **Can users withdraw consent?**
-Yes. Revoking the consent credential is one API call and takes effect immediately. The user's attributes become unverifiable across the ecosystem.
+Users can withdraw consent through your consent-management process and deny future disclosure requests. Revoke the consent credential so subsequent checks reject it once the updated status is available. Revocation does not retract data already disclosed; apply withdrawal to the relevant downstream processing as well.
 
 **Does this replace our CMP?**
 No. Your CMP continues to collect and record consent. AIR Kit converts that consent record into a portable, cryptographically verifiable credential.
