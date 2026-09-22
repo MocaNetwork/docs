@@ -1,113 +1,88 @@
 ---
 title: "Language & Currency Configuration"
-description: "Configure language and currency in AIR Kit — choose available languages, supply custom translations, and set the display currency for your application's UI."
+description: "Choose AIR Kit languages, customize copy with hosted JSON, and set the display currency."
 ---
 
-## Configuration Options
+AIR Kit includes English (`en`), Japanese (`ja`), Korean (`ko`), Turkish (`tr`), and Vietnamese (`vi`). English is always the fallback for missing translations. To override copy or add languages, host JSON files and register them through `localeUrls` in partner configuration. The SDK selects the language; it does not accept translation strings.
 
-```tsx
-{
-  defaultLanguage?: string; // Default language (e.g., "en", "es", "fr", ...)
-  authLocaleUrls?: Record<string, string>; // Auth interface language URLs
-  walletLocaleUrls?: Record<string, string>; // Wallet interface language URLs
-  recoveryLocaleUrls?: Record<string, string>; // Recovery interface language URLs
-  credentialLocaleUrls?: Record<string, string>; // Credential interface language URLs
-}
-```
+## How language selection works
 
-## Setting Up Multi-Language Support
+AIR Kit selects the language in this order:
 
-**1. Set Default Language:**
+1. The SDK's `sessionConfig.locale`, if set.
+2. The user's browser language preferences, unless detection is disabled.
+3. Your `defaultLocale`, or `en` if unset.
 
-```tsx
-defaultLanguage: "es"; // Spanish as default language
-```
+Regional tags resolve to available catalogs, such as `ko-KR` to `ko` and `en-US` to `en`, with region fallback. A language must be bundled or have a registered JSON URL, and must pass your `supportedLocales` allowlist. Adding a code to the allowlist does not provide translations.
 
-**2. Provide Language File URL:**
-We will upload your translated language file(s) to our server and provide the URL for configuration:
+Browser language changes are followed when detection is enabled and no SDK locale is explicitly set.
 
-```tsx
-{
-  defaultLanguage: "es",
-  authLocaleUrls: {
-    "es": "https://static.air3.com/partner/your-partner-id/i18n-auth-es.json"
-  },
-  walletLocaleUrls: {
-    "es": "https://static.air3.com/partner/your-partner-id/i18n-wallet-es.json"
-  }
-}
-```
+## Partner configuration
 
-### Language File Format
+Set these fields through partner configuration (backend or dashboard), separate from SDK initialization:
 
-Language files are JSON objects with translated strings:
+| Field | Purpose |
+| --- | --- |
+| `localeUrls` | Recommended: locale code → JSON URL, with one combined file per language for all AIR Kit interfaces. |
+| `defaultLocale` | Fallback language when no SDK or browser language is selected. Defaults to `en`. |
+| `supportedLocales` | Allowed languages. Empty means no restriction, including bundled languages. A non-empty list rejects other locales; use it to opt out of a bundled language. English remains the fallback. |
+| `disableBrowserLocaleDetection` | Ignore browser language preferences and use `defaultLocale`, unless the SDK sets a locale. |
+
+## Customize copy or add a language
+
+1. Use the combined English catalog's key structure, which covers all interfaces.
+2. Host a JSON file for each locale, such as `en.json` or `es.json`. Include only the keys you want to change; nested objects are merged and missing keys fall back to English.
+3. Register the URLs in `localeUrls` in partner configuration. If you use a non-empty `supportedLocales` list, include the new locale.
+
+For example, register one combined Spanish translation across all four interfaces:
 
 ```json
 {
-  "login": {
-    "google": {
-      "button": "Continue with Google",
-      "error": "Google login failed. Please try again or use another login method."
-    },
-    "passkey": {
-      "button": "Continue with Passkey",
-      "authenticating": "Authenticating..."
-    }
-  },
-  "wallet": {
-    "connect": "Connect Wallet",
-    "transaction": {
-      "confirm": "Confirm Transaction",
-      "pending": "Transaction Pending"
-    }
-  },
-  ...
+  "defaultLocale": "es",
+  "localeUrls": { "es": "https://cdn.example.com/airkit/i18n/es.json" }
 }
 ```
 
-## Currency Configuration
+<Note>
+English overrides customize the fallback copy. Bundled translations take precedence over that copy, so also provide a locale-specific override to customize wording for Japanese, Korean, Turkish, or Vietnamese users.
+</Note>
 
-You can configure the display currency for your application by passing a `sessionConfig` object to the `init()` method. Both `locale` and `currency` are optional:
+### Translate selected interfaces
+
+If you use only a subset of AIR Kit, you can fully translate those interfaces with separate files instead of working from the combined catalog. Each file should follow that interface's composed English catalog.
+
+Use `authLocaleUrls` for login, `walletLocaleUrls` for the wallet, `recoveryLocaleUrls` for recovery, or `credentialLocaleUrls` for credentials. Each maps a locale code to a JSON URL. For example, an integration using only login and credentials can register translations in `authLocaleUrls` and `credentialLocaleUrls`.
+
+If you also use `localeUrls`, interface-specific overrides take precedence for the same locale.
+
+## Set or change the language with the Web SDK
+
+Set `sessionConfig.locale` at [initialization](/airkit/usage/initialization) to override browser detection and the partner default. Omit it to allow automatic selection.
 
 ```tsx
 await airService.init({
   buildEnv: BUILD_ENV.SANDBOX,
-  enableLogging: true,
   sessionConfig: {
-    locale: "en", // Optional: Language code (e.g., "en", "es", "fr")
-    currency: "USD" // Optional: Display currency: "EUR", "USD", "CNY", "KRW", "TRY"
+    locale: "ja"
   }
 });
 ```
 
-**Supported Currency Codes:**
-
-- `EUR` - Euro
-- `USD` - US Dollar
-- `CNY` - Chinese Yuan
-- `KRW` - South Korean Won
-- `TRY` - Turkish Lira
-
-The currency setting affects how monetary values are displayed throughout the AIR Kit interface, including wallet balances, transaction amounts, and on-ramp/swap interfaces.
-
-### Updating Session Configuration
-
-You can update the locale or currency after initialization using the `updateSessionConfig()` method:
+Change the language after initialization across all loaded AIR Kit interfaces:
 
 ```tsx
-// Update currency, locale, or both
+await airService.updateSessionConfig({ locale: "ko" });
+```
+
+## Currency configuration
+
+Set the optional `sessionConfig.currency` at initialization, or update it alongside the locale:
+
+```tsx
 const updatedConfig = await airService.updateSessionConfig({
-  currency: "EUR", // Optional
-  locale: "fr" // Optional
+  currency: "EUR",
+  locale: "ja"
 });
 ```
 
-The method returns the complete `AirSessionConfig` object with both `locale` and `currency` values.
-
-## How Language Selection Works
-
-1. **Default Language**: Your `defaultLanguage` setting determines the interface language
-2. **Language File**: The system loads the language file from the provided URL
-3. **English Fallback**: If a translation key is missing, it falls back to English
-4. **No Language Switching**: Currently, the language is set once during initialization and cannot be detected by the browser or changed by the user
-5. **Session Configuration**: You can set the locale and currency programmatically via `sessionConfig` when calling `init()`, or update them later using `updateSessionConfig()`. Both `locale` and `currency` are optional within `sessionConfig`
+Supported currencies are `EUR` (Euro), `USD` (US Dollar), `CNY` (Chinese Yuan), `KRW` (South Korean Won), and `TRY` (Turkish Lira). Currency controls monetary display in wallet balances, transaction amounts, and on-ramp/swap interfaces. The update returns the complete `AirSessionConfig`, including locale and currency.

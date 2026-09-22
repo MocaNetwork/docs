@@ -20,7 +20,7 @@ await airService.init({
   preloadWallet: true, // Optional: Enable if wallet features will be used
   preloadCredential: true, // Optional: Enable if credential features will be used
   sessionConfig: {
-    locale: "en", // Optional: Language code (e.g. "en", "es", ...)
+    locale: "en", // Optional: Enforce a locale; omit for automatic language selection
     currency: "USD" // Optional: Display currency (e.g. "EUR", "USD", ...)
   }
 });
@@ -30,6 +30,8 @@ await airService.login();
 ```
 
 Once the SDK is installed and `AirService` is successfully initialized, it can be used to authenticate users.
+
+AIR Kit bundles `en`, `ja`, `ko`, `tr`, and `vi`. To customize copy or add languages, use hosted JSON in partner configuration. See [Language & currency configuration](/airkit/usage/config-language).
 
 </Tab>
 <Tab title="Flutter">
