@@ -3,7 +3,7 @@ title: "Language & Currency Configuration"
 description: "Choose AIR Kit languages, customize copy with hosted JSON, and set the display currency."
 ---
 
-AIR Kit includes English (`en`), Japanese (`ja`), Korean (`ko`), Turkish (`tr`), and Vietnamese (`vi`). English is always the fallback for missing translations. You can override copy or add languages with hosted JSON files registered in partner configuration. The SDK selects the language; it does not accept translation strings.
+AIR Kit includes English (`en`), Japanese (`ja`), Korean (`ko`), Turkish (`tr`), and Vietnamese (`vi`). English is always the fallback for missing translations. To override copy or add languages, host JSON files and register them through `localeUrls` in partner configuration. The SDK selects the language; it does not accept translation strings.
 
 ## How language selection works
 
@@ -23,36 +23,37 @@ Set these fields through partner configuration (backend or dashboard), separate 
 
 | Field | Purpose |
 | --- | --- |
+| `localeUrls` | Recommended: locale code → JSON URL, with one combined file per language for all AIR Kit interfaces. |
 | `defaultLocale` | Fallback language when no SDK or browser language is selected. Defaults to `en`. |
 | `supportedLocales` | Allowed languages. Empty means no restriction, including bundled languages. A non-empty list rejects other locales; use it to opt out of a bundled language. English remains the fallback. |
 | `disableBrowserLocaleDetection` | Ignore browser language preferences and use `defaultLocale`, unless the SDK sets a locale. |
-| `localeUrls` | Locale code → JSON URL for all AIR Kit interfaces, where available. Otherwise, register the same combined JSON URL in all four maps below. |
-| `authLocaleUrls` | Locale code → JSON URL for authentication. |
-| `walletLocaleUrls` | Locale code → JSON URL for the wallet. |
-| `recoveryLocaleUrls` | Locale code → JSON URL for recovery. |
-| `credentialLocaleUrls` | Locale code → JSON URL for credentials. |
 
 ## Customize copy or add a language
 
-1. Use the English catalog's key structure. A combined file covers all interfaces; an interface-specific file must match that interface's composed catalog.
+1. Use the combined English catalog's key structure, which covers all interfaces.
 2. Host a JSON file for each locale, such as `en.json` or `es.json`. Include only the keys you want to change; nested objects are merged and missing keys fall back to English.
-3. Register the URLs in partner configuration. If you use a non-empty `supportedLocales` list, include the new locale.
+3. Register the URLs in `localeUrls` in partner configuration. If you use a non-empty `supportedLocales` list, include the new locale.
 
 For example, register one combined Spanish translation across all four interfaces:
 
 ```json
 {
   "defaultLocale": "es",
-  "authLocaleUrls": { "es": "https://cdn.example.com/airkit/i18n/es.json" },
-  "walletLocaleUrls": { "es": "https://cdn.example.com/airkit/i18n/es.json" },
-  "recoveryLocaleUrls": { "es": "https://cdn.example.com/airkit/i18n/es.json" },
-  "credentialLocaleUrls": { "es": "https://cdn.example.com/airkit/i18n/es.json" }
+  "localeUrls": { "es": "https://cdn.example.com/airkit/i18n/es.json" }
 }
 ```
 
 <Note>
-English overrides customize the fallback copy. Bundled translations take precedence over that copy, so also provide a locale-specific override to customize wording for Japanese, Korean, Turkish, or Vietnamese users. Interface-specific overrides take precedence over shared overrides for the same locale.
+English overrides customize the fallback copy. Bundled translations take precedence over that copy, so also provide a locale-specific override to customize wording for Japanese, Korean, Turkish, or Vietnamese users.
 </Note>
+
+### Translate selected interfaces
+
+If you use only a subset of AIR Kit, you can fully translate those interfaces with separate files instead of working from the combined catalog. Each file should follow that interface's composed English catalog.
+
+Use `authLocaleUrls` for login, `walletLocaleUrls` for the wallet, `recoveryLocaleUrls` for recovery, or `credentialLocaleUrls` for credentials. Each maps a locale code to a JSON URL. For example, an integration using only login and credentials can register translations in `authLocaleUrls` and `credentialLocaleUrls`.
+
+If you also use `localeUrls`, interface-specific overrides take precedence for the same locale.
 
 ## Set or change the language with the Web SDK
 
