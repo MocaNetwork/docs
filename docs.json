@@ -82,7 +82,13 @@
       "index"
     ],
     "tabs": [
-      
+      {
+        "tab": "Home",
+        "icon": "home",
+        "pages": [
+          "index"
+        ]
+      },
       {
         "tab": "AIR Kit",
         "pages": [
