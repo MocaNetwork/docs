@@ -433,6 +433,10 @@
     {
       "source": "/airkit/usage/credential/direct-issuance",
       "destination": "/airkit/usage/credential/issuing-credentials"
+    },
+    {
+      "source": "/mocachain/native-dapps/airkit-dashboard",
+      "destination": "/airkit/airkit-dashboard"
     }
   ]
 }
