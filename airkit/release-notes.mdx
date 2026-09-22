@@ -1,7 +1,45 @@
 ---
-title: "AIR Kit SDK release notes and changelog"
+title: "Release Notes"
 description: "AIR Kit SDK release notes — version history, new features, breaking changes, deprecations, and migration notes for partners upgrading their integration."
 ---
+
+# **Version 1.12.1 (Sep 16, 2026)**
+
+### ✨ **New Features**
+- **Japanese, Vietnamese, and Turkish UI localization** — the SDK UI now ships `ja`, `vi`, and `tr` catalogs alongside existing locales. They are picked up automatically via `sessionConfig.locale` or browser language detection; no partner action needed unless you restrict `supportedLocales`
+- **Scoped agent keys** — `registerAgentKey` now accepts an OAuth `scope`, so you can bind credential-only agent keys without a signing key. `AgentPublicKey` now returns optional `scope` and `nickname` fields, and `getAgentKeys` returns the same enriched shape
+- **Optional `nonce` for SD-JWT verification** — `nonce` is no longer required for `SD_JWT_VC` programs. Omit it to skip the key-binding JWT entirely; when supplied, a KB-JWT is attached only if the issuer JWT carries `cnf.jwk` — see [Verifying credentials](/airkit/usage/credential/verify)
+- **Nested selective disclosure for SD-JWT** — `fieldsToDisclose` now accepts dotted claim paths (e.g. `address.city`) to disclose nested claims on `SD_JWT_VC` programs
+- **Issuer revocation checks** — verification programs can enable issuer-revocation checking; revoked credentials are excluded from verification and a `Revoked` result is returned when every matching credential is revoked
+
+### ➕ **Improvements**
+- More reliable SDK initialization and popup flows — the iframe/popup handshake was unified, eliminating missed-announcement failures during init
+- Faster first load — improved build chunking, deferred loading, and preloading of the credential flow
+- Wallet actions now validate the session first — fixes users appearing logged in after their tokens were deleted (e.g. clicking "Deploy Smart Account" with an expired session)
+- Recovery and PIN signature payloads now include a timestamp for replay protection
+- Credential holder signatures now use ERC-7739 typed-data signing — relevant if you verify holder signatures server-side
+- New `CHANNEL_CLOSED` error name, thrown when the user closes a popup or the messaging channel closes mid-flow — handle it alongside `USER_CANCELLED` if you switch on error names
+
+### **📋 Migration Guide**
+
+**SD-JWT nonce is now optional:**
+
+```js
+  // Before (1.11.x) — nonce required for SD_JWT_VC programs
+  await airService.verifyCredential({ programId, fieldsToDisclose, nonce });
+
+  // After (1.12.x) — omit nonce to skip the KB-JWT
+  await airService.verifyCredential({ programId, fieldsToDisclose });
+
+  // Nested claims via dotted paths
+  await airService.verifyCredential({
+    programId,
+    fieldsToDisclose: ["address.city", "age"],
+  });
+```
+<Note>
+When nonce is omitted, the compliant presentation's `verifiableCredential[0]` is `<Issuer-JWT>~<disclosures>~` with no KB-JWT segment — update verifier-side parsing if you assumed three segments.
+</Note>
 
 ## **Version 1.11.1 (Aug 13, 2026)**
 
