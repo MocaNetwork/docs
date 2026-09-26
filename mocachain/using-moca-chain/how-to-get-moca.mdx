@@ -1,13 +1,52 @@
 ---
 title: 'How To Get $MOCA'
-description: 'How to get &#36;MOCA tokens to pay Moca Chain transactions: Testnet faucet steps, exchange listings, and bridging options for mainnet.'
+description: 'How to get &#36;MOCA tokens to pay Moca Chain transactions: bridging from Ethereum or Base, exchange listings, and Testnet faucet steps.'
 ---
 
 
 &#36;MOCA is the network token used to pay for transactions on Moca Chain.
 Learn more about the [&#36;MOCA token](/learn/moca-coin).
 
-> _Moca Chain is currently in Testnet_
+## Mainnet
+
+### Bridge from Ethereum or Base
+
+You can bridge your existing &#36;MOCA from Ethereum or Base to Moca Chain with [Stargate](https://stargate.finance), powered by LayerZero. Bridging works in both directions, so you can also move &#36;MOCA from Moca Chain back to Ethereum or Base.
+
+<Steps>
+  <Step title="Connect your wallet">
+    Go to [stargate.finance](https://stargate.finance) and connect your wallet.
+  </Step>
+  <Step title="Choose the route">
+    Select &#36;MOCA on Ethereum or Base as the source, and Moca Chain as the destination.
+  </Step>
+  <Step title="Confirm the transfer">
+    Enter the amount, review the fee, and confirm the transaction in your wallet.
+  </Step>
+  <Step title="Receive on Moca Chain">
+    Your &#36;MOCA arrives on Moca Chain within a few minutes. You can track the transfer on [LayerZero Scan](https://layerzeroscan.com).
+  </Step>
+</Steps>
+
+**Fees:** You pay a LayerZero messaging fee in the source chain's gas token: ETH when you bridge from Ethereum or Base, and &#36;MOCA when you bridge out of Moca Chain. Stargate shows the fee before you confirm. Bridging from Moca Chain to Ethereum costs more than to Base because the fee covers Ethereum gas.
+
+**Daily limits:** Each route has a daily limit that resets at 00:00 UTC. If your transfer doesn't go through, try a smaller amount or try again the next day.
+
+<Note>
+When you bridge out of Moca Chain, some wallets label the amount as ETH on the confirmation screen. The amount is in &#36;MOCA and includes the bridge fee.
+</Note>
+
+To check that you are using the official &#36;MOCA token, compare the contract address:
+
+| Network    | &#36;MOCA contract                              |
+| ---------- | ------------------------------------------- |
+| Ethereum   | `0xF944e35f95E819E752f3cCB5Faf40957d311e8c5` |
+| Base       | `0x2B11834Ed1FeAEd4b4b3a86A6F571315E25A884D` |
+| Moca Chain | Native token (no contract address)          |
+
+### Available on Exchanges
+
+Currently &#36;MOCA is available on various centralized exchanges. For more information please refer to [Coin Gecko](https://www.coingecko.com/en/coins/moca-coin)
 
 ## Testnet
 
@@ -21,18 +60,3 @@ Go to the [**Testnet Faucet**](https://faucet.mocachain.org).
 <Tip>If this is insufficient to your use case please reach out to our team for more testnet tokens.</Tip>
 
 ![Moca Faucet](/images/guides/moca_faucet.png)
-
-## Mainnet
-
-{/* ### Bridging from Mainnet
-
-When mainnet goes live, you will be able to bridge your existing `&#36;MOCA` tokens from either ETH or Base chain to the Moca Chain via our bridging `&#36;MOCA` bridging partner.
-
-To do so please follow the step below: */}
-
-Our token is already live on select exchanges and can be bridged to mainnet once it is live. More details will be provided closer to the launch date. Meanwhile you can purchase our tokens on available exchanges.
-
-### Available on Exchanges
-
-Currently &#36;MOCA is available on various centralized exchanges. For more information please refer to [Coin Gecko](https://www.coingecko.com/en/coins/moca-coin)
-
