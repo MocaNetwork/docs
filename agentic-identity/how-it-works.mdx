@@ -1,0 +1,83 @@
+---
+title: "How it works"
+description: "Follow a user from connecting an agent to presenting delegated evidence and receiving an application decision."
+---
+
+import AgenticIdentityAvailability from "/snippets/agentic-identity-availability.mdx";
+
+<AgenticIdentityAvailability />
+
+The AIR Agent product model brings together three kinds of evidence: the agent's identity, the user's authorization, and the claims needed for the application to make a decision.
+
+## The building blocks
+
+| Element | What it establishes |
+| --- | --- |
+| AIR Identity | The user identity and credential layer behind the interaction. |
+| Agent identity | The agent performing the action. The identity alone does not establish which user it represents. |
+| Account binding | The approved link between the user's AIR Account and the agent. With the Agent APIs, this is an agent key bound to the user with a set of scopes. |
+| Delegation credential | In the target model, the authority the user grants to that agent, including its scope and conditions. |
+| User credential | An issuer-backed claim about the user, such as membership or eligibility. |
+| Verification | Whether the presented evidence satisfies the receiving application's requirements. |
+
+Binding connects the account and agent. In the target model, the delegation describes the authority granted through that relationship. Together, the binding and delegation chain establish whom the agent represents and under what authority. A membership credential supplies the evidence for a benefit decision.
+
+## The interaction
+
+These steps describe the target end-to-end interaction. The documented Agent APIs for account binding and credential verification do not establish that the complete delegated flow is released.
+
+<Steps>
+  <Step title="Connect the user's AIR Account">
+    The user links their AIR Account to the agent through an approval flow in which they can identify the agent and review the permissions requested. With the [Agent APIs](/agentic-identity/partner-agent-api), your backend binds the agent while the user has an AIR Kit session, and the bound key's scopes limit what the agent can do.
+  </Step>
+  <Step title="Authorize the task">
+    Target model: the user grants the agent scoped authority through a delegation credential. The scope identifies the permitted credential use and relevant conditions, such as the receiving application and duration.
+  </Step>
+  <Step title="Request the required evidence">
+    The receiving application defines the claims and issuers it accepts. For a member price, it might request a loyalty tier. For an eligibility check, it might request proof that a condition is met.
+  </Step>
+  <Step title="Present and verify">
+    In the target model, the agent presents evidence within its delegated scope. Where supported, verification evaluates both the user claim and the authority connecting the agent to the user. Current release support must be confirmed in the implementation reference. The application also applies its rules for validity, status, and the requested action.
+  </Step>
+  <Step title="Apply the result">
+    The application returns the benefit or service the user qualifies for, asks for additional approval, or declines the request. A purchase then follows the separate checkout and payment requirements for that integration.
+  </Step>
+</Steps>
+
+## Credential discovery and verification
+
+An agent can reach credential verification through two surfaces.
+
+The [Agent APIs](/agentic-identity/partner-agent-api) give your backend REST endpoints. With a short-lived agent JWT, it lists the user's credentials and runs a verification program. Verification returns `Compliant`, `Non-Compliant`, or `NotFound` in a single response, with a verifiable presentation when compliant.
+
+The AIR Agent Plugin tools have sandbox coverage and cover these functions:
+
+| Function | Purpose |
+| --- | --- |
+| Program discovery | Discover verification programs. |
+| Verification initiation | Start credential verification. |
+| Status polling | Check the status of a verification request. |
+
+For the Plugin, confirm the exact exported tool names, inputs, and response contract against the package and version selected for your integration. This overview does not establish a versioned tool reference.
+
+If the user does not hold the required credential, the documented flow includes an issuer-URL handoff so the user can follow the issuer's process. Confirm the missing-credential status and URL fields in the supported response contract. Verification does not itself issue the missing credential.
+
+{/* TODO: Check air_credential_list_programs, air_credential_verify, air_credential_poll_status, and the no_vc / issueUrl response against a supported package version before publishing an executable tool reference. */}
+
+User-bound proof handoff and the agent adaptation for consent and selective disclosure remain incomplete in the current product status. Verify on Behalf, which covers verification without the user in-session, remains at concept stage. Existing credential verification should not be read as availability of those delegated flows.
+
+Credential issuance remains part of AIR Identity. An issuer's backend can use the existing [issuance flow](/airkit/usage/credential/issuing-credentials). Issuer-owned agent automation is a separate integration from a user's agent presenting a credential.
+
+## What the application checks
+
+For the target delegated flow, the integration needs to establish that the requester is the delegated agent, the grant is valid for this application and action, and the accepted issuer supports the claim about the same user. It must also evaluate expiry and current status, and bind the evidence to the intended interaction. These are requirements for that flow, not a claim that every check is implemented in the current release.
+
+A successful claim check does not authorize every action. A verified loyalty tier can support a price decision. Authority to place an order or spend money must cover those actions separately.
+
+## What information is shared
+
+The verification program determines the requested claims and proof requirements. A program can request an eligibility result or approved claims, with zero-knowledge proofs where configured. The result depends on that program; it is not always limited to a single yes-or-no value.
+
+Credential payloads in the existing AIR model are encrypted before storage. Issuers retain their source information, and recipients must handle any disclosed information appropriately. See [AIR Credentials](/airkit/usage/credential/credentials-flow) for the underlying data flow.
+
+For the available integration surfaces, see [Integration options](/agentic-identity/integration-options). For requests and responses, see the [Agent API quickstart](/agentic-identity/partner-agent-api) and the [Agent APIs reference](/api-reference/agents/introduction).

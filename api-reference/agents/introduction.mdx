@@ -1,0 +1,106 @@
+---
+title: "Agent APIs"
+sidebarTitle: "Overview"
+description: "Bind an agent to an AIR Account, mint short-lived agent JWTs, list and verify the holder's credentials, and mint merchant checkout tokens."
+---
+
+The Agent APIs let your backend act for a holder through a bound agent. You bind an agent once, then mint a short-lived agent JWT for each operation and use it to list or verify the holder's credentials. If the agent's key includes checkout, you can also mint a token for a merchant checkout.
+
+For a step-by-step walkthrough with request examples, see the [Agent API quickstart](/agentic-identity/partner-agent-api).
+
+## Base URLs
+
+The Agent APIs span two hosts. Use the pair for the same environment.
+
+| Environment | AIR API (keys, session, checkout) | Credential API (list, verify) |
+| --- | --- | --- |
+| Sandbox | `https://air.api.sandbox.air3.com` | `https://credential-testnet.api.sandbox.air3.com` |
+| Production | `https://air.api.air3.com` | `https://credential-mainnet.api.air3.com` |
+
+<Note>
+  Agent keys must be enabled for your partner account. Otherwise, AIR API calls return `403 AGENT_KEYS_DISABLED`. Contact the AIR team to enable agent keys and confirm which environment is available for your integration.
+</Note>
+
+## Authentication
+
+Each route uses a different combination of headers.
+
+| Header | Value | Used by |
+| --- | --- | --- |
+| `x-partner-id` | Your Partner ID from the Developer Dashboard | All key routes and session creation |
+| `x-partner-access-token` | The holder's AIR Kit partner access token from `airService.getAccessToken()` | All key routes |
+| `x-partner-jwt` | A JWT signed with your partner login key | Bind, rotate, and revoke |
+| `x-agent-api-key` | The `air_ag_…` key returned at bind or rotate | Session and checkout creation |
+| `Authorization: Bearer` | The agent JWT from session creation | List and verify credentials |
+
+Sign `x-partner-jwt` on your backend with the same key you use for AIR Kit login. Its `partnerId` must match `x-partner-id` and the holder's session. See [Partner authentication](/airkit/usage/partner-authentication) for key setup.
+
+Session and checkout creation accept exactly one agent identity: the `x-agent-api-key` header, or a `signedMessage` in the body for agents bound with a P-256 public key.
+
+<Warning>
+  Treat `agentApiKey` and `x-partner-jwt` as backend secrets. Never send them to a browser or embed them in page JavaScript.
+</Warning>
+
+## Scopes
+
+Bind an agent with a space-delimited `scope`. AIR adds `openid` automatically.
+
+| Scope | Allows |
+| --- | --- |
+| `credentials.read` | List the holder's credentials. |
+| `credentials.verify` | Verify the holder's credentials against a program. |
+| `commerce.checkout` | Mint a merchant checkout token. |
+
+Partner bind cannot include `wallet.sign`. A session can request a subset of the bound scopes; omit `scope` to receive all of them.
+
+## Tokens and key lifecycle
+
+| Item | Lifetime | Notes |
+| --- | --- | --- |
+| `agentApiKey` | Until rotated or revoked | Returned only at bind and rotate. |
+| Agent JWT | 15 minutes | No refresh token. Create a new session for each operation. |
+| Checkout JWT | Short-lived | Its `aud` is the merchant. AIR and Credential APIs reject it. |
+
+Rotating a key returns a new `agentApiKey` and invalidates agent JWTs already issued for that key. Revoking a key stops new sessions for it.
+
+## Errors
+
+Errors return a JSON body with a machine-readable `code` and a `message`.
+
+| Status | AIR API | Credential API |
+| --- | --- | --- |
+| `400` | Invalid request, for example a missing `scope` | Invalid query or body |
+| `401` | Missing or invalid partner session, partner JWT, or agent identity | Missing or invalid bearer token |
+| `403` | Agent keys disabled, requested scope not a subset of the bound key, or `wallet.sign` on a partner route | User JWT on verify, or agent JWT missing the required scope |
+| `404` | Agent key not found | — |
+| `409` | Maximum agent keys per user reached | — |
+| `502` | — | Credential storage unavailable |
+
+AIR API codes: `INVALID_PARAMETER`, `UNAUTHORIZED`, `INVALID_TOKEN`, `AGENT_KEYS_DISABLED`, `AGENT_SCOPE_DENIED`, `AGENT_SCOPED_SESSION_DISABLED`, `CONFLICT_REQUEST`, `NOT_FOUND`, and `INTERNAL_SERVER_ERROR`.
+
+Credential API codes: `INVALID_PARAMETER`, `UNAUTHORIZED`, `FORBIDDEN`, `CREDENTIAL_STORAGE_UNAVAILABLE`, and `VERIFICATION_PROGRAM_NOT_FOUND`.
+
+A `502 CREDENTIAL_STORAGE_UNAVAILABLE` on verify means storage could not be read. It does not mean the holder lacks the credential; that case returns `200` with `status: "NotFound"`.
+
+## Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Bind an agent" icon="link" href="/api-reference/agents/bind-agent-key">
+    Register an agent for the holder and receive its API key once.
+  </Card>
+  <Card title="Create an agent session" icon="key" href="/api-reference/agents/create-agent-session">
+    Mint a 15-minute agent JWT.
+  </Card>
+  <Card title="List credentials" icon="list" href="/api-reference/agents/list-credentials">
+    Page through the holder's credentials with optional filters.
+  </Card>
+  <Card title="Verify a credential" icon="badge-check" href="/api-reference/agents/verify-credential-by-agent">
+    Run a verification program and receive a presentation when compliant.
+  </Card>
+  <Card title="Create a checkout session" icon="cart-shopping" href="/api-reference/agents/create-checkout-session">
+    Mint a token for a supported merchant checkout.
+  </Card>
+  <Card title="Manage agent keys" icon="gear" href="/api-reference/agents/list-agent-keys">
+    List, rename, rotate, and revoke bound agents.
+  </Card>
+</CardGroup>

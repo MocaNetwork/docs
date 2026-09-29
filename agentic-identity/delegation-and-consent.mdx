@@ -1,0 +1,86 @@
+---
+title: "Delegation and consent"
+description: "Understand the target model for controlling which claims an agent may present, where it may use them, and which actions a user authorizes."
+---
+
+import AgenticIdentityAvailability from "/snippets/agentic-identity-availability.mdx";
+
+<AgenticIdentityAvailability />
+
+In the target model, a delegation credential records a user's authorization for a specific agent. It connects the agent's identity to the user's AIR Identity and describes the permitted scope. Where supported, applications check that authority alongside the evidence presented for a request. An agent identity alone does not prove the person behind it.
+
+## Define the scope
+
+A shopping task might need permission to present a membership tier to one merchant for a limited period. A travel task may need different claims and a different duration.
+
+| Part of the grant | Example | Purpose |
+| --- | --- | --- |
+| Granting user | The customer's AIR Identity | Identifies who authorizes the agent. |
+| Delegate | The shopping agent | Identifies who receives the authority. |
+| Permitted claims | Membership and age eligibility | Bounds the information the agent may present. |
+| Receiving application | One merchant | Limits where the grant applies. |
+| Duration | 24 hours | Bounds how long the authority lasts. |
+| Permitted action | Request a member price | Defines what the agent may do. |
+
+These are illustrative policy terms, not API field names. The integration contract must specify the supported scope fields and how the receiving application checks them.
+
+## Disclosure and purchase authority
+
+Permission to show a loyalty tier lets an agent obtain a member quote. Placing an order and authorizing payment require the corresponding action permissions.
+
+For each integration, define the claims an agent may present, the applications that may receive them, and the actions it may perform. If the task changes, the application should obtain the additional authority it requires.
+
+For example, an agent allowed to compare hotel prices may need a new approval before it can book a non-refundable room.
+
+## Proof, disclosure, and context
+
+| Information type | Example | What it means for the interaction |
+| --- | --- | --- |
+| Proof of eligibility | The user meets an age threshold | The application can evaluate a condition without needing the source document. |
+| Approved disclosure | The user's loyalty tier | The recipient receives the particular claim approved for sharing. |
+| User context | A seat preference or preferred product category | The agent can personalize its work, but a preference is not automatically an issuer-verified fact. |
+
+Request only the information needed for the task. Do not infer that proving one attribute grants access to the user's entire profile.
+
+Portable context carried in credentials is a separate design area. Its schema and access model need to be defined for each integration; these docs do not promise a general-purpose memory-sharing service.
+
+## What the Agent APIs enforce today
+
+The delegation credential above is the target model. The [Agent APIs](/agentic-identity/partner-agent-api) already enforce a narrower, key-level form of authority:
+
+| Control | Behavior |
+| --- | --- |
+| Bound scopes | An agent key is bound with scopes such as `credentials.read`, `credentials.verify`, and `commerce.checkout`. It cannot act outside them. |
+| Session scopes | Each agent session can request a subset of the bound scopes. |
+| Session lifetime | Agent JWTs expire after 15 minutes and have no refresh token. |
+| Rotation | Rotating a key issues a new API key and invalidates agent JWTs already issued for it. |
+| Revocation | Revoking a key stops new sessions for that agent. |
+| Checkout audience | A checkout token is valid only for its merchant audience. AIR and Credential APIs reject it. |
+
+These controls bound what an agent can request from AIR. They do not yet express a per-merchant, per-claim, or per-action grant, and they do not replace the receiving application's own checks.
+
+## Expiry and withdrawal
+
+Expiry bounds the duration of a grant. In the target model, revocation withdraws authority before expiry. Actual propagation, status freshness, cached decisions, and in-flight request behavior depend on the supported release and integration contract.
+
+At the key level, the Agent APIs define rotation and revocation as described above. Consent management and complete delegation revocation behavior are not fully shipped. Applications must confirm the supported status checks before relying on a delegation grant.
+
+Account disconnection, delegation revocation, and transaction permission revocation can affect different parts of the interaction. Define which operation stops which actions, how cached decisions behave, and what happens to requests already in progress. Removing access does not undo completed purchases or erase information already disclosed.
+
+Outside key rotation, these docs do not specify an immediate revocation guarantee for delegation grants. The implementation contract must define propagation and status-check behavior.
+
+## Spending limits and enforcement
+
+A grant may describe a spending restriction, but the payment or wallet integration must enforce it. Define whether a cap applies per purchase, per session, or across a time period, including concurrent requests.
+
+The documented payment-tool controls include caps and domain restrictions. Those controls do not cover direct `air_wallet_send` calls. An integration must not assume that a cap configured for payment tools protects every wallet action.
+
+## Agent lifespan
+
+Match the duration of the authority to the user's task:
+
+- **One task:** obtain the evidence needed for a single interaction and let the authority end with the task.
+- **One session:** preserve approved scope across a multi-step shopping or booking flow.
+- **An ongoing relationship:** define renewal, expiry, withdrawal, and repeated-action approvals explicitly.
+
+An agent retaining a conversation or preference does not by itself extend its authority. Scheduled purchases and standing spending mandates require their own supported authorization flow.

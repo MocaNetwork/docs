@@ -201,6 +201,34 @@
         ]
       },
       {
+        "tab": "Agentic Identity",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "agentic-identity/index",
+              "agentic-identity/partners",
+              "agentic-identity/how-it-works"
+            ]
+          },
+          {
+            "group": "Commerce and consent",
+            "pages": [
+              "agentic-identity/delegation-and-consent",
+              "agentic-identity/use-cases",
+              "agentic-identity/offers-for-agents"
+            ]
+          },
+          {
+            "group": "Integration",
+            "pages": [
+              "agentic-identity/integration-options",
+              "agentic-identity/partner-agent-api"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Solutions",
         "groups": [
           {
@@ -336,6 +364,36 @@
             "group": "Status",
             "pages": [
               "status"
+            ]
+          },
+          {
+            "group": "Agent APIs",
+            "pages": [
+              "api-reference/agents/introduction",
+              {
+                "group": "Agent keys",
+                "pages": [
+                  "api-reference/agents/bind-agent-key",
+                  "api-reference/agents/list-agent-keys",
+                  "api-reference/agents/update-agent-key-nickname",
+                  "api-reference/agents/rotate-agent-key",
+                  "api-reference/agents/revoke-agent-key"
+                ]
+              },
+              {
+                "group": "Sessions",
+                "pages": [
+                  "api-reference/agents/create-agent-session",
+                  "api-reference/agents/create-checkout-session"
+                ]
+              },
+              {
+                "group": "Credentials",
+                "pages": [
+                  "api-reference/agents/list-credentials",
+                  "api-reference/agents/verify-credential-by-agent"
+                ]
+              }
             ]
           }
         ]

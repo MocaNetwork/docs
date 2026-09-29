@@ -8,13 +8,14 @@ Use this README as the working contract for contributors: how the docs are organ
 
 ## What lives here
 
-The site is split into five top-level tabs, all wired up in [`docs.json`](docs.json):
+The site is split into six top-level tabs, all wired up in [`docs.json`](docs.json):
 
 - **Moca Book** (`learn/`) — vision, ecosystem, identity primitives, and conceptual background for Moca Network.
 - **Solutions** (`solutions/`) — vertical-specific overviews for partners (loyalty, fintech, gaming, telco, advertising, identity).
 - **AIR Kit** (`airkit/`) — SDK reference, quickstarts, integration guides, credential and account services, recipes, and templates.
+- **Agentic Identity** (`agentic-identity/`) — partner fit, agentic commerce, delegated identity, consent, integration options, the Agent API quickstart, and the proposed offers model.
 - **Moca Chain** (`mocachain/`) — chain architecture, network information, node operator guides, and native dApps.
-- **API Reference** (`api-reference/`) — REST endpoints generated from [`api-reference/openapi.json`](api-reference/openapi.json).
+- **API Reference** (`api-reference/`) — REST endpoints generated from [`api-reference/openapi.json`](api-reference/openapi.json), plus the Agent APIs generated from [`api-reference/agent-openapi.json`](api-reference/agent-openapi.json).
 
 The landing page is [`index.mdx`](index.mdx). Shared assets live in [`images/`](images).
 
@@ -27,6 +28,7 @@ The landing page is [`index.mdx`](index.mdx). Shared assets live in [`images/`](
 ├── learn/                   # Moca Book content
 ├── solutions/               # Partner solutions by vertical
 ├── airkit/                  # AIR Kit SDK docs (web + Flutter)
+├── agentic-identity/         # Agent identity, commerce, and partner integrations
 ├── mocachain/               # Moca Chain docs and node guides
 ├── api-reference/           # OpenAPI spec + endpoint pages
 ├── recipes/                 # Task-oriented integration recipes

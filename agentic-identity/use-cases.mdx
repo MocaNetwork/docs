@@ -1,0 +1,60 @@
+---
+title: "Commerce use cases"
+description: "Recognize member benefits, verify eligibility, and carry approved customer context into agent-assisted shopping and travel."
+---
+
+Agentic commerce connects a user's intent with merchants that can serve it. The AIR Agent product model combines AIR Identity with delegated authority so a merchant can recognize the user behind an agent and apply the benefits they qualify for.
+
+The scenarios below describe the intended experience. Membership and entitlement recognition are suitable starting points for pilots. Confirm support for delegation and user-bound proof handoff using the [availability guidance](/agentic-identity/how-it-works) before implementing the full flow.
+
+## Membership pricing
+
+A customer asks their agent to find a product. The customer already belongs to a loyalty program whose credentials the merchant accepts.
+
+1. The user authorizes the agent to present the relevant membership evidence.
+2. The merchant verifies that evidence and the agent's authority.
+3. The merchant returns the member price.
+4. The agent compares the offer against the user's requirements and proceeds within its purchase permissions.
+
+The merchant defines which memberships qualify and what benefit to apply. The same model can support access to member inventory or a status-matched benefit, where the receiving program accepts an external tier.
+
+## Eligibility beyond the issuing application
+
+A program operator may hold information that qualifies a user for an offer. It can issue a credential for that fact so the user can present evidence to participating merchants.
+
+For example, an issuer could attest that a user belongs to an eligible customer segment. An accepting merchant verifies the evidence and applies its offer without needing the source record for that decision.
+
+Recognition and payment can be independent: the merchant may recognize the credential even when checkout uses another supported payment method. Credential acceptance, offer rules, and payment support remain separate integration decisions.
+
+## Travel and booking
+
+A travel agent can bring together verified loyalty status and user-approved preferences to request a relevant quote.
+
+| Context | How the application can use it |
+| --- | --- |
+| Accepted loyalty tier | Return an eligible member rate or benefit. |
+| Membership or eligibility proof | Check access to a particular offer. |
+| Travel preferences | Refine options, such as seat choice or departure time. |
+| Delegated booking authority | Determine whether the agent can complete the selected booking. |
+
+A preference helps personalize the trip. A verified claim supports an eligibility decision. The integration should preserve that distinction.
+
+## Recognizing agent traffic
+
+Publishers, marketplaces, and applications may receive requests from agents acting for their users. A binding and valid delegation provide evidence of that relationship. Approved claims can help the application determine which access or experience is appropriate.
+
+Identity is one input to that decision. Applications still apply their access rules, rate limits, and abuse controls. A verified relationship does not guarantee that every request is acceptable.
+
+## Offers during product discovery
+
+The longer-term opportunity is to let merchants present eligible offers while an agent is choosing products for its user. A merchant could make a first-purchase discount available when the agent can demonstrate the required eligibility.
+
+This extends member recognition into customer acquisition. The proposed flow and unresolved integration details are covered in [Offers for agents](/agentic-identity/offers-for-agents).
+
+## Other applications
+
+The identity model also applies to financial-service eligibility and interactions between agents. A service might request accepted evidence of residency or account-holder status. A counterparty might check which principal authorized an agent and what that agent may do.
+
+These are additional use cases, not a commitment that every corresponding workflow or payment integration is available. Agent-to-agent trust and commerce are exploratory rather than part of the current integration scope. They remain gated on a supported delegation model and standards maturity, including ERC-8004. General-purpose memory sharing also remains an area for further development.
+
+To scope a first commerce integration, see [Partner fit](/agentic-identity/partners).
