@@ -94,26 +94,77 @@
         ]
       },
       {
-        "tab": "AIR Kit",
-        "pages": [
-          "airkit/index",
-          "airkit/integrating-using-ai",
+        "tab": "Get started",
+        "menu": [
           {
-            "group": "Get started",
-            "pages": [
-              "airkit/usage/getting-started",
-              "airkit/environments",
-              "airkit/platform-matrix",
-              "airkit/usage/installation",
-              "airkit/usage/initialization"
+            "item": "Overview",
+            "icon": "compass",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "airkit/index",
+                  "airkit/integrating-using-ai",
+                  "airkit/usage/getting-started",
+                  "learn/when-to-use-airkit",
+                  "airkit/environments",
+                  "airkit/platform-matrix",
+                  "airkit/usage/installation",
+                  "airkit/usage/initialization"
+                ]
+              }
             ]
           },
           {
-            "group": "Quickstarts",
+            "item": "Issuer path",
+            "icon": "stamp",
+            "groups": [
+              {
+                "group": "Issuer path",
+                "pages": [
+                  "airkit/quickstart/index",
+                  "airkit/quickstart/issue-credentials",
+                  "recipes/kyc-credential-on-event",
+                  "recipes/loyalty-points-issuance"
+                ]
+              }
+            ]
+          },
+          {
+            "item": "Verifier path",
+            "icon": "badge-check",
+            "groups": [
+              {
+                "group": "Verifier path",
+                "pages": [
+                  "airkit/quickstart/verify-credentials",
+                  "recipes/verify-credential-in-app"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "AIR Identity",
+        "groups": [
+          {
+            "group": "How it works",
             "pages": [
-              "airkit/quickstart/index",
-              "airkit/quickstart/issue-credentials",
-              "airkit/quickstart/verify-credentials"
+              "learn/architecture",
+              "learn/airkit/credentials",
+              "learn/airkit/integration-workflow",
+              "learn/advanced-topics/zktls",
+              "learn/advanced-topics/privacy-and-compliance"
+            ]
+          },
+          {
+            "group": "Security",
+            "pages": [
+              "learn/security/overview",
+              "learn/security/credential-security",
+              "learn/security/data-privacy",
+              "learn/security/security-checklist"
             ]
           },
           {
@@ -173,9 +224,6 @@
             "group": "Recipes",
             "pages": [
               "recipes/index",
-              "recipes/kyc-credential-on-event",
-              "recipes/loyalty-points-issuance",
-              "recipes/verify-credential-in-app",
               "recipes/wagmi-integration",
               "recipes/custom-auth-integration"
             ]
@@ -187,21 +235,13 @@
               "airkit/usage/jwks-setup",
               "airkit/usage/backend-hosting",
               "airkit/usage/config-theming",
-              "airkit/usage/config-language",
-              {
-                "group": "Troubleshooting",
-                "pages": [
-                  "airkit/troubleshooting/common-errors",
-                  "airkit/troubleshooting/sdk-issues",
-                  "airkit/troubleshooting/credential-issues"
-                ]
-              }
+              "airkit/usage/config-language"
             ]
           }
         ]
       },
       {
-        "tab": "Agentic Identity",
+        "tab": "AIR Agents",
         "groups": [
           {
             "group": "Overview",
@@ -230,134 +270,224 @@
       },
       {
         "tab": "Solutions",
-        "groups": [
+        "menu": [
           {
-            "group": "Start here",
-            "pages": [
-              "solutions/index",
-              "solutions/partner-economics",
-              "solutions/compliance-faq"
-            ]
-          },
-          {
-            "group": "By vertical",
-            "pages": [
-              "solutions/loyalty",
-              "solutions/identity",
-              "solutions/fintech",
-              "solutions/gaming",
-              "solutions/ticketing",
-              "solutions/telco",
-              "solutions/advertising"
-            ]
-          },
-          {
-            "group": "KYC (Veriff powered by zkMe)",
-            "pages": [
-              "kyc/index",
-              "kyc/how-it-works",
-              "kyc/data-collection-and-sharing",
-              "kyc/zkme-security-architecture",
-              "kyc/pricing-and-faq"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Moca Chain",
-        "groups": [
-          {
-            "group": "Introduction",
-            "pages": [
-              "mocachain/index",
-              "mocachain/why-mocachain"
-            ]
-          },
-          {
-            "group": "Technical Details",
-            "pages": [
-              "mocachain/technical-details/architecture",
-              "mocachain/technical-details/consensus-layer",
-              "mocachain/technical-details/evm-compatibility",
-              "mocachain/technical-details/decentralized-storage"
-            ]
-          },
-          {
-            "group": "Using Moca Chain",
-            "pages": [
-              "mocachain/using-moca-chain/connect-to-mocachain",
-              "mocachain/using-moca-chain/how-to-get-moca",
-              "mocachain/using-moca-chain/network-information",
-              "mocachain/using-moca-chain/moca-chain-cli"
-            ]
-          },
-          {
-            "group": "Node Guides",
-            "pages": [
-              "mocachain/guides/run-a-node",
-              "mocachain/guides/run-a-validator",
-              "mocachain/guides/run-a-storage-provider",
-              "mocachain/guides/run-a-local-testnet",
-              "mocachain/guides/run-a-challenger"
-            ]
-          },
-          {
-            "group": "Native dApps",
-            "pages": [
-              "mocachain/native-dapps/block-explorer"
-            ]
-          },
-          {
-            "group": "Help",
-            "pages": [
-              "mocachain/help/faq"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Reference",
-        "groups": [
-          {
-            "group": "REST API",
-            "pages": [
-              "api-reference/introduction",
-              "airkit/usage/credential/issuance-api",
-              "api-reference/catalog/browse-schemas",
-              "api-reference/catalog/schema-detail"
-            ]
-          },
-          {
-            "group": "Web SDK",
-            "pages": [
-              "airkit/usage/reference"
-            ]
-          },
-          {
-            "group": "Flutter SDK",
-            "pages": [
-              "airkit/flutter/overview",
+            "item": "Overview",
+            "icon": "compass",
+            "groups": [
               {
-                "group": "Setup & usage",
-                "expanded": false,
+                "group": "Overview",
                 "pages": [
-                  "airkit/flutter/installation",
-                  "airkit/flutter/android-setup",
-                  "airkit/flutter/ios-setup",
-                  "airkit/flutter/google-signin",
-                  "airkit/flutter/wallet-operations",
-                  "airkit/flutter/provider-functions",
-                  "airkit/flutter/ui-components",
-                  "airkit/flutter/troubleshooting"
+                  "solutions/index",
+                  "solutions/partner-economics",
+                  "solutions/compliance-faq"
                 ]
               }
             ]
           },
           {
-            "group": "Releases",
+            "item": "Agentic Payment",
+            "icon": "robot",
+            "groups": [
+              {
+                "group": "Agentic Payment",
+                "pages": [
+                  "solutions/fintech"
+                ]
+              }
+            ]
+          },
+          {
+            "item": "Programs",
+            "icon": "layer-group",
+            "groups": [
+              {
+                "group": "Programs",
+                "pages": [
+                  "solutions/loyalty",
+                  "solutions/gaming",
+                  "solutions/ticketing",
+                  "solutions/telco"
+                ]
+              }
+            ]
+          },
+          {
+            "item": "Verified traffic",
+            "icon": "shield-check",
+            "groups": [
+              {
+                "group": "Verified traffic",
+                "pages": [
+                  "solutions/advertising",
+                  "solutions/identity"
+                ]
+              },
+              {
+                "group": "KYC (Veriff powered by zkMe)",
+                "pages": [
+                  "kyc/index",
+                  "kyc/how-it-works",
+                  "kyc/data-collection-and-sharing",
+                  "kyc/zkme-security-architecture",
+                  "kyc/pricing-and-faq"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "References",
+        "menu": [
+          {
+            "item": "API reference",
+            "icon": "code",
+            "groups": [
+              {
+                "group": "REST API",
+                "tag": "Identity",
+                "pages": [
+                  "api-reference/introduction",
+                  "airkit/usage/credential/issuance-api",
+                  "api-reference/catalog/browse-schemas",
+                  "api-reference/catalog/schema-detail"
+                ]
+              },
+              {
+                "group": "Web SDK",
+                "tag": "Identity",
+                "pages": [
+                  "airkit/usage/reference"
+                ]
+              },
+              {
+                "group": "Flutter SDK",
+                "tag": "Identity",
+                "pages": [
+                  "airkit/flutter/overview",
+                  {
+                    "group": "Setup & usage",
+                    "expanded": false,
+                    "pages": [
+                      "airkit/flutter/installation",
+                      "airkit/flutter/android-setup",
+                      "airkit/flutter/ios-setup",
+                      "airkit/flutter/google-signin",
+                      "airkit/flutter/wallet-operations",
+                      "airkit/flutter/provider-functions",
+                      "airkit/flutter/ui-components"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Agent APIs",
+                "tag": "Agents",
+                "pages": [
+                  "api-reference/agents/introduction",
+                  {
+                    "group": "Agent keys",
+                    "pages": [
+                      "api-reference/agents/bind-agent-key",
+                      "api-reference/agents/list-agent-keys",
+                      "api-reference/agents/update-agent-key-nickname",
+                      "api-reference/agents/rotate-agent-key",
+                      "api-reference/agents/revoke-agent-key"
+                    ]
+                  },
+                  {
+                    "group": "Sessions",
+                    "pages": [
+                      "api-reference/agents/create-agent-session",
+                      "api-reference/agents/create-checkout-session"
+                    ]
+                  },
+                  {
+                    "group": "Credentials",
+                    "pages": [
+                      "api-reference/agents/list-credentials",
+                      "api-reference/agents/verify-credential-by-agent"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Releases",
+                "pages": [
+                  "airkit/release-notes",
+                  "airkit/usage/migration-compatibility"
+                ]
+              }
+            ]
+          },
+          {
+            "item": "Moca Chain",
+            "icon": "link",
+            "groups": [
+              {
+                "group": "Introduction",
+                "pages": [
+                  "mocachain/index",
+                  "mocachain/why-mocachain",
+                  "learn/moca-coin"
+                ]
+              },
+              {
+                "group": "Technical Details",
+                "pages": [
+                  "mocachain/technical-details/architecture",
+                  "mocachain/technical-details/consensus-layer",
+                  "mocachain/technical-details/evm-compatibility",
+                  "mocachain/technical-details/decentralized-storage"
+                ]
+              },
+              {
+                "group": "Using Moca Chain",
+                "pages": [
+                  "mocachain/using-moca-chain/connect-to-mocachain",
+                  "mocachain/using-moca-chain/how-to-get-moca",
+                  "mocachain/using-moca-chain/network-information",
+                  "mocachain/using-moca-chain/moca-chain-cli"
+                ]
+              },
+              {
+                "group": "Node Guides",
+                "pages": [
+                  "mocachain/guides/run-a-node",
+                  "mocachain/guides/run-a-validator",
+                  "mocachain/guides/run-a-storage-provider",
+                  "mocachain/guides/run-a-local-testnet",
+                  "mocachain/guides/run-a-challenger"
+                ]
+              },
+              {
+                "group": "Native dApps",
+                "pages": [
+                  "mocachain/native-dapps/block-explorer"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Troubleshoot",
+        "groups": [
+          {
+            "group": "AIR Kit",
             "pages": [
-              "airkit/release-notes",
-              "airkit/usage/migration-compatibility"
+              "airkit/troubleshooting/common-errors",
+              "airkit/troubleshooting/sdk-issues",
+              "airkit/troubleshooting/credential-issues",
+              "airkit/flutter/troubleshooting"
+            ]
+          },
+          {
+            "group": "FAQs",
+            "pages": [
+              "learn/help/faq",
+              "mocachain/help/faq"
             ]
           },
           {
@@ -365,35 +495,16 @@
             "pages": [
               "status"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "Concepts",
+        "groups": [
           {
-            "group": "Agent APIs",
+            "group": "Concepts",
             "pages": [
-              "api-reference/agents/introduction",
-              {
-                "group": "Agent keys",
-                "pages": [
-                  "api-reference/agents/bind-agent-key",
-                  "api-reference/agents/list-agent-keys",
-                  "api-reference/agents/update-agent-key-nickname",
-                  "api-reference/agents/rotate-agent-key",
-                  "api-reference/agents/revoke-agent-key"
-                ]
-              },
-              {
-                "group": "Sessions",
-                "pages": [
-                  "api-reference/agents/create-agent-session",
-                  "api-reference/agents/create-checkout-session"
-                ]
-              },
-              {
-                "group": "Credentials",
-                "pages": [
-                  "api-reference/agents/list-credentials",
-                  "api-reference/agents/verify-credential-by-agent"
-                ]
-              }
+              "concepts/glossary"
             ]
           }
         ]
@@ -408,6 +519,174 @@
     {
       "source": "/mocachain/native-dapps/airkit-dashboard",
       "destination": "/airkit/airkit-dashboard"
+    },
+    {
+      "source": "/airkit/templates/plug-and-play",
+      "destination": "/airkit/quickstart/verify-credentials"
+    },
+    {
+      "source": "/airkit/templates/plug-and-play-issuer",
+      "destination": "/airkit/quickstart/issue-credentials"
+    },
+    {
+      "source": "/airkit/templates/plug-and-play-verifier",
+      "destination": "/airkit/quickstart/verify-credentials"
+    },
+    {
+      "source": "/airkit/when-to-use-airkit",
+      "destination": "/learn/when-to-use-airkit"
+    },
+    {
+      "source": "/airkit/guides/overview",
+      "destination": "/learn/architecture"
+    },
+    {
+      "source": "/airkit/guides/air-for-loyalty",
+      "destination": "/solutions/loyalty"
+    },
+    {
+      "source": "/airkit/guides/air-for-fintech",
+      "destination": "/solutions/fintech"
+    },
+    {
+      "source": "/airkit/guides/air-for-gaming",
+      "destination": "/solutions/gaming"
+    },
+    {
+      "source": "/airkit/guides/air-for-ticketing",
+      "destination": "/solutions/ticketing"
+    },
+    {
+      "source": "/airkit/guides/air-for-telco",
+      "destination": "/solutions/telco"
+    },
+    {
+      "source": "/airkit/guides/air-for-advertising",
+      "destination": "/solutions/advertising"
+    },
+    {
+      "source": "/learn/why-now/index",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/why-now/digital-identity",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/why-now/privacy-security",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/why-now/regulatory-landscape",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/vision/index",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/vision/comparison-with-centralized-identity-systems",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/vision/ecosystem",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/core-problems-addressed",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/target-users-stakeholders",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/build-on-moca",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/programs-events",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/index",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/moca-chain",
+      "destination": "/mocachain"
+    },
+    {
+      "source": "/mocachain/using-moca-chain/build-on-mocachain",
+      "destination": "/mocachain"
+    },
+    {
+      "source": "/learn/airkit/about-airkit",
+      "destination": "/airkit"
+    },
+    {
+      "source": "/airkit/how-to-use",
+      "destination": "/airkit"
+    },
+    {
+      "source": "/airkit/solutions/index",
+      "destination": "/airkit"
+    },
+    {
+      "source": "/airkit/solutions",
+      "destination": "/airkit"
+    },
+    {
+      "source": "/learn/integrating-using-ai",
+      "destination": "/airkit/integrating-using-ai"
+    },
+    {
+      "source": "/learn/airkit/key-features",
+      "destination": "/concepts/glossary"
+    },
+    {
+      "source": "/learn/airkit/features-developer-benefits",
+      "destination": "/concepts/glossary"
+    },
+    {
+      "source": "/learn/use-cases/identity-verification",
+      "destination": "/solutions/identity"
+    },
+    {
+      "source": "/learn/use-cases/verifiable-user-onboarding",
+      "destination": "/solutions/identity"
+    },
+    {
+      "source": "/learn/use-cases/programmable-money",
+      "destination": "/solutions/fintech"
+    },
+    {
+      "source": "/learn/advanced-topics/scaling-and-performance",
+      "destination": "/mocachain/technical-details/architecture"
+    },
+    {
+      "source": "/mocachain/technical-details/zktls",
+      "destination": "/learn/advanced-topics/zktls"
+    },
+    {
+      "source": "/mocachain/native-dapps/air-wallet",
+      "destination": "/mocachain"
+    },
+    {
+      "source": "/mocachain/native-dapps/moca-proof",
+      "destination": "/mocachain"
+    },
+    {
+      "source": "/learn/vision",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn/why-now",
+      "destination": "/solutions"
+    },
+    {
+      "source": "/learn",
+      "destination": "/solutions"
     }
   ]
 }

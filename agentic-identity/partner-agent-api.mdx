@@ -3,7 +3,7 @@ title: "Agent API quickstart"
 description: "Bind an agent to a user's AIR Account from your backend, then mint short-lived agent JWTs to list and verify credentials and start a merchant checkout."
 ---
 
-The Agent APIs let your backend act for a signed-in user through a bound agent. You bind the agent once while the user has an AIR Kit session. After that, the agent mints a 15-minute JWT for each operation and uses it to list or verify the user's credentials. If the user granted checkout, the agent can also mint a token for a supported merchant checkout.
+The Agent APIs let your backend act for a signed-in user through a bound agent. You bind the agent once while the user has an AIR Kit session. After that, the agent mints a 15-minute JWT for each operation and uses it to list or verify the user's credentials. If the agent's key includes `commerce.checkout`, the agent can also mint a token for a supported merchant checkout.
 
 This guide walks through the full flow. For every field and response code, see the [Agent APIs reference](/api-reference/agents/introduction).
 
@@ -11,6 +11,7 @@ This guide walks through the full flow. For every field and response code, see t
 
 - A Partner ID and a partner login key with a published JWKS endpoint. See [Partner authentication](/airkit/usage/partner-authentication).
 - AIR Kit installed in your frontend, with users signing in through [`login`](/airkit/usage/user-authentication).
+- A consent screen in your product where the user approves the agent and its scopes. The bind request has no approval step of its own. See [Ask for consent before binding](/agentic-identity/delegation-and-consent#ask-for-consent-before-binding).
 - Agent keys enabled for your partner account. Otherwise, AIR API calls return `403 AGENT_KEYS_DISABLED`. Contact the AIR team to enable them and confirm environment access.
 
 The Agent APIs use two hosts. Use the pair for the same environment.
@@ -50,8 +51,8 @@ sequenceDiagram
 ## Bind and use an agent
 
 <Steps>
-  <Step title="Get the user's AIR Kit session">
-    After the user signs in, get their partner access token in the frontend and send it to your backend over your authenticated channel.
+  <Step title="Get the user's approval and AIR Kit session">
+    After the user signs in and approves the agent on your consent screen, get their partner access token in the frontend. Send it to your backend over your authenticated channel, along with the scopes they approved.
 
     ```ts
     const { token } = await airService.getAccessToken();
@@ -66,7 +67,7 @@ sequenceDiagram
   </Step>
 
   <Step title="Bind the agent once">
-    From your backend, call [Bind an agent](/api-reference/agents/bind-agent-key) with the user's session and a freshly signed partner JWT. Request only the scopes the agent needs.
+    From your backend, call [Bind an agent](/api-reference/agents/bind-agent-key) with the user's session and a freshly signed partner JWT. Request only the scopes the user approved.
 
     <CodeGroup>
     ```bash cURL
@@ -117,7 +118,7 @@ sequenceDiagram
       `agentApiKey` is returned only once. Store it encrypted on your backend with the key `id`. If you lose it, [rotate the key](/api-reference/agents/rotate-agent-key) to get a new one.
     </Warning>
 
-    Add `commerce.checkout` to the scope only if the agent will start merchant checkouts.
+    Add `commerce.checkout` only if the user approved the agent starting merchant checkouts. Scopes are fixed at bind time; to add one later, get approval, bind a new key, and revoke the old one.
   </Step>
 
   <Step title="Create a session for each operation">
@@ -241,7 +242,9 @@ sequenceDiagram
     - `fieldsToDisclose` can be omitted, `"*"`, or a list such as `["birthday", "documentType"]`. What each option returns depends on the credential format; see the [endpoint reference](/api-reference/agents/verify-credential-by-agent).
     - For SD-JWT programs, pass a `nonce` to bind the presentation to your challenge. It is required when the credential was issued with `cnf.jwk`.
 
-    Verification runs offchain. A `502 CREDENTIAL_STORAGE_UNAVAILABLE` means storage was unavailable, not that the user lacks the credential.
+    Verification runs offchain, without a zero-knowledge proof, and the presentation has no proof block of its own. Before you pass a result to a merchant, see [What a verification result proves](/agentic-identity/how-it-works#what-a-verification-result-proves).
+
+    A `502 CREDENTIAL_STORAGE_UNAVAILABLE` means storage was unavailable, not that the user lacks the credential.
   </Step>
 
   <Step title="Optional: start a merchant checkout">
@@ -309,7 +312,7 @@ The signature can be DER or IEEE P1363 (ES256), in standard base64 or base64url.
 - Keep `agentApiKey`, the partner login key, and `x-partner-jwt` on your backend.
 - Request only the scopes the agent's task needs. Sessions can narrow them further.
 - Create a session per operation, and don't cache agent JWTs beyond their 15-minute lifetime.
-- Rotate a key if it may have leaked; revoke it when the user disconnects the agent.
+- Rotate a key if it may have leaked. When the user disconnects the agent, rotate and then revoke the key so sessions already issued end too.
 - Send checkout JWTs only to the merchant named in their `aud`.
 
-To understand how these scopes relate to user consent and the target delegation model, see [Delegation and consent](/agentic-identity/delegation-and-consent).
+For consent, disconnect flows, and how scopes relate to delegation credentials, see [Delegation and consent](/agentic-identity/delegation-and-consent).

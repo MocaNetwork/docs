@@ -1,0 +1,122 @@
+---
+title: "Glossary"
+description: "Definitions of the core terms used across AIR Kit, AIR Credentials, AIR Agents, and Moca Chain, with links to each term's main page."
+---
+
+Each term links to the page that covers it in depth.
+
+## A
+
+### Agent binding
+
+The link between a user's AIR Account and an agent, created when a partner binds an agent key with the user's approval. See [How it works](/agentic-identity/how-it-works).
+
+### Agent key
+
+A key that a partner binds to a user's AIR Account for an agent, with a fixed set of scopes. The agent exchanges it for short-lived agent sessions. See [Agent API quickstart](/agentic-identity/partner-agent-api).
+
+### Agent session
+
+A 15-minute JWT minted from an agent key. The agent uses it to list or verify the user's credentials. See [Create an agent session](/api-reference/agents/create-agent-session).
+
+### AIR Account
+
+A user's identity in the AIR ecosystem, created when they sign in through AIR Kit. It holds the user's credentials and is linked to a smart account. See [User authentication](/airkit/usage/user-authentication).
+
+### AIR Credential
+
+A verifiable credential that an issuer signs, encrypts to the holder, and stores in DStorage. The holder presents it to verifiers. See [How AIR Credentials work](/airkit/usage/credential/credentials-flow).
+
+### AIR Kit
+
+The SDK for web and Flutter that provides AIR Account login, credential issuance and verification, and smart-account wallet functions. See [AIR Kit overview](/airkit/index).
+
+## C
+
+### Compliance Access Key (CAK)
+
+An optional, consent-gated encryption framework that gives an authorized party access to regulated credential data. See [CAK overview](/airkit/usage/credential/cak-overview).
+
+## D
+
+### Delegation credential
+
+Not yet released. A credential that would record a user's per-task authorization for an agent, such as which claims it may present, to which application, and for how long. See [Delegation and consent](/agentic-identity/delegation-and-consent#delegation-credentials).
+
+### DStorage
+
+Moca Chain's decentralized storage, run by Moca Chain Storage Providers. AIR Credentials are stored there as encrypted envelopes. See [Decentralized storage](/mocachain/technical-details/decentralized-storage).
+
+## H
+
+### Holder
+
+The user who receives a credential in their AIR Account and chooses when to present it. See [How AIR Credentials work](/airkit/usage/credential/credentials-flow).
+
+## I
+
+### Issuer
+
+An organization that signs credentials about its users with its own keys, usually from a self-hosted issuer backend. See [Issuing credentials](/airkit/usage/credential/issuing-credentials).
+
+## M
+
+### $MOCA
+
+The utility and governance token of Moca Network, and the gas token on Moca Chain. See [$MOCA](/learn/moca-coin).
+
+### Moca Chain
+
+The EVM-compatible Layer 1 that anchors AIR identity, with CometBFT consensus and decentralized storage. See [Moca Chain overview](/mocachain/index).
+
+## P
+
+### Paymaster
+
+A service that sponsors gas for your users' smart-account transactions, within the budget and policies you set. See [Paymaster](/airkit/usage/account/paymaster).
+
+## S
+
+### Schema
+
+A credential template, defined as a JSON Schema with a JSON-LD context, that sets a credential's fields and validation rules. See [Schema overview](/airkit/usage/credential/schema-overview).
+
+### Selective disclosure
+
+A verification option that lets a verifier read specific credential fields after a successful proof, when the issuer opts in. See [Selective disclosure](/airkit/early-access/selective-disclosure).
+
+### Session key
+
+A scoped key that lets an app sign approved smart-account actions without prompting the user each time. See [Session keys](/airkit/usage/account/session-keys).
+
+### Smart account
+
+The account-abstraction wallet linked to an AIR Account. It can be deployed on any supported chain, with gas sponsored by the paymaster. See [Smart account](/airkit/usage/account/smart-account).
+
+## V
+
+### Verifiable presentation
+
+The package a holder returns to a verifier during verification. It contains the disclosed credential data and, when the program requires one, a proof. See [Verify credentials](/airkit/usage/credential/verify).
+
+### Verification program
+
+A configuration in the Developer Dashboard that sets how a credential is verified: proof type, whether a zero-knowledge proof is required, selective disclosure, and offchain or onchain mode. See [Verify credentials](/airkit/usage/credential/verify).
+
+### Verifier
+
+An application that checks a holder's credentials against a verification program before granting access or a benefit. See [Verify credentials](/airkit/usage/credential/verify).
+
+### Verify on Behalf
+
+A concept-stage capability for verifying a user's credentials without the user in session. It is not available. See [Integration options](/agentic-identity/integration-options#not-yet-available).
+
+## Z
+
+### Zero-knowledge proof (ZK proof)
+
+A proof that a credential satisfies a condition, such as an age threshold, without revealing the underlying value. See [Privacy and compliance](/learn/advanced-topics/privacy-and-compliance).
+
+### zkTLS
+
+A technique that turns data from Web2 sources, such as KYC or email providers, into verifiable proofs without exposing the raw HTTPS payload. See [zkTLS](/learn/advanced-topics/zktls).

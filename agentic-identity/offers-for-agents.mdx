@@ -13,17 +13,15 @@ description: "Explore how merchants could reach eligible users through agents wi
 | Merchant offer discovery | Proposed model. |
 | Campaign API or marketplace | Not released. |
 | Attribution and revenue sharing | Not defined. |
-| AIR Agent Coupon | Candidate product primitive. |
+| AIR Agent Coupon | Candidate concept; no coupon format or API. |
 
-AIR Agent Coupon is a candidate concept, not a released coupon format or API.
-
-An agent helping someone shop can consider merchant offers as part of its product search. AIR's proposed offers model connects those offers to verified eligibility, with the user's consent.
+An agent helping someone shop can consider merchant offers as part of its product search. The proposed offers model connects those offers to verified eligibility, with the user's consent.
 
 The merchant defines the audience and benefit. The user authorizes the necessary proof. The agent receives an eligible offer and evaluates it against the user's request.
 
 ## From verified traffic to agentic commerce
 
-AIR's [verified audience model](/solutions/advertising) uses credentials to support consent-based audience decisions. Agentic identity extends that relationship to an agent acting for the user: the receiving application can evaluate both the relevant user claims and the agent's delegated authority.
+AIR's [verified audience model](/solutions/advertising) uses credentials to support consent-based audience decisions. AIR Agents extends that to an agent acting for the user: the receiving application can evaluate both the user's claims and the agent's authority.
 
 The proposed commerce model brings that evidence into product discovery. Publishers and agent platforms provide distribution, merchants provide eligible offers, and AIR connects the identity and verification steps. An offer can reach the agent while it is working on the user's purchase intent.
 
@@ -55,13 +53,13 @@ flowchart LR
     C --> P[Authorized checkout]
 ```
 
-This is a proposed logical flow. It does not prescribe a discovery API, matching service, or payment protocol.
+The flow is conceptual. There is no discovery API, matching service, or payment protocol for it yet.
 
 ## Why merchants participate
 
 A merchant can make its acquisition offer available at the moment an agent is looking for a product. Eligibility evidence can support a specific benefit without requiring the merchant to receive the user's entire profile.
 
-The intended commercial model connects distribution from agent platforms and publishers with merchant-funded acquisition. Pricing, settlement between participants, attribution, and revenue sharing are not defined by these docs.
+The intended commercial model connects distribution from agent platforms and publishers with merchant-funded acquisition. Pricing, settlement between participants, attribution, and revenue sharing are not yet defined.
 
 ## The agent's responsibility to the user
 
@@ -71,6 +69,6 @@ Later purchases require their own valid authority. A successful first purchase d
 
 ## What a pilot must define
 
-Before treating this model as an integration, agree how offers are published and discovered, which claims and issuers are accepted, what the user approves, and how the merchant verifies eligibility. Also define redemption limits, attribution, handling of disclosed data, and what happens when evidence is unavailable.
+To run this model as a pilot, agree how offers are published and discovered, which claims and issuers are accepted, what the user approves, and how the merchant verifies eligibility. Also define redemption limits, attribution, handling of disclosed data, and what happens when evidence is unavailable.
 
 Existing [membership-pricing flows](/agentic-identity/use-cases#membership-pricing) provide a narrower starting point: verify an entitlement the user already holds and return the corresponding benefit.
