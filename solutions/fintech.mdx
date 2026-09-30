@@ -15,14 +15,14 @@ Financial services carry the heaviest identity verification burden of any indust
 ## What Changes With AIR Kit
 
 - **KYC costs fall per partner onboarded** — Your first KYC verification is the only one your customers need. Partners accept the credential, not a new document submission
-- **Limit verifier data collection** — A ZK proof can confirm eligibility without disclosing identity documents. Programs may also request user-approved claims or CAK access; verifiers must protect the data they receive
+- **Limit verifier data collection** — A ZK proof can confirm eligibility without disclosing identity documents. Programs may also request user-approved claims; verifiers must protect the data they receive
 - **Age and accreditation gates with limited disclosure** — Prove a user is 18+, 21+, or an accredited investor without disclosing the underlying values to the verifier
 - **Cross-border compliance without bilateral agreements** — One KYC credential, presentable to partners across the Moca ecosystem. Partner acceptance depends on their regulatory requirements
 
 ## Specific Use Cases
 
 **KYC Re-use Across Partners**
-Your bank onboards a customer, passes KYC, issues a credential. That customer opens an account with a partner fintech. The partner verifies the credential in one SDK call — no new document submission, no re-KYC cost, no waiting period.
+Your bank onboards a customer, passes KYC, issues a credential. That customer opens an account with a partner fintech. The partner verifies the credential in one SDK call — no new document submission, no re-KYC cost, no waiting period. [See the reusable KYC demo](https://air-bd-v2.netlify.app/demo/reusable-kyc).
 
 **DeFi and Financial Product Access**
 Gate access to financial products, DeFi pools, or high-value transactions behind a KYC credential check. Users who have already verified are admitted instantly. Users who haven't are prompted to verify once.
@@ -31,7 +31,7 @@ Gate access to financial products, DeFi pools, or high-value transactions behind
 Issue an income or net worth attestation on your platform. Any partner offering private placements, alternative investments, or regulated financial products can verify it via ZK proof — without ever seeing the income figures.
 
 **Age Gating**
-Prove `isOver18` or `isOver21` without revealing the user's birthdate to the verifier. Regulatory requirements for age-restricted financial products are met without creating a new data storage obligation.
+Prove `isOver18` or `isOver21` without revealing the user's birthdate to the verifier. Regulatory requirements for age-restricted financial products are met without creating a new data storage obligation. [Try it live](https://air-bd-v2.netlify.app/try-it-live/meet-verified): the verifier learns only that an ID check passed.
 
 ## What Compliance Will Ask
 
@@ -260,6 +260,9 @@ A program configured for a ZK eligibility check can avoid disclosing raw KYC doc
 ## Examples
 
 <CardGroup cols={2}>
+  <Card title="KYC Passport — demo" icon="play" href="https://air-bd-v2.netlify.app/demo/reusable-kyc">
+    Walk through reusable KYC: verify once, then open an account with a partner without re-running KYC.
+  </Card>
   <Card title="KYC Passport — Issuer" icon="github" href="https://github.com/MocaNetwork/air-examples/tree/main/kyc-passport/issuer">
     KYC provider app: issues credentials once; user carries the proof to other platforms.
   </Card>

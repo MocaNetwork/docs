@@ -1,14 +1,7 @@
 ---
 title: "Selective Disclosure"
-tag: "Early access"
 description: "Selective Disclosure lets verifiers read specific credential fields after a successful zero-knowledge proof — opt-in by the issuer, sandbox only."
 ---
-
-<Warning>
-**Early Access**
-
-Selective Disclosure is a new feature we are currently testing. It is only available in the Sandbox environment, and the API surface may change. It requires the latest AIR Kit SDK and an issuance program with disclosure explicitly enabled by the Issuer.
-</Warning>
 
 By default, AIR Kit credential verification follows the settings in your Verification Program, which define the requested claims and whether a zero-knowledge proof is required. Successful verification returns a Verifiable Presentation with user-approved claims and any required proof. A proof-only check can establish a condition without revealing its underlying value.
 

@@ -17,17 +17,17 @@ The industry has accepted this as the cost of compliance. It isn't.
 ## What Changes With AIR Kit
 
 - **Your customer verifies once** — KYC passed at your platform issues a portable credential. Every partner in the ecosystem accepts it without running KYC again
-- **Control what verifiers receive** — Programs can request ZK proofs of eligibility, specific claims with user approval, or consent-controlled CAK access when underlying documents are required
+- **Control what verifiers receive** — Programs can request ZK proofs of eligibility or specific claims with user approval
 - **Your KYC provider doesn't change** — You keep Jumio, Onfido, Persona, or whoever you use. AIR Kit converts their pass result into a portable credential. The verification itself stays with your provider
 - **Limit copies of identity data** — Raw source documents remain with the issuer or its KYC provider. Encrypted credential payloads may be stored in DStorage, and users control decryption and disclosure. Verifiers remain responsible for protecting any data they receive
 
 ## Use Cases
 
 <CardGroup cols={2}>
-  <Card title="KYC Portability" icon="id-card">
+  <Card title="KYC Portability" icon="id-card" href="https://air-bd-v2.netlify.app/demo/reusable-kyc">
     Issue a KYC attestation on verification pass. Partner platforms accept it without re-running checks. One verification, ecosystem-wide acceptance.
   </Card>
-  <Card title="Age Verification" icon="cake-candles">
+  <Card title="Age Verification" icon="cake-candles" href="https://air-bd-v2.netlify.app/try-it-live/meet-verified">
     Prove a user is 18+ or 21+ without revealing their birthdate. The verifier learns only the boolean result — the actual age stays private.
   </Card>
   <Card title="Accredited Investor" icon="chart-line">
@@ -57,7 +57,7 @@ The industry has accepted this as the cost of compliance. It isn't.
 
 ## What the Verifier Actually Sees
 
-The following example uses a program that requests KYC status and limited claims with user approval. Other programs can request different disclosures or CAK access.
+The following example uses a program that requests KYC status and limited claims with user approval. Other programs can request different disclosures.
 
 | What the Verifier Receives | What Stays Private |
 |----------------------------|--------------------|
@@ -66,6 +66,8 @@ The following example uses a program that requests KYC status and limited claims
 | `isOver18: true` | Residential address |
 | Credential expiry date | National ID / tax number |
 | Issuer identifier | Income, net worth, financial data |
+
+[Try it live](https://air-bd-v2.netlify.app/try-it-live/meet-verified): a marketplace learns only that the user passed an ID check.
 
 ## What Compliance Will Ask
 
@@ -76,7 +78,7 @@ Use the minimum claims needed for the check, such as KYC level and `isOver18`. T
 Revoke the credential to stop future successful checks once its revoked status is available. Handle deletion of source records, encrypted payloads, metadata, and disclosed copies separately. See the [Compliance FAQ](/solutions/compliance-faq).
 
 **Who has access to the underlying identity documents?**
-Raw source documents remain with the issuer or its KYC provider. AIR may store encrypted credential payloads in DStorage. If CAK is enabled for source-data access, a verifier can decrypt the separately encrypted data only after explicit user consent.
+Raw source documents remain with the issuer or its KYC provider. AIR may store encrypted credential payloads in DStorage.
 
 **What if a user disputes their KYC result?**
 The dispute process stays entirely with your KYC provider, as it does today. You revoke or re-issue the AIR Kit credential once the dispute resolves.

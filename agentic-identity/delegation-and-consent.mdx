@@ -61,7 +61,7 @@ For each integration, define the claims an agent may present, the applications t
 
 | Information type | Example | What it means for the interaction |
 | --- | --- | --- |
-| Proof of eligibility | The user meets an age threshold | The application can check a condition without the source document. |
+| Proof of eligibility | The user is over 18 ([see the demo](https://air-bd-v2.netlify.app/demo/agent-booking)) | The application can check a condition without the source document. The date of birth stays hidden. |
 | Approved disclosure | The user's loyalty tier | The recipient receives the specific claim approved for sharing. |
 | User context | A seat preference or product category | The agent can personalize its work, but a preference is not an issuer-verified fact. |
 
@@ -86,9 +86,9 @@ These are illustrative terms, not API fields. Expiry would end a grant at a set 
 
 ## Spending limits
 
-A spending limit only works if the payment or wallet integration enforces it. Decide whether a cap applies per purchase, per session, or over a period, and how concurrent requests count against it.
+A spending limit only works if the payment or wallet integration enforces it. The Agent APIs don't set spending caps. Decide whether a cap applies per purchase, per session, or over a period, and how concurrent requests count against it.
 
-The AIR Agent Plugin's payment tools support caps and domain restrictions, but those controls don't cover direct `air_wallet_send` calls. Don't assume a cap set for payment tools protects every wallet action.
+Enforce the cap wherever money moves. A limit in one payment path doesn't protect a different path the agent can reach.
 
 ## Match authority to the task
 

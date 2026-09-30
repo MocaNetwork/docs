@@ -1,0 +1,42 @@
+---
+title: "AIR Loyalty"
+sidebarTitle: "Overview"
+description: "Turn loyalty tiers and milestones into portable credentials that customers carry to partner brands, verified without an API integration between you."
+---
+
+AIR Loyalty turns a customer's loyalty status into a credential in their AIR Account. You issue it when your loyalty engine records a tier change or milestone. A partner brand verifies it at the point of benefit and receives only the tier information its program requests, with the customer's approval. You and the partner never need a direct API integration.
+
+Loyalty credentials are AIR credentials, so AIR Loyalty is built on the same schemas, issuance, and verification as [AIR Identity](/learn/airkit/credentials).
+
+## Choose your path
+
+<CardGroup cols={2}>
+  <Card title="For business" icon="briefcase" href="/loyalty/business">
+    The problem, how it works for your customers, compliance questions, and effort to launch.
+  </Card>
+  <Card title="For developers" icon="code" href="/loyalty/developers">
+    Recommended schema, issuance from your loyalty engine, and tier verification code.
+  </Card>
+</CardGroup>
+
+## What you can build
+
+- **Tier credentials:** issue a Gold or Platinum credential and replace it when the tier changes.
+- **Milestone badges:** issue a credential when a customer crosses a points, purchase, or visit threshold.
+- **Cross-brand benefits:** let partners grant perks based on a tier you issued.
+- **Time-boxed status:** set an expiry for seasonal or campaign-based access.
+
+## Before you build
+
+AIR Loyalty uses the setup shared by every AIR product:
+
+1. [Set up your partner account](/airkit/usage/getting-started), then configure [partner authentication](/airkit/usage/partner-authentication) and your [JWKS endpoint](/airkit/usage/jwks-setup).
+2. Design the loyalty credential's [schema](/airkit/usage/credential/schema-overview).
+3. [Issue credentials](/airkit/usage/credential/issuing-credentials) from your backend.
+4. Partners set up [verification](/airkit/usage/credential/verify) for the benefits they offer.
+
+Then follow the [end-to-end loyalty credential flow](/recipes/loyalty-points-issuance).
+
+## See it live
+
+In the [member discount demo](https://air-bd-v2.netlify.app/try-it-live/member-discount), a customer presents airline Gold status at a partner café. The café never sees the membership number.

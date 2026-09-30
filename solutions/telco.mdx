@@ -38,7 +38,7 @@ Carriers spend on KYC at activation, then that verified status expires at the ed
 
 ## What Crosses the Network — and What Doesn't
 
-This example requests limited claims with user approval. The Verification Program determines which claims are disclosed and whether a ZK proof or CAK access is required.
+This example requests limited claims with user approval. The Verification Program determines which claims are disclosed and whether a ZK proof is required.
 
 | What the Roaming Partner Receives | What Stays Private |
 |-----------------------------------|--------------------|
@@ -54,7 +54,7 @@ This example requests limited claims with user approval. The Verification Progra
 The credential attests to the level of KYC completed at your platform. Roaming partners accepting it are verifying that fact — the underlying compliance obligation remains with the issuing carrier.
 
 **Is subscriber PII transmitted to roaming partners?**
-A ZK proof can confirm KYC status without disclosing MSISDN or subscriber documents. Verification Programs may also request claims with user approval, or CAK access when enabled. Limit disclosures to what the roaming partner needs.
+A ZK proof can confirm KYC status without disclosing MSISDN or subscriber documents. Verification Programs may also request claims with user approval. Limit disclosures to what the roaming partner needs.
 
 **GDPR: where is subscriber data stored?**
 Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure. Subscriber claims and metadata can still be personal data; assess storage-provider locations and retention as part of your GDPR review.

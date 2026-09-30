@@ -8,14 +8,20 @@ Use this README as the working contract for contributors: how the docs are organ
 
 ## What lives here
 
-The site is split into six top-level tabs, all wired up in [`docs.json`](docs.json):
+The site has a Home icon tab for the landing page ([`index.mdx`](index.mdx)) and six top-level tabs, all wired up in [`docs.json`](docs.json). Products and Technicals are dropdowns; each dropdown item has its own sidebar. Shared setup lives in Get Started, and each product keeps only its own pages, linking back to Get Started from its overview. A page belongs to exactly one place in the navigation.
 
-- **Moca Book** (`learn/`) — vision, ecosystem, identity primitives, and conceptual background for Moca Network.
-- **Solutions** (`solutions/`) — vertical-specific overviews for partners (loyalty, fintech, gaming, telco, advertising, identity).
-- **AIR Kit** (`airkit/`) — SDK reference, quickstarts, integration guides, credential and account services, recipes, and templates.
-- **Agentic Identity** (`agentic-identity/`) — partner fit, agentic commerce, delegated identity, consent, integration options, the Agent API quickstart, and the proposed offers model.
-- **Moca Chain** (`mocachain/`) — chain architecture, network information, node operator guides, and native dApps.
-- **API Reference** (`api-reference/`) — REST endpoints generated from [`api-reference/openapi.json`](api-reference/openapi.json), plus the Agent APIs generated from [`api-reference/agent-openapi.json`](api-reference/agent-openapi.json).
+- **Get Started** — everything the products share: overview, Build with AI, setup, authentication (including JWKS), UI customization, quickstarts, and general recipes.
+- **Products** (dropdown):
+  - **AIR Identity** (`airkit/usage/credential/`, `learn/airkit/`): how credentials work, schema design, issuing (including issuer backend hosting), verifying, and selective disclosure.
+  - **AIR Agents** (`agentic-identity/`): agent binding, consent, commerce use cases, and the Agent API quickstart.
+  - **AIR Money** (`money/`, `airkit/usage/account/`): overview, smart accounts, paymaster, the built-in wallet UI, session keys, and the wagmi recipe.
+  - **AIR Loyalty** (`loyalty/`): overview, loyalty for businesses, loyalty for developers, and the loyalty points recipe.
+- **Solutions** (`solutions/`, `kyc/`) — industry overviews for partners, all listed in the sidebar.
+- **Technicals** (dropdown) — Architecture and security (`learn/`), and Moca Chain (`mocachain/`).
+- **API References** (`api-reference/`) — REST endpoints generated from [`api-reference/openapi.json`](api-reference/openapi.json), the Agent APIs generated from [`api-reference/agent-openapi.json`](api-reference/agent-openapi.json), the SDK references, and release notes.
+- **Help** — troubleshooting, FAQs, status, and the glossary (`concepts/`).
+
+[`custom.css`](custom.css) renders the first tab as an icon and pushes the last two tabs (API References and Help) to the right, so keep that tab order. Demo apps live on the [AIR Kit demo site](https://air-bd-v2.netlify.app); link to them from existing pages rather than adding docs routes.
 
 The landing page is [`index.mdx`](index.mdx). Shared assets live in [`images/`](images).
 

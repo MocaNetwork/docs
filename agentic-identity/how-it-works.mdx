@@ -47,16 +47,11 @@ The binding shows whom the agent represents. Its scopes limit what the agent can
 
 **Not yet released:** with delegation credentials, the user would also grant per-task authority, such as a specific merchant, claim, and duration, and verification would check that authority alongside the user's claims.
 
-## Verification surfaces
+## Verification through the Agent APIs
 
-An agent can reach credential verification in two ways:
+Agents reach credential verification through the Agent APIs, REST endpoints your backend calls. With an agent session, your backend lists the user's credentials and runs a verification program in a single call. See the [Agent API quickstart](/agentic-identity/partner-agent-api).
 
-- **Agent APIs:** REST endpoints for your backend. With an agent session, it lists the user's credentials and runs a verification program in a single call. See the [Agent API quickstart](/agentic-identity/partner-agent-api).
-- **AIR Agent Plugin:** callable tools for an existing agent, with sandbox coverage. They cover program discovery, starting a verification, and polling its status. Check tool names and responses against the Plugin version you install.
-
-If the user doesn't hold the required credential, the Plugin flow can hand the user an issuer URL so they can get it. Verification never issues the missing credential itself.
-
-{/* TODO: Check air_credential_list_programs, air_credential_verify, air_credential_poll_status, and the no_vc / issueUrl response against a supported package version before publishing an executable tool reference. */}
+If the user doesn't hold the required credential, the result is `NotFound`. Verification never issues the missing credential itself.
 
 Issuing credentials is a separate integration owned by the issuer. See [Issuing credentials](/airkit/usage/credential/issuing-credentials).
 

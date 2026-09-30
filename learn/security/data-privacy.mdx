@@ -13,11 +13,10 @@ The default AIR Kit integration stores the minimum data necessary:
 | Data type | Stored by Moca? | Notes |
 | --- | --- | --- |
 | User email | Yes (hashed identifier) | Used as the AIR Account identifier for cross-partner portability |
-| Raw source documents | Remain with the issuer | Optional CAK access uses a separately encrypted copy with explicit user consent |
+| Raw source documents | Remain with the issuer | Not shared with AIR or verifiers |
 | Credential claims | Encrypted envelope in DStorage | Payloads are encrypted to the holder; AIR stores opaque ciphertext and metadata, never plaintext |
 | Private keys | No | Keys are split via MPC; no single party holds a full key |
 | Verification records | Off-chain by default | Recorded on-chain only when a program requires on-chain verification |
-| CAK-protected source-data copies (ID photos, biometrics) | When CAK is enabled | Encrypted in DStorage, accessible only with user consent |
 
 ## Who can access what
 
@@ -29,17 +28,6 @@ Every credential is signed by the issuer and encrypted to the holder before stor
 - **Verifiers** receive a Verifiable Presentation containing the claims requested by the program and approved by the user, plus any required proof. They never see undisclosed claim data.
 - **AIR** stores encrypted credential objects and metadata as a blind facilitator. It cannot reconstruct credential content.
 - **Users** hold the encrypted credential in their AIR Account and control when and to whom it is presented.
-
-### With CAK enabled
-
-When the Compliance Access Key framework is active:
-
-- **Issuers** encrypt raw data with a user-derived public key before storing it. The issuer cannot decrypt that stored copy without the corresponding private key, but retains access to its own source records.
-- **Verifiers** can decrypt raw data only after the user grants explicit consent in the SDK UI. Consent is per-verifier and per-session.
-- **dStorage** holds encrypted blobs. Storage providers cannot decrypt them.
-- **Users** are the only party who can authorize decryption by generating the corresponding private key locally.
-
-See [Privacy & Compliance (CAK)](/learn/advanced-topics/privacy-and-compliance) for the full framework.
 
 ## Data residency
 

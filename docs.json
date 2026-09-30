@@ -63,12 +63,8 @@
   "navbar": {
     "links": [
       {
-        "label": "Changelog",
-        "href": "/airkit/release-notes"
-      },
-      {
-        "label": "Status",
-        "href": "/status"
+        "label": "Demo",
+        "href": "https://air-bd-v2.netlify.app"
       },
       {
         "label": "Partner with us",
@@ -94,92 +90,78 @@
         ]
       },
       {
-        "tab": "Get started",
-        "menu": [
-          {
-            "item": "Overview",
-            "icon": "compass",
-            "groups": [
-              {
-                "group": "Overview",
-                "pages": [
-                  "airkit/index",
-                  "airkit/integrating-using-ai",
-                  "airkit/usage/getting-started",
-                  "learn/when-to-use-airkit",
-                  "airkit/environments",
-                  "airkit/platform-matrix",
-                  "airkit/usage/installation",
-                  "airkit/usage/initialization"
-                ]
-              }
-            ]
-          },
-          {
-            "item": "Issuer path",
-            "icon": "stamp",
-            "groups": [
-              {
-                "group": "Issuer path",
-                "pages": [
-                  "airkit/quickstart/index",
-                  "airkit/quickstart/issue-credentials",
-                  "recipes/kyc-credential-on-event",
-                  "recipes/loyalty-points-issuance"
-                ]
-              }
-            ]
-          },
-          {
-            "item": "Verifier path",
-            "icon": "badge-check",
-            "groups": [
-              {
-                "group": "Verifier path",
-                "pages": [
-                  "airkit/quickstart/verify-credentials",
-                  "recipes/verify-credential-in-app"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "AIR Identity",
+        "tab": "Get Started",
         "groups": [
           {
-            "group": "How it works",
+            "group": "Overview",
             "pages": [
-              "learn/architecture",
-              "learn/airkit/credentials",
-              "learn/airkit/integration-workflow",
-              "learn/advanced-topics/zktls",
-              "learn/advanced-topics/privacy-and-compliance"
+              "airkit/index",
+              "airkit/integrating-using-ai",
+              "learn/when-to-use-airkit"
             ]
           },
           {
-            "group": "Security",
+            "group": "Set up",
             "pages": [
-              "learn/security/overview",
-              "learn/security/credential-security",
-              "learn/security/data-privacy",
-              "learn/security/security-checklist"
+              "airkit/usage/getting-started",
+              "airkit/airkit-dashboard",
+              "airkit/environments",
+              "airkit/platform-matrix",
+              "airkit/usage/installation",
+              "airkit/usage/initialization"
             ]
           },
           {
             "group": "Authentication",
             "pages": [
               "airkit/usage/partner-authentication",
+              "airkit/usage/jwks-setup",
               "airkit/usage/user-authentication",
-              "airkit/usage/config-login",
               "airkit/usage/user-management"
             ]
           },
           {
-            "group": "Credentials",
+            "group": "Customize",
             "pages": [
-              "airkit/usage/credential/credentials-flow",
+              "airkit/usage/config-login",
+              "airkit/usage/config-theming",
+              "airkit/usage/config-language"
+            ]
+          },
+          {
+            "group": "Quickstarts",
+            "pages": [
+              "airkit/quickstart/index",
+              "airkit/quickstart/issue-credentials",
+              "airkit/quickstart/verify-credentials"
+            ]
+          },
+          {
+            "group": "Recipes",
+            "pages": [
+              "recipes/index",
+              "recipes/custom-auth-integration",
+              "recipes/kyc-credential-on-event",
+              "recipes/verify-credential-in-app"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Products",
+        "menu": [
+          {
+            "item": "AIR Identity",
+            "icon": "id-card",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "learn/airkit/credentials",
+                  "learn/airkit/integration-workflow",
+                  "airkit/usage/credential/credentials-flow"
+                ]
+              },
               {
                 "group": "Schema design",
                 "pages": [
@@ -189,27 +171,66 @@
                   "airkit/usage/credential/schema-management"
                 ]
               },
-              "airkit/usage/credential/issuing-credentials",
               {
-                "group": "Compliance Access Key (CAK)",
+                "group": "Issue and verify",
                 "pages": [
-                  "airkit/usage/credential/cak-overview",
-                  "airkit/usage/credential/cak-issuer-guide",
-                  "airkit/usage/credential/cak-verifier-guide"
+                  "airkit/usage/credential/issuing-credentials",
+                  "airkit/usage/backend-hosting",
+                  "airkit/usage/credential/verify",
+                  "airkit/early-access/selective-disclosure"
                 ]
-              },
-              "airkit/usage/credential/verify",
-              "airkit/early-access/selective-disclosure"
+              }
             ]
           },
           {
-            "group": "Accounts & wallet",
-            "pages": [
-              "airkit/usage/account/smart-account",
-              "airkit/usage/account/provider-functions",
-              "airkit/usage/account/wagmi",
-              "airkit/usage/account/supported-chains",
-              "airkit/usage/account/paymaster",
+            "item": "AIR Agents",
+            "icon": "robot",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "agentic-identity/index",
+                  "agentic-identity/partners",
+                  "agentic-identity/how-it-works"
+                ]
+              },
+              {
+                "group": "Commerce and consent",
+                "pages": [
+                  "agentic-identity/delegation-and-consent",
+                  "agentic-identity/use-cases",
+                  "agentic-identity/offers-for-agents"
+                ]
+              },
+              {
+                "group": "Integration",
+                "pages": [
+                  "agentic-identity/integration-options",
+                  "agentic-identity/partner-agent-api"
+                ]
+              }
+            ]
+          },
+          {
+            "item": "AIR Money",
+            "icon": "wallet",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "money/index"
+                ]
+              },
+              {
+                "group": "Accounts & wallet",
+                "pages": [
+                  "airkit/usage/account/smart-account",
+                  "airkit/usage/account/provider-functions",
+                  "airkit/usage/account/wagmi",
+                  "airkit/usage/account/supported-chains",
+                  "airkit/usage/account/paymaster"
+                ]
+              },
               {
                 "group": "Advanced",
                 "pages": [
@@ -217,206 +238,103 @@
                   "airkit/usage/account/session-keys",
                   "airkit/usage/account/advanced-functions"
                 ]
+              },
+              {
+                "group": "Recipes",
+                "pages": [
+                  "recipes/wagmi-integration"
+                ]
               }
             ]
           },
           {
-            "group": "Recipes",
-            "pages": [
-              "recipes/index",
-              "recipes/wagmi-integration",
-              "recipes/custom-auth-integration"
-            ]
-          },
-          {
-            "group": "Operate",
-            "pages": [
-              "airkit/airkit-dashboard",
-              "airkit/usage/jwks-setup",
-              "airkit/usage/backend-hosting",
-              "airkit/usage/config-theming",
-              "airkit/usage/config-language"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "AIR Agents",
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": [
-              "agentic-identity/index",
-              "agentic-identity/partners",
-              "agentic-identity/how-it-works"
-            ]
-          },
-          {
-            "group": "Commerce and consent",
-            "pages": [
-              "agentic-identity/delegation-and-consent",
-              "agentic-identity/use-cases",
-              "agentic-identity/offers-for-agents"
-            ]
-          },
-          {
-            "group": "Integration",
-            "pages": [
-              "agentic-identity/integration-options",
-              "agentic-identity/partner-agent-api"
+            "item": "AIR Loyalty",
+            "icon": "gift",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "loyalty/index",
+                  "loyalty/business",
+                  "loyalty/developers"
+                ]
+              },
+              {
+                "group": "Build",
+                "pages": [
+                  "recipes/loyalty-points-issuance"
+                ]
+              }
             ]
           }
         ]
       },
       {
         "tab": "Solutions",
-        "menu": [
+        "groups": [
           {
-            "item": "Overview",
-            "icon": "compass",
-            "groups": [
-              {
-                "group": "Overview",
-                "pages": [
-                  "solutions/index",
-                  "solutions/partner-economics",
-                  "solutions/compliance-faq"
-                ]
-              }
+            "group": "Overview",
+            "pages": [
+              "solutions/index",
+              "solutions/partner-economics",
+              "solutions/compliance-faq"
             ]
           },
           {
-            "item": "Agentic Payment",
-            "icon": "robot",
-            "groups": [
-              {
-                "group": "Agentic Payment",
-                "pages": [
-                  "solutions/fintech"
-                ]
-              }
+            "group": "Payments",
+            "pages": [
+              "solutions/fintech"
             ]
           },
           {
-            "item": "Programs",
-            "icon": "layer-group",
-            "groups": [
-              {
-                "group": "Programs",
-                "pages": [
-                  "solutions/loyalty",
-                  "solutions/gaming",
-                  "solutions/ticketing",
-                  "solutions/telco"
-                ]
-              }
+            "group": "Programs",
+            "pages": [
+              "solutions/gaming",
+              "solutions/ticketing",
+              "solutions/telco"
             ]
           },
           {
-            "item": "Verified traffic",
-            "icon": "shield-check",
-            "groups": [
-              {
-                "group": "Verified traffic",
-                "pages": [
-                  "solutions/advertising",
-                  "solutions/identity"
-                ]
-              },
-              {
-                "group": "KYC (Veriff powered by zkMe)",
-                "pages": [
-                  "kyc/index",
-                  "kyc/how-it-works",
-                  "kyc/data-collection-and-sharing",
-                  "kyc/zkme-security-architecture",
-                  "kyc/pricing-and-faq"
-                ]
-              }
+            "group": "Verified traffic",
+            "pages": [
+              "solutions/advertising",
+              "solutions/identity"
+            ]
+          },
+          {
+            "group": "KYC (Veriff powered by zkMe)",
+            "pages": [
+              "kyc/index",
+              "kyc/how-it-works",
+              "kyc/data-collection-and-sharing",
+              "kyc/zkme-security-architecture",
+              "kyc/pricing-and-faq"
             ]
           }
         ]
       },
       {
-        "tab": "References",
+        "tab": "Technicals",
         "menu": [
           {
-            "item": "API reference",
-            "icon": "code",
+            "item": "Architecture",
+            "icon": "diagram-project",
             "groups": [
               {
-                "group": "REST API",
-                "tag": "Identity",
+                "group": "How it works",
                 "pages": [
-                  "api-reference/introduction",
-                  "airkit/usage/credential/issuance-api",
-                  "api-reference/catalog/browse-schemas",
-                  "api-reference/catalog/schema-detail"
+                  "learn/architecture",
+                  "learn/advanced-topics/zktls",
+                  "learn/advanced-topics/privacy-and-compliance"
                 ]
               },
               {
-                "group": "Web SDK",
-                "tag": "Identity",
+                "group": "Security",
                 "pages": [
-                  "airkit/usage/reference"
-                ]
-              },
-              {
-                "group": "Flutter SDK",
-                "tag": "Identity",
-                "pages": [
-                  "airkit/flutter/overview",
-                  {
-                    "group": "Setup & usage",
-                    "expanded": false,
-                    "pages": [
-                      "airkit/flutter/installation",
-                      "airkit/flutter/android-setup",
-                      "airkit/flutter/ios-setup",
-                      "airkit/flutter/google-signin",
-                      "airkit/flutter/wallet-operations",
-                      "airkit/flutter/provider-functions",
-                      "airkit/flutter/ui-components"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Agent APIs",
-                "tag": "Agents",
-                "pages": [
-                  "api-reference/agents/introduction",
-                  {
-                    "group": "Agent keys",
-                    "pages": [
-                      "api-reference/agents/bind-agent-key",
-                      "api-reference/agents/list-agent-keys",
-                      "api-reference/agents/update-agent-key-nickname",
-                      "api-reference/agents/rotate-agent-key",
-                      "api-reference/agents/revoke-agent-key"
-                    ]
-                  },
-                  {
-                    "group": "Sessions",
-                    "pages": [
-                      "api-reference/agents/create-agent-session",
-                      "api-reference/agents/create-checkout-session"
-                    ]
-                  },
-                  {
-                    "group": "Credentials",
-                    "pages": [
-                      "api-reference/agents/list-credentials",
-                      "api-reference/agents/verify-credential-by-agent"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Releases",
-                "pages": [
-                  "airkit/release-notes",
-                  "airkit/usage/migration-compatibility"
+                  "learn/security/overview",
+                  "learn/security/credential-security",
+                  "learn/security/data-privacy",
+                  "learn/security/security-checklist"
                 ]
               }
             ]
@@ -430,7 +348,8 @@
                 "pages": [
                   "mocachain/index",
                   "mocachain/why-mocachain",
-                  "learn/moca-coin"
+                  "learn/moca-coin",
+                  "mocachain/block-explorer"
                 ]
               },
               {
@@ -460,22 +379,96 @@
                   "mocachain/guides/run-a-local-testnet",
                   "mocachain/guides/run-a-challenger"
                 ]
-              },
-              {
-                "group": "Native dApps",
-                "pages": [
-                  "mocachain/native-dapps/block-explorer"
-                ]
               }
             ]
           }
         ]
       },
       {
-        "tab": "Troubleshoot",
+        "tab": "API References",
         "groups": [
           {
-            "group": "AIR Kit",
+            "group": "REST API",
+            "tag": "Identity",
+            "pages": [
+              "api-reference/introduction",
+              "airkit/usage/credential/issuance-api",
+              "api-reference/catalog/browse-schemas",
+              "api-reference/catalog/schema-detail"
+            ]
+          },
+          {
+            "group": "Web SDK",
+            "tag": "Identity",
+            "pages": [
+              "airkit/usage/reference"
+            ]
+          },
+          {
+            "group": "Flutter SDK",
+            "tag": "Identity",
+            "pages": [
+              "airkit/flutter/overview",
+              {
+                "group": "Setup & usage",
+                "expanded": false,
+                "pages": [
+                  "airkit/flutter/installation",
+                  "airkit/flutter/android-setup",
+                  "airkit/flutter/ios-setup",
+                  "airkit/flutter/google-signin",
+                  "airkit/flutter/wallet-operations",
+                  "airkit/flutter/provider-functions",
+                  "airkit/flutter/ui-components"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Agent APIs",
+            "tag": "Agents",
+            "pages": [
+              "api-reference/agents/introduction",
+              {
+                "group": "Agent keys",
+                "pages": [
+                  "api-reference/agents/bind-agent-key",
+                  "api-reference/agents/list-agent-keys",
+                  "api-reference/agents/update-agent-key-nickname",
+                  "api-reference/agents/rotate-agent-key",
+                  "api-reference/agents/revoke-agent-key"
+                ]
+              },
+              {
+                "group": "Sessions",
+                "pages": [
+                  "api-reference/agents/create-agent-session",
+                  "api-reference/agents/create-checkout-session"
+                ]
+              },
+              {
+                "group": "Credentials",
+                "pages": [
+                  "api-reference/agents/list-credentials",
+                  "api-reference/agents/verify-credential-by-agent"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Releases",
+            "pages": [
+              "airkit/release-notes",
+              "airkit/usage/migration-compatibility"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Help",
+        "groups": [
+          {
+            "group": "Troubleshooting",
             "pages": [
               "airkit/troubleshooting/common-errors",
               "airkit/troubleshooting/sdk-issues",
@@ -495,14 +488,9 @@
             "pages": [
               "status"
             ]
-          }
-        ]
-      },
-      {
-        "tab": "Concepts",
-        "groups": [
+          },
           {
-            "group": "Concepts",
+            "group": "Glossary",
             "pages": [
               "concepts/glossary"
             ]
@@ -542,7 +530,7 @@
     },
     {
       "source": "/airkit/guides/air-for-loyalty",
-      "destination": "/solutions/loyalty"
+      "destination": "/loyalty/business"
     },
     {
       "source": "/airkit/guides/air-for-fintech",
@@ -687,6 +675,26 @@
     {
       "source": "/learn",
       "destination": "/solutions"
+    },
+    {
+      "source": "/solutions/loyalty",
+      "destination": "/loyalty/business"
+    },
+    {
+      "source": "/solutions/loyalty-developers",
+      "destination": "/loyalty/developers"
+    },
+    {
+      "source": "/airkit/usage/credential/cak-overview",
+      "destination": "/learn/advanced-topics/privacy-and-compliance"
+    },
+    {
+      "source": "/airkit/usage/credential/cak-issuer-guide",
+      "destination": "/airkit/usage/credential/issuing-credentials"
+    },
+    {
+      "source": "/airkit/usage/credential/cak-verifier-guide",
+      "destination": "/airkit/usage/credential/verify"
     }
   ]
 }

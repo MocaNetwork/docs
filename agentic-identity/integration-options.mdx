@@ -1,17 +1,11 @@
 ---
-title: "Integration options"
-description: "Choose between the Agent APIs, the AIR Agent Plugin, and the AIR Agent SDK."
+title: "Plan your integration"
+description: "Plan an Agent APIs integration: start with agent binding and credential verification, then add checkout where the journey needs it."
 ---
 
-Choose a surface based on where your agent runs and how much of the experience you want to control. All of them use the same AIR Accounts and credentials.
+Agents integrate with AIR through the Agent APIs, a set of REST endpoints your backend calls. They cover binding an agent to a user's AIR Account, agent sessions, credential listing and verification, and merchant checkout tokens. Your team provides the backend services, secure key storage, the consent screen, and the user-facing flow.
 
-## Choose a surface
-
-| Surface | Fits | Your team provides | Availability |
-| --- | --- | --- | --- |
-| Agent APIs (REST) | A backend that binds agents to users and calls AIR directly | Backend services, secure key storage, the consent screen, and the user-facing flow | Documented endpoints for binding, agent sessions, credential listing and verification, and merchant checkout tokens. Contact the AIR team for environment access. See the [Agent API quickstart](/agentic-identity/partner-agent-api). |
-| AIR Agent Plugin | An existing agent that needs callable AIR tools | Agent configuration and the surrounding user experience | Alpha, with sandbox-verified installation, account connection, and wallet, credential, and payment tools. |
-| AIR Agent SDK | An application that needs programmatic control in code | The application interface and orchestration of its flows | Headless v0.1 developer kit, including `@mocanetwork/airkit-agent`. The hosted demo is a reference SDK application, not an installable Widget. |
+Contact the AIR team for environment access, then follow the [Agent API quickstart](/agentic-identity/partner-agent-api).
 
 ## Start with identity
 
@@ -21,7 +15,7 @@ Start a commerce pilot with agent binding and credential verification:
 2. Run the receiving application's verification program for each request.
 3. Share the result with the receiving application in a format it can check. See [What a verification result proves](/agentic-identity/how-it-works#what-a-verification-result-proves).
 
-The Agent APIs return a verification result in a single call. The Plugin's tools cover program discovery, verification, and status polling, and can hand the user an issuer URL when they lack a credential.
+The Agent APIs return a verification result in a single call.
 
 A partner acting as a verifier sets up programs with AIR Kit's [verification](/airkit/usage/credential/verify). Issuing credentials is an issuer's job, with its own [backend integration](/airkit/usage/credential/issuing-credentials).
 
@@ -31,7 +25,7 @@ Identity tells the merchant whom the agent represents and which benefits apply. 
 
 For a supported merchant, an agent whose key includes `commerce.checkout` can mint a short-lived checkout token. The token's audience is the merchant, which verifies it during checkout. See [Create a checkout session](/api-reference/agents/create-checkout-session).
 
-For wallet payments through the Plugin, decide where spending limits are enforced. Payment-tool caps don't cover direct wallet transfers. See [Spending limits](/agentic-identity/delegation-and-consent#spending-limits).
+Decide where spending limits are enforced before an agent can pay. See [Spending limits](/agentic-identity/delegation-and-consent#spending-limits).
 
 ## Not yet available
 
@@ -42,6 +36,6 @@ Plan your integration without these:
 - Standing payment mandates.
 - Onchain audit logs for every agent action.
 
-For the Plugin and SDK, confirm package versions and tool names with the AIR team before you build. The [Agent APIs reference](/api-reference/agents/introduction) documents the REST endpoints.
+The [Agent APIs reference](/api-reference/agents/introduction) documents every endpoint, request, and response.
 
 Use [Partner fit](/agentic-identity/partners) to scope the first journey with the AIR team.

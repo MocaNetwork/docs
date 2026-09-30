@@ -28,7 +28,6 @@ Use this checklist when integrating AIR Kit to ensure your implementation follow
 - [ ] For on-demand issuance, confirm DStorage returned a `storagePath` or that `POST /issue-vc` succeeded and the issuer persisted its DStorage result.
 - [ ] Sign credentials with issuer-controlled keys and encrypt them to the holder before DStorage upload. Keep raw source documents in issuer-controlled systems.
 - [ ] Configure requested claims and proof requirements in the Verification Program; require user approval for disclosure.
-- [ ] If verifiers need underlying source data, configure optional [CAK access](/learn/advanced-topics/privacy-and-compliance) with explicit user consent.
 
 ## API security
 
@@ -53,4 +52,4 @@ Use this checklist when integrating AIR Kit to ensure your implementation follow
 
 - [ ] Set up alerts for failed authentication attempts.
 - [ ] Monitor credential issuance volumes for anomalies.
-- [ ] Log user consent events (CAK authorizations) for audit compliance.
+- [ ] Log user consent events for audit compliance.

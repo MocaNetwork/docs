@@ -5,7 +5,7 @@ description: "Turnkey KYC for Moca partners — document checks, NFC ePassport, 
 
 **Veriff powered by zkMe** is Moca Network's **on-chain IDV/KYC solution**. The bundled pipeline runs document, biometric, liveness, and AML checks; on success, **zkMe** issues a portable **AIR Credential** that any partner in the ecosystem can verify — without you running a separate KYC vendor procurement or holding raw identity data on your servers.
 
-**Disclosure is configurable per verification program.** Verifiers can receive a simple pass/fail eligibility signal, a selective set of attributes, or the full raw KYC dataset — with full raw access gated by explicit user consent through the **Compliance Access Key (CAK)** framework where your program requires it.
+**Disclosure is configurable per verification program.** Verifiers can receive a simple pass/fail eligibility signal or a selective set of attributes.
 
 ---
 
@@ -24,17 +24,15 @@ Each **verification program** in the Developer Dashboard defines what downstream
 
 - **Pass/fail** — a single eligibility signal (for example **COMPLIANT** / **NON_COMPLIANT**) with no underlying document fields.
 - **Selective disclosure** — an explicit subset of attributes (for example `kycLevel`, `isOver18`, country band) without sharing the full KYC packet.
-- **Full raw data** — the original verification payload (images, MRZ, structured fields) delivered to the verifier only when the program requires it **and** the user consents under **CAK**. See [CAK overview](/airkit/usage/credential/cak-overview).
 
 ```mermaid
 flowchart LR
   passFail["PassFail eligibility signal"]
   selective["Selective attribute set"]
-  fullRaw["Full raw KYC via CAK consent"]
-  passFail --> selective --> fullRaw
+  passFail --> selective
 ```
 
-For selective disclosure product detail on AIR Kit, see [Selective disclosure](/airkit/early-access/selective-disclosure) (early access).
+For selective disclosure product detail on AIR Kit, see [Selective disclosure](/airkit/early-access/selective-disclosure).
 
 ---
 
@@ -45,7 +43,7 @@ For selective disclosure product detail on AIR Kit, see [Selective disclosure](/
     Programmatic verification, manual fallback, AML, credential issuance, and verifier outcomes — end to end.
   </Card>
   <Card title="Data collection & sharing" icon="database" href="/kyc/data-collection-and-sharing">
-    What is collected, what partners see, what lands on Moca Chain, and how disclosure modes map to CAK.
+    What is collected, what partners see, what lands on Moca Chain, and how disclosure modes work.
   </Card>
   <Card title="zkMe security architecture" icon="shield-halved" href="/kyc/zkme-security-architecture">
     zkPassport, zkVault, homomorphic face matching, and credential cryptography — in Moca context.
