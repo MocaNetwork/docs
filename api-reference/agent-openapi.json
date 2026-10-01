@@ -1093,7 +1093,7 @@
           },
           "verifiableCredential": {
             "type": "array",
-            "description": "Iden3: W3C credential objects. BJJ credentials embed the issuer proof;\nMTP credentials omit it. SD-JWT: compact presentation strings\n(`<Issuer-JWT>~<disclosures>~[<KB-JWT>]`).\n",
+            "description": "Iden3: W3C credential objects. BJJ credentials embed the issuer proof. SD-JWT: compact presentation strings\n(`<Issuer-JWT>~<disclosures>~[<KB-JWT>]`).\n",
             "items": {
               "oneOf": [
                 {

@@ -51,7 +51,7 @@ When nonce is omitted, the compliant presentation's `verifiableCredential[0]` is
 
 - **W3C Verifiable Presentation on every compliant verification** — `verifyCredential` now returns the disclosed claims and any proof material on `verifiablePresentation` — see [Verifying credentials](/airkit/usage/credential/verify#response)
 - **SD-JWT VC verification** — verification programs can use the `SD_JWT_VC` proof type. These programs require both `fieldsToDisclose` and the new `nonce` parameter
-- **`IDEN3_MTP` proof type** available for verification programs alongside `BJJ_SIG_2021`
+- **`IDEN3` proof type** available for verification programs alongside `BJJ_SIG_2021`
 - Verification programs with multiple ZK queries return one proof per query on `verifiablePresentation.proof`
 
 ### ➕ **Improvements**
