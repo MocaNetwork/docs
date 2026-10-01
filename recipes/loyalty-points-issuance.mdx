@@ -69,7 +69,7 @@ async function issueLoyaltyCredential(recipientEmail, tierData) {
   if (!initRes.ok) throw new Error(`initialize-user failed: ${initRes.status}`);
   const { did, publicKey } = await initRes.json();
 
-  // 2. Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  // 2. Build, sign (SD-JWT VC), and encrypt the credential to the holder
   const schemaId = process.env.LOYALTY_CREDENTIAL_ID;
   const vc = buildVc({
     holderDid: did,

@@ -12,7 +12,7 @@ You need to generate and use the JWT when:
 - Authenticating a User
 - Performing credentials-related operations such as issuing or verifying credentials
 
-For **server-side issuance** without user presence, sign a Partner JWT with `scope: "issue"` and `typ: "JWT"`. The JWT no longer carries an `email` claim — the credential recipient is identified when you call `initialize-user` (the email is passed in the request body), not through a JWT claim. See [Issuing Credentials](/airkit/usage/credential/issuing-credentials#server-side-issuance) for concepts and [Issuance API Reference](/airkit/usage/credential/issuance-api) for endpoint usage.
+For **server-side issuance** without user presence, sign a Partner JWT with `scope: "issue"` and `typ: "JWT"`. The JWT no longer carries an `email` claim — the credential recipient is identified when you call `initialize-user` (the email is passed in the request body), not through a JWT claim. See [Issuing Credentials](/airkit/usage/credential/issuing-credentials#direct-issuance) for concepts and [Issuance API Reference](/airkit/usage/credential/issuance-api) for endpoint usage.
 
 **JWT Details**
 
@@ -37,7 +37,7 @@ The canonical Next.js route is `app/api/.well-known/jwks/route.ts`, used by ever
 ## Issuance JWT
 
 For AIR Kit `issueCredential` and
-[On-demand issuance](/airkit/usage/credential/issuing-credentials#on-demand-issuance), use a Partner JWT with
+[On-demand issuance](/airkit/usage/credential/issuing-credentials#direct-issuance), use a Partner JWT with
 these fields. For on-demand issuance, the recipient is resolved through the
 `initialize-user` call, so **no `email` claim is required in the JWT**.
 

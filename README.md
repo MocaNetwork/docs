@@ -12,7 +12,7 @@ The site has a Home icon tab for the landing page ([`index.mdx`](index.mdx)) and
 
 - **Get Started** — everything the products share: overview, Build with AI, setup, authentication (including JWKS), UI customization, quickstarts, and general recipes.
 - **Products** (dropdown):
-  - **AIR Identity** (`airkit/usage/credential/`, `learn/airkit/`): how credentials work, schema design, issuing (including issuer backend hosting), verifying, and selective disclosure.
+  - **AIR Identity** (`airkit/usage/credential/`, `learn/airkit/`): how credentials work, credential formats (SD-JWT VC by default), schema design, issuing (including issuer backend hosting), revocation, verifying (including backend SD-JWT verification), and selective disclosure. An Advanced group covers Iden3 credentials, which the AIR team enables per partner. SD-JWT pages link the `main` branch of the issuer service; the Iden3 page links `main_iden3`.
   - **AIR Agents** (`agentic-identity/`): agent binding, consent, commerce use cases, and the Agent API quickstart.
   - **AIR Money** (`money/`, `airkit/usage/account/`): overview, smart accounts, paymaster, the built-in wallet UI, session keys, and the wagmi recipe.
   - **AIR Loyalty** (`loyalty/`): overview, loyalty for businesses, loyalty for developers, and the loyalty points recipe.

@@ -17,7 +17,7 @@ Post-cookie advertising has a trust problem that no contextual or cohort-based r
 - **Users hold their own verified attributes** — Demographic and interest credentials are issued by your platform based on actual KYC and behaviour, not declared preferences. They're cryptographically signed
 - **Advertisers buy proof, not claims** — The DSP or SSP verifies the credential at serve time. They get COMPLIANT / NON_COMPLIANT — a ZK proof that the user is 25–34, verified, consented, and located in AU. No raw data in the bid request
 - **Consent records are portable** — A credential can record consent collected by your CMP. Each publisher must still check that consent covers its purposes and recipients, and users control credential disclosure
-- **Age-restricted serving without storing DOB** — Prove `isOver18` at ad-serve time for gambling, alcohol, or adult categories. Regulatory requirements met without creating a DOB database
+- **Age-restricted serving without storing DOB** — Prove `isOver18` at ad-serve time for gambling, alcohol, or adult categories. No DOB database to create or secure; confirm the setup meets your regulatory obligations
 
 ## How It Works
 
@@ -88,7 +88,7 @@ No. Your CMP continues to collect and record consent. AIR Kit converts that cons
 - **Age-verified ad targeting** — Gate alcohol, gambling, and adult ad categories behind a ZK age proof — no DOB ever transmitted to the ad server
 - **Cross-publisher identity** — A user's verified attributes follow them across publisher sites without third-party cookies or device fingerprinting
 - **Bot and fraud resistance** — Issue a "verified human" credential after KYC or passkey authentication; DSPs and SSPs can filter on-credential instead of on-signal
-- **Brand safety compliance** — Verify user age and location at serve time without storing the data, satisfying COPPA, GDPR Article 8, and regional ad regulations
+- **Brand safety compliance** — Verify user age and location at serve time without storing the data, supporting data-minimization requirements such as those in COPPA and GDPR Article 8. Whether a deployment complies depends on your implementation and jurisdiction
 
 ## Architecture
 
@@ -209,7 +209,7 @@ async function issueEncryptedCredential({ recipientEmail, schemaId, credentialSu
   }).then((r) => r.json());
 
   const vc = buildVc({ holderDid: init.did, schemaId, credentialSubject });
-  const encrypted = encryptToHolder(signVc(vc), init.publicKey); // BJJ_SIG_2021, encrypted to holder
+  const encrypted = encryptToHolder(signVc(vc), init.publicKey); // SD-JWT VC, encrypted to holder
 
   const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
     method: 'POST',
@@ -417,7 +417,7 @@ Credentials can record consent and support age or eligibility checks, but do not
 ## Next Steps
 
 <Columns cols={2}>
-  <Card title="On-demand Issuance — Concepts" icon="book" href="/airkit/usage/credential/issuing-credentials#on-demand-issuance">
+  <Card title="On-demand Issuance — Concepts" icon="book" href="/airkit/usage/credential/issuing-credentials#direct-issuance">
     On-demand issuance without user presence.
   </Card>
   <Card title="On-demand Issuance — API" icon="code" href="/airkit/usage/credential/issuance-api">

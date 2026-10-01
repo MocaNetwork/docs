@@ -14,7 +14,7 @@ For on-demand credential issuance without user presence, resolve the user and st
 - **Production:** `https://mocachain-mainnet.api.air3.com/v1`
 
 <Note>
-  The production endpoint is for approved production partners on Moca Chain private Mainnet. See [Production mainnet access](/airkit/environments#production-mainnet-access) before requesting mainnet \$MOCA gas tokens.
+  The production endpoint serves Moca Chain mainnet. See [Production mainnet access](/airkit/environments#production-mainnet-access).
 </Note>
 
 Authenticate with a Partner JWT in the `x-partner-auth` header. Full endpoint reference and implementation examples: [Issuance API Reference](/airkit/usage/credential/issuance-api).
@@ -97,7 +97,7 @@ class AirService {
 
 `claimAirId` and the `show*UI` methods are experimental and may change in future releases.
 
-`fieldsToDisclose` is documented in [Selective Disclosure](/airkit/early-access/selective-disclosure). `fieldsToDisclose` and `nonce` are both required for `SD_JWT_VC` verification programs — see [Verifying credentials](/airkit/usage/credential/verify).
+`fieldsToDisclose` is required for `SD_JWT_VC` verification programs; `"*"` discloses every field, and dotted paths such as `address.city` select nested fields. See [Selective Disclosure](/airkit/usage/credential/selective-disclosure). `nonce` is optional: pass a fresh value from your backend so that credentials with a holder key return a key-binding JWT. See [Verify SD-JWT on your backend](/airkit/usage/credential/verify-sd-jwt).
 
 ### Types
 
@@ -252,8 +252,10 @@ export type AirVerifiablePresentation = {
   /** The holder DID. */
   holder: string;
   /**
-   * Embedded credentials. W3C VC objects for BJJ_SIG_2021 and IDEN3_MTP
-   * programs; a compact string for SD_JWT_VC programs.
+   * Embedded credentials. For SD_JWT_VC programs, an
+   * EnvelopedVerifiableCredential whose `id` is a `data:` URL carrying the
+   * compact SD-JWT. W3C VC objects for BJJ_SIG_2021 and IDEN3_MTP programs.
+   * Type-check each entry before reading it.
    */
   verifiableCredential: Array<PresentationVerifiableCredential | string>;
   /** Omitted when the program does not require a ZKP. */

@@ -129,7 +129,7 @@ async function issueAttendanceCredential({ fanEmail, eventDetails }) {
     body: JSON.stringify({ email: fanEmail }),
   }).then((r) => r.json());
 
-  // Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  // Build, sign (SD-JWT VC), and encrypt the credential to the holder
   const schemaId = process.env.ATTENDANCE_CREDENTIAL_ID;
   const vc = buildVc({
     holderDid: init.did,
@@ -225,7 +225,7 @@ The key advantage for events: **fans never interact with the credential system a
     No app to open, no wallet prompt. Exactly the same experience as today.
   </Step>
   <Step title="Your backend issues the attendance credential">
-    On-demand issuance fires silently. The fan's AIR Account receives the credential on-chain.
+    On-demand issuance fires silently. The credential lands in the fan's AIR Account, encrypted to them.
   </Step>
   <Step title="Fan opens the app the next day">
     Sees a notification: "You earned a Verified Attendee credential for Coachella 2025."

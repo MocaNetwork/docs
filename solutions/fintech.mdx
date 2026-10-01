@@ -17,7 +17,7 @@ Financial services carry the heaviest identity verification burden of any indust
 - **KYC costs fall per partner onboarded** — Your first KYC verification is the only one your customers need. Partners accept the credential, not a new document submission
 - **Limit verifier data collection** — A ZK proof can confirm eligibility without disclosing identity documents. Programs may also request user-approved claims; verifiers must protect the data they receive
 - **Age and accreditation gates with limited disclosure** — Prove a user is 18+, 21+, or an accredited investor without disclosing the underlying values to the verifier
-- **Cross-border compliance without bilateral agreements** — One KYC credential, presentable to partners across the Moca ecosystem. Partner acceptance depends on their regulatory requirements
+- **Reusable KYC without bilateral agreements** — One KYC credential, presentable to partners across the Moca ecosystem. Partner acceptance depends on their regulatory requirements
 
 ## Specific Use Cases
 
@@ -31,7 +31,7 @@ Gate access to financial products, DeFi pools, or high-value transactions behind
 Issue an income or net worth attestation on your platform. Any partner offering private placements, alternative investments, or regulated financial products can verify it via ZK proof — without ever seeing the income figures.
 
 **Age Gating**
-Prove `isOver18` or `isOver21` without revealing the user's birthdate to the verifier. Regulatory requirements for age-restricted financial products are met without creating a new data storage obligation. [Try it live](https://air-bd-v2.netlify.app/try-it-live/meet-verified): the verifier learns only that an ID check passed.
+Prove `isOver18` or `isOver21` without revealing the user's birthdate to the verifier. You check age eligibility without creating a new store of birthdates; confirm the approach meets the rules for your products and jurisdictions. [Try it live](https://air-bd-v2.netlify.app/try-it-live/meet-verified): the verifier learns only that an ID check passed.
 
 ## What Compliance Will Ask
 
@@ -157,7 +157,7 @@ async function issueKycCredential({ userEmail, kycResult }) {
     body: JSON.stringify({ email: userEmail }),
   }).then((r) => r.json());
 
-  // Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  // Build, sign (SD-JWT VC), and encrypt the credential to the holder
   const schemaId = process.env.KYC_CREDENTIAL_ID;
   const vc = buildVc({
     holderDid: init.did,
@@ -280,7 +280,7 @@ A program configured for a ZK eligibility check can avoid disclosing raw KYC doc
 ## Next Steps
 
 <Columns cols={2}>
-  <Card title="On-demand Issuance — Concepts" icon="book" href="/airkit/usage/credential/issuing-credentials#on-demand-issuance">
+  <Card title="On-demand Issuance — Concepts" icon="book" href="/airkit/usage/credential/issuing-credentials#direct-issuance">
     On-demand issuance without user presence.
   </Card>
   <Card title="Architecture & Data Flow" icon="diagram-project" href="/learn/architecture">

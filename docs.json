@@ -160,7 +160,8 @@
                 "pages": [
                   "learn/airkit/credentials",
                   "learn/airkit/integration-workflow",
-                  "airkit/usage/credential/credentials-flow"
+                  "airkit/usage/credential/credentials-flow",
+                  "airkit/usage/credential/credential-formats"
                 ]
               },
               {
@@ -177,8 +178,17 @@
                 "pages": [
                   "airkit/usage/credential/issuing-credentials",
                   "airkit/usage/backend-hosting",
+                  "airkit/usage/credential/revocation",
                   "airkit/usage/credential/verify",
-                  "airkit/early-access/selective-disclosure"
+                  "airkit/usage/credential/verify-sd-jwt",
+                  "airkit/usage/credential/selective-disclosure"
+                ]
+              },
+              {
+                "group": "Advanced",
+                "tag": "Contact AIR",
+                "pages": [
+                  "airkit/usage/credential/iden3-credentials"
                 ]
               }
             ]
@@ -696,6 +706,10 @@
     {
       "source": "/airkit/usage/credential/cak-verifier-guide",
       "destination": "/airkit/usage/credential/verify"
+    },
+    {
+      "source": "/airkit/usage/credential/selective-disclosure",
+      "destination": "/airkit/usage/credential/selective-disclosure"
     }
   ]
 }

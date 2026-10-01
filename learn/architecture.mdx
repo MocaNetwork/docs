@@ -60,7 +60,7 @@ sequenceDiagram
         SDK->>AIR: Establish AIR session
         AIR-->>SDK: Holder DID and public key
     end
-    SDK->>AIR: GET /issuer/{issuerDidHash}/available-vc
+    SDK->>AIR: GET /v2/issuer/{partnerId}/available-vc
     AIR->>Iss: POST /available-vc (holder DID, public key, schema, identifier)
     Iss->>Data: Check eligibility and load available claims
     Data-->>Iss: Eligible credential data
@@ -69,8 +69,8 @@ sequenceDiagram
     SDK->>SDK: Decrypt previews
     SDK->>U: Show available credentials for review
     U->>SDK: Select credential and confirm issuance
-    SDK->>AIR: POST /issuer/{issuerDidHash}/issue-vc
-    AIR->>Iss: POST /issue-vc (holder DID, public key, schema, identifier)
+    SDK->>AIR: POST /v2/issuer/{partnerId}/issue-vc
+    AIR->>Iss: POST /issue-vc (holder DID, public key, signing key, schema, identifier)
     Iss->>Iss: Authorize issuance
     Iss->>Data: Retrieve source data
     Data-->>Iss: Authoritative claims
@@ -82,6 +82,8 @@ sequenceDiagram
     SDK-->>App: Return issuance result / reference
     App-->>U: Credential delivered to AIR Account
 ```
+
+The `/v2/issuer/{partnerId}/…` routes are AIR proxy endpoints, addressed by your Partner ID. AIR forwards them to the `POST /available-vc` and `POST /issue-vc` routes on your own issuer service, which use a different host and the `x-api-key` header.
 
 `available-vc` discovers credentials and returns encrypted previews. It does not issue a credential. The SDK calls `issue-vc` only after the user confirms. The issuer backend remains responsible for authorization, data retrieval, VC generation and signing, encryption, and storage; `issueCredential()` orchestrates these steps without creating or signing the VC itself.
 
@@ -116,7 +118,7 @@ The verification program selects the mode. Both paths use the credential discove
 | Mode | Where verification runs | What the app receives |
 | --- | --- | --- |
 | **Off-chain** | The proof or presentation is checked outside a blockchain transaction against the program's requirements. | Verification status and the presentation/proof material applicable to the program. |
-| **On-chain** | The proof is submitted for verification on-chain. This mode is available only for BJJ credentials. | The verification outcome and applicable on-chain transaction information. |
+| **On-chain** | The proof is submitted for verification on-chain. This mode is available only for [Iden3](/airkit/usage/credential/iden3-credentials) `BJJ_SIG_2021` credentials. | The verification outcome and applicable on-chain transaction information. |
 
 Using dStorage or anchoring issuer state does not, by itself, mean that verification runs on-chain. The verification mode describes where the proof is checked. The app uses the returned outcome to decide whether to grant access.
 

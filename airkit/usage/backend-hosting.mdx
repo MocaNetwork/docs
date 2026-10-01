@@ -9,32 +9,35 @@ Host an issuer backend so AIR can call its credential preview and issuance
 endpoints. You can use a hosted service or expose a local service through an
 HTTPS tunnel for sandbox development.
 
-**A database is optional for an AIR integration.** Choose persistence according
-to your backend implementation and the records you need to retain. Encrypted
-credentials are stored in dStorage.
+**A database is optional in sandbox.** Revocation, issuance history, and the
+token status list need PostgreSQL, so plan for one before production. Encrypted
+credentials are stored in dStorage either way.
 
 ## What you are hosting
 
 | Component | Purpose | Required? |
 | --- | --- | --- |
-| Issuer backend | Authorizes issuance, loads claims, signs and encrypts credentials, and uploads them to dStorage | Yes, for the on-demand backend integration |
+| Issuer backend | Authorizes issuance, loads claims, signs and encrypts credentials, uploads them to dStorage, and serves revocation status | Yes, for the on-demand backend integration |
+| `did:web` document | Publishes the issuer DID and the keys verifiers use to check your credentials, at `/.well-known/did.json` | Yes; served by the issuer service |
 | Public JWKS endpoint | Publishes the public keys AIR uses to validate Partner JWTs | Yes; it may share a host with your backend or web app |
-| PostgreSQL | Persists issuer history, revocation records, and other application data | Optional; depends on the implementation and required features |
+| PostgreSQL | Persists issuer history, revocation records, and the token status list | Optional in sandbox; required for revocation |
 | dStorage | Stores encrypted credential envelopes | Used by the issuance flow; independent of your application's database |
 
 Credential claims can come from an existing service or API, an existing database,
 or static test data. You do not need to create a new database simply to provide claims.
 
-## Fork and review back end implementation
+## Fork and review the backend implementation
 
-The [AIR issuer service](https://github.com/MocaNetwork/air-issuer-service).
+Fork the SD-JWT branch of the [AIR issuer service](https://github.com/MocaNetwork/air-issuer-service/tree/main).
+It issues `SD_JWT_VC` credentials under a `did:web` issuer DID.
 
-- The issuer service includes a configuration path without `DATABASE_URL`.
-  Its database-backed history and durable revocation records require persistence.
+- The service runs without `DATABASE_URL` for sandbox testing. Issuance
+  history, revocation, and the token status list require PostgreSQL.
+- Iden3 issuers use a separate branch. See [Iden3 credentials](/airkit/usage/credential/iden3-credentials).
 
 This guide follows the issuer service used in the
-[issuance quickstart](/airkit/quickstart/issue-credentials#step-1-generate-issuer-and-partner-secrets).
-Check the README for your chosen revision before deploying.
+[issuance quickstart](/airkit/quickstart/issue-credentials#step-1-generate-partner-secrets).
+Check the branch README before deploying.
 
 ## Choose a hosting path
 
@@ -55,7 +58,7 @@ A sleeping service may delay the first credential request.
 
 - Your issuer backend repository
 - An [AIR Developer Dashboard](https://developers.sandbox.air3.com/dashboard) Partner ID
-- Issuer and partner secrets configured using the [issuance quickstart](/airkit/quickstart/issue-credentials#step-1-generate-issuer-and-partner-secrets)
+- Partner secrets configured using the [issuance quickstart](/airkit/quickstart/issue-credentials#step-1-generate-partner-secrets)
 - A public HTTPS domain or development tunnel
 
 ## Deploy the issuer service
@@ -81,12 +84,14 @@ environment configuration, and public endpoint requirements on another host.
   </Step>
   <Step title="Configure the public origin and environment">
     Generate a public HTTPS domain in the host's networking settings. Set
-    `ISSUER_ORIGIN` to that origin without a trailing slash.
+    `ISSUER_ORIGIN` to that origin without a trailing slash. Use a custom
+    domain you control for production: the issuer DID is
+    `did:web:<host of ISSUER_ORIGIN>`, so the host is your issuer identity.
 
     Add the environment values from
     [Configure and start the issuer backend](/airkit/quickstart/issue-credentials#step-2-configure-and-start-the-issuer-backend),
-    including `SEED`, Partner JWT key configuration, `PARTNER_JWKS`, and the
-    issuer API keys. Keep secrets in the host's environment settings.
+    including Partner JWT key configuration, `PARTNER_JWKS`, and the issuer
+    API keys. Keep secrets in the host's environment settings.
 
     For this sandbox example, use `NODE_ENV=sandbox` and sandbox API origins.
     Railway supplies `PORT`; the issuer service listens on it.
@@ -105,20 +110,23 @@ environment configuration, and public endpoint requirements on another host.
     ```
 
     Run migrations before starting the database-backed service. This enables the
-    persistence used by issuance history and revocation records.
+    persistence used by issuance history, revocation records, and the token
+    status list.
   </Step>
   <Step title="Deploy and check the service">
-    Confirm the process starts successfully and copy the BJJ issuer DID from its
-    `Issuer DID:` startup log. Verify that the public host routes requests to your
-    issuer endpoints and that its TLS certificate is valid.
+    Confirm the process starts successfully, then open
+    `https://<your-host>/.well-known/did.json` and
+    `https://<your-host>/.well-known/jwt-vc-issuer`. The DID document's `id` is
+    the issuer DID you register with AIR. Verify that the public host routes
+    requests to your issuer endpoints and that its TLS certificate is valid.
 
     When you use PostgreSQL, also confirm connectivity and successful migrations.
     Use your implementation's health checks.
   </Step>
 </Steps>
 
-Keep `ISSUER_ORIGIN` stable once you issue credentials: credential-status URLs
-refer to that origin.
+Keep `ISSUER_ORIGIN` stable once you issue credentials. It defines the issuer
+DID, and revocation and status-list URLs in issued credentials refer to it.
 
 ## Optional database persistence
 
@@ -132,16 +140,19 @@ Without database persistence, skip migrations and database readiness checks.
 Do not use an empty database history as evidence that issuance failed, or rely
 on persistent history and revocation records being available.
 
-For an issuer with those requirements, connect a durable database and validate
-history and revocation behavior before using it with real users. dStorage keeps
-the encrypted credential; it serves a different purpose from issuer application records.
+Connect a durable database and validate history and revocation behavior before
+using the issuer with real users. dStorage keeps the encrypted credential; it
+serves a different purpose from issuer application records. See
+[Revoke credentials](/airkit/usage/credential/revocation).
 
 ## After hosting: connect AIR
 
-1. **Register the issuer.** In sandbox, use **Issuer → Settings**. For mainnet,
-   coordinate activation with the AIR team.
-2. **Register both endpoint URLs.** Configure `availableVcApiUrl` and `issueVcApiUrl`
-   to point to `POST /available-vc` and `POST /issue-vc` on your backend.
+1. **Register the issuer.** Use **Issuer → Settings** in the sandbox or
+   production Dashboard and enter the `did:web` issuer DID. Both environments
+   are self-serve for SD-JWT issuers.
+2. **Register the endpoint URLs.** Configure `availableVcApiUrl` and `issueVcApiUrl`
+   to point to `POST /available-vc` and `POST /issue-vc` on your backend, and
+   `revocationStatusApiUrl` to its `GET /revocation-status/:nonce` route.
 3. **Match the issuer API key.** Register the backend's `API_KEY` with AIR.
    AIR sends it as `x-api-key`; keep it out of browser code.
 4. **Register the public JWKS URL.** Its keys must match the Partner JWT signing
@@ -153,6 +164,21 @@ the encrypted credential; it serves a different purpose from issuer application 
 
 The issuer endpoints and JWKS must be reachable by AIR over HTTPS. They may share
 a domain; separate public origins for every component are not required.
+
+If you enable CORS on the issuer or a reverse proxy in front of it, allow
+`*.air3.com`. Restricting origins to your own domain breaks the holder claim flow.
+
+## Go-live checklist
+
+- [ ] `did:web` document served at `${ISSUER_ORIGIN}/.well-known/did.json` and its DID registered with AIR
+- [ ] Partner JWT keys (`PARTNER_*`) match your JWKS, and `PARTNER_JWKS` holds the matching public keys
+- [ ] Each Dashboard schema has a matching class in `src/issuer/sd-jwt-vc-schemas/`, exported from `index.ts`
+- [ ] `generateCredentialData` returns schema-valid claims, and `disclosureFrame` and `expirySec` are set per schema
+- [ ] PostgreSQL is durable and migrations are applied
+- [ ] `ISSUER_ORIGIN` is public HTTPS on a domain you control, and the status endpoints are reachable
+- [ ] `availableVcApiUrl`, `issueVcApiUrl`, `revocationStatusApiUrl`, and the API key are set in AIR
+- [ ] If you use the [token status list](/airkit/usage/credential/revocation#token-status-list), the partition size is final and a publish job is scheduled
+- [ ] The claim flow passes end to end with a test holder
 
 ## Local development
 
@@ -168,5 +194,6 @@ connection only when your backend configuration uses database persistence.
 ## Next steps
 
 - [Credential issuance quickstart](/airkit/quickstart/issue-credentials)
+- [Revoke credentials](/airkit/usage/credential/revocation)
 - [JWKS endpoint setup](/airkit/usage/jwks-setup)
 - [Architecture and data flow](/learn/architecture)

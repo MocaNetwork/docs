@@ -26,8 +26,8 @@ In CometBFT, consensus is achieved through a voting process among validators—n
 
 1. **Block Proposal and Voting Rounds:** Validators take turns proposing blocks. Each block contains transactions that modify the chain's state, such as token transfers or data storage updates. Proposals are broadcast to the network, and validators vote in rounds: Prevote, Precommit, and Commit. A block is finalized if more than two-thirds of validators (by stake weight) precommit to it.
 
-2. **Proof-of-Stake Mechanics:** Validators stake `$MOCA` tokens to participate. The probability of being selected to propose a block is proportional to their stake. This incentivizes honest behavior, as malicious actions (e.g., double-signing) result in slashing—automatic deduction of staked tokens. Moca Chain produces blocks every (1) second, ensuring low latency and high throughput.
+2. **Proof-of-Stake Mechanics:** Validators stake `\$MOCA` tokens to participate. The probability of being selected to propose a block is proportional to their stake. This incentivizes honest behavior, as malicious actions (e.g., double-signing) result in slashing—automatic deduction of staked tokens. Moca Chain produces blocks every (1) second, ensuring low latency and high throughput.
 
 3. **Fault Tolerance:** CometBFT (formerly Tendermint) tolerates up to one-third of validators being faulty or offline without halting the network. This BFT property makes it resilient against attacks, provided the majority of stake is held by honest validators.
 
-This consensus model secures Moca Chain's two primary states: account balances (including `$MOCA` ledgers) and metadata for its object storage system. Transactions, such as uploading data to Moca Chain Storage Providers (MCSPs), directly impact these states, with validators ensuring integrity through consensus.
+This consensus model secures Moca Chain's two primary states: account balances (including `\$MOCA` ledgers) and metadata for its object storage system. Transactions, such as uploading data to Moca Chain Storage Providers (MCSPs), directly impact these states, with validators ensuring integrity through consensus.

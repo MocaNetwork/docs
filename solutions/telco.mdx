@@ -199,7 +199,7 @@ async function issueEncryptedCredential({ recipientEmail, schemaId, credentialSu
   }).then((r) => r.json());
 
   const vc = buildVc({ holderDid: init.did, schemaId, credentialSubject });
-  const encrypted = encryptToHolder(signVc(vc), init.publicKey); // BJJ_SIG_2021, encrypted to holder
+  const encrypted = encryptToHolder(signVc(vc), init.publicKey); // SD-JWT VC, encrypted to holder
 
   const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
     method: 'POST',
@@ -357,7 +357,7 @@ The repo uses fintech and loyalty app names (KYC provider, lending platform, air
 ## Next Steps
 
 <Columns cols={2}>
-  <Card title="On-demand Issuance — Concepts" icon="book" href="/airkit/usage/credential/issuing-credentials#on-demand-issuance">
+  <Card title="On-demand Issuance — Concepts" icon="book" href="/airkit/usage/credential/issuing-credentials#direct-issuance">
     On-demand issuance without user presence.
   </Card>
   <Card title="On-demand Issuance — API" icon="code" href="/airkit/usage/credential/issuance-api">

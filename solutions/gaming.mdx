@@ -75,7 +75,7 @@ Review your terms and privacy notice for encrypted credential storage, cross-pla
 
 ## What You Can Build
 
-- **Achievement badges** — Issue on-chain proof that a player reached Diamond rank, completed a raid, or earned a title
+- **Achievement badges** — Issue a verifiable credential proving a player reached Diamond rank, completed a raid, or earned a title
 - **Cross-game identity** — Let players carry their AIR Account identity and credentials into any game in the Moca ecosystem
 - **Anti-cheat / bot gating** — Verify a player holds a "verified human" or KYC credential before allowing tournament entry
 - **Airdrop gating** — Reward only players who hold specific credentials (e.g. "played > 100 hrs", "held NFT for 90 days")
@@ -101,7 +101,7 @@ graph TD
 ```json
 {
   "title": "Game Achievement",
-  "description": "On-chain proof of a player achievement or rank",
+  "description": "Verifiable proof of a player achievement or rank",
   "properties": {
     "gameId": {
       "type": "string",
@@ -155,7 +155,7 @@ async function issueAchievement({ playerEmail, achievement }) {
     body: JSON.stringify({ email: playerEmail }),
   }).then((r) => r.json());
 
-  // Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  // Build, sign (SD-JWT VC), and encrypt the credential to the holder
   const schemaId = process.env.ACHIEVEMENT_CREDENTIAL_ID;
   const vc = buildVc({
     holderDid: init.did,

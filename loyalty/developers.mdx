@@ -84,7 +84,7 @@ async function issueLoyaltyCredential({ userEmail, tier, totalPoints, memberSinc
     body: JSON.stringify({ email: userEmail }),
   }).then((r) => r.json());
 
-  // Build, sign (BJJ_SIG_2021), and encrypt the credential to the holder
+  // Build, sign (SD-JWT VC), and encrypt the credential to the holder
   const schemaId = process.env.LOYALTY_CRED_ID; // Dashboard → Issuer → Programs
   const vc = buildVc({
     holderDid: init.did,
@@ -182,7 +182,7 @@ Issuance completes in ~1–4 seconds and returns a `storagePath` once the encryp
 ## Next Steps
 
 <Columns cols={2}>
-  <Card title="On-demand Issuance — Concepts" icon="book" href="/airkit/usage/credential/issuing-credentials#on-demand-issuance">
+  <Card title="On-demand Issuance — Concepts" icon="book" href="/airkit/usage/credential/issuing-credentials#direct-issuance">
     Understand when and why to use On-demand issuance.
   </Card>
   <Card title="On-demand Issuance — API" icon="code" href="/airkit/usage/credential/issuance-api">
