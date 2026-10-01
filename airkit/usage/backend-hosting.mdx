@@ -1,6 +1,6 @@
 ---
 title: "Host an issuer backend"
-description: "Deploy an AIR issuer backend with public HTTPS endpoints and add PostgreSQL persistence only when your implementation needs it."
+description: "Deploy an AIR issuer backend with public HTTPS endpoints and add a database only when your implementation needs it."
 sidebarTitle: "Issuer backend hosting"
 keywords: ["issuer backend", "database", "postgresql", "railway", "neon", "supabase", "render", "koyeb", "hosting", "sandbox", "DATABASE_URL"]
 ---
@@ -10,8 +10,9 @@ endpoints. You can use a hosted service or expose a local service through an
 HTTPS tunnel for sandbox development.
 
 **A database is optional in sandbox.** Revocation, issuance history, and the
-token status list need PostgreSQL, so plan for one before production. Encrypted
-credentials are stored in dStorage either way.
+token status list need a database, so plan for one before production. Use any
+database your backend supports; the reference issuer service uses PostgreSQL.
+Encrypted credentials are stored in dStorage either way.
 
 ## What you are hosting
 
@@ -20,7 +21,7 @@ credentials are stored in dStorage either way.
 | Issuer backend | Authorizes issuance, loads claims, signs and encrypts credentials, uploads them to dStorage, and serves revocation status | Yes, for the on-demand backend integration |
 | `did:web` document | Publishes the issuer DID and the keys verifiers use to check your credentials, at `/.well-known/did.json` | Yes; served by the issuer service |
 | Public JWKS endpoint | Publishes the public keys AIR uses to validate Partner JWTs | Yes; it may share a host with your backend or web app |
-| PostgreSQL | Persists issuer history, revocation records, and the token status list | Optional in sandbox; required for revocation |
+| Database | Persists issuer history, revocation records, and the token status list. The reference issuer service uses PostgreSQL | Optional in sandbox; required for revocation |
 | dStorage | Stores encrypted credential envelopes | Used by the issuance flow; independent of your application's database |
 
 Credential claims can come from an existing service or API, an existing database,
@@ -31,13 +32,11 @@ or static test data. You do not need to create a new database simply to provide 
 Fork the SD-JWT branch of the [AIR issuer service](https://github.com/MocaNetwork/air-issuer-service/tree/main).
 It issues `SD_JWT_VC` credentials under a `did:web` issuer DID.
 
-- The service runs without `DATABASE_URL` for sandbox testing. Issuance
-  history, revocation, and the token status list require PostgreSQL.
+- The service runs without `DATABASE_URL` for sandbox testing. For issuance history, revocation, and a token status list at scale across many users, you will need to persist the relevant data in your own database.
 - Iden3 issuers use a separate branch. See [Iden3 credentials](/airkit/usage/credential/iden3-credentials).
 
 This guide follows the issuer service used in the
 [issuance quickstart](/airkit/quickstart/issue-credentials#step-1-generate-partner-secrets).
-Check the branch README before deploying.
 
 ## Choose a hosting path
 
@@ -45,7 +44,7 @@ Check the branch README before deploying.
 | --- | --- | --- |
 | Local sandbox | Local Node.js service with an HTTPS tunnel | Database only if your implementation or features require one |
 | Hosted backend | Railway, Render, Koyeb, or your existing infrastructure | Public HTTPS, environment variables, and the service's build/start commands |
-| Optional PostgreSQL | Railway PostgreSQL, Neon, Supabase, or your existing PostgreSQL service | Set `DATABASE_URL` and run migrations only when using this persistence |
+| Optional database | Any database your backend supports. For the reference issuer service: Railway PostgreSQL, Neon, Supabase, or your existing PostgreSQL service | For the reference issuer service, set `DATABASE_URL` and run migrations |
 
 Check each provider's current plans and idle/sleep behavior before selecting a
 sandbox host: [Railway](https://docs.railway.com/pricing/plans),
@@ -75,11 +74,11 @@ environment configuration, and public endpoint requirements on another host.
 
     | Setting | Value |
     | --- | --- |
-    | Build command | `pnpm install && pnpm run build` |
-    | Start command | `pnpm run start:prod` |
+    | Build command | `npm i && npm run build` |
+    | Start command | `npm run start:prod` |
     | Pre-deploy command | Leave empty unless you enabled database persistence |
 
-    If using PostgreSQL, set the pre-deploy command to
+    If you enable database persistence, set the pre-deploy command to
     `npx mikro-orm migration:up` after configuring `DATABASE_URL`.
   </Step>
   <Step title="Configure the public origin and environment">
@@ -96,12 +95,14 @@ environment configuration, and public endpoint requirements on another host.
     For this sandbox example, use `NODE_ENV=sandbox` and sandbox API origins.
     Railway supplies `PORT`; the issuer service listens on it.
   </Step>
-  <Step title="Optionally add PostgreSQL">
+  <Step title="Optionally add a database">
     Skip this step if you are using a backend configuration without database
     persistence.
 
-    Add PostgreSQL to the project, or use an existing PostgreSQL service. Set
-    `DATABASE_URL` on the issuer backend to its connection string.
+    The reference issuer service uses PostgreSQL. Add PostgreSQL to the project,
+    or use an existing PostgreSQL service, and set `DATABASE_URL` on the issuer
+    backend to its connection string. If you built your own backend, connect the
+    database it uses instead.
 
     For a Railway database named `Postgres`, the reference variable is:
 
@@ -120,7 +121,7 @@ environment configuration, and public endpoint requirements on another host.
     the issuer DID you register with AIR. Verify that the public host routes
     requests to your issuer endpoints and that its TLS certificate is valid.
 
-    When you use PostgreSQL, also confirm connectivity and successful migrations.
+    When you use a database, also confirm connectivity and successful migrations.
     Use your implementation's health checks.
   </Step>
 </Steps>
@@ -130,7 +131,7 @@ DID, and revocation and status-list URLs in issued credentials refer to it.
 
 ## Optional database persistence
 
-When `DATABASE_URL` is configured, apply the service's migrations:
+For the reference issuer service, apply its migrations when `DATABASE_URL` is configured:
 
 ```bash
 npx mikro-orm migration:up
@@ -174,7 +175,7 @@ If you enable CORS on the issuer or a reverse proxy in front of it, allow
 - [ ] Partner JWT keys (`PARTNER_*`) match your JWKS, and `PARTNER_JWKS` holds the matching public keys
 - [ ] Each Dashboard schema has a matching class in `src/issuer/sd-jwt-vc-schemas/`, exported from `index.ts`
 - [ ] `generateCredentialData` returns schema-valid claims, and `disclosureFrame` and `expirySec` are set per schema
-- [ ] PostgreSQL is durable and migrations are applied
+- [ ] The database is durable and its migrations are applied
 - [ ] `ISSUER_ORIGIN` is public HTTPS on a domain you control, and the status endpoints are reachable
 - [ ] `availableVcApiUrl`, `issueVcApiUrl`, `revocationStatusApiUrl`, and the API key are set in AIR
 - [ ] If you use the [token status list](/airkit/usage/credential/revocation#token-status-list), the partition size is final and a publish job is scheduled
@@ -188,8 +189,9 @@ Run the issuer locally and expose it through an HTTPS tunnel such as
 Follow the [HTTPS tunnel setup](/airkit/usage/jwks-setup#local-development-https-tunnel).
 
 Set `ISSUER_ORIGIN` and the registered issuer endpoint URLs to the tunnel address.
-If the tunnel address changes, update both. Add a local or managed PostgreSQL
-connection only when your backend configuration uses database persistence.
+If the tunnel address changes, update both. Add a local or managed database
+connection (PostgreSQL for the reference issuer service) only when your backend
+configuration uses database persistence.
 
 ## Next steps
 

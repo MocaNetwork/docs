@@ -109,7 +109,8 @@
               "airkit/environments",
               "airkit/platform-matrix",
               "airkit/usage/installation",
-              "airkit/usage/initialization"
+              "airkit/usage/initialization",
+              "airkit/usage/go-to-production"
             ]
           },
           {
@@ -186,7 +187,6 @@
               },
               {
                 "group": "Advanced",
-                "tag": "Contact AIR",
                 "pages": [
                   "airkit/usage/credential/iden3-credentials"
                 ]
