@@ -12,8 +12,8 @@ AIR Kit separates issuer source data and signing authority from encrypted creden
 | Party | What they hold | What they cannot do |
 | --- | --- | --- |
 | **User (Holder)** | Private keys, consent authority, credential wallet | Cannot forge credentials or bypass schema rules |
-| **Issuer** | Source data, issuer signing keys, CAK public key (if enabled) | Cannot decrypt holder-encrypted storage without the relevant key; retains access to its own source records |
-| **Verifier** | Verification programs, approved claims, optional ZK proofs | Cannot access undisclosed claims or CAK-protected data without user consent |
+| **Issuer** | Source data, issuer signing keys | Cannot decrypt holder-encrypted storage without the relevant key; retains access to its own source records |
+| **Verifier** | Verification programs, approved claims, optional ZK proofs | Cannot access undisclosed claims without user consent |
 | **Moca Chain** | Storage metadata, state records, optional on-chain verification proofs | Cannot reconstruct private keys or decrypt stored data |
 | **dStorage** | Encrypted credential payloads | Cannot decrypt without the user-consented key |
 
@@ -33,7 +33,7 @@ The issuer's signature makes the credential tamper-evident. Programs that requir
 
 ### Encrypted storage
 
-Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure. Credential payloads are encrypted by default, independently of CAK. The optional [Compliance Access Key (CAK)](/learn/advanced-topics/privacy-and-compliance) framework adds consent-controlled access to separately encrypted source data.
+Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure. Credential payloads are encrypted by default. See [Privacy & Compliance](/learn/advanced-topics/privacy-and-compliance).
 
 ### Account abstraction
 
@@ -51,7 +51,7 @@ User wallets use smart accounts (ERC-4337 account abstraction) with paymaster-sp
   <Card title="Security checklist" icon="list-check" href="/learn/security/security-checklist">
     Integration best practices for partners.
   </Card>
-  <Card title="Privacy & Compliance (CAK)" icon="key" href="/learn/advanced-topics/privacy-and-compliance">
-    The Compliance Access Key framework for regulated industries.
+  <Card title="Privacy & Compliance" icon="key" href="/learn/advanced-topics/privacy-and-compliance">
+    Encryption, ZK proofs, and user consent.
   </Card>
 </CardGroup>

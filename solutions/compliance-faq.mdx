@@ -19,7 +19,7 @@ The credential contains the attributes defined by its schema. Prefer the minimum
 
 **Can AIR Kit or Moca Network read our customers' credential data?**
 
-Issuers know the source data and the claims they issue. AIR receives encrypted credential payloads and metadata without the holder's decryption key. Users control decryption and disclosure. Verifiers receive the claims requested by their Verification Program and approved by the user; a ZK proof can establish a condition without disclosing the underlying value. Optional CAK access has a separate consent flow for encrypted source data.
+Issuers know the source data and the claims they issue. AIR receives encrypted credential payloads and metadata without the holder's decryption key. Users control decryption and disclosure. Verifiers receive the claims requested by their Verification Program and approved by the user; a ZK proof can establish a condition without disclosing the underlying value.
 
 **Where is data stored geographically?**
 
@@ -39,7 +39,7 @@ Revocation prevents a credential from passing subsequent checks that recognise i
 
 **Does issuing credentials constitute international data transfer under GDPR Chapter V?**
 
-Assess the actual data flow: encrypted credential payloads and metadata may be stored outside the issuer's systems, and verifiers may receive user-approved claims or CAK-protected data. Review provider locations, recipients, and applicable transfer safeguards with your data protection team. Do not assume that encryption or ZK proofs remove transfer obligations.
+Assess the actual data flow: encrypted credential payloads and metadata may be stored outside the issuer's systems, and verifiers may receive user-approved claims. Review provider locations, recipients, and applicable transfer safeguards with your data protection team. Do not assume that encryption or ZK proofs remove transfer obligations.
 
 **Who is the data controller?**
 
@@ -47,7 +47,7 @@ Issuers control their source data and signing keys. Verifiers determine how they
 
 **Does consent need to be obtained to issue credentials?**
 
-Determine and document the lawful basis for issuance with your data protection team. User controls for decryption and disclosure, including explicit consent for CAK access, are separate from that legal assessment. Direct issuance does not remove your notice or lawful-basis requirements.
+Determine and document the lawful basis for issuance with your data protection team. User controls for decryption and disclosure are separate from that legal assessment. Direct issuance does not remove your notice or lawful-basis requirements.
 
 ---
 
@@ -67,7 +67,7 @@ Apply the opt-out to the relevant processing and sharing activities. Revocation 
 
 **What is the breach liability for verifiers accepting AIR Kit credentials?**
 
-A proof-only program can reduce the data a verifier receives. Successful verification returns a Verifiable Presentation that can contain user-approved claims and optional proof material. Verifiers must protect any disclosed claims, identifiers, session records, and CAK-decrypted data they retain. Exposure depends on the program and the verifier's data handling.
+A proof-only program can reduce the data a verifier receives. Successful verification returns a Verifiable Presentation that can contain user-approved claims and optional proof material. Verifiers must protect any disclosed claims, identifiers, and session records they retain. Exposure depends on the program and the verifier's data handling.
 
 **What is the breach liability for issuers?**
 
@@ -96,32 +96,6 @@ Yes. An AIR Account can hold credentials from any number of issuers. The user co
 **Can credentials expire?**
 
 Yes. You set an `expirationDate` in the credential subject. After expiry, the credential returns NON_COMPLIANT. You can re-issue with a new expiry at any time.
-
----
-
-## Compliance Access Key (CAK)
-
-**What is the Compliance Access Key (CAK)?**
-
-CAK is an optional encryption framework within AIR Kit designed for regulated industries where verifiers need access to raw personal data (ID images, biometric photos). It adds user-consent-driven encryption at issuance and controlled decryption at verification, ensuring data sovereignty remains with the user at all times.
-
-**How does CAK differ from standard credential verification?**
-
-The Verification Program determines requested claims, whether a ZK proof is required, and whether verification is off-chain or on-chain. Successful verification returns a Verifiable Presentation with the approved disclosures and any required proof. CAK adds consent-controlled access to separately encrypted source data when a verifier needs to review identity documents or other underlying records.
-
-**Do I need to enable CAK?**
-
-Not necessarily. CAK is optional. If your credentials only need ZK proof-based verification (attribute proofs without revealing raw data), the standard flow is sufficient. Enable CAK when raw PII access by verifiers is a regulatory requirement, when multiple verifiers need the same underlying data, or when you need an auditable consent trail for data access.
-
-**Who controls whether CAK is active?**
-
-Both Issuers and Verifiers make independent decisions. Issuers enable CAK on their pricing schemas and issuance programs. Verifiers choose whether to require CAK on their verification programs. The user always has the final say — they must explicitly consent before any data is decrypted.
-
-**Can the platform or Moca Network decrypt CAK-encrypted data?**
-
-No. The CAK private key is generated locally on the user's device and only shared with the Verifier after explicit user consent. The platform never holds the private key and cannot decrypt the data.
-
-For full technical details, see the [CAK overview](/airkit/usage/credential/cak-overview), [Issuer guide](/airkit/usage/credential/cak-issuer-guide), and [Verifier guide](/airkit/usage/credential/cak-verifier-guide).
 
 ---
 

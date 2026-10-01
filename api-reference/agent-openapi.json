@@ -1,0 +1,1318 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AIR Agent APIs",
+    "version": "1.1.0",
+    "description": "Partner-facing agent APIs for binding a holder's agent, minting a short-lived\nagent JWT, listing the holder's credentials, verifying them offchain, and\nminting a merchant checkout JWT.\n\n**Hosts:** AIR API (bind, keys, session, checkout) and Credential API (list,\nverify). The partner must have agent keys enabled. The AIR Kit partner access\ntoken is a **user-bound** holder session.\n\n**Typical flow**\n\n1. Bind once (`POST /v2/auth/agent/keys/partner`). Save `agentApiKey` — it is\n   returned only on bind and rotate.\n2. Create a session per operation (`POST /v2/auth/agent/session`). The agent\n   JWT lasts **15 minutes** and has no refresh token.\n3. List (`GET /v2/credentials`) and/or verify\n   (`POST /v2/credentials/verify-by-agent`) with `Authorization: Bearer`.\n4. Optional: mint a checkout JWT (`POST /v2/auth/agent/checkout-session`) when\n   the bound key includes `commerce.checkout`.\n\nPartner bind cannot include `wallet.sign`. `openid` is added automatically on\nbind. Partner scopes: `credentials.read`, `credentials.verify`,\n`commerce.checkout`. Mutating key routes (bind, rotate, revoke) require\n`x-partner-jwt`. Listing keys and updating a nickname use the AIR Kit session\nonly.\n",
+    "contact": {
+      "name": "Moca Network",
+      "url": "https://moca.network"
+    }
+  },
+  "servers": [
+    {
+      "url": "{AIR_API}",
+      "description": "AIR API (bind, keys, session, checkout)",
+      "variables": {
+        "AIR_API": {
+          "description": "Sandbox or Production",
+          "default": "https://air.api.sandbox.air3.com",
+          "enum": [
+            "https://air.api.sandbox.air3.com",
+            "https://air.api.air3.com"
+          ]
+        }
+      }
+    }
+  ],
+  "tags": [
+    {
+      "name": "Agent keys",
+      "description": "Bind and manage partner-bound agent keys (AIR API)."
+    },
+    {
+      "name": "Agent session",
+      "description": "Mint a short-lived agent JWT (AIR API)."
+    },
+    {
+      "name": "Agent checkout",
+      "description": "Mint a merchant checkout JWT (AIR API)."
+    },
+    {
+      "name": "Credentials",
+      "description": "List and verify the holder's credentials (Credential API)."
+    }
+  ],
+  "paths": {
+    "/v2/auth/agent/keys/partner": {
+      "servers": [
+        {
+          "url": "{AIR_API}",
+          "description": "AIR API",
+          "variables": {
+            "AIR_API": {
+              "description": "Sandbox or Production",
+              "default": "https://air.api.sandbox.air3.com",
+              "enum": [
+                "https://air.api.sandbox.air3.com",
+                "https://air.api.air3.com"
+              ]
+            }
+          }
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XPartnerId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Agent keys"
+        ],
+        "operationId": "listPartnerAgentKeys",
+        "summary": "List bound agents",
+        "description": "Keys this partner bound for the holder identified by the partner access\ntoken. Unbound keys and other partners' keys are omitted. `agentApiKey` is\nnever returned here.\n",
+        "security": [
+          {
+            "PartnerSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bound agent keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AgentKey"
+                  }
+                },
+                "example": [
+                  {
+                    "id": "3f1a9c8e-2b7d-4f60-a1c5-e9b8d7f6a4c2",
+                    "publicKey": null,
+                    "createdAt": "2026-08-19T12:00:00.000Z",
+                    "scope": "openid credentials.read credentials.verify",
+                    "nickname": "Shopping agent",
+                    "partnerId": "11111111-2222-4333-8444-555555555555"
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AirUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AirForbidden"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Agent keys"
+        ],
+        "operationId": "bindPartnerAgentKey",
+        "summary": "Bind an agent",
+        "description": "Registers an agent key for the holder authenticated by the partner access\ntoken. Call this once per agent. `publicKey` is optional; omit it for\nAPI-key-only agents.\n\n`agentApiKey` is returned **once**. Store it on your backend.\n",
+        "security": [
+          {
+            "PartnerSession": [],
+            "PartnerLoginJwt": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BindAgentKeyRequest"
+              },
+              "example": {
+                "scope": "credentials.read credentials.verify",
+                "nickname": "Shopping agent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Agent bound. `agentApiKey` is returned only this once.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentKeyCreated"
+                },
+                "example": {
+                  "id": "3f1a9c8e-2b7d-4f60-a1c5-e9b8d7f6a4c2",
+                  "publicKey": null,
+                  "createdAt": "2026-08-19T12:00:00.000Z",
+                  "scope": "openid credentials.read credentials.verify",
+                  "nickname": "Shopping agent",
+                  "partnerId": "11111111-2222-4333-8444-555555555555",
+                  "agentApiKey": "air_ag_<secret>"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/AirBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/AirUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AirForbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/AirConflict"
+          }
+        }
+      }
+    },
+    "/v2/auth/agent/keys/partner/{id}": {
+      "servers": [
+        {
+          "url": "{AIR_API}",
+          "description": "AIR API",
+          "variables": {
+            "AIR_API": {
+              "description": "Sandbox or Production",
+              "default": "https://air.api.sandbox.air3.com",
+              "enum": [
+                "https://air.api.sandbox.air3.com",
+                "https://air.api.air3.com"
+              ]
+            }
+          }
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XPartnerId"
+        },
+        {
+          "$ref": "#/components/parameters/AgentKeyId"
+        }
+      ],
+      "patch": {
+        "tags": [
+          "Agent keys"
+        ],
+        "operationId": "patchPartnerAgentKeyNickname",
+        "summary": "Update an agent nickname",
+        "description": "Letters, numbers, spaces, hyphens, and colons; maximum 32 characters. An\nempty string clears the nickname. Does not require `x-partner-jwt`.\n",
+        "security": [
+          {
+            "PartnerSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchAgentKeyRequest"
+              },
+              "example": {
+                "nickname": "KYC reader"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated key (no `agentApiKey`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentKey"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/AirBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/AirUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AirForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/AirNotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Agent keys"
+        ],
+        "operationId": "revokePartnerAgentKey",
+        "summary": "Revoke an agent key",
+        "description": "Removes the agent key. After revocation, session requests with that API key\n(or its public key) fail. `wallet.sign` keys cannot be revoked on this path.\n",
+        "security": [
+          {
+            "PartnerSession": [],
+            "PartnerLoginJwt": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Agent key removed"
+          },
+          "401": {
+            "$ref": "#/components/responses/AirUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AirForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/AirNotFound"
+          }
+        }
+      }
+    },
+    "/v2/auth/agent/keys/partner/{id}/rotate": {
+      "servers": [
+        {
+          "url": "{AIR_API}",
+          "description": "AIR API",
+          "variables": {
+            "AIR_API": {
+              "description": "Sandbox or Production",
+              "default": "https://air.api.sandbox.air3.com",
+              "enum": [
+                "https://air.api.sandbox.air3.com",
+                "https://air.api.air3.com"
+              ]
+            }
+          }
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/XPartnerId"
+        },
+        {
+          "$ref": "#/components/parameters/AgentKeyId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Agent keys"
+        ],
+        "operationId": "rotatePartnerAgentKey",
+        "summary": "Rotate an agent API key",
+        "description": "Issues a new `agentApiKey` (returned once), increments the key's token\nversion, and invalidates agent JWTs already issued for it. `wallet.sign`\nkeys cannot be rotated on this path.\n",
+        "security": [
+          {
+            "PartnerSession": [],
+            "PartnerLoginJwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rotated key. Store the new `agentApiKey`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentKeyCreated"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AirUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AirForbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/AirNotFound"
+          }
+        }
+      }
+    },
+    "/v2/auth/agent/session": {
+      "servers": [
+        {
+          "url": "{AIR_API}",
+          "description": "AIR API",
+          "variables": {
+            "AIR_API": {
+              "description": "Sandbox or Production",
+              "default": "https://air.api.sandbox.air3.com",
+              "enum": [
+                "https://air.api.sandbox.air3.com",
+                "https://air.api.air3.com"
+              ]
+            }
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Agent session"
+        ],
+        "operationId": "createAgentSession",
+        "summary": "Create an agent session",
+        "description": "Issues a **15-minute** access token (`type=agent`) with no refresh token.\nCreate one per operation.\n\nIdentify the agent with **exactly one** of the `x-agent-api-key` header or\nthe body `signedMessage`. API-key-only agents must use the header.\n`signedMessage` requires a public key stored at bind time.\n\nThe requested `scope` must be a subset of the bound key's scopes; omit it\nto receive the full bound set. Tokens issued before a key rotation fail.\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/XPartnerId"
+          },
+          {
+            "$ref": "#/components/parameters/XAgentApiKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAgentSessionRequest"
+              },
+              "example": {
+                "scope": "openid credentials.read credentials.verify"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent JWT issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSessionResponse"
+                },
+                "example": {
+                  "accessToken": "<jwt>",
+                  "user": {
+                    "id": "018f9a2b-7c3d-7e10-9a4b-2c1d5e6f7a8b",
+                    "abstractAccountAddress": "0x…"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/AirBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/AirUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AirForbidden"
+          }
+        }
+      }
+    },
+    "/v2/auth/agent/checkout-session": {
+      "servers": [
+        {
+          "url": "{AIR_API}",
+          "description": "AIR API",
+          "variables": {
+            "AIR_API": {
+              "description": "Sandbox or Production",
+              "default": "https://air.api.sandbox.air3.com",
+              "enum": [
+                "https://air.api.sandbox.air3.com",
+                "https://air.api.air3.com"
+              ]
+            }
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Agent checkout"
+        ],
+        "operationId": "createAgentCheckoutSession",
+        "summary": "Create a checkout session",
+        "description": "Issues a short-lived access token (`type=agent`) for a merchant checkout.\nNo refresh token. The bound key must include `commerce.checkout`.\n\nIdentify the agent with **exactly one** of the `x-agent-api-key` header or\nthe body `signedMessage`.\n\nThe request `scope` names the merchant checkout target, not an agent\nscope. `pivota.checkout` is currently the only supported value. The JWT's\n`scope` equals the requested value, and its `aud` is the merchant mapped to\nthat target. The JWT includes the holder's abstract account address.\n\nAIR and Credential APIs reject this token because of the audience. The\nmerchant must verify `aud`.\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/XAgentApiKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutSessionRequest"
+              },
+              "example": {
+                "scope": "pivota.checkout"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout JWT issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutSessionResponse"
+                },
+                "example": {
+                  "accessToken": "<jwt>",
+                  "user": {
+                    "id": "018f9a2b-7c3d-7e10-9a4b-2c1d5e6f7a8b",
+                    "abstractAccountAddress": "0x…"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/AirBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/AirUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AirForbidden"
+          }
+        }
+      }
+    },
+    "/v2/credentials": {
+      "servers": [
+        {
+          "url": "{CREDENTIAL_API}",
+          "description": "Credential API",
+          "variables": {
+            "CREDENTIAL_API": {
+              "description": "Sandbox or Production",
+              "default": "https://credential-testnet.api.sandbox.air3.com",
+              "enum": [
+                "https://credential-testnet.api.sandbox.air3.com",
+                "https://credential-mainnet.api.air3.com"
+              ]
+            }
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Credentials"
+        ],
+        "operationId": "listCredentials",
+        "summary": "List credentials",
+        "description": "Cursor-paginated list of the authenticated holder's credentials. Agent JWTs\nneed `credentials.read`. A holder user JWT also works.\n\nFilters are repeatable. `vct` also accepts a comma-separated list (except\nfor `http(s)` URLs). Filters on different fields are combined as an\nintersection.\n",
+        "security": [
+          {
+            "AgentBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "schemaId",
+            "in": "query",
+            "description": "Filter to one or more credential schema IDs.",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "maxItems": 100,
+              "items": {
+                "type": "string",
+                "maxLength": 255
+              }
+            }
+          },
+          {
+            "name": "issuerDid",
+            "in": "query",
+            "description": "Filter to one or more issuer DIDs.",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "maxItems": 100,
+              "items": {
+                "type": "string",
+                "maxLength": 255
+              }
+            }
+          },
+          {
+            "name": "vct",
+            "in": "query",
+            "description": "OR filter of SD-JWT `vct` values (schema identifier or published VCT\nURL). Repeat the parameter (`?vct=a&vct=b`) or pass a comma-separated\nlist (`?vct=a,b`).\n",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "maxItems": 100,
+              "items": {
+                "type": "string",
+                "maxLength": 2048
+              }
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size (1–100).",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor from a previous page's `nextCursor`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCredentialsResponse"
+                },
+                "example": {
+                  "items": [
+                    {
+                      "storagePath": "vc/3f1a9c8e2b7d4f60a1c5e9b8d7f6a4c2/018f9a2b-7c3d-7e10-9a4b-2c1d5e6f7a8b",
+                      "schemaId": "<schema-id>",
+                      "issuerDid": "did:iden3:…",
+                      "createdAt": "2026-08-01T00:00:00.000Z"
+                    }
+                  ],
+                  "hasMore": false
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/CredentialBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/CredentialUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/CredentialForbidden"
+          },
+          "502": {
+            "$ref": "#/components/responses/CredentialStorageUnavailable"
+          }
+        }
+      }
+    },
+    "/v2/credentials/verify-by-agent": {
+      "servers": [
+        {
+          "url": "{CREDENTIAL_API}",
+          "description": "Credential API",
+          "variables": {
+            "CREDENTIAL_API": {
+              "description": "Sandbox or Production",
+              "default": "https://credential-testnet.api.sandbox.air3.com",
+              "enum": [
+                "https://credential-testnet.api.sandbox.air3.com",
+                "https://credential-mainnet.api.air3.com"
+              ]
+            }
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Credentials"
+        ],
+        "operationId": "verifyCredentialByAgent",
+        "summary": "Verify a credential",
+        "description": "Runs a verification program against the holder's credentials. Requires an\nagent JWT with `credentials.verify`; user JWTs are rejected. Verification\nalways runs offchain, without a zero-knowledge proof.\n\n`status` is `Compliant`, `Non-Compliant`, or `NotFound`.\n`verifiablePresentation` is present only when the status is `Compliant`.\n\nA storage outage returns `502 CREDENTIAL_STORAGE_UNAVAILABLE`, not\n`NotFound`.\n",
+        "security": [
+          {
+            "AgentBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyByAgentRequest"
+              },
+              "example": {
+                "programId": "<verification-program-id>",
+                "fieldsToDisclose": "*"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyByAgentResponse"
+                },
+                "example": {
+                  "verificationResult": {
+                    "status": "Compliant",
+                    "verifiablePresentation": {
+                      "@context": [
+                        "https://www.w3.org/2018/credentials/v1"
+                      ],
+                      "type": [
+                        "VerifiablePresentation"
+                      ],
+                      "holder": "did:…",
+                      "verifiableCredential": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/CredentialBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/CredentialUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/CredentialForbidden"
+          },
+          "502": {
+            "$ref": "#/components/responses/CredentialStorageUnavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "PartnerSession": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-partner-access-token",
+        "description": "The holder's AIR Kit partner access token, from `airService.getAccessToken()`.\nSend it with `x-partner-id`.\n"
+      },
+      "PartnerLoginJwt": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-partner-jwt",
+        "description": "JWT signed with your partner login key (the same key used for the AIR Kit\nlogin `partnerJwt`). Its `partnerId` must match `x-partner-id` and the\nAIR Kit session. Omit `email` unless it is this holder's. Body `partnerJwt`\nis accepted as a fallback.\n"
+      },
+      "AgentBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Agent JWT from `POST /v2/auth/agent/session`."
+      }
+    },
+    "parameters": {
+      "XPartnerId": {
+        "name": "x-partner-id",
+        "in": "header",
+        "required": true,
+        "description": "Your Partner ID (UUID) from the Developer Dashboard.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "AgentKeyId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Agent key UUID from bind or list.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "XAgentApiKey": {
+        "name": "x-agent-api-key",
+        "in": "header",
+        "required": false,
+        "description": "Opaque API key returned once at bind or rotate. Mutually exclusive with body\n`signedMessage`. Required for API-key-only agents.\n",
+        "schema": {
+          "type": "string",
+          "example": "air_ag_…"
+        }
+      }
+    },
+    "schemas": {
+      "BindAgentKeyRequest": {
+        "type": "object",
+        "required": [
+          "scope"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "scope": {
+            "type": "string",
+            "description": "Space-delimited scopes. `openid` is added automatically. Allowed:\n`credentials.read`, `credentials.verify`, `commerce.checkout`. Partner\nbind cannot include `wallet.sign`.\n",
+            "example": "credentials.read credentials.verify"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "Display name (letters, numbers, spaces, hyphens, colons; maximum 32\ncharacters). Defaults to `Agent YYYY-MM-dd HH:mm:ss` (UTC).\n",
+            "maxLength": 32,
+            "example": "Shopping agent"
+          },
+          "publicKey": {
+            "type": "string",
+            "description": "secp256r1 (P-256) public key, PEM or base64 DER. Required only when the\nagent will create sessions with `signedMessage`.\n",
+            "example": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE…\n-----END PUBLIC KEY-----\n"
+          }
+        }
+      },
+      "PatchAgentKeyRequest": {
+        "type": "object",
+        "required": [
+          "nickname"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "nickname": {
+            "type": "string",
+            "description": "Display name (letters, numbers, spaces, hyphens, colons; maximum 32\ncharacters), or an empty string to clear it.\n",
+            "maxLength": 32,
+            "example": "KYC reader"
+          }
+        }
+      },
+      "AgentKey": {
+        "type": "object",
+        "required": [
+          "id",
+          "createdAt",
+          "scope"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "publicKey": {
+            "type": "string",
+            "nullable": true,
+            "description": "Masked PEM when a public key was bound; `null` for API-key-only agents."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "scope": {
+            "type": "string",
+            "description": "Space-delimited scopes granted to the key, including `openid`.",
+            "example": "openid credentials.read credentials.verify"
+          },
+          "nickname": {
+            "type": "string",
+            "nullable": true
+          },
+          "partnerId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        }
+      },
+      "AgentKeyCreated": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AgentKey"
+          },
+          {
+            "type": "object",
+            "required": [
+              "agentApiKey"
+            ],
+            "properties": {
+              "agentApiKey": {
+                "type": "string",
+                "description": "Opaque secret with the prefix `air_ag_`. Returned only once.",
+                "example": "air_ag_<secret>"
+              }
+            }
+          }
+        ]
+      },
+      "CreateAgentSessionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "scope": {
+            "type": "string",
+            "description": "Space-delimited scopes for the agent JWT. Must be a subset of the bound\nkey's scopes. Omit to use the full bound set.\n",
+            "example": "openid credentials.read credentials.verify"
+          },
+          "signedMessage": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AgentSignedMessage"
+              }
+            ],
+            "description": "Mutually exclusive with `x-agent-api-key`. The bound key must have a\nstored public key.\n"
+          }
+        }
+      },
+      "CreateCheckoutSessionRequest": {
+        "type": "object",
+        "required": [
+          "scope"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "scope": {
+            "type": "string",
+            "description": "Merchant checkout target. `pivota.checkout` is currently the only supported value.",
+            "enum": [
+              "pivota.checkout"
+            ],
+            "example": "pivota.checkout"
+          },
+          "signedMessage": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AgentSignedMessage"
+              }
+            ],
+            "description": "Mutually exclusive with `x-agent-api-key`. The bound key must have a\nstored public key.\n"
+          }
+        }
+      },
+      "AgentSignedMessage": {
+        "type": "object",
+        "required": [
+          "message",
+          "signature",
+          "publicKey"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Canonical proof `agent_pubkey:userId:unixEpochTime`, with the time in seconds."
+          },
+          "signature": {
+            "type": "string",
+            "description": "ECDSA P-256 signature over `message` (standard base64 or base64url; DER or IEEE P1363 / ES256)."
+          },
+          "publicKey": {
+            "type": "string",
+            "description": "secp256r1 public key (PEM or base64 DER) that signed `message`."
+          }
+        }
+      },
+      "AgentSessionResponse": {
+        "type": "object",
+        "required": [
+          "accessToken",
+          "user"
+        ],
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "Agent JWT (`type=agent`), valid for 15 minutes. Send as `Authorization: Bearer`."
+          },
+          "user": {
+            "$ref": "#/components/schemas/AgentUser"
+          }
+        }
+      },
+      "CheckoutSessionResponse": {
+        "type": "object",
+        "required": [
+          "accessToken",
+          "user"
+        ],
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "JWT (`type=agent`) whose `scope` is the requested checkout target and\nwhose `aud` is the mapped merchant. Not valid on the AIR or Credential\nAPI. The merchant must verify `aud`.\n"
+          },
+          "user": {
+            "$ref": "#/components/schemas/AgentUser"
+          }
+        }
+      },
+      "AgentUser": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "AIR user ID."
+          },
+          "abstractAccountAddress": {
+            "type": "string",
+            "nullable": true,
+            "description": "The holder's AIR Account (smart account) address.",
+            "example": "0x…"
+          }
+        }
+      },
+      "CredentialItem": {
+        "type": "object",
+        "required": [
+          "storagePath",
+          "schemaId",
+          "issuerDid",
+          "createdAt"
+        ],
+        "properties": {
+          "storagePath": {
+            "type": "string",
+            "description": "Storage handle of the encrypted credential.",
+            "example": "vc/3f1a9c8e2b7d4f60a1c5e9b8d7f6a4c2/018f9a2b-7c3d-7e10-9a4b-2c1d5e6f7a8b"
+          },
+          "schemaId": {
+            "type": "string"
+          },
+          "issuerDid": {
+            "type": "string",
+            "example": "did:iden3:…"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Issuance timestamp (ISO 8601). Also the sort key for the cursor."
+          },
+          "vct": {
+            "type": "string",
+            "description": "SD-JWT `vct` claim for SD-JWT VC credentials. Omitted for other credential types."
+          }
+        }
+      },
+      "ListCredentialsResponse": {
+        "type": "object",
+        "required": [
+          "items",
+          "hasMore"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CredentialItem"
+            }
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "nextCursor": {
+            "type": "string",
+            "description": "Opaque cursor for the next page. Absent when `hasMore` is `false`."
+          }
+        }
+      },
+      "VerifyByAgentRequest": {
+        "type": "object",
+        "required": [
+          "programId"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "programId": {
+            "type": "string",
+            "description": "Verification program to run."
+          },
+          "fieldsToDisclose": {
+            "description": "Omit, `\"*\"`, or a non-empty list of field names.\n\n- Iden3: omit to return an empty `verifiableCredential` (queries still\n  run on the full credential); `\"*\"` keeps every subject field except `id`.\n- SD-JWT: omit to disclose the claims the program queries; `\"*\"` attaches\n  every presentable disclosure.\n",
+            "oneOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "*"
+                ]
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            ],
+            "example": "*"
+          },
+          "nonce": {
+            "type": "string",
+            "description": "SD-JWT programs only. Verifier challenge bound into the key-binding JWT.\nRequired when the credential was issued with `cnf.jwk`.\n"
+          }
+        }
+      },
+      "AgentVerifiablePresentation": {
+        "type": "object",
+        "required": [
+          "@context",
+          "type",
+          "holder",
+          "verifiableCredential"
+        ],
+        "properties": {
+          "@context": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "https://www.w3.org/2018/credentials/v1"
+            ]
+          },
+          "type": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "VerifiablePresentation"
+            ]
+          },
+          "holder": {
+            "type": "string",
+            "description": "Holder DID."
+          },
+          "verifiableCredential": {
+            "type": "array",
+            "description": "Iden3: W3C credential objects. BJJ credentials embed the issuer proof;\nMTP credentials omit it. SD-JWT: compact presentation strings\n(`<Issuer-JWT>~<disclosures>~[<KB-JWT>]`).\n",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AgentVerificationResult": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "Compliant",
+              "Non-Compliant",
+              "NotFound"
+            ]
+          },
+          "verifiablePresentation": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AgentVerifiablePresentation"
+              }
+            ],
+            "description": "Present only when `status` is `Compliant`."
+          }
+        }
+      },
+      "VerifyByAgentResponse": {
+        "type": "object",
+        "required": [
+          "verificationResult"
+        ],
+        "properties": {
+          "verificationResult": {
+            "$ref": "#/components/schemas/AgentVerificationResult"
+          }
+        }
+      },
+      "AirError": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Machine-readable AIR API error code.",
+            "enum": [
+              "INVALID_PARAMETER",
+              "UNAUTHORIZED",
+              "INVALID_TOKEN",
+              "AGENT_KEYS_DISABLED",
+              "AGENT_SCOPE_DENIED",
+              "AGENT_SCOPED_SESSION_DISABLED",
+              "CONFLICT_REQUEST",
+              "NOT_FOUND",
+              "INTERNAL_SERVER_ERROR"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "CredentialError": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Machine-readable Credential API error code.",
+            "enum": [
+              "INVALID_PARAMETER",
+              "UNAUTHORIZED",
+              "FORBIDDEN",
+              "CREDENTIAL_STORAGE_UNAVAILABLE",
+              "VERIFICATION_PROGRAM_NOT_FOUND"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responses": {
+      "AirBadRequest": {
+        "description": "Invalid request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AirError"
+            },
+            "example": {
+              "code": "INVALID_PARAMETER",
+              "message": "scope is required"
+            }
+          }
+        }
+      },
+      "AirUnauthorized": {
+        "description": "Missing or invalid partner session, partner JWT, or agent identity",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AirError"
+            },
+            "example": {
+              "code": "INVALID_TOKEN",
+              "message": "Unknown agent API key"
+            }
+          }
+        }
+      },
+      "AirForbidden": {
+        "description": "Agent keys disabled for the partner, scope not a subset of the bound key, or `wallet.sign` on a partner route",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AirError"
+            },
+            "example": {
+              "code": "AGENT_KEYS_DISABLED",
+              "message": "Agent keys are not enabled for this partner"
+            }
+          }
+        }
+      },
+      "AirConflict": {
+        "description": "Maximum agent keys per user reached",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AirError"
+            },
+            "example": {
+              "code": "CONFLICT_REQUEST",
+              "message": "Maximum agent keys per user reached"
+            }
+          }
+        }
+      },
+      "AirNotFound": {
+        "description": "Agent key not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AirError"
+            }
+          }
+        }
+      },
+      "CredentialBadRequest": {
+        "description": "Invalid query or body",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CredentialError"
+            },
+            "example": {
+              "code": "INVALID_PARAMETER",
+              "message": "limit must be between 1 and 100"
+            }
+          }
+        }
+      },
+      "CredentialUnauthorized": {
+        "description": "Missing or invalid bearer token",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CredentialError"
+            }
+          }
+        }
+      },
+      "CredentialForbidden": {
+        "description": "User JWT on verify-by-agent, or agent JWT missing the required scope",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CredentialError"
+            },
+            "example": {
+              "code": "FORBIDDEN",
+              "message": "This endpoint requires an agent JWT"
+            }
+          }
+        }
+      },
+      "CredentialStorageUnavailable": {
+        "description": "Credential storage temporarily unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CredentialError"
+            },
+            "example": {
+              "code": "CREDENTIAL_STORAGE_UNAVAILABLE",
+              "message": "Failed to read credential envelope"
+            }
+          }
+        }
+      }
+    }
+  }
+}

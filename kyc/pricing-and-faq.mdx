@@ -36,7 +36,6 @@ It depends on how you configure each **verification program**:
 
 - **Pass/fail** — typically a single eligibility outcome (for example **COMPLIANT** / **NON_COMPLIANT**) plus credential metadata your schema defines.
 - **Selective disclosure** — the verifier receives only the attributes and proofs the program asks for (for example tier, age gate, jurisdiction band).
-- **Full raw KYC** — underlying documents and structured fields are available to the verifier only when the program requires it **and** the user consents under **Compliance Access Key (CAK)**. See [CAK overview](/airkit/usage/credential/cak-overview).
 
 ### Is AML screening included?
 
@@ -56,7 +55,7 @@ Many partners rely on **AIR Credentials** and verifier outcomes without duplicat
 
 ### Can a verifier ever see raw KYC fields?
 
-Yes, when your **verification program** is built for it **and** the user has granted access through **Compliance Access Key (CAK)** where required. See [CAK overview](/airkit/usage/credential/cak-overview).
+Verifiers receive the pass/fail outcome or the attributes their **verification program** requests and the user approves. If your use case requires access to raw KYC documents, contact the AIR team.
 
 ### Where is zkPassport supported?
 
