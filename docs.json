@@ -159,9 +159,8 @@
               {
                 "group": "Overview",
                 "pages": [
-                  "learn/airkit/credentials",
-                  "learn/airkit/integration-workflow",
                   "airkit/usage/credential/credentials-flow",
+                  "learn/airkit/integration-workflow",
                   "airkit/usage/credential/credential-formats"
                 ]
               },
@@ -708,8 +707,8 @@
       "destination": "/airkit/usage/credential/verify"
     },
     {
-      "source": "/airkit/usage/credential/selective-disclosure",
-      "destination": "/airkit/usage/credential/selective-disclosure"
+      "source": "/learn/airkit/credentials",
+      "destination": "/airkit/usage/credential/credentials-flow"
     }
   ]
 }
