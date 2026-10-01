@@ -64,6 +64,7 @@
     "links": [
       {
         "label": "Demo",
+        "icon": "up-right-from-square",
         "href": "https://air-bd-v2.netlify.app"
       },
       {
