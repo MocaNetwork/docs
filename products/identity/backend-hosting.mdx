@@ -157,11 +157,11 @@ serves a different purpose from issuer application records. See
 3. **Match the issuer API key.** Register the backend's `API_KEY` with AIR.
    AIR sends it as `x-api-key`; keep it out of browser code.
 4. **Register the public JWKS URL.** Its keys must match the Partner JWT signing
-   key and `kid`. See [JWKS endpoint setup](/get-started/jwks-setup).
+   key and `kid`. See [JWKS endpoint setup](/get-started/authentication/jwks-endpoint).
 5. **Register the web app origin.** Add it under **Account → Domains**.
 6. **Test issuance.** Confirm the holder sees the preview, approves issuance,
    and can use the resulting credential. See the
-   [issuance quickstart](/get-started/quickstarts/issue-credentials#step-8-complete-dashboard-setup-and-test-end-to-end).
+   [issuance quickstart](/get-started/quickstarts/issue-credentials#step-8-test-end-to-end).
 
 The issuer endpoints and JWKS must be reachable by AIR over HTTPS. They may share
 a domain; separate public origins for every component are not required.
@@ -186,7 +186,7 @@ If you enable CORS on the issuer or a reverse proxy in front of it, allow
 Run the issuer locally and expose it through an HTTPS tunnel such as
 [ngrok](https://ngrok.com) or
 [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/).
-Follow the [HTTPS tunnel setup](/get-started/jwks-setup#local-development-https-tunnel).
+Follow the [HTTPS tunnel setup](/get-started/authentication/jwks-endpoint#local-development-https-tunnel).
 
 Set `ISSUER_ORIGIN` and the registered issuer endpoint URLs to the tunnel address.
 If the tunnel address changes, update both. Add a local or managed database
@@ -197,5 +197,5 @@ configuration uses database persistence.
 
 - [Credential issuance quickstart](/get-started/quickstarts/issue-credentials)
 - [Revoke credentials](/products/identity/revocation)
-- [JWKS endpoint setup](/get-started/jwks-setup)
+- [JWKS endpoint setup](/get-started/authentication/jwks-endpoint)
 - [Architecture and data flow](/technicals/architecture)

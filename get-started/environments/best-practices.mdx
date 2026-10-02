@@ -1,0 +1,44 @@
+---
+title: "Environment best practices"
+sidebarTitle: "Best practices"
+description: "Keep AIR Kit sandbox and production separate — match chains to environments, isolate partner IDs and keys, re-issue network-specific credentials, and migrate from older SDK versions."
+---
+
+## Match the chain to the environment
+
+Sandbox always uses Moca Chain Testnet. Production uses Moca Chain mainnet when you set `credentialNetwork: "mainnet"`. If your app's chain does not match its build environment, you can hit unexpected errors. See [Environments](/get-started/environments/about) for the full mapping.
+
+## Treat credentials as network-specific
+
+Credentials, schemas, and programs are network-specific. Credentials issued on Testnet are not available on Mainnet, and Devnet-issued credentials are not available on either. When you move to a new network:
+
+- Re-issue credentials on the target network.
+- Recreate issuance schemas and programs if needed.
+- Check your Issuer and Verifier DIDs, which may differ per network.
+
+## Keep each environment separate
+
+- Sandbox and production each have their own Developer Dashboard, and nothing you set up in sandbox carries over. Copy the Partner ID from each Dashboard; do not assume they match.
+- Register a JWKS URL in each Dashboard, and keep production private keys apart from sandbox keys. See [JWKS endpoint](/get-started/authentication/jwks-endpoint).
+- Read `buildEnv`, `credentialNetwork`, Partner ID, program IDs, and API origins from configuration, not hard-coded values, so a production build never ships with sandbox values.
+
+## Test on sandbox, then launch
+
+Build and test the full flow on sandbox first. When it works end to end, follow the [Launch checklist](/get-started/launch-checklist) to set up production.
+
+## Migrating from older SDK versions
+
+Starting with **AirKit 1.10.0**, Sandbox is Testnet-only — the temporary `credentialNetwork: "devnet"` opt-in is removed.
+
+### What changed
+
+| Before (< 1.8.0) | 1.8.0–1.9.x | 1.10.0+ |
+| ---------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------ |
+| Sandbox → Devnet (Chain ID: 5151) | Sandbox → Testnet by default; optional `credentialNetwork: "devnet"` | Sandbox → Testnet only; no `credentialNetwork` on Sandbox |
+| Dashboard: https://developers.sandbox.air3.com | Dashboard: https://developers.sandbox.air3.com | Dashboard: https://developers.sandbox.air3.com |
+
+### Impact
+
+- Credentials issued on Devnet are **not** available on Testnet or Mainnet
+- Smart Account addresses remain the same across networks
+- Re-issue test credentials on Testnet, or on Mainnet for production launches

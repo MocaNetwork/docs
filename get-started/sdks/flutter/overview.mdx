@@ -1,0 +1,23 @@
+---
+title: "Flutter SDK overview"
+sidebarTitle: "Overview"
+description: "Integrate AIR Kit in Flutter apps for AIR Account login, embedded wallets, credential issuance and verification, and native UI flows on iOS and Android."
+---
+
+The AIR Kit Flutter SDK brings AIR Account login, the embedded wallet, and credential issuance and verification to iOS and Android apps. Set it up with [Installation](/get-started/sdks/flutter/installation), then [Android setup](/get-started/sdks/flutter/android-setup) and [iOS setup](/get-started/sdks/flutter/ios-setup). See [Platform support](/get-started/sdks/platform-support) for supported versions.
+
+## Credentials on Flutter
+
+`issueCredential` and `verifyCredential` are available on Flutter. The [issuance](/get-started/quickstarts/issue-credentials) and [verification](/get-started/quickstarts/verify-credentials) quickstarts use Web code, but the issuer service, Dashboard setup, and Partner JWT steps are the same. [Direct issuance](/api-reference/issuance-api) runs on your backend, so it works with any client.
+
+## Authentication on Flutter
+
+On Flutter, sign-in uses `login` with a **Partner JWT** (`authToken`) after `initialize()`. See [Login](/get-started/authentication/login) (Flutter tab) and [SDK authentication](/get-started/authentication/sdk-auth).
+
+## Environment and dashboard
+
+Use the [Developer Dashboard](https://developers.sandbox.air3.com/dashboard) for partner ID, programs, and configuration. Environment values match [Environments](/get-started/environments/about) (`Environment.sandbox`, `production`, etc.).
+
+## Troubleshooting
+
+See [Flutter troubleshooting](/help/flutter-troubleshooting) for common setup and login issues.

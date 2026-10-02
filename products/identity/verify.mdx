@@ -50,12 +50,12 @@ Every verification attempt is recorded as a **verification session** — a serve
 7. On success, send the returned Verifiable Presentation to your backend and [verify it there](/products/identity/verify-sd-jwt) before granting access or rewards.
 
 <Note>
-  The dashboard link above uses Sandbox for development. For production launches, use the [production Developer Dashboard](https://developers.air3.com/dashboard). Moca Chain mainnet is live, and SD-JWT verification programs are self-serve in production. See [Production mainnet access](/get-started/environments#production-mainnet-access).
+  The dashboard link above uses Sandbox for development. For production launches, use the [production Developer Dashboard](https://developers.air3.com/dashboard). Moca Chain mainnet is live, and SD-JWT verification programs are self-serve in production. See [Production mainnet access](/get-started/environments/about#production-mainnet-access).
 </Note>
 
 ## Start verification
 
-Generate a [Partner JWT](/get-started/partner-authentication) with `scope=verify` and a fresh `nonce` on your backend, then start verification with the SDK. The credential format and requested claims come from the program configuration, so your call stays minimal.
+Generate a [Partner JWT](/get-started/authentication/sdk-auth) with `scope=verify` and a fresh `nonce` on your backend, then start verification with the SDK. The credential format and requested claims come from the program configuration, so your call stays minimal.
 
 <Tabs>
 <Tab title="Web">

@@ -1,0 +1,88 @@
+---
+title: "Bring your own auth"
+sidebarTitle: "Bring your own auth"
+description: "Skip the AIR Kit login dialog and pass users from Firebase, Auth0, Supabase, or your custom auth into AIR Kit sessions using a Partner JWT."
+---
+
+If your app already authenticates users (via Firebase, Auth0, Supabase, or a custom system), you can bypass the AIR Kit login dialog and pass the authenticated user straight into an AIR Kit session. This is called [Custom Auth](/get-started/authentication/custom-auth).
+
+## How it works
+
+1. Your app authenticates the user through your own system.
+2. Your backend signs a Partner JWT containing the user's `email`.
+3. Your frontend passes that JWT to `airService.login({ authToken })`.
+4. AIR Kit creates or loads the user's AIR Account, skipping the built-in login UI.
+
+<Note>
+The first time an email is used, AIR verifies it with a one-time password. Later logins with that email skip this step.
+</Note>
+
+## Prerequisites
+
+- AIR Kit SDK installed and initialized. See [Web SDK](/get-started/sdks/web).
+- A Partner JWT signing key, with its public key published through a registered [JWKS endpoint](/get-started/authentication/jwks-endpoint).
+- The authenticated user's email address available on your backend.
+
+## Step 1: Generate a Partner JWT on your backend
+
+Include `email` and `partnerId`:
+
+```js
+const jwt = require("jsonwebtoken");
+const fs = require("fs");
+
+const privateKey = fs.readFileSync("path/to/private.key");
+
+function getAuthToken(user) {
+  const now = Math.floor(Date.now() / 1000);
+  return jwt.sign(
+    {
+      partnerId: process.env.PARTNER_ID,
+      email: user.email,
+      iat: now,
+      exp: now + 5 * 60,
+    },
+    privateKey,
+    { algorithm: "RS256", header: { kid: process.env.KEY_ID, typ: "JWT" } }
+  );
+}
+
+// Express example
+app.get("/api/air-token", requireAuth, (req, res) => {
+  const token = getAuthToken(req.user);
+  res.json({ token });
+});
+```
+
+## Step 2: Fetch the token and log in on the frontend
+
+```ts
+import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
+
+const airService = new AirService({ partnerId: "your-partner-id" });
+await airService.init({ buildEnv: BUILD_ENV.SANDBOX });
+
+const res = await fetch("/api/air-token");
+const { token } = await res.json();
+
+await airService.login({ authToken: token });
+```
+
+The user is now logged in without the AIR Kit login dialog, apart from the one-time email check on first use. Their AIR Account is tied to the email from your system.
+
+## Step 3: Use AIR Kit features normally
+
+After login, all SDK methods work as usual — issue credentials, verify credentials, access smart accounts:
+
+```ts
+if (airService.isLoggedIn) {
+  const userInfo = await airService.getUserInfo();
+  console.log("User:", userInfo);
+}
+```
+
+## Next steps
+
+- [Custom Auth](/get-started/authentication/custom-auth) for the JWT payload reference
+- [SDK authentication](/get-started/authentication/sdk-auth) for signing in other languages
+- [Sessions & user info](/get-started/authentication/sessions) and [MFA](/get-started/authentication/mfa)

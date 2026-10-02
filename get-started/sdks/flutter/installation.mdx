@@ -1,0 +1,93 @@
+---
+title: "Install the AIR Kit Flutter SDK"
+sidebarTitle: "Installation"
+description: "Install the AIR Kit Flutter SDK via OnePub, configure minimum platform versions for iOS and Android, and add it to your pubspec.yaml."
+---
+
+## Prerequisites
+
+- Flutter SDK and Dart toolchain on your PATH
+- OnePub access (credentials provided by Moca)
+- Android: `compileSdk` 34+, `minSdk` 26+ (see [Android setup](/get-started/sdks/flutter/android-setup))
+- iOS: platform 14.0+ in `Podfile` (see [iOS setup](/get-started/sdks/flutter/ios-setup))
+
+<Note>
+  Production mobile apps should use the production AIR pages and domains, including `account.air3.com` for passkey setup. Moca Chain mainnet is live; see [Production mainnet access](/get-started/environments/about#production-mainnet-access).
+</Note>
+
+## OnePub CLI
+
+```bash
+dart pub global activate onepub
+onepub login
+```
+
+<Warning>
+If `onepub` is not found, add Pub’s global bin directory to your PATH, for example: `export PATH=$PATH:$HOME/.pub-cache/bin`
+</Warning>
+
+## Add the dependency
+
+**Option A — `pubspec.yaml`**
+
+```yaml
+dependencies:
+  airkit:
+    hosted: https://onepub.dev/api/sxhddavuhn/
+    version: ^1.6.0
+```
+
+Use the version your team recommends; check [Release notes](/api-reference/release-notes) for current Flutter SDK versions.
+
+**Option B — CLI**
+
+```bash
+onepub pub add airkit
+```
+
+Then run:
+
+```bash
+flutter pub get
+```
+
+## Import
+
+```dart
+import 'package:airkit/airkit.dart';
+```
+
+## Initialize
+
+Create an `AirService` instance and call `initialize`:
+
+```dart
+Future<void> initialize({
+    required String partnerId,
+    required GlobalKey<NavigatorState> navigatorKey,
+    Environment env = Environment.production,
+    bool enableLogging = false,
+})
+```
+
+You receive your `partnerId` from us. The `navigatorKey` is used to overlay the dialogs that specific user flows need. During development, use `Environment.sandbox` and enable logging.
+
+```dart
+final navigatorKey = GlobalKey<NavigatorState>();
+final airService = AirService();
+
+await airService.initialize(
+  partnerId: 'YOUR_PARTNER_ID',
+  navigatorKey: navigatorKey,
+  env: Environment.sandbox,
+  enableLogging: true,
+);
+
+// In MaterialApp: navigatorKey: navigatorKey
+```
+
+## Next steps
+
+1. [Android setup](/get-started/sdks/flutter/android-setup) — asset statements, manifest, network security
+2. [iOS setup](/get-started/sdks/flutter/ios-setup) — associated domains, `Podfile`
+3. [Google Sign-In](/get-started/sdks/flutter/google-signin) if you use Google login

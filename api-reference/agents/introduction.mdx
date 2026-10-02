@@ -33,7 +33,7 @@ Each route uses a different combination of headers.
 | `x-agent-api-key` | The `air_ag_…` key returned at bind or rotate | Session and checkout creation |
 | `Authorization: Bearer` | The agent JWT from session creation | List and verify credentials |
 
-Sign `x-partner-jwt` on your backend with the same key you use for AIR Kit login. Its `partnerId` must match `x-partner-id` and the holder's session. See [Partner authentication](/get-started/partner-authentication) for key setup.
+Sign `x-partner-jwt` on your backend with the same key you use for AIR Kit login. Its `partnerId` must match `x-partner-id` and the holder's session. See [SDK authentication](/get-started/authentication/sdk-auth) for key setup.
 
 Session and checkout creation accept exactly one agent identity: the `x-agent-api-key` header, or a `signedMessage` in the body for agents bound with a P-256 public key.
 

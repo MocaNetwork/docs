@@ -410,8 +410,31 @@ mobile-nav-tabs-item:focus-visible {
   background: var(--air-container-primary) !important;
 }
 
+/* Nested groups: the toggle matches page links; children indent under a guide line */
+#sidebar-content li > button[aria-expanded] {
+  align-items: center !important;
+  justify-content: space-between;
+  padding: 7px 8px !important;
+  border-radius: var(--air-corner-small) !important;
+  color: #3B484F !important;
+  font: var(--air-type-body-2) !important;
+  background: transparent !important;
+}
+
+#sidebar-content li > button[aria-expanded]:hover {
+  color: var(--air-text-primary) !important;
+  background: var(--air-container-primary) !important;
+}
+
+#sidebar-content li > button[aria-expanded] + ul {
+  margin: 1px 0 4px 8px;
+  padding-left: 8px;
+  border-left: 1px solid var(--air-border-divider);
+}
+
 #sidebar a:focus-visible,
-#sidebar-content a:focus-visible {
+#sidebar-content a:focus-visible,
+#sidebar-content li > button[aria-expanded]:focus-visible {
   outline: 2px solid var(--air-outline-focus);
   outline-offset: 2px;
 }

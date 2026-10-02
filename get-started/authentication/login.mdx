@@ -1,0 +1,94 @@
+---
+title: "User login"
+sidebarTitle: "Login"
+description: "Log users in with AIR Kit — built-in Google and passwordless email login with single sign-on across the AIR ecosystem, plus optional EOA wallet authentication."
+---
+
+## Using AIR Kit as your authentication provider
+
+By default, users can log in with:
+
+- Google
+- Passwordless email
+
+Wallet (EOA) login is not enabled by default. The AIR team enables it on request; see [EOA wallet authentication](#eoa-wallet-authentication-optional-add-on). To change which methods appear and in what order, see [Login options](/get-started/customization/login-options).
+
+See the [single sign-on demo](https://air-bd-v2.netlify.app/demo/single-sign-on) for a click-through of the login flow. It is a walkthrough, not a live session.
+
+<Warning>
+**Google sign-in redirect on recent Apple OSes.** On **iOS 26.5.2 and above (any browser)** and **macOS 26.5.2 with Safari**, Google sign-in completes through a full-page redirect instead of a popup. Single-page apps — or any app whose state is not fully represented by the URL — must persist and restore their page state across the redirect so the user returns to where they left off after authenticating.
+</Warning>
+
+
+<Tabs>
+<Tab title="Web">
+
+```tsx
+login(options?: { authToken?: string }): Promise<AirLoginResult>
+```
+
+</Tab>
+<Tab title="Flutter">
+
+On Flutter, call `login` with a **Partner JWT** after `initialize()`:
+
+```dart
+Future<LoginResult> login({
+  required String authToken,
+  OnOtpRequest? onOtpRequest,
+});
+```
+
+See the [SDK reference](/api-reference/sdk-reference) (Flutter tab).
+
+</Tab>
+</Tabs>
+
+Calling `login()` opens the AIR Kit login dialog with your enabled login methods. On Web, `authToken` is optional but recommended: pass a [Partner JWT](/get-started/authentication/sdk-auth) to identify your app, or one that includes the user's email for [Custom Auth](/get-started/authentication/custom-auth). On Flutter, `authToken` is required.
+
+After login, see [Sessions & user info](/get-started/authentication/sessions).
+
+## EOA Wallet Authentication (optional add-on)
+
+EOA-based authentication is available as an optional customization on top of the default AIR Account login flow.
+This allows your users to authenticate using any EOA wallet (e.g., MetaMask, Trust Wallet) while still benefiting from the AIR Account identity stack. The EOA wallet is used only for authentication and identity verification. It does not replace the underlying MPC-based account abstraction or control mechanisms. In effect, the wallet address serves purely as a login identifier, while account control remains securely managed by AIR.
+
+### Why enable EOA auth?
+
+- Seamlessly supports existing “Connect Wallet” flows
+- Zero disruption to current users
+- Adds AIR Account–powered authentication without requiring UX changes
+- Works alongside Web2 and other login methods
+
+If your application already uses EOA wallet login, you can enable AIR Account authentication on top of it—ensuring a unified identity experience while preserving your existing flow.
+
+### How to request EOA authentication
+
+EOA auth is not enabled by default.
+To enable it for your project, please contact our support team with the following details:
+
+### EOA auth enablement request template
+
+**Subject:** Request to Enable EOA Authentication for \<Project Name \>
+
+**Email Body:**
+
+```
+Hi Team,
+
+I would like to request **EOA authentication** to be enabled for our project.
+
+**Project Name:**
+**Partner ID: (Can be obtained from the Dev dashboard: https://developers.sandbox.air3.com/dashboard/general):**
+**Environment:** (Production / Sandbox / Both)
+
+**Current Login Method:**
+(e.g., Connect Wallet, Web2 login, AIR Account)
+
+**Reason for Enabling EOA Auth:**
+(e.g., we support existing EOA wallet login and want to integrate AIR Account without disrupting our users)
+
+Please let us know if you require any additional information or configuration details.
+
+Thank you!
+```

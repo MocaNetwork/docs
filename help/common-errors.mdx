@@ -45,7 +45,7 @@ try {
 
 | Name | Meaning | How to handle |
 | --- | --- | --- |
-| `PARTNER_TOKEN_EXPIRED` | The Partner JWT you passed is past its `exp` | Mint a fresh JWT and retry. See [Partner authentication](/get-started/partner-authentication) |
+| `PARTNER_TOKEN_EXPIRED` | The Partner JWT you passed is past its `exp` | Mint a fresh JWT and retry. See [SDK authentication](/get-started/authentication/sdk-auth) |
 | `PARTNER_ACCESS_TOKEN_INVALID` | The Partner JWT failed validation | Check signing key, `kid`, and payload — see [JWT and JWKS errors](#jwt-and-jwks-errors) below |
 | `USER_MISMATCH` | The token identifies a different user than the active session | Log out before switching users |
 | `TOKEN_EXPIRED` / `INVALID_TOKEN` / `UNAUTHORIZED` | The AIR session token is expired or rejected | Re-run `login()` |
@@ -91,7 +91,7 @@ curl https://your-domain/api/.well-known/jwks
 
 - `air-examples` ships `/api/.well-known/jwks`; the plug-and-play template ships `/jwks.json`. Register whichever your app actually serves.
 - Ensure no firewall or IP allowlist blocks AIR Kit's servers.
-- Full setup procedure: [JWKS endpoint setup](/get-started/jwks-setup).
+- Full setup procedure: [JWKS endpoint setup](/get-started/authentication/jwks-endpoint).
 
 ### "kid not found"
 

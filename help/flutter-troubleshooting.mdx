@@ -8,20 +8,20 @@ description: "Resolve common AIR Kit Flutter integration issues — installation
 | Issue | What to try |
 |-------|-------------|
 | `onepub` command not found | Add `$HOME/.pub-cache/bin` to PATH |
-| Package resolve failures | `onepub login`, verify hosted URL and version in [Flutter installation](/get-started/flutter/installation) |
+| Package resolve failures | `onepub login`, verify hosted URL and version in [Flutter installation](/get-started/sdks/flutter/installation) |
 
 ## Android
 
 | Issue | What to try |
 |-------|-------------|
-| Passkey / asset links | [Android setup](/get-started/flutter/android-setup): `strings.xml`, manifest `meta-data`, signing cert allowlisting |
+| Passkey / asset links | [Android setup](/get-started/sdks/flutter/android-setup): `strings.xml`, manifest `meta-data`, signing cert allowlisting |
 | `minSdk` / manifest merge errors | Set `minSdk` 26+, `compileSdk` 34+ |
 
 ## iOS
 
 | Issue | What to try |
 |-------|-------------|
-| Associated Domains | [iOS setup](/get-started/flutter/ios-setup): capability, exact domain entries, physical device |
+| Associated Domains | [iOS setup](/get-started/sdks/flutter/ios-setup): capability, exact domain entries, physical device |
 | CocoaPods | `cd ios && rm -rf Pods Podfile.lock && pod install` |
 
 ## Runtime
@@ -36,7 +36,7 @@ description: "Resolve common AIR Kit Flutter integration issues — installation
 
 Credential **issuance** and **verification** are available on Flutter. Use the [Issue credentials](/get-started/quickstarts/issue-credentials) and [Verify credentials](/get-started/quickstarts/verify-credentials) quickstarts, plus [Issuing credentials](/products/identity/issuing-credentials) and [Verify](/products/identity/verify).
 
-If calls fail or payloads are rejected, see [Credential issues](/help/credential-issues). For Google OAuth client IDs and dashboard-side setup, see [Google Sign-In — Dashboard](/get-started/flutter/google-signin#dashboard).
+If calls fail or payloads are rejected, see [Credential issues](/help/credential-issues). For Google OAuth client IDs and dashboard-side setup, see [Google Sign-In — Dashboard](/get-started/sdks/flutter/google-signin#dashboard).
 
 ## More help
 

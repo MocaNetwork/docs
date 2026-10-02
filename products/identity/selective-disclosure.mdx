@@ -35,7 +35,7 @@ Before using Selective Disclosure you need:
 1. **Latest AIR Kit SDK** — Install or upgrade to the latest version of `@mocanetwork/airkit`. Nested field paths need 1.12.1 or later.
 2. **SD-JWT credential with disclosable claims** — The Issuer lists the claims in `disclosureFrame._sd` and has **Allow data disclosure** turned on for the issuance program.
 3. **Active verification program** — A published verification program in the Developer Dashboard (Verifier → Programs).
-4. **Partner JWT with `scope=verify`** — See [Partner Authentication](/get-started/partner-authentication).
+4. **Partner JWT with `scope=verify`** — See [SDK authentication](/get-started/authentication/sdk-auth).
 
 ## Step 1: Enable Disclosure on the Issuance Program
 
@@ -146,6 +146,6 @@ Treat the disclosed `credentialSubject` as user data: store it only as long as y
   The base verification flow that Selective Disclosure builds on.
 </Card>
 
-<Card title="Partner Authentication" icon="key" href="/get-started/partner-authentication">
+<Card title="Partner Authentication" icon="key" href="/get-started/authentication/sdk-auth">
   Generate the `scope=verify` Partner JWT used as `authToken`.
 </Card>

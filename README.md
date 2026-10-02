@@ -51,7 +51,7 @@ Match the voice of the surrounding pages and keep contributions reviewable.
 - Use sentence case for headings ("Issuing credentials", not "Issuing Credentials").
 - Lead with the goal of the page; put prerequisites near the top.
 - Keep terminology consistent: **Moca Network**, **Moca Chain**, **AIR Kit**, **AIR Account**, **credential**, **issuer**, **verifier**.
-- Use root-relative internal links without file extensions, for example `/get-started/partner-account`. Do not use relative paths or full URLs for pages inside this repo.
+- Use root-relative internal links without file extensions, for example `/get-started/dashboard/account-setup`. Do not use relative paths or full URLs for pages inside this repo.
 - Store images under `images/` and reference them as `/images/your-file.png` from MDX. Always include descriptive alt text.
 - Tag every code block with a language (` ```ts `, ` ```bash `, ` ```json `).
 - Prefer Mintlify components (`<Steps>`, `<CodeGroup>`, `<Card>`, `<Note>`, `<Warning>`) over custom HTML when they exist for the use case.

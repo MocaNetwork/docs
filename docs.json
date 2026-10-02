@@ -91,67 +91,101 @@
           {
             "group": "Overview",
             "pages": [
-              "get-started/integrating-using-ai",
+              "get-started/build-with-your-agent",
               "get-started/what-is-airkit",
               "get-started/when-to-use-airkit"
             ]
           },
           {
-            "group": "Set up",
-            "pages": [
-              "get-started/partner-account",
-              "get-started/dashboard",
-              "get-started/environments",
-              "get-started/installation",
-              "get-started/go-to-production",
-              "get-started/platform-matrix"
-            ]
-          },
-          {
-            "group": "Authentication",
-            "pages": [
-              "get-started/partner-authentication",
-              "get-started/jwks-setup",
-              "get-started/user-authentication",
-              "get-started/user-management"
-            ]
-          },
-          {
-            "group": "Customize",
-            "pages": [
-              "get-started/config-login",
-              "get-started/config-theming",
-              "get-started/config-language"
-            ]
-          },
-          {
-            "group": "Flutter",
-            "pages": [
-              "get-started/flutter/overview",
-              "get-started/flutter/installation",
-              "get-started/flutter/android-setup",
-              "get-started/flutter/ios-setup",
-              "get-started/flutter/google-signin",
-              "get-started/flutter/wallet-operations",
-              "get-started/flutter/provider-functions",
-              "get-started/flutter/ui-components"
-            ]
-          },
-          {
             "group": "Quickstarts",
             "pages": [
-              "get-started/quickstarts/index",
+              "get-started/quickstarts/login",
               "get-started/quickstarts/issue-credentials",
               "get-started/quickstarts/verify-credentials"
+            ]
+          },
+          {
+            "group": "Additional",
+            "pages": [
+              {
+                "group": "Developer Dashboard",
+                "pages": [
+                  "get-started/dashboard/account-setup",
+                  "get-started/dashboard/features"
+                ]
+              },
+              {
+                "group": "Environments",
+                "pages": [
+                  "get-started/environments/about",
+                  "get-started/environments/best-practices"
+                ]
+              },
+              {
+                "group": "Using AIR Kit (SDKs)",
+                "pages": [
+                  "get-started/sdks/web",
+                  {
+                    "group": "Flutter",
+                    "pages": [
+                      "get-started/sdks/flutter/overview",
+                      "get-started/sdks/flutter/installation",
+                      "get-started/sdks/flutter/android-setup",
+                      "get-started/sdks/flutter/ios-setup",
+                      "get-started/sdks/flutter/google-signin",
+                      "get-started/sdks/flutter/wallet-operations",
+                      "get-started/sdks/flutter/provider-functions",
+                      "get-started/sdks/flutter/ui-components"
+                    ]
+                  },
+                  "get-started/sdks/platform-support"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Launch",
+            "pages": [
+              "get-started/launch-checklist"
+            ]
+          },
+          {
+            "group": "About Authentication",
+            "pages": [
+              {
+                "group": "Managing Auths",
+                "pages": [
+                  "get-started/authentication/sdk-auth",
+                  "get-started/authentication/jwks-endpoint",
+                  "get-started/authentication/custom-auth"
+                ]
+              },
+              {
+                "group": "User",
+                "pages": [
+                  "get-started/authentication/login",
+                  "get-started/authentication/sessions",
+                  "get-started/authentication/mfa"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Customization Options",
+            "pages": [
+              "get-started/customization/theming",
+              "get-started/customization/language",
+              "get-started/customization/login-options",
+              "get-started/customization/other-options"
             ]
           },
           {
             "group": "Recipes",
             "pages": [
               "get-started/recipes/index",
-              "get-started/recipes/custom-auth-integration",
-              "get-started/recipes/kyc-credential-on-event",
-              "get-started/recipes/verify-credential-in-app"
+              "get-started/recipes/bring-your-own-auth",
+              "get-started/recipes/issue-kyc-credential",
+              "get-started/recipes/verify-credential"
             ]
           }
         ]
@@ -166,7 +200,7 @@
               {
                 "group": "Overview",
                 "pages": [
-                  "products/integrating-using-ai",
+                  "products/identity/integrating-using-ai",
                   "products/identity/credentials-flow",
                   "products/identity/integration-workflow",
                   "products/identity/credential-formats"
@@ -207,7 +241,7 @@
               {
                 "group": "Overview",
                 "pages": [
-                  "products/integrating-using-ai",
+                  "products/agents/integrating-using-ai",
                   "products/agents/index",
                   "products/agents/partners",
                   "products/agents/how-it-works"
@@ -237,7 +271,7 @@
               {
                 "group": "Overview",
                 "pages": [
-                  "products/integrating-using-ai",
+                  "products/money/integrating-using-ai",
                   "products/money/index"
                 ]
               },
@@ -274,7 +308,7 @@
               {
                 "group": "Overview",
                 "pages": [
-                  "products/integrating-using-ai",
+                  "products/loyalty/integrating-using-ai",
                   "products/loyalty/index",
                   "products/loyalty/business",
                   "products/loyalty/developers"
@@ -484,7 +518,7 @@
     },
     {
       "source": "/mocachain/native-dapps/airkit-dashboard",
-      "destination": "/get-started/dashboard"
+      "destination": "/get-started/dashboard/features"
     },
     {
       "source": "/airkit/templates/plug-and-play",
@@ -604,7 +638,7 @@
     },
     {
       "source": "/learn/integrating-using-ai",
-      "destination": "/get-started/integrating-using-ai"
+      "destination": "/get-started/build-with-your-agent"
     },
     {
       "source": "/learn/airkit/key-features",
@@ -680,7 +714,7 @@
     },
     {
       "source": "/airkit/integrating-using-ai",
-      "destination": "/get-started/integrating-using-ai"
+      "destination": "/get-started/build-with-your-agent"
     },
     {
       "source": "/learn/when-to-use-airkit",
@@ -688,51 +722,51 @@
     },
     {
       "source": "/airkit/airkit-dashboard",
-      "destination": "/get-started/dashboard"
+      "destination": "/get-started/dashboard/features"
     },
     {
       "source": "/airkit/environments",
-      "destination": "/get-started/environments"
+      "destination": "/get-started/environments/about"
     },
     {
       "source": "/airkit/usage/installation",
-      "destination": "/get-started/installation"
+      "destination": "/get-started/sdks/web"
     },
     {
       "source": "/airkit/usage/go-to-production",
-      "destination": "/get-started/go-to-production"
+      "destination": "/get-started/launch-checklist"
     },
     {
       "source": "/airkit/platform-matrix",
-      "destination": "/get-started/platform-matrix"
+      "destination": "/get-started/sdks/platform-support"
     },
     {
       "source": "/airkit/usage/partner-authentication",
-      "destination": "/get-started/partner-authentication"
+      "destination": "/get-started/authentication/sdk-auth"
     },
     {
       "source": "/airkit/usage/jwks-setup",
-      "destination": "/get-started/jwks-setup"
+      "destination": "/get-started/authentication/jwks-endpoint"
     },
     {
       "source": "/airkit/usage/user-authentication",
-      "destination": "/get-started/user-authentication"
+      "destination": "/get-started/authentication/login"
     },
     {
       "source": "/airkit/usage/user-management",
-      "destination": "/get-started/user-management"
+      "destination": "/get-started/authentication/sessions"
     },
     {
       "source": "/airkit/usage/config-login",
-      "destination": "/get-started/config-login"
+      "destination": "/get-started/customization/login-options"
     },
     {
       "source": "/airkit/usage/config-theming",
-      "destination": "/get-started/config-theming"
+      "destination": "/get-started/customization/theming"
     },
     {
       "source": "/airkit/usage/config-language",
-      "destination": "/get-started/config-language"
+      "destination": "/get-started/customization/language"
     },
     {
       "source": "/airkit",
@@ -740,43 +774,43 @@
     },
     {
       "source": "/airkit/usage/getting-started",
-      "destination": "/get-started/partner-account"
+      "destination": "/get-started/dashboard/account-setup"
     },
     {
       "source": "/airkit/flutter/overview",
-      "destination": "/get-started/flutter/overview"
+      "destination": "/get-started/sdks/flutter/overview"
     },
     {
       "source": "/airkit/flutter/installation",
-      "destination": "/get-started/flutter/installation"
+      "destination": "/get-started/sdks/flutter/installation"
     },
     {
       "source": "/airkit/flutter/android-setup",
-      "destination": "/get-started/flutter/android-setup"
+      "destination": "/get-started/sdks/flutter/android-setup"
     },
     {
       "source": "/airkit/flutter/ios-setup",
-      "destination": "/get-started/flutter/ios-setup"
+      "destination": "/get-started/sdks/flutter/ios-setup"
     },
     {
       "source": "/airkit/flutter/google-signin",
-      "destination": "/get-started/flutter/google-signin"
+      "destination": "/get-started/sdks/flutter/google-signin"
     },
     {
       "source": "/airkit/flutter/wallet-operations",
-      "destination": "/get-started/flutter/wallet-operations"
+      "destination": "/get-started/sdks/flutter/wallet-operations"
     },
     {
       "source": "/airkit/flutter/provider-functions",
-      "destination": "/get-started/flutter/provider-functions"
+      "destination": "/get-started/sdks/flutter/provider-functions"
     },
     {
       "source": "/airkit/flutter/ui-components",
-      "destination": "/get-started/flutter/ui-components"
+      "destination": "/get-started/sdks/flutter/ui-components"
     },
     {
       "source": "/airkit/quickstart",
-      "destination": "/get-started/quickstarts"
+      "destination": "/get-started/quickstarts/login"
     },
     {
       "source": "/airkit/quickstart/issue-credentials",
@@ -792,15 +826,15 @@
     },
     {
       "source": "/recipes/custom-auth-integration",
-      "destination": "/get-started/recipes/custom-auth-integration"
+      "destination": "/get-started/recipes/bring-your-own-auth"
     },
     {
       "source": "/recipes/kyc-credential-on-event",
-      "destination": "/get-started/recipes/kyc-credential-on-event"
+      "destination": "/get-started/recipes/issue-kyc-credential"
     },
     {
       "source": "/recipes/verify-credential-in-app",
-      "destination": "/get-started/recipes/verify-credential-in-app"
+      "destination": "/get-started/recipes/verify-credential"
     },
     {
       "source": "/airkit/usage/credential/credentials-flow",
@@ -1105,6 +1139,110 @@
     {
       "source": "/status",
       "destination": "/help/status"
+    },
+    {
+      "source": "/get-started/integrating-using-ai",
+      "destination": "/get-started/build-with-your-agent"
+    },
+    {
+      "source": "/get-started/quickstarts",
+      "destination": "/get-started/quickstarts/login"
+    },
+    {
+      "source": "/get-started/partner-account",
+      "destination": "/get-started/dashboard/account-setup"
+    },
+    {
+      "source": "/get-started/dashboard",
+      "destination": "/get-started/dashboard/features"
+    },
+    {
+      "source": "/get-started/environments",
+      "destination": "/get-started/environments/about"
+    },
+    {
+      "source": "/get-started/installation",
+      "destination": "/get-started/sdks/web"
+    },
+    {
+      "source": "/get-started/platform-matrix",
+      "destination": "/get-started/sdks/platform-support"
+    },
+    {
+      "source": "/get-started/go-to-production",
+      "destination": "/get-started/launch-checklist"
+    },
+    {
+      "source": "/get-started/partner-authentication",
+      "destination": "/get-started/authentication/sdk-auth"
+    },
+    {
+      "source": "/get-started/jwks-setup",
+      "destination": "/get-started/authentication/jwks-endpoint"
+    },
+    {
+      "source": "/get-started/user-authentication",
+      "destination": "/get-started/authentication/login"
+    },
+    {
+      "source": "/get-started/user-management",
+      "destination": "/get-started/authentication/sessions"
+    },
+    {
+      "source": "/get-started/config-theming",
+      "destination": "/get-started/customization/theming"
+    },
+    {
+      "source": "/get-started/config-language",
+      "destination": "/get-started/customization/language"
+    },
+    {
+      "source": "/get-started/config-login",
+      "destination": "/get-started/customization/login-options"
+    },
+    {
+      "source": "/get-started/recipes/custom-auth-integration",
+      "destination": "/get-started/recipes/bring-your-own-auth"
+    },
+    {
+      "source": "/get-started/recipes/kyc-credential-on-event",
+      "destination": "/get-started/recipes/issue-kyc-credential"
+    },
+    {
+      "source": "/get-started/recipes/verify-credential-in-app",
+      "destination": "/get-started/recipes/verify-credential"
+    },
+    {
+      "source": "/get-started/flutter/overview",
+      "destination": "/get-started/sdks/flutter/overview"
+    },
+    {
+      "source": "/get-started/flutter/installation",
+      "destination": "/get-started/sdks/flutter/installation"
+    },
+    {
+      "source": "/get-started/flutter/android-setup",
+      "destination": "/get-started/sdks/flutter/android-setup"
+    },
+    {
+      "source": "/get-started/flutter/ios-setup",
+      "destination": "/get-started/sdks/flutter/ios-setup"
+    },
+    {
+      "source": "/get-started/flutter/google-signin",
+      "destination": "/get-started/sdks/flutter/google-signin"
+    },
+    {
+      "source": "/get-started/flutter/wallet-operations",
+      "destination": "/get-started/sdks/flutter/wallet-operations"
+    },
+    {
+      "source": "/get-started/flutter/provider-functions",
+      "destination": "/get-started/sdks/flutter/provider-functions"
+    },
+    {
+      "source": "/get-started/flutter/ui-components",
+      "destination": "/get-started/sdks/flutter/ui-components"
     }
   ]
 }

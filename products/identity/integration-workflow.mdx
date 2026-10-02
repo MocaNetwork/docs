@@ -18,7 +18,7 @@ Before starting the integration, ensure you have:
 The AIR Kit integration follows a structured approach:
 
 1. **Setup & Configuration** - Install SDKs and configure your environment
-2. **Configure JWKS** - Stand up a public HTTPS JWKS endpoint and register it in the Developer Dashboard. **Required before any `issueCredential` or `verifyCredential` call.** See [JWKS endpoint setup](/get-started/jwks-setup).
+2. **Configure JWKS** - Stand up a public HTTPS JWKS endpoint and register it in the Developer Dashboard. **Required before any `issueCredential` or `verifyCredential` call.** See [JWKS endpoint setup](/get-started/authentication/jwks-endpoint).
 3. **Issuer Integration** - Set up credential issuance capabilities
 4. **User Wallet Integration** - Enable users to store and manage credentials
 5. **Verification Integration** - Implement privacy-preserving verification
@@ -35,9 +35,9 @@ graph LR
     F --> G[Production]
 ```
 
-JWKS is a peer-tier dashboard account field alongside Partner ID, Issuer DID, and Verifier DID — configure it early. The [JWKS endpoint setup](/get-started/jwks-setup) page walks through the route, registration, and `kid` matching.
+JWKS is a peer-tier dashboard account field alongside Partner ID, Issuer DID, and Verifier DID — configure it early. The [JWKS endpoint setup](/get-started/authentication/jwks-endpoint) page walks through the route, registration, and `kid` matching.
 
-Learn more about how to integrate the SDKs in the [Quickstart](/get-started/quickstarts/) section.
+Learn more about how to integrate the SDKs in the [Quickstart](/get-started/quickstarts/login/) section.
 
 Once you've successfully integrated AIR Kit into your application, here are some next steps to consider:
 

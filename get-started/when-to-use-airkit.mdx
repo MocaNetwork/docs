@@ -1,28 +1,40 @@
 ---
-title: "When to Use AIR"
-sidebarTitle: "When to use AIR Kit"
-description: "Decision guide for AIR Kit credentials — when verifiable credentials and AIR Account are the right fit for your use case versus traditional auth or APIs."
+title: "When to use AIR Kit"
+description: "Decide whether AIR Kit fits your use case — when AIR Account login and verifiable credentials are a good fit, and when another approach works better."
 ---
 
+AIR Kit has two main parts you can adopt separately: **AIR Account** for login and wallets, and **AIR Credentials** for issuing and verifying claims about users. Use this page to check whether each one fits.
 
-{/* ## For Account
+## AIR Account
 
-### When to Use
-- [TBA ]
+**A good fit when you want to:**
 
-### Not Ideal For
-- [ TBA ] */}
+- Let users sign in with Google or email and get a wallet, without installing anything or managing a seed phrase.
+- Share one account with other apps in the AIR ecosystem, so returning users don't sign up again.
+- Add a wallet to an app that already has its own login, by passing your users in with [Custom Auth](/get-started/authentication/custom-auth).
 
-## For Credentials
+**Consider another approach when:**
 
-### When to Use
+- You need full control over the identity provider, account recovery, and user database, and don't want users to have a shared account across apps.
+- Your users must sign in only with their own external wallet. Wallet login is available as an add-on, not by default. See [EOA wallet authentication](/get-started/authentication/login#eoa-wallet-authentication-optional-add-on).
 
-- When users demand **proof-based access** without sharing sensitive personal data (KYC, gated content, regulatory compliance).
-- In ecosystems where **data portability, privacy, and user autonomy** are priorities (gaming, DeFi, Web3, loyalty, education).
-- To **unify fragmented user identities** and streamline onboarding across platforms.
+## AIR Credentials
 
-### Not Ideal For
+**A good fit when you want to:**
 
-- Use cases that require **central authority** over credential storage (e.g., when data value changes very quickly) or where **open, public data access** is necessary.
-- **Extremely rapid, low-latency verification flows** where decentralized checks could introduce unacceptable friction (though Moca Chain is optimized for performance).
-- Situations where **complex document uploads or visual/manual checks** (outside ZKP-compatible claims) are essential.
+- Let users prove something about themselves, such as a KYC result, membership tier, or age, without sending you the underlying documents.
+- Reuse a check another issuer has already done, so users don't repeat KYC or onboarding for every app.
+- Issue claims from your own data that users can present to partners, with no direct API integration between you and each partner.
+- Receive only the fields you need, so you store less personal data.
+
+**Consider another approach when:**
+
+- The data changes faster than you can reissue credentials, such as a live account balance. Query it directly from the source instead.
+- You need predicate checks, such as "older than 18" without revealing the birth date, or on-chain verification. These need [Iden3 credentials](/products/identity/iden3-credentials), which the AIR team enables on request.
+- The check depends on a person reviewing documents or images. Do that review in your own flow, then issue a credential with the result.
+
+## Next steps
+
+- [What is AIR Kit?](/get-started/what-is-airkit)
+- [Credential formats](/products/identity/credential-formats) to compare SD-JWT and Iden3 credentials
+- [Login quickstart](/get-started/quickstarts/login)

@@ -1,0 +1,22 @@
+---
+title: "Setting up your partner account"
+sidebarTitle: "Setting up your account"
+description: "Set up your AIR Kit partner account on the Developer Dashboard: get your Partner ID, add your domains, register your JWKS URL, and enable credential services."
+---
+
+Every AIR Kit integration starts with a partner account in the <a href="https://developers.sandbox.air3.com" target="_blank" rel="noreferrer">Developer Dashboard</a>. Sign in by connecting your EVM wallet, then set up the following.
+
+| Setting | Where | Needed for |
+| --- | --- | --- |
+| **Partner ID** | **Account → General Settings** (copy it) | Everything. You pass it to the SDK and your backend. |
+| **Name, logo, and website** | **Account → General Settings** | Shown to users during login, issuance, and verification. |
+| **Domains** | **Account → Domains** | Loading AIR Kit from your app's origin. |
+| **JWKS URL** | **Account → General Settings** | Issuing or verifying credentials, and [Custom Auth](/get-started/authentication/custom-auth). See [JWKS endpoint](/get-started/authentication/jwks-endpoint). |
+
+If you only use login, the Partner ID and domains are enough.
+
+## Enable credential services
+
+To issue or verify credentials, register your own DID with AIR. AIR does not create one for you: you publish it from your domain with your own keys. Until a DID is registered, the **Issuer** and **Verifier** menus stay hidden. See [Issuing credentials](/products/identity/issuing-credentials) for the steps.
+
+For a tour of every Dashboard section, see [Features](/get-started/dashboard/features). This page uses the sandbox Dashboard; production has its own, covered in the [Launch checklist](/get-started/launch-checklist).
