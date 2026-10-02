@@ -63,11 +63,6 @@
   "navbar": {
     "links": [
       {
-        "label": "Demo",
-        "icon": "up-right-from-square",
-        "href": "https://air-bd-v2.netlify.app"
-      },
-      {
         "label": "Partner with us",
         "href": "https://air3.com/partner-with-us"
       }
@@ -107,10 +102,9 @@
               "airkit/usage/getting-started",
               "airkit/airkit-dashboard",
               "airkit/environments",
-              "airkit/platform-matrix",
               "airkit/usage/installation",
-              "airkit/usage/initialization",
-              "airkit/usage/go-to-production"
+              "airkit/usage/go-to-production",
+              "airkit/platform-matrix"
             ]
           },
           {
@@ -128,6 +122,19 @@
               "airkit/usage/config-login",
               "airkit/usage/config-theming",
               "airkit/usage/config-language"
+            ]
+          },
+          {
+            "group": "Flutter",
+            "pages": [
+              "airkit/flutter/overview",
+              "airkit/flutter/installation",
+              "airkit/flutter/android-setup",
+              "airkit/flutter/ios-setup",
+              "airkit/flutter/google-signin",
+              "airkit/flutter/wallet-operations",
+              "airkit/flutter/provider-functions",
+              "airkit/flutter/ui-components"
             ]
           },
           {
@@ -395,6 +402,11 @@
         ]
       },
       {
+        "tab": "Demo",
+        "icon": "up-right-from-square",
+        "href": "https://air-bd-v2.netlify.app"
+      },
+      {
         "tab": "API References",
         "groups": [
           {
@@ -408,61 +420,24 @@
             ]
           },
           {
-            "group": "Web SDK",
-            "tag": "Identity",
-            "pages": [
-              "airkit/usage/reference"
-            ]
-          },
-          {
-            "group": "Flutter SDK",
-            "tag": "Identity",
-            "pages": [
-              "airkit/flutter/overview",
-              {
-                "group": "Setup & usage",
-                "expanded": false,
-                "pages": [
-                  "airkit/flutter/installation",
-                  "airkit/flutter/android-setup",
-                  "airkit/flutter/ios-setup",
-                  "airkit/flutter/google-signin",
-                  "airkit/flutter/wallet-operations",
-                  "airkit/flutter/provider-functions",
-                  "airkit/flutter/ui-components"
-                ]
-              }
-            ]
-          },
-          {
             "group": "Agent APIs",
-            "tag": "Agents",
             "pages": [
               "api-reference/agents/introduction",
-              {
-                "group": "Agent keys",
-                "pages": [
-                  "api-reference/agents/bind-agent-key",
-                  "api-reference/agents/list-agent-keys",
-                  "api-reference/agents/update-agent-key-nickname",
-                  "api-reference/agents/rotate-agent-key",
-                  "api-reference/agents/revoke-agent-key"
-                ]
-              },
-              {
-                "group": "Sessions",
-                "pages": [
-                  "api-reference/agents/create-agent-session",
-                  "api-reference/agents/create-checkout-session"
-                ]
-              },
-              {
-                "group": "Credentials",
-                "pages": [
-                  "api-reference/agents/list-credentials",
-                  "api-reference/agents/verify-credential-by-agent"
-                ]
-              }
+              "api-reference/agents/bind-agent-key",
+              "api-reference/agents/list-agent-keys",
+              "api-reference/agents/update-agent-key-nickname",
+              "api-reference/agents/rotate-agent-key",
+              "api-reference/agents/revoke-agent-key",
+              "api-reference/agents/create-agent-session",
+              "api-reference/agents/create-checkout-session",
+              "api-reference/agents/list-credentials",
+              "api-reference/agents/verify-credential-by-agent"
+            ]
+          },
+          {
+            "group": "Web SDK",
+            "pages": [
+              "airkit/usage/reference"
             ]
           },
           {
@@ -487,22 +462,11 @@
             ]
           },
           {
-            "group": "FAQs",
+            "group": "Resources",
             "pages": [
               "learn/help/faq",
-              "mocachain/help/faq"
-            ]
-          },
-          {
-            "group": "Status",
-            "pages": [
+              "concepts/glossary",
               "status"
-            ]
-          },
-          {
-            "group": "Glossary",
-            "pages": [
-              "concepts/glossary"
             ]
           }
         ]

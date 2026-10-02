@@ -1,10 +1,13 @@
 ---
-title: "Install the AIR Kit Web SDK"
-description: "Install the AIR Kit Web SDK with npm — @mocanetwork/airkit, available in ESM, CommonJS, and UMD module formats for web app integration."
+title: "Install and initialize AIR Kit"
+sidebarTitle: "Install and initialize"
+description: "Install the AIR Kit SDK for Web or Flutter, then create and initialize the AirService instance with your Partner ID and environment."
 ---
 
 <Tabs>
 <Tab title="Web">
+
+## Install
 
 <Info>
 **Latest version:** `1.12.1` — install with `npm i @mocanetwork/airkit@1.12.1`, or omit the version tag to get the latest release from npm. See [Release notes](/airkit/release-notes) for changes and migration guidance.
@@ -14,139 +17,96 @@ description: "Install the AIR Kit Web SDK with npm — @mocanetwork/airkit, avai
 npm i @mocanetwork/airkit
 ```
 
-### **Bundling**
-
-This module is distributed in 3 formats
+The package ships in three formats, and your bundler picks the right one automatically:
 
 - `esm` build `dist/airkit.esm.js` is es6 format
 - `commonjs` build `dist/airkit.cjs.js` in es5 format
 - `umd` build `dist/airkit.umd.min.js` In ES5 format without polyfilling corejs minified
 
-By default, the appropriate format is used for your specified use case. A different format can be used (if you know what you're doing) by referencing the correct file.
+To force a different format, reference its file directly.
+
+## Initialize
+
+AIR Kit creates an iframe that loads the login flow and sets up communication streams between the iframe and the DApp's JavaScript context.
+
+```js
+import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
+
+const airService = new AirService({
+  partnerId: YOUR_PARTNER_ID // Replace with your actual Partner ID
+});
+await airService.init({
+  buildEnv: BUILD_ENV.SANDBOX,
+  enableLogging: true,
+  preloadWallet: true, // Optional: Enable if wallet features will be used
+  preloadCredential: true, // Optional: Enable if credential features will be used
+  sessionConfig: {
+    locale: "en", // Optional: Enforce a locale; omit for automatic language selection
+    currency: "USD" // Optional: Display currency (e.g. "EUR", "USD", ...)
+  }
+});
+
+// Without any parameters, this will trigger the default Air login dialog which provides different login methods for the user to choose from.
+await airService.login();
+```
+
+Once `AirService` is initialized, you can use it to authenticate users. See [User login & sessions](/airkit/usage/user-authentication).
+
+AIR Kit bundles `en`, `ja`, `ko`, `tr`, and `vi`. To customize copy or add languages, use hosted JSON in partner configuration. See [Language & currency configuration](/airkit/usage/config-language).
 
 </Tab>
 <Tab title="Flutter">
 
-### Installation
+## Install
 
-Before you can install the AirKit Flutter package, you need to install the OnePub CLI in order to access our private package repository. We will provide you with the login credentials for OnePub.
-
-Open your terminal and use following commands:
+The Flutter package is hosted on OnePub, a private package repository. We will provide you with the OnePub login credentials.
 
 ```bash
 dart pub global activate onepub
 onepub login
-
+onepub pub add airkit
 ```
 
-<Warning>
-**OnePub PATH Troubleshooting**
+Then configure each platform for passkeys and app allowlisting:
 
-In case the `onepub` command is not recognized, adding following to your PATH should help:\
-`export PATH=$PATH:$HOME/.pub-cache/bin`
-</Warning>
+1. [Flutter installation](/airkit/flutter/installation): OnePub setup, `pubspec.yaml`, and import
+2. [Android setup](/airkit/flutter/android-setup): asset statements, SHA-256 fingerprint, `compileSdk` 34+, `minSdk` 26+
+3. [iOS setup](/airkit/flutter/ios-setup): associated domains, Apple App ID, iOS 14.0+
 
 <Note>
   For production mobile apps, keep the production AIR domain (`account.air3.com`) in your Android asset statements and iOS associated domains. Use `account.sandbox.air3.com` for Sandbox testing.
 </Note>
 
+## Initialize
 
+Create an `AirService` instance and call `initialize`:
 
-To install the AirKit Flutter package, you have two options. You can either manually add the package in the `pubspec.yaml` file, or you can use the `onepub pub add` command.
-
-Add `airkit` as a dependency to your `pubspec.yaml`.
-
-```yaml
-dependencies:
-  airkit:
-    hosted: https://onepub.dev/api/sxhddavuhn/
-    version: ^1.6.0
+```dart
+Future<void> initialize({
+    required String partnerId,
+    required GlobalKey<NavigatorState> navigatorKey,
+    Environment env = Environment.production,
+    bool enableLogging = false,
+})
 ```
 
-Add `airkit` using `onepub pub add` command.
+You receive your `partnerId` from us. The `navigatorKey` is used to overlay the dialogs that specific user flows need. During development, use `Environment.sandbox` and enable logging.
 
-```bash
-onepub pub add airkit
+```dart
+final navigatorKey = GlobalKey<NavigatorState>();
+final airService = AirService();
 
+await airService.initialize(
+  partnerId: 'YOUR_PARTNER_ID',
+  navigatorKey: navigatorKey,
+  env: Environment.sandbox,
+  enableLogging: true,
+);
+
+// In MaterialApp: navigatorKey: navigatorKey
 ```
 
-### Android Configuration
+See the [Flutter SDK overview](/airkit/flutter/overview) for wallet operations, provider functions, and UI components.
 
-### Generate SHA256 fingerprint
-
-In order to whitelist your Android app we would need the SHA-256 fingerprint of the certificate you use to sign your Android app. You will have different fingerprints for your debug and release builds.
-
-You can get this fingerprint by using the `keytool` command:
-
-```bash
-keytool -list -v -keystore <path-to-your-keystore> -alias <your-key-alias>
-
-```
-
-In addition to above fingerprints, we would also need the package name.
-
-### Update compileSdkVersion and minSdk
-
-For Android build `compileSdkVersion` needs to be at least `34` and `minSdk` needs to be at least `26`. Check your app module gradle file in your project to change it.
-
-```json
-android {
-    namespace "com.example.appname"
-    compileSdkVersion 34
-    // ..
-
-    defaultConfig {
-        minSdk = 26
-        // ..
-    }
-}
-
-```
-
-### Configure asset links
-
-For passkey to work, you need to add the following to your `android/app/src/main/res/values/strings.xml`:
-
-```xml
-<string name="asset_statements" translatable="false">
-[
-  {"include": "https://account.air3.com/.well-known/assetlinks.json"},
-  {"include": "https://account.sandbox.air3.com/.well-known/assetlinks.json"}
-]
-</string>
-
-```
-
-### iOS Configuration
-
-### App ID whitelisting
-
-In order to whitelist your iOS app we would need one or more valid Apple App IDs that consist of:
-
-1. Your **Apple Team ID**: This is a unique, 10-character alphanumeric string assigned to your developer account by Apple (e.g., `ABCDE12345`). You can find it in your Apple Developer account under "Membership Details" or by inspecting your provisioning profiles.
-2. Your App's **Bundle Identifier**: This is the unique identifier for your app, typically in reverse domain name format (e.g., `com.example.appname`). This is set in your Xcode project.
-
-The final format would be `ABCDE12345.com.example.appname`.
-
-### Update global iOS platform
-
-For iOS build global platform needs to be 14.0. Check `Podfile` in your project to change the global platform.
-
-```json
-platform :ios, '14.0'
-```
-
-### Configure associate domains
-
-In order to enable passkey, following steps need to be done:
-
-1. Open your project in Xcode (`ios/Runner.xcworkspace`).
-2. Select the `Runner` target, go to the **Signing & Capabilities** tab.
-3. Add the **Associated Domains** capability.
-4. Add following domains:
-   - `webcredentials:account.air3.com`
-   - `webcredentials:account.sandbox.air3.com`
-
-For dedicated Flutter guides (platform checklist, Google Sign-In, troubleshooting), see the **[Flutter](/airkit/flutter/overview)** section in the sidebar.
 </Tab>
 </Tabs>

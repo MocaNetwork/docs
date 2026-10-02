@@ -350,7 +350,7 @@ mobile-nav-tabs-item:focus-visible {
         height: 16px !important;
       }
     }
-    & > :nth-last-child(2) {
+    & > :nth-last-child(3) {
       margin-inline-start: auto;
     }
   }
