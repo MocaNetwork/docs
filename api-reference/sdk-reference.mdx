@@ -1,0 +1,553 @@
+---
+title: "AIR Kit SDK and REST API reference"
+sidebarTitle: "SDK reference"
+description: "AIR Kit API reference — Web SDK and Flutter SDK methods for AIR Account login, smart accounts, credentials, and the credential issuance REST API."
+---
+
+## REST API
+
+For on-demand credential issuance without user presence, resolve the user and store an encrypted credential in DStorage:
+
+- **Resolve user:** `POST /v1/auth/initialize-user`
+- **Store encrypted VC:** `POST /v1/dstorage/vcs`
+- **Sandbox:** `https://api.sandbox.mocachain.org/v1`
+- **Production:** `https://mocachain-mainnet.api.air3.com/v1`
+
+<Note>
+  The production endpoint serves Moca Chain mainnet. See [Production mainnet access](/get-started/environments#production-mainnet-access).
+</Note>
+
+Authenticate with a Partner JWT in the `x-partner-auth` header. Full endpoint reference and implementation examples: [Issuance API Reference](/api-reference/issuance-api).
+
+---
+
+<Tabs>
+
+<Tab title="Web">
+
+### AirService
+
+```ts
+class AirService {
+  constructor({ partnerId: string; });
+  get buildEnv(): BUILD_ENV_TYPE;
+  get isInitialized(): boolean;
+  get isLoggedIn(): boolean;
+  get isWalletInitialized(): boolean;
+  get provider(): EIP1193Provider;
+  init({
+    buildEnv: BUILD_ENV_TYPE;
+    // Only when buildEnv is PRODUCTION:
+    credentialNetwork?: "testnet" | "mainnet";
+    enableLogging: boolean;
+    skipRehydration: boolean;
+    preloadWallet: boolean;
+    preloadCredential: boolean;
+    sessionConfig?: Partial<AirSessionConfig>;
+  }): Promise<AirLoginResult | null>;
+  login(options?: { authToken?: string }): Promise<AirLoginResult>;
+  isSmartAccountDeployed(): Promise<boolean>;
+  deploySmartAccount(): Promise<{ txHash: string }>;
+  getProvider(): EIP1193Provider;
+  preloadWallet(): Promise<void>;
+  preloadCredential(): Promise<void>;
+  setupOrUpdateMfa(): Promise<void>;
+  getUserInfo(): Promise<AirUserDetails>;
+  goToPartner(partnerUrl: string): Promise<{ urlWithToken: string }>;
+  getAccessToken(): Promise<{ token: string }>;
+  updateSessionConfig(config: Partial<AirSessionConfig>): Promise<AirSessionConfig>;
+  showSwapUI(options?: ShowSwapUIOptions): Promise<{
+    txHash: `0x${string}`;
+    /** `amount` is in base units — divide by 10 ** decimals to display. */
+    from: Token & { amount: string };
+    to: Token & { amount: string };
+  }>;
+  showOnRampUI(options: {
+    displayCurrencyCode: string;
+    targetCurrencyCode?: string;
+  }): Promise<void>;
+  showTransferUI(options?: ShowTransferUIOptions): Promise<ShowTransferUIResult>;
+  showReceiveUI(): Promise<void>;
+  getAgentKeys(): Promise<AgentPublicKey[]>;
+  registerAgentKey(publicKey: string): Promise<AgentPublicKey>;
+  removeAgentKey(id: string): Promise<void>;
+  claimAirId(options?: ClaimAirIdOptions): Promise<ClaimAirIdResult>;
+  startRecovery(payload?: StartRecoveryPayload): Promise<void>;
+  issueCredential({
+    authToken: string;
+    issuerDid: string;
+    credentialId: string;
+    credentialSubject: Record<string, unknown>;
+    curve?: "secp256r1" | "secp256k1";
+    waitForOnchainCompletion?: boolean;
+  }): Promise<{ cakPublicKey?: string }>;
+  verifyCredential({
+    authToken: string;
+    programId: string;
+    redirectUrl?: string;
+    fieldsToDisclose?: "*" | string[];
+    nonce?: string;
+  }): Promise<CredentialVerificationResult>;
+  logout(): Promise<void>;
+  cleanUp(): Promise<void>;
+  on(listener: AirEventListener): void;
+  off(listener: AirEventListener): void;
+}
+```
+
+`claimAirId` and the `show*UI` methods are experimental and may change in future releases.
+
+`fieldsToDisclose` is required for `SD_JWT_VC` verification programs; `"*"` discloses every field, and dotted paths such as `address.city` select nested fields. See [Selective Disclosure](/products/identity/selective-disclosure). `nonce` is optional: pass a fresh value from your backend so that credentials with a holder key return a key-binding JWT. See [Verify SD-JWT on your backend](/products/identity/verify-sd-jwt).
+
+### Types
+
+```ts
+export type AirIdDetails = {
+  id: string;
+  name?: string;
+  node: string;
+  status: "minting" | "minted";
+  chainId: number;
+  imageUrl?: string;
+};
+
+export type AbstractAccountAddressEntry = {
+  readonly address: string;
+  readonly chainIds: readonly string[];
+};
+
+export type AirUserDetails = {
+  partnerId?: string;
+  airId?: AirIdDetails;
+  user: {
+    id: string;
+    abstractAccountAddress?: string;
+    email?: string;
+    wallet?: string;
+    isMFASetup: boolean;
+  };
+};
+
+export type AirInitializationResult = {
+  rehydrated: boolean;
+};
+
+export type AirLoginResult = {
+  isLoggedIn: boolean;
+  id: string;
+  abstractAccountAddress?: string;
+  abstractAccountAddresses?: readonly AbstractAccountAddressEntry[];
+  token: string;
+  isMFASetup: boolean;
+};
+
+export type AirWalletInitializedResult = {
+  abstractAccountAddress: string | null;
+  isMFASetup: boolean;
+};
+
+export type AgentPublicKey = {
+  id: string;
+  publicKey: string;
+  createdAt: string;
+};
+
+export type TokenSymbol = {
+  symbol: string;
+  chainId: number;
+};
+
+export type Token = TokenSymbol & {
+  decimals: number;
+  address: `0x${string}`;
+};
+
+export type ShowSwapUIOptions = {
+  /** Preferred "from" token. Used when the user holds a balance and the token is supported. */
+  initialFromToken?: TokenSymbol;
+  /** "From" token to show when the user holds no assets. */
+  fallbackFromToken?: TokenSymbol;
+  /** Preferred "to" token. */
+  initialToToken?: TokenSymbol;
+  /** Slippage tolerance, in percent. Omitted or out-of-range values use automatic slippage. */
+  defaultSlippage?: number;
+};
+
+export type ShowTransferUIOptions = {
+  tokenSymbol?: string;
+  chainId?: number;
+  recipientAddress?: string;
+  /** Display decimal string, e.g. "1.5" — not base units. */
+  amount?: string;
+};
+
+export type ShowTransferUIResult = {
+  txHash: `0x${string}`;
+  symbol: string;
+  chainId: number;
+  decimals: number;
+  address: `0x${string}`;
+  recipientAddress: string;
+  /** Display decimal string, as entered by the user. */
+  amount: string;
+};
+
+export type CredentialProof = {
+  type: string;
+  coreClaim?: string;
+  issuerData?: Record<string, unknown>;
+  signature?: string;
+  /** Compact SD-JWT presentation string (SD-JWT VC proof type). */
+  jwt?: string;
+  mtp?: Record<string, unknown>;
+};
+
+/** @deprecated No longer populated. Read verifiablePresentation instead. */
+export type DisclosedCredentialData = {
+  credentialSubject: Record<string, unknown>;
+  credentialType: string;
+  issuerDid: string;
+  issuanceDate: string;
+  expirationDate: string;
+  proof?: CredentialProof[];
+};
+
+/** A credential embedded in a Verifiable Presentation. */
+export type PresentationVerifiableCredential = {
+  "@context": string[];
+  type: string[];
+  issuer: string;
+  issuanceDate: string;
+  expirationDate?: string;
+  /** Disclosed subject fields, respecting selective disclosure. */
+  credentialSubject: Record<string, unknown>;
+  proof?: CredentialProof[];
+};
+
+/**
+ * Presentation-level proof. Present only when the verification program
+ * requires a zero-knowledge proof.
+ */
+export type VerifiablePresentationProof = {
+  type: string;
+  proofPurpose: "authentication";
+  circuitId: string;
+  /** Present when the program has multiple ZK queries. */
+  zkQueryId?: string;
+  proofValue: {
+    pi_a: string[];
+    pi_b: string[][];
+    pi_c: string[];
+    protocol?: string;
+    curve?: string;
+  };
+  publicSignals: string[];
+  /** On-chain submission hash, for on-chain programs only. */
+  transactionHash?: string;
+};
+
+export type AirVerifiablePresentation = {
+  "@context": string[];
+  type: string[];
+  /** The holder DID. */
+  holder: string;
+  /**
+   * Embedded credentials. For SD_JWT_VC programs, an
+   * EnvelopedVerifiableCredential whose `id` is a `data:` URL carrying the
+   * compact SD-JWT. W3C VC objects for BJJ_SIG_2021 programs.
+   * Type-check each entry before reading it.
+   */
+  verifiableCredential: Array<PresentationVerifiableCredential | string>;
+  /** Omitted when the program does not require a ZKP. */
+  proof?: VerifiablePresentationProof | VerifiablePresentationProof[];
+};
+
+export type CredentialVerificationResult =
+  | {
+      status:
+        | "Non-Compliant"
+        | "Pending"
+        | "Revoking"
+        | "Revoked"
+        | "Expired"
+        | "NotFound";
+    }
+  | {
+      status: "Compliant";
+      verifiablePresentation?: AirVerifiablePresentation;
+      cakPrivateKey?: string;
+      /** @deprecated Not populated. Use verifiablePresentation.proof. */
+      zkProofs?: Record<string, string>;
+      /** @deprecated Not populated. Use verifiablePresentation.proof.transactionHash. */
+      transactionHash?: string;
+      /** @deprecated Not populated. Use verifiablePresentation.verifiableCredential. */
+      disclosedData?: DisclosedCredentialData;
+    };
+
+export type ClaimAirIdResult = {
+  airId: AirIdDetails;
+};
+
+export type StartRecoveryOptions = {
+  type?:
+    /** Delete the current user's account. Performs its own email step-up. */
+    | "delete"
+    /** Create or rotate the current user's recovery key. Requires a session. */
+    | "recovery_key_setup"
+    /** Recover an account when the user lost email access, then set a new PIN. */
+    | "email_recovery"
+    /** Recover an account when the user forgot their PIN but still controls their email. */
+    | "pin_recovery"
+    /** Update the current user's email address. Requires a session. */
+    | "update_email"
+    /** Update the current user's PIN. Requires a session. */
+    | "update_pin";
+};
+
+export type StartRecoveryPayload = {
+  options?: StartRecoveryOptions;
+};
+
+export type AirEventOnInitialized = {
+  event: "initialized";
+  result: AirInitializationResult;
+};
+
+export type AirEventOnLoggedIn = {
+  event: "logged_in";
+  result: AirLoginResult;
+};
+
+export type AirEventOnAirIdMintingStarted = {
+  event: "air_id_minting_started";
+};
+
+export type AirEventOnAirIdMintingFailed = {
+  event: "air_id_minting_failed";
+  errorMessage?: string;
+};
+
+export type AirEventOnLoggedOut = {
+  event: "logged_out";
+};
+
+export type AirEventOnWalletInitialized = {
+  event: "wallet_initialized";
+  result: AirWalletInitializedResult;
+};
+
+export type AirEventData =
+  | AirEventOnInitialized
+  | AirEventOnLoggedIn
+  | AirEventOnWalletInitialized
+  | AirEventOnAirIdMintingStarted
+  | AirEventOnAirIdMintingFailed
+  | AirEventOnLoggedOut;
+
+export type AirEventListener = (data: AirEventData) => void;
+
+export type CredentialNetwork = "testnet" | "mainnet";
+
+export type SupportedCurrencyCode = "EUR" | "USD" | "CNY" | "KRW" | "TRY";
+
+export type AirSessionConfig = {
+  locale: string;
+  currency: SupportedCurrencyCode;
+};
+
+export type ClaimAirIdOptions =
+  | {
+      token?: string;
+      background?: false;
+      offchain?: boolean;
+    }
+  | {
+      token: string;
+      background: true;
+      offchain?: boolean;
+    };
+```
+
+</Tab>
+
+<Tab title="Flutter">
+
+### AirService
+
+```dart
+class AirService {
+
+  Stream<AirEvent> get airEvents;
+
+  void on(AirEventListener listener);
+  void off(AirEventListener listener);
+  void clearEventListeners();
+
+  bool get isInitialized;
+
+  Future<void> initialize({
+    required String partnerId,
+    Environment env = Environment.production,
+    required GlobalKey<NavigatorState> navigatorKey,
+    bool enableLogging = false,
+    SessionConfig? sessionConfig,
+  });
+
+  Future<LoginResult> login({
+    String? authToken,
+  });
+
+  Future<LoginResult> rehydrate();
+
+  Future<UserInfo> getUserInfo();
+
+  Future<SessionConfig> updateSessionConfig({
+    String? locale,
+    String? currency,
+  });
+
+  Future<void> preloadWallet();
+
+  Future<void> preloadCredential();
+
+  Future<CredentialIssuanceResult> issueCredential({
+    required String authToken,
+    required String issuerDid,
+    required String credentialId,
+    required Map<String, dynamic> credentialSubject,
+    String? curve,
+  });
+
+  Future<CredentialVerificationResult> verifyCredential({
+    required String authToken,
+    required String programId,
+    String? redirectUrl,
+  });
+
+  Future<String?> getAbstractAccountAddress();
+
+  Future<List<String>> getAccounts();
+
+  Future<void> setupOrUpdateMfa();
+
+  Future<BigInt> getBalance(String address);
+
+  Future<EthereumRpcSuccessResponse> call(
+    String address,
+    String function,
+    List<dynamic> params,
+    String abi,
+  );
+
+  Future<String> signMessage(String message);
+
+  Future<String> sendTransaction(Transaction transaction);
+
+  Future<EthereumRpcSuccessResponse> sendEthereumRpcRequest(
+    EthereumRpcRequest request
+  );
+
+  Future<String> deploySmartAccount();
+
+  Future<bool> isSmartAccountDeployed();
+
+  Future<void> showSwapUi();
+
+  Future<void> showOnRampUi({
+    required String displayCurrencyCode,
+    String? targetCurrencyCode,
+  });
+
+  Future<void> logout();
+
+  void cleanup();
+}
+```
+
+### Models
+
+```dart
+enum Environment { staging, uat, sandbox, production }
+
+class SessionConfig {
+  final String? locale;
+  final String? currency;
+}
+
+class LoginResult {
+  final bool isLoggedIn;
+  final String? id;
+  final String? abstractAccountAddress;
+  final String? token;
+  final bool? isMFASetup;
+}
+
+enum AirIdStatus {
+  minting,
+  minted,
+}
+
+class AirId {
+  final String id;
+  final String name;
+  final String node;
+  final AirIdStatus status;
+  final int? chainId;
+  final String? imageUrl;
+}
+
+class UserInfo {
+  final AirId? airId;
+  final String? partnerId;
+  final User? user;
+}
+
+class User {
+  final String id;
+  final String? abstractAccountAddress;
+  final String? email;
+  final bool isMFASetup;
+}
+
+class CredentialIssuanceResult {
+  final String? cakPublicKey;
+}
+
+class EthereumRpcRequest {
+  final String method;
+  final List<dynamic> params;
+  final String? requestId;
+}
+
+class EthereumRpcSuccessResponse {
+  final dynamic response;
+}
+
+class AirEvent { }
+
+class AirInitializedEvent extends AirEvent {}
+
+class AirLoggedInEvent extends AirEvent {
+  final LoginResult payload;
+}
+
+class AirLoggedOutEvent extends AirEvent { }
+
+class AirWalletInitializedEvent extends AirEvent { }
+
+typedef AirEventListener = void Function(AirEvent event);
+
+enum ExceptionType {
+  client,
+  sdk,
+  server,
+  unknown,
+}
+
+class AirKitException implements Exception {
+  final String message;
+  final ExceptionType type;
+}
+```
+</Tab>
+</Tabs>

@@ -1,0 +1,101 @@
+---
+title: "Delegation and consent"
+description: "Control what an agent may present and do on a user's behalf, get the user's approval before binding, and withdraw access when they disconnect."
+---
+
+import AgenticIdentityAvailability from "/snippets/agentic-identity-availability.mdx";
+
+<AgenticIdentityAvailability />
+
+An agent acts for a user only within the authority the user gives it. Today, that authority is the set of scopes on the agent's key. Delegation credentials, which are not yet released, would add finer-grained, per-task grants.
+
+## What the Agent APIs enforce today
+
+| Control | Behavior |
+| --- | --- |
+| Bound scopes | An agent key is bound with scopes such as `credentials.read`, `credentials.verify`, and `commerce.checkout`. It cannot act outside them. |
+| Session scopes | Each agent session can request a subset of the bound scopes. |
+| Session lifetime | Agent JWTs expire after 15 minutes and have no refresh token. |
+| Rotation | Rotating a key issues a new API key and invalidates agent JWTs already issued for it. |
+| Revocation | Revoking a key stops new sessions for that agent. |
+| Checkout audience | A checkout token is valid only for its merchant. AIR and Credential APIs reject it. |
+
+These controls limit what an agent can request from AIR. They don't express a per-merchant, per-claim, or per-action grant, and they don't replace the receiving application's own checks.
+
+## Ask for consent before binding
+
+The bind request has no user-facing approval step. Your application owns consent, so before you bind an agent:
+
+1. Show the user which agent they are connecting, using the nickname you will bind it with.
+2. Explain each scope in plain language:
+
+   | Scope | Tell the user the agent can |
+   | --- | --- |
+   | `credentials.read` | See which credentials they hold, such as issuer and credential type. |
+   | `credentials.verify` | Check their credentials against a verification program and share the result, including any claims the program discloses. |
+   | `commerce.checkout` | Start a checkout with a supported merchant, which receives their AIR Account address. |
+
+3. Bind only the scopes the user approved, and keep a record of the approval.
+
+Ask again before adding scopes. A key's scopes are fixed at bind time, so bind a new key for the wider set and revoke the old one.
+
+## Let users see and disconnect agents
+
+Give users a place in your product to review and remove connected agents:
+
+- List the agents your partner bound for the user with [List bound agents](/api-reference/agents/list-agent-keys).
+- When the user disconnects an agent, call [Revoke an agent key](/api-reference/agents/revoke-agent-key).
+- Revocation is documented as stopping new sessions. To also end sessions already issued, [rotate the key](/api-reference/agents/rotate-agent-key) before you revoke it.
+
+AIR Kit also has agent key calls that run in the user's own session (`getAgentKeys`, `registerAgentKey`, `removeAgentKey`). See the [Web SDK reference](/api-reference/sdk-reference).
+
+Removing access does not undo completed purchases or recall claims already disclosed.
+
+## Disclosure and purchase authority
+
+Permission to show a loyalty tier lets an agent get a member quote. Placing an order and paying need separate permission. With the Agent APIs, that means binding `commerce.checkout` only when the user wants the agent to start purchases.
+
+For each integration, define the claims an agent may present, the applications that may receive them, and the actions it may take. When the task changes, get the additional approval. For example, an agent allowed to compare hotel prices should ask again before it books a non-refundable room.
+
+## Proof, disclosure, and context
+
+| Information type | Example | What it means for the interaction |
+| --- | --- | --- |
+| Proof of eligibility | The user is over 18 ([see the demo](https://air-bd-v2.netlify.app/demo/agent-booking)) | The application can check a condition without the source document. The date of birth stays hidden. |
+| Approved disclosure | The user's loyalty tier | The recipient receives the specific claim approved for sharing. |
+| User context | A seat preference or product category | The agent can personalize its work, but a preference is not an issuer-verified fact. |
+
+Request only what the task needs. Proving one attribute does not grant access to the user's whole profile.
+
+## Delegation credentials
+
+**Not yet released.** A delegation credential would record a user's authorization for a specific agent and task, linking the agent to the user's AIR Account. The receiving application would check it alongside the user's claims.
+
+A grant could cover:
+
+| Part of the grant | Example | Purpose |
+| --- | --- | --- |
+| Granting user | The customer's AIR Account | Who authorizes the agent. |
+| Delegate | The shopping agent | Who receives the authority. |
+| Permitted claims | Membership and age eligibility | What the agent may present. |
+| Receiving application | One merchant | Where the grant applies. |
+| Duration | 24 hours | How long the authority lasts. |
+| Permitted action | Request a member price | What the agent may do. |
+
+These are illustrative terms, not API fields. Expiry would end a grant at a set time, and revocation would withdraw it earlier. How quickly revocation takes effect, and what happens to requests already in progress, will be defined with the release.
+
+## Spending limits
+
+A spending limit only works if the payment or wallet integration enforces it. The Agent APIs don't set spending caps. Decide whether a cap applies per purchase, per session, or over a period, and how concurrent requests count against it.
+
+Enforce the cap wherever money moves. A limit in one payment path doesn't protect a different path the agent can reach.
+
+## Match authority to the task
+
+- **One task:** get the evidence for a single interaction, and let the authority end with it.
+- **One session:** keep the approved scope across a multi-step shopping or booking flow.
+- **An ongoing relationship:** define renewal, expiry, withdrawal, and approval for repeated actions.
+
+An agent remembering a conversation or preference does not extend its authority. Scheduled purchases and standing spending mandates are not supported.
+
+Portable user context, such as preferences carried in credentials, needs its own schema and access model for each integration. AIR does not provide a general-purpose memory-sharing service.

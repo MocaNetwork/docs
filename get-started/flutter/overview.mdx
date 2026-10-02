@@ -1,0 +1,32 @@
+---
+title: "Flutter SDK overview"
+description: "Integrate AIR Kit in Flutter apps for AIR Account login, embedded wallets, credential issuance and verification, and native UI flows on iOS and Android."
+---
+
+## What to read first
+
+1. [Flutter installation](/get-started/flutter/installation) — OnePub setup and `pubspec.yaml`
+2. [Android setup](/get-started/flutter/android-setup) and [iOS setup](/get-started/flutter/ios-setup) — passkeys, asset links, associated domains
+3. [Install and initialize](/get-started/installation#initialize) (Flutter tab) and [Reference](/api-reference/sdk-reference) (Flutter tab) for `AirService` APIs
+
+## Capability summary
+
+See the [platform support matrix](/get-started/platform-matrix) for supported platforms, browsers, and package installs.
+
+Credential **issuance** and **verification** in the client SDK are available on Flutter. Start with [Issue credentials](/get-started/quickstarts/issue-credentials), [Verify credentials](/get-started/quickstarts/verify-credentials), [Issuing credentials](/products/identity/issuing-credentials), and [Verify](/products/identity/verify). [On-demand issuance](/api-reference/issuance-api) works from any backend.
+
+## Authentication on Flutter
+
+On Flutter, sign-in uses `login` with a **Partner JWT** (`authToken`) after `initialize()`. See [User login & sessions](/get-started/user-authentication) (Flutter tab) and [Partner authentication](/get-started/partner-authentication).
+
+## Environment and dashboard
+
+Use the [Developer Dashboard](https://developers.sandbox.air3.com/dashboard) for partner ID, programs, and configuration. Environment values match [Environments](/get-started/environments) (`Environment.sandbox`, `production`, etc.).
+
+## Related guides
+
+- [Google Sign-In](/get-started/flutter/google-signin) — Firebase / platform OAuth setup
+- [Wallet operations](/get-started/flutter/wallet-operations) — balances, transactions, signing
+- [Provider functions](/get-started/flutter/provider-functions) — JSON-RPC via `AirService`
+- [UI components](/get-started/flutter/ui-components) — login, swap, on-ramp, MFA
+- [Troubleshooting](/help/flutter-troubleshooting) — common Flutter issues

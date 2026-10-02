@@ -6,7 +6,7 @@ description: "Bind an agent to an AIR Account, mint short-lived agent JWTs, list
 
 The Agent APIs let your backend act for a holder, the signed-in user, through a bound agent. You bind an agent once, then mint a short-lived agent JWT for each operation and use it to list or verify the holder's credentials. If the agent's key includes checkout, you can also mint a token for a merchant checkout.
 
-For a step-by-step walkthrough with request examples, see the [Agent API quickstart](/agentic-identity/partner-agent-api). Get the user's approval before you bind an agent; the bind request has no approval step of its own. See [Ask for consent before binding](/agentic-identity/delegation-and-consent#ask-for-consent-before-binding).
+For a step-by-step walkthrough with request examples, see the [Agent API quickstart](/products/agents/partner-agent-api). Get the user's approval before you bind an agent; the bind request has no approval step of its own. See [Ask for consent before binding](/products/agents/delegation-and-consent#ask-for-consent-before-binding).
 
 ## Base URLs
 
@@ -33,7 +33,7 @@ Each route uses a different combination of headers.
 | `x-agent-api-key` | The `air_ag_…` key returned at bind or rotate | Session and checkout creation |
 | `Authorization: Bearer` | The agent JWT from session creation | List and verify credentials |
 
-Sign `x-partner-jwt` on your backend with the same key you use for AIR Kit login. Its `partnerId` must match `x-partner-id` and the holder's session. See [Partner authentication](/airkit/usage/partner-authentication) for key setup.
+Sign `x-partner-jwt` on your backend with the same key you use for AIR Kit login. Its `partnerId` must match `x-partner-id` and the holder's session. See [Partner authentication](/get-started/partner-authentication) for key setup.
 
 Session and checkout creation accept exactly one agent identity: the `x-agent-api-key` header, or a `signedMessage` in the body for agents bound with a P-256 public key.
 

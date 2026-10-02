@@ -33,7 +33,7 @@ For on-demand issuance, do not put the recipient email in the Partner JWT. Send 
 
 The JWT header must include `kid` (Key ID) matching a key in your JWKS endpoint and `typ: "JWT"`.
 
-For full setup instructions, key generation, and code examples see [Partner Authentication](/airkit/usage/partner-authentication).
+For full setup instructions, key generation, and code examples see [Partner Authentication](/get-started/partner-authentication).
 
 **Catalog endpoints** are public and require no authentication.
 
@@ -41,7 +41,7 @@ For full setup instructions, key generation, and code examples see [Partner Auth
 
 ## Credentials
 
-On-demand credential issuance resolves the recipient and stores an issuer-signed, holder-encrypted credential in DStorage. See the [Issuance API Reference](/airkit/usage/credential/issuance-api) for the `initialize-user` and `dstorage/vcs` endpoints, request and response details, and code examples.
+On-demand credential issuance resolves the recipient and stores an issuer-signed, holder-encrypted credential in DStorage. See the [Issuance API Reference](/api-reference/issuance-api) for the `initialize-user` and `dstorage/vcs` endpoints, request and response details, and code examples.
 
 ## Catalog
 
@@ -68,4 +68,4 @@ The Agent APIs use their own hosts and authentication. They let your backend bin
 
 ## Code examples
 
-For end-to-end integration examples including issue-and-poll flows, webhook-driven issuance, and retry logic, see [Issuance API Reference](/airkit/usage/credential/issuance-api).
+For end-to-end integration examples including issue-and-poll flows, webhook-driven issuance, and retry logic, see [Issuance API Reference](/api-reference/issuance-api).

@@ -1,0 +1,395 @@
+---
+title: "Verify SD-JWT on your backend"
+sidebarTitle: "Verify SD-JWT on your backend"
+description: "Verify the SD-JWT presentation returned by verifyCredential on your own server: issuer signature, disclosures, expiry, key binding, nonce, audience, and revocation."
+---
+
+Use this guide when you call `airService.verifyCredential(...)` against an `SD_JWT_VC` verification program and the result drives anything on your side, such as account upgrades, access, or payouts.
+
+AIR checks the presentation before it returns `Compliant`, but that check runs in the user's browser. Send the presentation to your backend and verify it there.
+
+## What you receive
+
+A `Compliant` result carries a W3C Verifiable Presentation. For `SD_JWT_VC` programs it wraps one compact SD-JWT inside an `EnvelopedVerifiableCredential`:
+
+```json
+{
+  "status": "Compliant",
+  "verifiablePresentation": {
+    "@context": ["https://www.w3.org/ns/credentials/v2"],
+    "type": ["VerifiablePresentation"],
+    "holder": "did:air:…",
+    "verifiableCredential": [
+      {
+        "@context": ["https://www.w3.org/ns/credentials/v2"],
+        "type": ["EnvelopedVerifiableCredential"],
+        "id": "data:application/dc+sd-jwt,<Issuer-JWT>~<Disclosure-1>~…~<Disclosure-N>~<KB-JWT>"
+      }
+    ]
+  }
+}
+```
+
+<Warning>
+  The presentation wrapper, including `holder`, is **not signed**. Only the compact SD-JWT inside `id` is. Everything you trust must come from that token.
+</Warning>
+
+Other statuses (i.e. `Non-Compliant`, `NotFound`) carry no presentation.
+
+## Holder key binding
+
+Holder binding stops a leaked credential from being presented by someone else.
+
+- **At issuance**, the user's AIR Account provides a P-256 public key, and the issuer writes it to the credential's `cnf.jwk` claim. In SDK issuance AIR sends the key to the issuer as `signingKey.jwk`, and the credential carries `cnf` whenever it does; [direct issuance](/products/identity/issuing-credentials#direct-issuance) has no holder present, so those credentials do not.
+- **At verification**, the holder signs a key-binding JWT (KB-JWT) with the matching private key. It covers your `nonce`, your `programId`, the signing time, and a hash of the disclosed claims, so it cannot be reused or edited.
+
+AIR attaches a KB-JWT only when **both** of these are true:
+
+1. You passed a `nonce` to `verifyCredential`.
+2. The credential's issuer JWT contains a holder key in `cnf.jwk` (EC P-256).
+
+The KB-JWT's `aud` is always the `programId` you passed.
+
+| You sent `nonce` | Issuer JWT has `cnf.jwk` | Token ends with | What it proves |
+| --- | --- | --- | --- |
+| No | Either | `~` | The issuer issued these claims. Anyone holding the token can replay it. |
+| Yes | No | `~` | Same as above. The credential has no holder key, so it cannot be holder-bound. |
+| Yes | Yes | `~<KB-JWT>` | The holder's key signed this exact presentation, for your nonce and your `programId`. |
+
+Without a KB-JWT the token is a **bearer** presentation: if it leaks through logs, proxies, or a malicious script on the page, someone else can submit it as their own. If that matters for your use case, always send a nonce and require holder binding.
+
+## Recommended flow
+
+<Steps>
+  <Step title="Create a nonce on your backend">
+    Generate at least 128 bits of randomness, for example `crypto.randomBytes(16).toString("base64url")`, and store it against the user's session.
+  </Step>
+  <Step title="Pass it to verifyCredential">
+    ```ts
+    const result = await airService.verifyCredential({
+      authToken,
+      programId,
+      fieldsToDisclose: ["given_name", "address.city"], // required for SD_JWT_VC programs; "*" discloses all
+      nonce, // from your backend
+    });
+    ```
+  </Step>
+  <Step title="Send the presentation to your backend">
+    On `Compliant`, post `result.verifiablePresentation` to your backend.
+  </Step>
+  <Step title="Verify, then consume the nonce">
+    Run the checks below, then delete the nonce so it cannot be used again.
+  </Step>
+</Steps>
+
+## Token anatomy
+
+The compact token is `~`-separated:
+
+```text
+<Issuer-JWT>~<Disclosure-1>~…~<Disclosure-N>~             no KB-JWT
+<Issuer-JWT>~<Disclosure-1>~…~<Disclosure-N>~<KB-JWT>     with KB-JWT
+```
+
+To get it, take `verifiableCredential[0].id` and strip the `data:application/dc+sd-jwt,` prefix. Older results may use `data:application/vc+sd-jwt,`; accept both.
+
+**Issuer JWT.** Signed by the credential issuer. The payload carries the always-visible claims, plus `_sd` digests for the selectively disclosable ones:
+
+```json
+{
+  "iss": "did:web:issuer.example",
+  "vct": "<credential type>",
+  "iat": 1790000000,
+  "exp": 1821536000,
+  "cnf": { "jwk": { "kty": "EC", "crv": "P-256", "x": "…", "y": "…" } },
+  "status": { "status_list": { "idx": 42, "uri": "https://…" } },
+  "_sd_alg": "sha-256",
+  "_sd": ["<digest>", "<digest>"]
+}
+```
+
+`cnf` is present only on holder-bound credentials, and `status` only when the issuer publishes a [token status list](/products/identity/revocation#token-status-list).
+
+**Disclosures.** Each is base64url-encoded JSON such as `["<salt>", "given_name", "Ada"]`. A disclosure is valid only if its SHA-256 digest appears in an `_sd` array of the signed payload. The token contains only the disclosures for the fields you requested; the others stay hidden behind their digests.
+
+**KB-JWT.** Signed by the holder's key from `cnf.jwk`:
+
+```json
+// header
+{ "typ": "kb+jwt", "alg": "ES256" }
+// payload
+{ "nonce": "<your nonce>", "aud": "<your programId>", "iat": 1790000000, "sd_hash": "<base64url SHA-256>" }
+```
+
+`sd_hash` is the base64url SHA-256 of everything before the KB-JWT, including the trailing `~`. It locks the set of disclosures, so nobody can add or remove one after the holder signed.
+
+## Checks
+
+### Always
+
+1. **Issuer is trusted.** `iss` is on your allowlist. Choose the issuer's key source from your own configuration, never from a URL taken from the token.
+2. **Issuer signature is valid**, using the issuer's keys:
+   - `did:web` issuer: fetch the DID document. `did:web:issuer.example` resolves to `https://issuer.example/.well-known/did.json`, and `did:web:issuer.example:path` to `https://issuer.example/path/did.json`. Use the `publicKeyJwk` of its `assertionMethod` entries. The JWT header `kid` is the full DID URL (`did:web:issuer.example#key-1`); older credentials carry only the fragment (`key-1`).
+   - HTTPS issuer: use the issuer's JWKS URL, the one registered with AIR for the issuing partner. If you are the issuer, that is your own JWKS URL.
+3. **Disclosures are genuine.** `_sd_alg` is `sha-256`, and every disclosure's digest appears in the signed payload.
+4. **Credential is in date.** `exp` has not passed, and `nbf` (if present) has.
+5. **Credential type is right.** `vct` equals the type you expect.
+6. **You got what you asked for.** Every field in your `fieldsToDisclose` is present among the verified claims.
+7. **Optional: not revoked.** See [Revocation](#revocation).
+
+### Additionally, when a KB-JWT is expected
+
+Expect a KB-JWT whenever you sent a nonce and the issuer JWT has `cnf.jwk`.
+
+1. **KB-JWT is present.** If it is missing, reject: someone stripped the binding.
+2. **Header** is `typ: kb+jwt` with `alg: ES256`.
+3. **Signature** verifies against the issuer JWT's `cnf.jwk`.
+4. `nonce` equals the nonce you issued for this session. Consume it after one check.
+5. `aud` equals your `programId`.
+6. `iat` is recent: no older than your freshness window (for example 5 minutes), and not in the future beyond a small clock-skew allowance (for example 60 seconds).
+7. `sd_hash` equals the base64url SHA-256 of the token up to and including the `~` before the KB-JWT.
+
+### Decision table
+
+| You sent `nonce` | `cnf.jwk` | KB-JWT present | Action |
+| --- | --- | --- | --- |
+| No | Either | No | Accept only if a bearer presentation is acceptable for your use case. |
+| Yes | Yes | Yes | Run every check above. Accept if all pass. |
+| Yes | Yes | No | **Reject.** AIR always attaches it in this case, so it was removed. |
+| Yes | No | No | The credential cannot be holder-bound. Reject if you require binding, otherwise treat it as bearer. |
+| No | Either | Yes | AIR does not produce this. The KB-JWT proves nothing without your nonce; treat it as bearer. |
+
+A KB-JWT whose `nonce`, `aud`, signature, or `sd_hash` does not match is always a rejection.
+
+## Reference implementation (TypeScript, Node.js)
+
+Built on [`@sd-jwt/sd-jwt-vc`](https://github.com/openwallet-foundation/sd-jwt-js) and [`jose`](https://github.com/panva/jose), the libraries AIR itself uses. Tested with `@sd-jwt/sd-jwt-vc` 0.20 and `jose` 5 on Node.js 22, covering the valid cases and the rejections in the decision table: stripped KB-JWT, wrong `aud`, wrong nonce, stale KB-JWT, a disclosure removed after signing, and a forged issuer signature.
+
+```bash
+npm i @sd-jwt/sd-jwt-vc@^0.20 jose@^5
+```
+
+The code works around two library behaviors:
+
+- The library checks the KB-JWT's `typ`, signature, `nonce`, and `sd_hash`, but **not** `aud` or how old `iat` is. The function checks those itself.
+- The library **ignores the KB-JWT entirely** unless you pass `keyBindingNonce`. The function passes it whenever a KB-JWT is expected, so a stripped KB-JWT fails with `Key Binding JWT not exist`.
+
+```ts verify-air-sd-jwt.ts
+import { createHash } from "node:crypto";
+import { SDJwtVcInstance } from "@sd-jwt/sd-jwt-vc";
+import {
+  compactVerify,
+  createLocalJWKSet,
+  createRemoteJWKSet,
+  decodeJwt,
+  importJWK,
+  type JWK,
+} from "jose";
+
+/** An issuer you accept, and where its signing keys are published. */
+export type TrustedIssuer =
+  | { iss: `did:web:${string}` } // keys from the DID document's assertionMethod
+  | { iss: string; jwksUrl: string }; // keys from the issuer's JWKS
+
+export type VerifyAirSdJwtInput = {
+  /** `verifiablePresentation` from a Compliant `verifyCredential` result. */
+  verifiablePresentation: { verifiableCredential?: Array<{ id?: unknown }> };
+  /** The `programId` you passed to `verifyCredential`. It is the KB-JWT `aud`. */
+  programId: string;
+  /** The `nonce` you passed to `verifyCredential`. Omit it if you passed none. */
+  expectedNonce?: string;
+  /** Reject presentations that are not holder-bound. */
+  requireHolderBinding?: boolean;
+  trustedIssuers: TrustedIssuer[];
+  expectedVct: string;
+  /** Claims that must be present, for example your `fieldsToDisclose`. */
+  requiredClaims?: string[];
+  /** Maximum KB-JWT age. Default 300. */
+  maxKbAgeSeconds?: number;
+  /** Tolerated clock difference with the holder's device. Default 60. */
+  skewSeconds?: number;
+  /** Check the issuer's Token Status List (revocation). Default false. */
+  checkStatus?: boolean;
+};
+
+const ENVELOPE_PREFIXES = ["data:application/dc+sd-jwt,", "data:application/vc+sd-jwt,"];
+
+export function extractCompactSdJwt(vp: VerifyAirSdJwtInput["verifiablePresentation"]): string {
+  const id = vp.verifiableCredential?.[0]?.id;
+  const prefix = ENVELOPE_PREFIXES.find((p) => typeof id === "string" && id.startsWith(p));
+  if (typeof id !== "string" || !prefix) {
+    throw new Error("The presentation does not contain an enveloped SD-JWT");
+  }
+  return id.slice(prefix.length);
+}
+
+const sha256 = (data: string | ArrayBuffer, alg: string): Uint8Array => {
+  if (alg !== "sha-256") throw new Error(`Unsupported _sd_alg: ${alg}`);
+  return createHash("sha256")
+    .update(typeof data === "string" ? data : new Uint8Array(data))
+    .digest();
+};
+
+type DidVerificationMethod = { id: string; publicKeyJwk?: JWK };
+type DidDocument = {
+  verificationMethod?: DidVerificationMethod[];
+  assertionMethod?: Array<string | DidVerificationMethod>;
+};
+
+async function didWebKeySet(did: string) {
+  const [host, ...path] = did.slice("did:web:".length).split(":");
+  const origin = `https://${host.replace(/%3A/gi, ":")}`;
+  const url = path.length
+    ? `${origin}/${path.join("/")}/did.json`
+    : `${origin}/.well-known/did.json`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`DID document fetch failed: HTTP ${res.status}`);
+  const doc = (await res.json()) as DidDocument;
+
+  const absolute = (id: string) => (id.startsWith("#") ? `${did}${id}` : id);
+  const methods = new Map((doc.verificationMethod ?? []).map((vm) => [absolute(vm.id), vm]));
+  const keys: JWK[] = [];
+  for (const ref of doc.assertionMethod ?? []) {
+    const vm = typeof ref === "string" ? methods.get(absolute(ref)) : ref;
+    if (!vm?.publicKeyJwk) continue;
+    const id = absolute(vm.id);
+    // Current credentials use the full DID URL as `kid`; older ones use only the fragment.
+    keys.push({ ...vm.publicKeyJwk, kid: id });
+    const fragment = id.split("#")[1];
+    if (fragment) keys.push({ ...vm.publicKeyJwk, kid: fragment });
+  }
+  return createLocalJWKSet({ keys });
+}
+
+export async function verifyAirSdJwt(input: VerifyAirSdJwtInput) {
+  const {
+    programId,
+    expectedNonce,
+    requireHolderBinding = false,
+    maxKbAgeSeconds = 300,
+    skewSeconds = 60,
+    checkStatus = false,
+  } = input;
+  const compact = extractCompactSdJwt(input.verifiablePresentation);
+
+  // Unverified read, used only to select keys. The signature check below covers these claims.
+  const unverified = decodeJwt(compact.split("~")[0]);
+  const issuer = input.trustedIssuers.find((t) => t.iss === unverified.iss);
+  if (!issuer) throw new Error(`Untrusted issuer: ${String(unverified.iss)}`);
+  const issuerKeys =
+    "jwksUrl" in issuer
+      ? createRemoteJWKSet(new URL(issuer.jwksUrl))
+      : await didWebKeySet(issuer.iss);
+
+  const cnf = unverified.cnf;
+  const holderBindable = typeof cnf === "object" && cnf !== null && "jwk" in cnf;
+  if (requireHolderBinding && !(expectedNonce && holderBindable)) {
+    throw new Error(
+      "Holder binding required: send a nonce and accept only credentials with cnf.jwk"
+    );
+  }
+  // With a nonce and cnf.jwk, Air always attaches a KB-JWT, so a missing one means it was stripped.
+  const keyBindingNonce = expectedNonce && holderBindable ? expectedNonce : undefined;
+
+  const verifyIssuerSignature = async (data: string, sig: string) => {
+    try {
+      await compactVerify(`${data}.${sig}`, issuerKeys);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const sdjwt = new SDJwtVcInstance({
+    hasher: sha256,
+    verifier: verifyIssuerSignature,
+    statusVerifier: verifyIssuerSignature,
+    kbVerifier: async (data, sig, payload) => {
+      const jwk = payload.cnf?.jwk;
+      if (jwk?.kty !== "EC") return false;
+      try {
+        const key = await importJWK({ kty: "EC", crv: jwk.crv, x: jwk.x, y: jwk.y }, "ES256");
+        await compactVerify(`${data}.${sig}`, key, { algorithms: ["ES256"] });
+        return true;
+      } catch {
+        return false;
+      }
+    },
+  });
+
+  // Checks the issuer signature, disclosure digests, exp/nbf, and, when keyBindingNonce is set,
+  // the KB-JWT's typ, signature, nonce and sd_hash.
+  const { payload, kb } = await sdjwt.verify(compact, {
+    keyBindingNonce,
+    requiredClaimKeys: input.requiredClaims,
+    skewSeconds,
+    disableStatusVerification: !checkStatus,
+  });
+
+  if (payload.vct !== input.expectedVct) throw new Error(`Unexpected vct: ${payload.vct}`);
+  if (keyBindingNonce) {
+    // The library does not check the KB-JWT audience or age.
+    if (!kb) throw new Error("Missing KB-JWT");
+    if (kb.payload.aud !== programId) throw new Error(`KB-JWT aud mismatch: ${kb.payload.aud}`);
+    if (Math.floor(Date.now() / 1000) - kb.payload.iat > maxKbAgeSeconds) {
+      throw new Error("KB-JWT is too old");
+    }
+  }
+
+  return { claims: payload, holderBound: keyBindingNonce !== undefined };
+}
+```
+
+Usage on your backend:
+
+```ts
+const { claims, holderBound } = await verifyAirSdJwt({
+  verifiablePresentation: body.verifiablePresentation,
+  programId: "<your programId>",
+  expectedNonce: await consumeNonce(session), // your store: return the session's nonce and delete it
+  requireHolderBinding: true,
+  trustedIssuers: [{ iss: "did:web:issuer.example" }],
+  expectedVct: "<credential type>",
+  requiredClaims: ["given_name", "address.city"],
+});
+```
+
+`claims` holds every verified claim: the always-visible ones (`iss`, `vct`, `cnf`, and so on) plus the disclosed fields, with nested fields as nested objects (`claims.address.city`). Undisclosed fields are absent. `holderBound` tells you whether a KB-JWT was verified.
+
+Any failure throws, so treat an exception as "not verified".
+
+## Revocation
+
+Credentials whose issuer publishes an [IETF Token Status List](https://datatracker.ietf.org/doc/draft-ietf-oauth-status-list/) carry `status.status_list.{uri, idx}` in the issuer JWT. To check it, pass `checkStatus: true`. The library then:
+
+1. Fetches `uri` with `Accept: application/statuslist+jwt`. The response must use that content type.
+2. Verifies the status-list JWT with the same issuer keys.
+3. Rejects the credential if the entry at `idx` is not `0` (valid).
+
+AIR performs this check during `verifyCredential` only when the verification program enables issuer revocation checks. If you store presentations and re-verify them later, check the status at that point. Issuers without a status list answer per credential at `GET /revocation-status/:nonce`; see [Revoke credentials](/products/identity/revocation).
+
+## Troubleshooting
+
+| Error | Likely cause |
+| --- | --- |
+| `The presentation does not contain an enveloped SD-JWT` | Not an `SD_JWT_VC` program, or not a `Compliant` result. |
+| `Untrusted issuer: …` | `iss` is not in `trustedIssuers`. Compare it exactly, including the `did:web:` prefix. |
+| `Verify Error: Invalid JWT Signature` | The issuer key set has no key matching the header `kid` (check the DID document or JWKS), the token was altered, or the KB-JWT was not signed by `cnf.jwk`. |
+| `Key Binding JWT not exist` | You sent a nonce, the credential has `cnf.jwk`, but the token has no KB-JWT. Reject. |
+| `Verify Error: Invalid Nonce` | KB-JWT `nonce` differs from the one you issued: a replay, or the wrong session's nonce. |
+| `KB-JWT aud mismatch: …` | The presentation was made for a different `programId`. |
+| `KB-JWT is too old` / `Verify Error: JWT is not yet valid` | KB-JWT `iat` is outside your window. Check your server clock, or adjust `maxKbAgeSeconds` / `skewSeconds`. |
+| `Invalid sd_hash in Key Binding JWT` | Disclosures were added or removed after the holder signed. |
+| `Missing required claim keys: …` | A field you required was not disclosed. Use dotted paths for nested fields (`address.city`). |
+| `Unexpected vct: …` | The credential is a different type than you expected. |
+| `Verify Error: JWT is expired` | The credential's `exp` has passed. |
+| `Status is not valid` | The credential is revoked (only with `checkStatus: true`). |
+| `Status List JWT verification failed: …` | The status list could not be fetched or its signature did not verify. |
+
+## References
+
+- [Selective Disclosure for JWTs (SD-JWT)](https://datatracker.ietf.org/doc/draft-ietf-oauth-selective-disclosure-jwt/): token format, disclosures, KB-JWT, `sd_hash`.
+- [SD-JWT-based Verifiable Credentials (SD-JWT VC)](https://datatracker.ietf.org/doc/draft-ietf-oauth-sd-jwt-vc/): `vct`, `cnf`, `status`, `dc+sd-jwt` media type.
+- [Token Status List](https://datatracker.ietf.org/doc/draft-ietf-oauth-status-list/): revocation.
+- [VC Data Model 2.0: Enveloped Verifiable Credentials](https://www.w3.org/TR/vc-data-model-2.0/#enveloped-verifiable-credentials): the `data:` URL wrapper.
+- [did:web method](https://w3c-ccg.github.io/did-method-web/): resolving `did:web` issuers.

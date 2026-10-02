@@ -1,0 +1,151 @@
+---
+title: "Selective Disclosure"
+description: "Selective disclosure lets verifiers read only the credential fields they request, with the holder's approval. It is built into SD-JWT VC credentials."
+---
+
+Selective disclosure lets a verifier request specific fields from a credential, and the holder share only those, with their approval. It is built into SD-JWT VC credentials, the default format.
+
+**How it works for SD-JWT.** At issuance, each selectively disclosable claim is replaced in the signed credential by a salted digest. The issuer chooses these claims with the `disclosureFrame` in its schema class. At verification, the holder sends the disclosures for the fields you request. You can check each one against its digest, and the rest stay hidden. Claims outside the `disclosureFrame` are always visible.
+
+Iden3 programs can instead prove a condition, such as `membershipTier > bronze`, with a zero-knowledge proof. See [Iden3 credentials](/products/identity/iden3-credentials).
+
+## When to Use It
+
+Selective Disclosure is useful when the Verifier needs a specific value, but not the whole credential, to choose the right reward, access level, or next step.
+
+A common example is a **membership rewards flow**:
+
+- A user proves they hold a valid membership credential.
+- The Verifier requests only `membershipTier`, not the member's name, ID, or points balance.
+- The holder approves, and the Verifier confirms the value is `gold` and grants the Gold reward.
+
+In this flow, Selective Disclosure gives the Verifier the one field it needs to apply the correct business logic, and nothing else.
+
+Other typical scenarios:
+
+- A loyalty program that discloses `rewardPoints` only after the credential is verified.
+- A KYC Verifier that needs `countryCode` and `kycLevel` to route the user through the correct compliance flow.
+- A ticketing partner that needs `seatTier` to issue a physical wristband at the venue.
+- A fintech onboarding step where an analyst reviews disclosed `verifiedAt` timestamps.
+
+## Prerequisites
+
+Before using Selective Disclosure you need:
+
+1. **Latest AIR Kit SDK** — Install or upgrade to the latest version of `@mocanetwork/airkit`. Nested field paths need 1.12.1 or later.
+2. **SD-JWT credential with disclosable claims** — The Issuer lists the claims in `disclosureFrame._sd` and has **Allow data disclosure** turned on for the issuance program.
+3. **Active verification program** — A published verification program in the Developer Dashboard (Verifier → Programs).
+4. **Partner JWT with `scope=verify`** — See [Partner Authentication](/get-started/partner-authentication).
+
+## Step 1: Enable Disclosure on the Issuance Program
+
+Selective Disclosure must be enabled by the **Issuer**. As a Verifier, you cannot request disclosed data unless the Issuer has opted in.
+
+In the issuer service, list each disclosable claim in the schema class's `disclosureFrame`:
+
+```ts
+public readonly disclosureFrame: DisclosureFrame<Claim> = {
+  _sd: ["membershipTier", "rewardPoints"],
+};
+```
+
+Then enable disclosure on the issuance program in the Dashboard:
+
+<Steps>
+  <Step title="Open the Developer Dashboard">
+    Sign in to the <a href="https://developers.sandbox.air3.com/dashboard" target="_blank" rel="noreferrer">Developer Dashboard</a> with your Issuer account.
+  </Step>
+  <Step title="Create or edit an issuance program">
+    Navigate to **Issuer → Programs** and either create a new program (Issue Pricing) or open an existing one to edit.
+  </Step>
+  <Step title="Expand Advanced set up">
+    In the credential form, expand the **Advanced set up** section.
+  </Step>
+  <Step title="Enable Allow data disclosure">
+    Toggle **Allow data disclosure** on, then save the program.
+  </Step>
+</Steps>
+
+Any credential issued from this program will now support Selective Disclosure during verification.
+
+## Step 2: Request Disclosure During Verification
+
+On the Verifier side, pass `fieldsToDisclose` to `airService.verifyCredential`, along with a `nonce` from your backend. `fieldsToDisclose` is required for `SD_JWT_VC` programs. There are two supported shapes.
+
+### Disclose the Entire Credential Subject
+
+Pass `'*'` to receive every field in the credential subject.
+
+<Tabs>
+<Tab title="Web">
+
+```ts
+const result = await airService!.verifyCredential({
+  authToken,
+  programId,
+  fieldsToDisclose: '*',
+  nonce,
+});
+```
+
+</Tab>
+</Tabs>
+
+### Disclose Specific Fields
+
+Pass an array of field names from the credential subject. Only the listed fields are returned. Use dotted paths for nested fields, such as `address.city`.
+
+```ts
+const result = await airService!.verifyCredential({
+  authToken,
+  programId,
+  fieldsToDisclose: ['membershipTier', 'address.city'],
+  nonce,
+});
+```
+
+
+<Note>
+Field names in `fieldsToDisclose` must match keys defined in the credential schema. Fields the Issuer has not enabled for disclosure are silently omitted.
+</Note>
+
+## Response Shape
+
+When the verification result is `Compliant`, the disclosed fields are inside the W3C Verifiable Presentation on `verifiablePresentation`.
+
+For `SD_JWT_VC` programs, `verifiableCredential[0]` is an `EnvelopedVerifiableCredential`. Its `id` is `data:application/dc+sd-jwt,` followed by the compact SD-JWT, which carries one disclosure per requested field:
+
+```text
+<Issuer-JWT>~<Disclosure: membershipTier>~<Disclosure: address.city>~<KB-JWT>
+```
+
+Do not read the disclosed values in the browser and trust them. Send the presentation to your backend, verify it, and read the claims from the verified result. See [Verify SD-JWT on your backend](/products/identity/verify-sd-jwt): its reference implementation returns the verified claims, with nested fields as nested objects (`claims.address.city`).
+
+For Iden3 programs, `verifiableCredential` holds W3C Verifiable Credential objects whose `credentialSubject` contains the requested fields.
+
+<Note>
+  **Deprecated as of 1.11.** Disclosure used to be returned on a top-level `disclosedData` object alongside `zkProofs` and `transactionHash`. Those fields are no longer populated — read `verifiablePresentation` instead. See the [1.11.1 release notes](/api-reference/release-notes).
+</Note>
+
+## Behavior and Limits
+
+- Disclosed fields are only returned when `status === "Compliant"`. Non-compliant verifications never expose credential data.
+- If the Issuer has not enabled **Allow data disclosure** on the program, `fieldsToDisclose` is ignored and no disclosed claims appear in the presentation.
+- Requesting fields that do not exist on the schema or were not enabled for disclosure does not fail the verification — those fields are simply absent.
+- `fieldsToDisclose` is **required** for `SD_JWT_VC` programs — an empty array or an omitted value is rejected.
+- Disclosure is additive, not a replacement for verification. The issuer signature, expiry, and key binding are checked regardless of which fields you disclose.
+- SD-JWT disclosures reveal exact values. To prove a condition without revealing the value, use an [Iden3 program](/products/identity/iden3-credentials).
+
+<Tip>
+Treat the disclosed `credentialSubject` as user data: store it only as long as you need it for the downstream action (redemption, compliance review, fulfillment), and apply the same retention rules as any PII you receive directly from the user.
+</Tip>
+
+## Related
+
+<Card title="Verifying Credentials" icon="arrow-right" href="/products/identity/verify">
+  The base verification flow that Selective Disclosure builds on.
+</Card>
+
+<Card title="Partner Authentication" icon="key" href="/get-started/partner-authentication">
+  Generate the `scope=verify` Partner JWT used as `authToken`.
+</Card>

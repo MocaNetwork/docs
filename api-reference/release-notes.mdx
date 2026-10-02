@@ -1,0 +1,414 @@
+---
+title: "Release Notes"
+description: "AIR Kit SDK release notes — version history, new features, breaking changes, deprecations, and migration notes for partners upgrading their integration."
+---
+
+# **Version 1.12.1 (Sep 16, 2026)**
+
+### ✨ **New Features**
+- **Japanese, Vietnamese, and Turkish UI localization** — the SDK UI now ships `ja`, `vi`, and `tr` catalogs alongside existing locales. They are picked up automatically via `sessionConfig.locale` or browser language detection; no partner action needed unless you restrict `supportedLocales`
+- **Scoped agent keys** — `registerAgentKey` now accepts an OAuth `scope`, so you can bind credential-only agent keys without a signing key. `AgentPublicKey` now returns optional `scope` and `nickname` fields, and `getAgentKeys` returns the same enriched shape
+- **Optional `nonce` for SD-JWT verification** — `nonce` is no longer required for `SD_JWT_VC` programs. Omit it to skip the key-binding JWT entirely; when supplied, a KB-JWT is attached only if the issuer JWT carries `cnf.jwk` — see [Verifying credentials](/products/identity/verify)
+- **Nested selective disclosure for SD-JWT** — `fieldsToDisclose` now accepts dotted claim paths (e.g. `address.city`) to disclose nested claims on `SD_JWT_VC` programs
+- **Issuer revocation checks** — verification programs can enable issuer-revocation checking; revoked credentials are excluded from verification and a `Revoked` result is returned when every matching credential is revoked
+
+### ➕ **Improvements**
+- More reliable SDK initialization and popup flows — the iframe/popup handshake was unified, eliminating missed-announcement failures during init
+- Faster first load — improved build chunking, deferred loading, and preloading of the credential flow
+- Wallet actions now validate the session first — fixes users appearing logged in after their tokens were deleted (e.g. clicking "Deploy Smart Account" with an expired session)
+- Recovery and PIN signature payloads now include a timestamp for replay protection
+- Credential holder signatures now use ERC-7739 typed-data signing — relevant if you verify holder signatures server-side
+- New `CHANNEL_CLOSED` error name, thrown when the user closes a popup or the messaging channel closes mid-flow — handle it alongside `USER_CANCELLED` if you switch on error names
+
+### **📋 Migration Guide**
+
+**SD-JWT nonce is now optional:**
+
+```js
+  // Before (1.11.x) — nonce required for SD_JWT_VC programs
+  await airService.verifyCredential({ programId, fieldsToDisclose, nonce });
+
+  // After (1.12.x) — omit nonce to skip the KB-JWT
+  await airService.verifyCredential({ programId, fieldsToDisclose });
+
+  // Nested claims via dotted paths
+  await airService.verifyCredential({
+    programId,
+    fieldsToDisclose: ["address.city", "age"],
+  });
+```
+<Note>
+When nonce is omitted, the compliant presentation's `verifiableCredential[0]` is `<Issuer-JWT>~<disclosures>~` with no KB-JWT segment — update verifier-side parsing if you assumed three segments.
+</Note>
+
+## **Version 1.11.1 (Aug 13, 2026)**
+
+<Note>
+`1.11.1` is a patch over `1.11.0` with no SDK behavior changes between them. Everything below landed in the 1.11 line — upgrade directly from `1.10.0` to `1.11.1`.
+</Note>
+
+### ✨ **New Features**
+
+- **W3C Verifiable Presentation on every compliant verification** — `verifyCredential` now returns the disclosed claims and any proof material on `verifiablePresentation` — see [Verifying credentials](/products/identity/verify#response)
+- **SD-JWT VC verification** — verification programs can use the `SD_JWT_VC` proof type. These programs require both `fieldsToDisclose` and the new `nonce` parameter
+- **`IDEN3` proof type** available for verification programs alongside `BJJ_SIG_2021`
+- Verification programs with multiple ZK queries return one proof per query on `verifiablePresentation.proof`
+
+### ➕ **Improvements**
+
+- Google login now works in mobile in-app browsers and Android Custom Tabs via a server-side redirect fallback
+- The SDK removes its transient `airkit_handoff` and `airkit_login_error` parameters from your page URL after login, so a page refresh cannot replay a consumed one-time code
+- The partner linking confirmation screen is removed from login, reducing steps for new users
+- Improved session cleanup when a user requests account deletion
+- Package license changed from MIT to Apache 2.0
+
+### **⚠️ Breaking Changes**
+
+- **`AirUserDetails.partnerUserId` is removed.** AIR no longer stores partner-local user IDs — key off the AIR user UUID (`user.id`) and keep the join in your own system.
+- **`verifyCredential` no longer accepts `offchain`.** Off-chain versus on-chain mode is configured on the verification program in the Developer Dashboard.
+- **`zkProofs`, `transactionHash`, and `disclosedData` are deprecated and no longer populated** on compliant verification results. Read `verifiablePresentation` instead.
+
+### **📋 Migration Guide**
+
+**Reading verification results:**
+
+```js
+// Before (1.10.0 and earlier)
+if (result.status === "Compliant") {
+  console.log(result.transactionHash);
+  console.log(result.zkProofs);
+  console.log(result.disclosedData.credentialSubject);
+}
+
+// After (1.11.x)
+if (result.status === "Compliant") {
+  const vp = result.verifiablePresentation;
+
+  // Disclosed claims live on the embedded credential
+  const [credential] = vp?.verifiableCredential ?? [];
+  if (credential && typeof credential !== "string") {
+    console.log(credential.credentialSubject);
+  }
+
+  // proof is present only when the program requires a ZKP
+  const proof = Array.isArray(vp?.proof) ? vp.proof[0] : vp?.proof;
+  console.log(proof?.transactionHash); // on-chain programs only
+  console.log(proof?.proofValue);
+}
+```
+
+<Warning>
+When a verification program is not configured to require a zero-knowledge proof, the presentation has **no `proof` block** — it is unsigned and carries no cryptographic guarantee. In that case the verification session status is the only trust anchor. Ask the verifier owner to enable the ZKP requirement if you need an attested result.
+</Warning>
+
+For `SD_JWT_VC` programs, `verifiableCredential[0]` is a compact string rather than an object, and both `fieldsToDisclose` and `nonce` are required on the call. See [Verifying credentials](/products/identity/verify).
+
+**Replacing `partnerUserId`:**
+
+```js
+const { user } = await airService.getUserInfo();
+// Persist the AIR user UUID against your own user record
+await db.users.update(localUserId, { airUserId: user.id });
+```
+
+---
+
+## **Version 1.10.0 (June 11, 2026)**
+
+### ✨ **New Features**
+
+- Program-driven verification modes — proof type, ZKP requirement, and off-chain / on-chain mode configured centrally — see [Issuing credentials](/products/identity/issuing-credentials) and [Verifying credentials](/products/identity/verify)
+- Selective and full data disclosure on verify (`fieldsToDisclose`) — see [Selective Disclosure](/products/identity/selective-disclosure)
+- In-wallet Transfer and Receive UIs: `showTransferUI`, `showReceiveUI`
+- Agent key management: `getAgentKeys`, `registerAgentKey`, `removeAgentKey`
+- Streamlined PIN setup / confirmation / recovery and account recovery entry points (`startRecovery`)
+- Login / `getUserInfo` payloads: optional `user.wallet` and `abstractAccountAddresses`
+
+### ➕ **Improvements**
+
+- More reliable recovery OTP and Forgot PIN flows (including Safari)
+
+### **⚠️ Breaking Changes**
+
+- Sandbox no longer accepts `credentialNetwork` — it is **Testnet-only**. Devnet opt-in is removed.
+- `CredentialNetwork` is now `"testnet" | "mainnet"` (no longer `"devnet" | "testnet"`)
+- Private Mainnet requires `buildEnv: BUILD_ENV.PRODUCTION` with `credentialNetwork: "mainnet"`
+- Credentials and programs issued on Devnet are not available on Testnet or Mainnet — re-issue on the target network
+
+### **📋 Migration Guide**
+
+**Sandbox (Testnet only):**
+
+```js
+import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
+
+const airService = new AirService({
+  partnerId: YOUR_PARTNER_ID
+});
+await airService.init({
+  buildEnv: BUILD_ENV.SANDBOX,
+  enableLogging: true
+});
+```
+
+**Private Mainnet (production):**
+
+```js
+await airService.init({
+  buildEnv: BUILD_ENV.PRODUCTION,
+  credentialNetwork: "mainnet",
+  enableLogging: true
+});
+```
+
+If you previously passed `credentialNetwork: "devnet"` (or any Sandbox `credentialNetwork`), remove it. Re-issue test credentials on Testnet or Mainnet as needed.
+
+Moca Chain Mainnet is currently private. For production launches, use the production AIR pages and contact Moca for mainnet access and \$MOCA gas tokens. See [Production mainnet access](/get-started/environments#production-mainnet-access).
+
+---
+
+## **Flutter SDK 1.6.0**
+
+### ✨ **New Features**
+
+- Credential issuance and verification (`issueCredential`, `verifyCredential`, `preloadCredential`)
+- Google and email passwordless login
+
+### ➕ **Improvements**
+
+- Credential stability improvements
+
+Install with `version: ^1.6.0` via OnePub — see [Flutter installation](/get-started/flutter/installation).
+
+---
+
+## **Version 1.8.0 (Feb 9, 2026)**
+
+### ✨ **New Features**
+
+- Credential payment support
+- Issue credentials on behalf of users
+- Compliance encryption keys support for credential issuance and verification
+- Display currency configuration (USD, EUR, CNY, KRW, TRY)
+- New `air_accounts` RPC method to check account status across all supported chains
+- `wallet_sendCalls` RPC method for batch transaction execution
+- Temporary Devnet opt-in on Sandbox via `credentialNetwork: "devnet"` (removed in 1.10.0)
+
+### ➕ **Improvements**
+
+- Credential issuance and verification UI improvements and bug fixes
+- Swap and OnRamp UI improvements and bug fixes
+- WalletConnect stability improvements
+
+### **⚠️ Breaking Changes**
+
+- Sandbox environment now defaults to **Moca Chain Testnet** instead of Devnet
+- Credentials issued on Devnet will not be available on Testnet
+- Devnet support remained available via `credentialNetwork: "devnet"` until **1.10.0**, when it was removed
+
+### **📋 Migration Guide**
+
+After upgrading to `1.8.0`, Sandbox connects to Testnet by default. If your integration was not ready, you could temporarily stay on Devnet:
+
+```js
+import { AirService, BUILD_ENV } from "@mocanetwork/airkit";
+
+const airService = new AirService({
+  partnerId: YOUR_PARTNER_ID
+});
+await airService.init({
+  buildEnv: BUILD_ENV.SANDBOX,
+  credentialNetwork: "devnet", // Temporary opt-in; removed in 1.10.0
+  enableLogging: true
+});
+```
+
+We recommend migrating to Testnet as soon as possible. Re-issue any test credentials on Testnet. **As of 1.10.0, Devnet opt-in is removed** — see the 1.10.0 migration guide above.
+
+---
+## **Version 1.7.0 (Nov 18, 2025)**
+
+### ✨ **New Features**
+
+- Cross-chain credential verification support
+- Transaction payment token support
+- Custom RPC URL configuration
+- Automatic in-wallet login flow
+
+### ➕ **Improvements**
+
+- Credential UI updates
+- Passkey UI updates
+- Significant Air Services performance improvements
+- Improved Credential error handling
+- Swap UI improvements and bug fixes
+
+## **Version 1.6.0 (Sept 16, 2025)**
+
+### ✨ **New Features**
+
+- Initial Air Credential support
+- Flutter SDK released (version 1.5.0)
+- Swap beta support
+- OnRamp beta support
+- Account deletion (via air3.com/recovery)
+- Additional chains added:
+  - Ethereum Testnet & Mainnet
+  - Moca Testnet
+  - Gnosis Testnet & Mainnet
+  - Edu Testnet & Mainnet
+
+### ➕ **Improvements**
+
+- Air theme update
+- Improved wallet login and mobile support
+- Improved i18n support
+- Improved error handling
+- Overall Air Services stability
+
+### **⚠️ Notes**
+
+- Air theme uses light theme only now
+
+## **Version 1.5.0 (July 30, 2025)**
+
+### ✨ **New Features**
+
+- Flutter SDK beta released (version `1.5.0-beta.x`)
+- Account email update and recovery (via air3.com/recovery)
+- Additional chains added:
+  - BNB Smart Chain
+  - Kaia and Kairos
+
+### ➕ **Improvements**
+
+- Improved iOS Safari PWA support
+
+### **⚠️ Notes**
+
+- `eth_accounts` will only return AA from now on
+
+## **Version 1.4.0 (June 26, 2025)**
+
+### ✨ **New Features**
+
+- Moca Devnet chain added
+
+### ➕ **Improvements**
+
+- New SANDBOX environment for development and testing
+
+## **Version 1.3.0 (June 5, 2025)**
+
+### ➕ **Improvements**
+
+- Captcha required during OTP for enhanced security
+- Signing screen shows actual message
+- Improved security by moving signing and transaction screens into separate window
+- Improved Passkey provider suggestions
+- Wagmi connect method now exposes authToken parameter
+- Access token contains `sourcePartnerId` in case of cross partner rehydration
+- Many small stabilization improvements
+
+### **⚠️ Notes**
+
+- Signing and transaction screens are now shown in a separate browser window instead of iframe modals
+
+## **Version 1.2.0 (May 7, 2025)**
+
+### ✨ **New Features**
+
+- User login token refresh support
+
+### ➕ **Improvements**
+
+- Improved MFA setup and verification flow
+- More user-friendly transaction screen
+- Bottom sheet instead of modal on mobile screens
+- Animations for smoother transitions
+- Support of small mobile screens
+- Improved session key support
+- Improved provider error handling
+
+## **Version 1.1.0 (March 27, 2025)**
+
+### ✨ **New Features**
+
+- Persistent user sessions across AIR Kit dApps
+- Protect user accounts with MFA via Passkey
+- Login via EoA wallet
+- Soneium chain support (Testnet / Mainnet)
+
+### ➕ **Improvements**
+
+- Simplified transaction screens
+- Improved modal UI
+- Wallet can be preloaded in the background
+- Provider can be retrieved and subscribed to before wallet initialization
+- Paymaster policies can be defined per chain
+- Various minor bug fixes and optimizations
+
+### **⚠️ Notes**
+
+- The AA will only be returned after the user has MFA set up
+- MFA setup will automatically trigger on any wallet action
+
+## **Version 1.0.0 (Feb 27, 2025)**
+
+### ✨ **New Features**
+
+- Smart accounts (AA) can be checked for deployment
+- Smart accounts (AA) can be deployed without minting an Air Id
+- Experimental session key support
+
+### ➕ **Improvements**
+
+- Full wallet services support
+- Improved token refresh mechanism
+- Login rehydration across partners
+
+### **⚠️ Notes**
+
+- The `getUserInfo()` and `getPartnerUserInfo()` methods have been merged into `getUserInfo()`
+
+## **Version 0.6.0 (Feb 17, 2025)**
+
+### ✨ **New Features**
+
+- Beta version of wallet services
+
+### ➕ **Improvements**
+
+- Small UI updates
+- More helpful error messages
+
+### **⚠️ Notes**
+
+- The wallet initialized event also returns the Smart Account (AA) address from now on
+
+## **Version 0.5.0 (Feb 11, 2025)**
+
+The first official release of AIR Kit, rebranded from Realm SDK, focuses on drastic performance and UX improvements and sets the foundation for upcoming features.
+
+### ✨ **New Features**
+
+- Customizable language support, including localized emails
+- Toggleable email input field
+- Support for custom authentication (Bring Your Own Auth)
+- Optional partner user linking flow
+- Introduction of a Global User ID to unify multiple Air IDs
+
+### ➕ **Improvements**
+
+- Simplified design tokens for UI customization
+- Significantly faster initialization time and login experience
+- Keep login session alive by automatic token refresh
+- Backward compatibility down to ES2020
+- Various minor bug fixes and optimizations
+
+### **⚠️ Notes**
+
+- The MPC Signer address is no longer being returned
+- External wallet login (e.g. MetaMask) is not yet supported
+- Wallet-related services, including EIP1193 provider support, are unavailable in this version
+- Smart Account (AA) addresses created in this version are different from previous versions

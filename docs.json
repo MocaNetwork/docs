@@ -91,67 +91,67 @@
           {
             "group": "Overview",
             "pages": [
-              "airkit/index",
-              "airkit/integrating-using-ai",
-              "learn/when-to-use-airkit"
+              "get-started/integrating-using-ai",
+              "get-started/what-is-airkit",
+              "get-started/when-to-use-airkit"
             ]
           },
           {
             "group": "Set up",
             "pages": [
-              "airkit/usage/getting-started",
-              "airkit/airkit-dashboard",
-              "airkit/environments",
-              "airkit/usage/installation",
-              "airkit/usage/go-to-production",
-              "airkit/platform-matrix"
+              "get-started/partner-account",
+              "get-started/dashboard",
+              "get-started/environments",
+              "get-started/installation",
+              "get-started/go-to-production",
+              "get-started/platform-matrix"
             ]
           },
           {
             "group": "Authentication",
             "pages": [
-              "airkit/usage/partner-authentication",
-              "airkit/usage/jwks-setup",
-              "airkit/usage/user-authentication",
-              "airkit/usage/user-management"
+              "get-started/partner-authentication",
+              "get-started/jwks-setup",
+              "get-started/user-authentication",
+              "get-started/user-management"
             ]
           },
           {
             "group": "Customize",
             "pages": [
-              "airkit/usage/config-login",
-              "airkit/usage/config-theming",
-              "airkit/usage/config-language"
+              "get-started/config-login",
+              "get-started/config-theming",
+              "get-started/config-language"
             ]
           },
           {
             "group": "Flutter",
             "pages": [
-              "airkit/flutter/overview",
-              "airkit/flutter/installation",
-              "airkit/flutter/android-setup",
-              "airkit/flutter/ios-setup",
-              "airkit/flutter/google-signin",
-              "airkit/flutter/wallet-operations",
-              "airkit/flutter/provider-functions",
-              "airkit/flutter/ui-components"
+              "get-started/flutter/overview",
+              "get-started/flutter/installation",
+              "get-started/flutter/android-setup",
+              "get-started/flutter/ios-setup",
+              "get-started/flutter/google-signin",
+              "get-started/flutter/wallet-operations",
+              "get-started/flutter/provider-functions",
+              "get-started/flutter/ui-components"
             ]
           },
           {
             "group": "Quickstarts",
             "pages": [
-              "airkit/quickstart/index",
-              "airkit/quickstart/issue-credentials",
-              "airkit/quickstart/verify-credentials"
+              "get-started/quickstarts/index",
+              "get-started/quickstarts/issue-credentials",
+              "get-started/quickstarts/verify-credentials"
             ]
           },
           {
             "group": "Recipes",
             "pages": [
-              "recipes/index",
-              "recipes/custom-auth-integration",
-              "recipes/kyc-credential-on-event",
-              "recipes/verify-credential-in-app"
+              "get-started/recipes/index",
+              "get-started/recipes/custom-auth-integration",
+              "get-started/recipes/kyc-credential-on-event",
+              "get-started/recipes/verify-credential-in-app"
             ]
           }
         ]
@@ -166,35 +166,35 @@
               {
                 "group": "Overview",
                 "pages": [
-                  "airkit/usage/credential/credentials-flow",
-                  "learn/airkit/integration-workflow",
-                  "airkit/usage/credential/credential-formats"
+                  "products/identity/credentials-flow",
+                  "products/identity/integration-workflow",
+                  "products/identity/credential-formats"
                 ]
               },
               {
                 "group": "Schema design",
                 "pages": [
-                  "airkit/usage/credential/schema-overview",
-                  "airkit/usage/credential/schema-use-cases",
-                  "airkit/usage/credential/schema-creation",
-                  "airkit/usage/credential/schema-management"
+                  "products/identity/schema-overview",
+                  "products/identity/schema-use-cases",
+                  "products/identity/schema-creation",
+                  "products/identity/schema-management"
                 ]
               },
               {
                 "group": "Issue and verify",
                 "pages": [
-                  "airkit/usage/credential/issuing-credentials",
-                  "airkit/usage/backend-hosting",
-                  "airkit/usage/credential/revocation",
-                  "airkit/usage/credential/verify",
-                  "airkit/usage/credential/verify-sd-jwt",
-                  "airkit/usage/credential/selective-disclosure"
+                  "products/identity/issuing-credentials",
+                  "products/identity/backend-hosting",
+                  "products/identity/revocation",
+                  "products/identity/verify",
+                  "products/identity/verify-sd-jwt",
+                  "products/identity/selective-disclosure"
                 ]
               },
               {
                 "group": "Advanced",
                 "pages": [
-                  "airkit/usage/credential/iden3-credentials"
+                  "products/identity/iden3-credentials"
                 ]
               }
             ]
@@ -206,24 +206,24 @@
               {
                 "group": "Overview",
                 "pages": [
-                  "agentic-identity/index",
-                  "agentic-identity/partners",
-                  "agentic-identity/how-it-works"
+                  "products/agents/index",
+                  "products/agents/partners",
+                  "products/agents/how-it-works"
                 ]
               },
               {
                 "group": "Commerce and consent",
                 "pages": [
-                  "agentic-identity/delegation-and-consent",
-                  "agentic-identity/use-cases",
-                  "agentic-identity/offers-for-agents"
+                  "products/agents/delegation-and-consent",
+                  "products/agents/use-cases",
+                  "products/agents/offers-for-agents"
                 ]
               },
               {
                 "group": "Integration",
                 "pages": [
-                  "agentic-identity/integration-options",
-                  "agentic-identity/partner-agent-api"
+                  "products/agents/integration-options",
+                  "products/agents/partner-agent-api"
                 ]
               }
             ]
@@ -235,31 +235,31 @@
               {
                 "group": "Overview",
                 "pages": [
-                  "money/index"
+                  "products/money/index"
                 ]
               },
               {
                 "group": "Accounts & wallet",
                 "pages": [
-                  "airkit/usage/account/smart-account",
-                  "airkit/usage/account/provider-functions",
-                  "airkit/usage/account/wagmi",
-                  "airkit/usage/account/supported-chains",
-                  "airkit/usage/account/paymaster"
+                  "products/money/smart-account",
+                  "products/money/provider-functions",
+                  "products/money/wagmi",
+                  "products/money/supported-chains",
+                  "products/money/paymaster"
                 ]
               },
               {
                 "group": "Advanced",
                 "pages": [
-                  "airkit/usage/account/builtin-ui",
-                  "airkit/usage/account/session-keys",
-                  "airkit/usage/account/advanced-functions"
+                  "products/money/builtin-ui",
+                  "products/money/session-keys",
+                  "products/money/advanced-functions"
                 ]
               },
               {
                 "group": "Recipes",
                 "pages": [
-                  "recipes/wagmi-integration"
+                  "products/money/wagmi-integration"
                 ]
               }
             ]
@@ -271,15 +271,15 @@
               {
                 "group": "Overview",
                 "pages": [
-                  "loyalty/index",
-                  "loyalty/business",
-                  "loyalty/developers"
+                  "products/loyalty/index",
+                  "products/loyalty/business",
+                  "products/loyalty/developers"
                 ]
               },
               {
                 "group": "Build",
                 "pages": [
-                  "recipes/loyalty-points-issuance"
+                  "products/loyalty/loyalty-points-issuance"
                 ]
               }
             ]
@@ -321,11 +321,11 @@
           {
             "group": "KYC (Veriff powered by zkMe)",
             "pages": [
-              "kyc/index",
-              "kyc/how-it-works",
-              "kyc/data-collection-and-sharing",
-              "kyc/zkme-security-architecture",
-              "kyc/pricing-and-faq"
+              "solutions/kyc/index",
+              "solutions/kyc/how-it-works",
+              "solutions/kyc/data-collection-and-sharing",
+              "solutions/kyc/zkme-security-architecture",
+              "solutions/kyc/pricing-and-faq"
             ]
           }
         ]
@@ -340,18 +340,18 @@
               {
                 "group": "How it works",
                 "pages": [
-                  "learn/architecture",
-                  "learn/advanced-topics/zktls",
-                  "learn/advanced-topics/privacy-and-compliance"
+                  "technicals/architecture/index",
+                  "technicals/architecture/zktls",
+                  "technicals/architecture/privacy-and-compliance"
                 ]
               },
               {
                 "group": "Security",
                 "pages": [
-                  "learn/security/overview",
-                  "learn/security/credential-security",
-                  "learn/security/data-privacy",
-                  "learn/security/security-checklist"
+                  "technicals/architecture/security-overview",
+                  "technicals/architecture/credential-security",
+                  "technicals/architecture/data-privacy",
+                  "technicals/architecture/security-checklist"
                 ]
               }
             ]
@@ -363,38 +363,38 @@
               {
                 "group": "Introduction",
                 "pages": [
-                  "mocachain/index",
-                  "mocachain/why-mocachain",
-                  "learn/moca-coin",
-                  "mocachain/block-explorer"
+                  "technicals/mocachain/index",
+                  "technicals/mocachain/why-mocachain",
+                  "technicals/mocachain/moca-coin",
+                  "technicals/mocachain/block-explorer"
                 ]
               },
               {
                 "group": "Technical Details",
                 "pages": [
-                  "mocachain/technical-details/architecture",
-                  "mocachain/technical-details/consensus-layer",
-                  "mocachain/technical-details/evm-compatibility",
-                  "mocachain/technical-details/decentralized-storage"
+                  "technicals/mocachain/architecture",
+                  "technicals/mocachain/consensus-layer",
+                  "technicals/mocachain/evm-compatibility",
+                  "technicals/mocachain/decentralized-storage"
                 ]
               },
               {
                 "group": "Using Moca Chain",
                 "pages": [
-                  "mocachain/using-moca-chain/connect-to-mocachain",
-                  "mocachain/using-moca-chain/how-to-get-moca",
-                  "mocachain/using-moca-chain/network-information",
-                  "mocachain/using-moca-chain/moca-chain-cli"
+                  "technicals/mocachain/connect-to-mocachain",
+                  "technicals/mocachain/how-to-get-moca",
+                  "technicals/mocachain/network-information",
+                  "technicals/mocachain/moca-chain-cli"
                 ]
               },
               {
                 "group": "Node Guides",
                 "pages": [
-                  "mocachain/guides/run-a-node",
-                  "mocachain/guides/run-a-validator",
-                  "mocachain/guides/run-a-storage-provider",
-                  "mocachain/guides/run-a-local-testnet",
-                  "mocachain/guides/run-a-challenger"
+                  "technicals/mocachain/run-a-node",
+                  "technicals/mocachain/run-a-validator",
+                  "technicals/mocachain/run-a-storage-provider",
+                  "technicals/mocachain/run-a-local-testnet",
+                  "technicals/mocachain/run-a-challenger"
                 ]
               }
             ]
@@ -414,7 +414,7 @@
             "tag": "Identity",
             "pages": [
               "api-reference/introduction",
-              "airkit/usage/credential/issuance-api",
+              "api-reference/issuance-api",
               "api-reference/catalog/browse-schemas",
               "api-reference/catalog/schema-detail"
             ]
@@ -437,14 +437,14 @@
           {
             "group": "Web SDK",
             "pages": [
-              "airkit/usage/reference"
+              "api-reference/sdk-reference"
             ]
           },
           {
             "group": "Releases",
             "pages": [
-              "airkit/release-notes",
-              "airkit/usage/migration-compatibility"
+              "api-reference/release-notes",
+              "api-reference/migration-compatibility"
             ]
           }
         ]
@@ -455,18 +455,18 @@
           {
             "group": "Troubleshooting",
             "pages": [
-              "airkit/troubleshooting/common-errors",
-              "airkit/troubleshooting/sdk-issues",
-              "airkit/troubleshooting/credential-issues",
-              "airkit/flutter/troubleshooting"
+              "help/common-errors",
+              "help/sdk-issues",
+              "help/credential-issues",
+              "help/flutter-troubleshooting"
             ]
           },
           {
             "group": "Resources",
             "pages": [
-              "learn/help/faq",
-              "concepts/glossary",
-              "status"
+              "help/faq",
+              "help/glossary",
+              "help/status"
             ]
           }
         ]
@@ -476,35 +476,35 @@
   "redirects": [
     {
       "source": "/airkit/usage/credential/direct-issuance",
-      "destination": "/airkit/usage/credential/issuing-credentials"
+      "destination": "/products/identity/issuing-credentials"
     },
     {
       "source": "/mocachain/native-dapps/airkit-dashboard",
-      "destination": "/airkit/airkit-dashboard"
+      "destination": "/get-started/dashboard"
     },
     {
       "source": "/airkit/templates/plug-and-play",
-      "destination": "/airkit/quickstart/verify-credentials"
+      "destination": "/get-started/quickstarts/verify-credentials"
     },
     {
       "source": "/airkit/templates/plug-and-play-issuer",
-      "destination": "/airkit/quickstart/issue-credentials"
+      "destination": "/get-started/quickstarts/issue-credentials"
     },
     {
       "source": "/airkit/templates/plug-and-play-verifier",
-      "destination": "/airkit/quickstart/verify-credentials"
+      "destination": "/get-started/quickstarts/verify-credentials"
     },
     {
       "source": "/airkit/when-to-use-airkit",
-      "destination": "/learn/when-to-use-airkit"
+      "destination": "/get-started/when-to-use-airkit"
     },
     {
       "source": "/airkit/guides/overview",
-      "destination": "/learn/architecture"
+      "destination": "/technicals/architecture"
     },
     {
       "source": "/airkit/guides/air-for-loyalty",
-      "destination": "/loyalty/business"
+      "destination": "/products/loyalty/business"
     },
     {
       "source": "/airkit/guides/air-for-fintech",
@@ -576,39 +576,39 @@
     },
     {
       "source": "/learn/moca-chain",
-      "destination": "/mocachain"
+      "destination": "/technicals/mocachain"
     },
     {
       "source": "/mocachain/using-moca-chain/build-on-mocachain",
-      "destination": "/mocachain"
+      "destination": "/technicals/mocachain"
     },
     {
       "source": "/learn/airkit/about-airkit",
-      "destination": "/airkit"
+      "destination": "/get-started/what-is-airkit"
     },
     {
       "source": "/airkit/how-to-use",
-      "destination": "/airkit"
+      "destination": "/get-started/what-is-airkit"
     },
     {
       "source": "/airkit/solutions/index",
-      "destination": "/airkit"
+      "destination": "/get-started/what-is-airkit"
     },
     {
       "source": "/airkit/solutions",
-      "destination": "/airkit"
+      "destination": "/get-started/what-is-airkit"
     },
     {
       "source": "/learn/integrating-using-ai",
-      "destination": "/airkit/integrating-using-ai"
+      "destination": "/get-started/integrating-using-ai"
     },
     {
       "source": "/learn/airkit/key-features",
-      "destination": "/concepts/glossary"
+      "destination": "/help/glossary"
     },
     {
       "source": "/learn/airkit/features-developer-benefits",
-      "destination": "/concepts/glossary"
+      "destination": "/help/glossary"
     },
     {
       "source": "/learn/use-cases/identity-verification",
@@ -624,19 +624,19 @@
     },
     {
       "source": "/learn/advanced-topics/scaling-and-performance",
-      "destination": "/mocachain/technical-details/architecture"
+      "destination": "/technicals/mocachain/architecture"
     },
     {
       "source": "/mocachain/technical-details/zktls",
-      "destination": "/learn/advanced-topics/zktls"
+      "destination": "/technicals/architecture/zktls"
     },
     {
       "source": "/mocachain/native-dapps/air-wallet",
-      "destination": "/mocachain"
+      "destination": "/technicals/mocachain"
     },
     {
       "source": "/mocachain/native-dapps/moca-proof",
-      "destination": "/mocachain"
+      "destination": "/technicals/mocachain"
     },
     {
       "source": "/learn/vision",
@@ -652,27 +652,455 @@
     },
     {
       "source": "/solutions/loyalty",
-      "destination": "/loyalty/business"
+      "destination": "/products/loyalty/business"
     },
     {
       "source": "/solutions/loyalty-developers",
-      "destination": "/loyalty/developers"
+      "destination": "/products/loyalty/developers"
     },
     {
       "source": "/airkit/usage/credential/cak-overview",
-      "destination": "/learn/advanced-topics/privacy-and-compliance"
+      "destination": "/technicals/architecture/privacy-and-compliance"
     },
     {
       "source": "/airkit/usage/credential/cak-issuer-guide",
-      "destination": "/airkit/usage/credential/issuing-credentials"
+      "destination": "/products/identity/issuing-credentials"
     },
     {
       "source": "/airkit/usage/credential/cak-verifier-guide",
-      "destination": "/airkit/usage/credential/verify"
+      "destination": "/products/identity/verify"
     },
     {
       "source": "/learn/airkit/credentials",
-      "destination": "/airkit/usage/credential/credentials-flow"
+      "destination": "/products/identity/credentials-flow"
+    },
+    {
+      "source": "/airkit/integrating-using-ai",
+      "destination": "/get-started/integrating-using-ai"
+    },
+    {
+      "source": "/learn/when-to-use-airkit",
+      "destination": "/get-started/when-to-use-airkit"
+    },
+    {
+      "source": "/airkit/airkit-dashboard",
+      "destination": "/get-started/dashboard"
+    },
+    {
+      "source": "/airkit/environments",
+      "destination": "/get-started/environments"
+    },
+    {
+      "source": "/airkit/usage/installation",
+      "destination": "/get-started/installation"
+    },
+    {
+      "source": "/airkit/usage/go-to-production",
+      "destination": "/get-started/go-to-production"
+    },
+    {
+      "source": "/airkit/platform-matrix",
+      "destination": "/get-started/platform-matrix"
+    },
+    {
+      "source": "/airkit/usage/partner-authentication",
+      "destination": "/get-started/partner-authentication"
+    },
+    {
+      "source": "/airkit/usage/jwks-setup",
+      "destination": "/get-started/jwks-setup"
+    },
+    {
+      "source": "/airkit/usage/user-authentication",
+      "destination": "/get-started/user-authentication"
+    },
+    {
+      "source": "/airkit/usage/user-management",
+      "destination": "/get-started/user-management"
+    },
+    {
+      "source": "/airkit/usage/config-login",
+      "destination": "/get-started/config-login"
+    },
+    {
+      "source": "/airkit/usage/config-theming",
+      "destination": "/get-started/config-theming"
+    },
+    {
+      "source": "/airkit/usage/config-language",
+      "destination": "/get-started/config-language"
+    },
+    {
+      "source": "/airkit",
+      "destination": "/get-started/what-is-airkit"
+    },
+    {
+      "source": "/airkit/usage/getting-started",
+      "destination": "/get-started/partner-account"
+    },
+    {
+      "source": "/airkit/flutter/overview",
+      "destination": "/get-started/flutter/overview"
+    },
+    {
+      "source": "/airkit/flutter/installation",
+      "destination": "/get-started/flutter/installation"
+    },
+    {
+      "source": "/airkit/flutter/android-setup",
+      "destination": "/get-started/flutter/android-setup"
+    },
+    {
+      "source": "/airkit/flutter/ios-setup",
+      "destination": "/get-started/flutter/ios-setup"
+    },
+    {
+      "source": "/airkit/flutter/google-signin",
+      "destination": "/get-started/flutter/google-signin"
+    },
+    {
+      "source": "/airkit/flutter/wallet-operations",
+      "destination": "/get-started/flutter/wallet-operations"
+    },
+    {
+      "source": "/airkit/flutter/provider-functions",
+      "destination": "/get-started/flutter/provider-functions"
+    },
+    {
+      "source": "/airkit/flutter/ui-components",
+      "destination": "/get-started/flutter/ui-components"
+    },
+    {
+      "source": "/airkit/quickstart",
+      "destination": "/get-started/quickstarts"
+    },
+    {
+      "source": "/airkit/quickstart/issue-credentials",
+      "destination": "/get-started/quickstarts/issue-credentials"
+    },
+    {
+      "source": "/airkit/quickstart/verify-credentials",
+      "destination": "/get-started/quickstarts/verify-credentials"
+    },
+    {
+      "source": "/recipes",
+      "destination": "/get-started/recipes"
+    },
+    {
+      "source": "/recipes/custom-auth-integration",
+      "destination": "/get-started/recipes/custom-auth-integration"
+    },
+    {
+      "source": "/recipes/kyc-credential-on-event",
+      "destination": "/get-started/recipes/kyc-credential-on-event"
+    },
+    {
+      "source": "/recipes/verify-credential-in-app",
+      "destination": "/get-started/recipes/verify-credential-in-app"
+    },
+    {
+      "source": "/airkit/usage/credential/credentials-flow",
+      "destination": "/products/identity/credentials-flow"
+    },
+    {
+      "source": "/airkit/usage/credential/credential-formats",
+      "destination": "/products/identity/credential-formats"
+    },
+    {
+      "source": "/airkit/usage/credential/schema-overview",
+      "destination": "/products/identity/schema-overview"
+    },
+    {
+      "source": "/airkit/usage/credential/schema-use-cases",
+      "destination": "/products/identity/schema-use-cases"
+    },
+    {
+      "source": "/airkit/usage/credential/schema-creation",
+      "destination": "/products/identity/schema-creation"
+    },
+    {
+      "source": "/airkit/usage/credential/schema-management",
+      "destination": "/products/identity/schema-management"
+    },
+    {
+      "source": "/airkit/usage/credential/issuing-credentials",
+      "destination": "/products/identity/issuing-credentials"
+    },
+    {
+      "source": "/airkit/usage/credential/revocation",
+      "destination": "/products/identity/revocation"
+    },
+    {
+      "source": "/airkit/usage/credential/verify",
+      "destination": "/products/identity/verify"
+    },
+    {
+      "source": "/airkit/usage/credential/verify-sd-jwt",
+      "destination": "/products/identity/verify-sd-jwt"
+    },
+    {
+      "source": "/airkit/usage/credential/selective-disclosure",
+      "destination": "/products/identity/selective-disclosure"
+    },
+    {
+      "source": "/airkit/usage/credential/iden3-credentials",
+      "destination": "/products/identity/iden3-credentials"
+    },
+    {
+      "source": "/learn/airkit/integration-workflow",
+      "destination": "/products/identity/integration-workflow"
+    },
+    {
+      "source": "/airkit/usage/backend-hosting",
+      "destination": "/products/identity/backend-hosting"
+    },
+    {
+      "source": "/agentic-identity",
+      "destination": "/products/agents"
+    },
+    {
+      "source": "/agentic-identity/partners",
+      "destination": "/products/agents/partners"
+    },
+    {
+      "source": "/agentic-identity/how-it-works",
+      "destination": "/products/agents/how-it-works"
+    },
+    {
+      "source": "/agentic-identity/delegation-and-consent",
+      "destination": "/products/agents/delegation-and-consent"
+    },
+    {
+      "source": "/agentic-identity/use-cases",
+      "destination": "/products/agents/use-cases"
+    },
+    {
+      "source": "/agentic-identity/offers-for-agents",
+      "destination": "/products/agents/offers-for-agents"
+    },
+    {
+      "source": "/agentic-identity/integration-options",
+      "destination": "/products/agents/integration-options"
+    },
+    {
+      "source": "/agentic-identity/partner-agent-api",
+      "destination": "/products/agents/partner-agent-api"
+    },
+    {
+      "source": "/money",
+      "destination": "/products/money"
+    },
+    {
+      "source": "/airkit/usage/account/smart-account",
+      "destination": "/products/money/smart-account"
+    },
+    {
+      "source": "/airkit/usage/account/provider-functions",
+      "destination": "/products/money/provider-functions"
+    },
+    {
+      "source": "/airkit/usage/account/wagmi",
+      "destination": "/products/money/wagmi"
+    },
+    {
+      "source": "/airkit/usage/account/supported-chains",
+      "destination": "/products/money/supported-chains"
+    },
+    {
+      "source": "/airkit/usage/account/paymaster",
+      "destination": "/products/money/paymaster"
+    },
+    {
+      "source": "/airkit/usage/account/builtin-ui",
+      "destination": "/products/money/builtin-ui"
+    },
+    {
+      "source": "/airkit/usage/account/session-keys",
+      "destination": "/products/money/session-keys"
+    },
+    {
+      "source": "/airkit/usage/account/advanced-functions",
+      "destination": "/products/money/advanced-functions"
+    },
+    {
+      "source": "/recipes/wagmi-integration",
+      "destination": "/products/money/wagmi-integration"
+    },
+    {
+      "source": "/loyalty",
+      "destination": "/products/loyalty"
+    },
+    {
+      "source": "/loyalty/business",
+      "destination": "/products/loyalty/business"
+    },
+    {
+      "source": "/loyalty/developers",
+      "destination": "/products/loyalty/developers"
+    },
+    {
+      "source": "/recipes/loyalty-points-issuance",
+      "destination": "/products/loyalty/loyalty-points-issuance"
+    },
+    {
+      "source": "/kyc",
+      "destination": "/solutions/kyc"
+    },
+    {
+      "source": "/kyc/how-it-works",
+      "destination": "/solutions/kyc/how-it-works"
+    },
+    {
+      "source": "/kyc/data-collection-and-sharing",
+      "destination": "/solutions/kyc/data-collection-and-sharing"
+    },
+    {
+      "source": "/kyc/zkme-security-architecture",
+      "destination": "/solutions/kyc/zkme-security-architecture"
+    },
+    {
+      "source": "/kyc/pricing-and-faq",
+      "destination": "/solutions/kyc/pricing-and-faq"
+    },
+    {
+      "source": "/learn/architecture",
+      "destination": "/technicals/architecture"
+    },
+    {
+      "source": "/learn/advanced-topics/zktls",
+      "destination": "/technicals/architecture/zktls"
+    },
+    {
+      "source": "/learn/advanced-topics/privacy-and-compliance",
+      "destination": "/technicals/architecture/privacy-and-compliance"
+    },
+    {
+      "source": "/learn/security/overview",
+      "destination": "/technicals/architecture/security-overview"
+    },
+    {
+      "source": "/learn/security/credential-security",
+      "destination": "/technicals/architecture/credential-security"
+    },
+    {
+      "source": "/learn/security/data-privacy",
+      "destination": "/technicals/architecture/data-privacy"
+    },
+    {
+      "source": "/learn/security/security-checklist",
+      "destination": "/technicals/architecture/security-checklist"
+    },
+    {
+      "source": "/mocachain",
+      "destination": "/technicals/mocachain"
+    },
+    {
+      "source": "/mocachain/why-mocachain",
+      "destination": "/technicals/mocachain/why-mocachain"
+    },
+    {
+      "source": "/learn/moca-coin",
+      "destination": "/technicals/mocachain/moca-coin"
+    },
+    {
+      "source": "/mocachain/block-explorer",
+      "destination": "/technicals/mocachain/block-explorer"
+    },
+    {
+      "source": "/mocachain/technical-details/architecture",
+      "destination": "/technicals/mocachain/architecture"
+    },
+    {
+      "source": "/mocachain/technical-details/consensus-layer",
+      "destination": "/technicals/mocachain/consensus-layer"
+    },
+    {
+      "source": "/mocachain/technical-details/evm-compatibility",
+      "destination": "/technicals/mocachain/evm-compatibility"
+    },
+    {
+      "source": "/mocachain/technical-details/decentralized-storage",
+      "destination": "/technicals/mocachain/decentralized-storage"
+    },
+    {
+      "source": "/mocachain/using-moca-chain/connect-to-mocachain",
+      "destination": "/technicals/mocachain/connect-to-mocachain"
+    },
+    {
+      "source": "/mocachain/using-moca-chain/how-to-get-moca",
+      "destination": "/technicals/mocachain/how-to-get-moca"
+    },
+    {
+      "source": "/mocachain/using-moca-chain/network-information",
+      "destination": "/technicals/mocachain/network-information"
+    },
+    {
+      "source": "/mocachain/using-moca-chain/moca-chain-cli",
+      "destination": "/technicals/mocachain/moca-chain-cli"
+    },
+    {
+      "source": "/mocachain/guides/run-a-node",
+      "destination": "/technicals/mocachain/run-a-node"
+    },
+    {
+      "source": "/mocachain/guides/run-a-validator",
+      "destination": "/technicals/mocachain/run-a-validator"
+    },
+    {
+      "source": "/mocachain/guides/run-a-storage-provider",
+      "destination": "/technicals/mocachain/run-a-storage-provider"
+    },
+    {
+      "source": "/mocachain/guides/run-a-local-testnet",
+      "destination": "/technicals/mocachain/run-a-local-testnet"
+    },
+    {
+      "source": "/mocachain/guides/run-a-challenger",
+      "destination": "/technicals/mocachain/run-a-challenger"
+    },
+    {
+      "source": "/airkit/usage/credential/issuance-api",
+      "destination": "/api-reference/issuance-api"
+    },
+    {
+      "source": "/airkit/usage/reference",
+      "destination": "/api-reference/sdk-reference"
+    },
+    {
+      "source": "/airkit/release-notes",
+      "destination": "/api-reference/release-notes"
+    },
+    {
+      "source": "/airkit/usage/migration-compatibility",
+      "destination": "/api-reference/migration-compatibility"
+    },
+    {
+      "source": "/airkit/troubleshooting/common-errors",
+      "destination": "/help/common-errors"
+    },
+    {
+      "source": "/airkit/troubleshooting/sdk-issues",
+      "destination": "/help/sdk-issues"
+    },
+    {
+      "source": "/airkit/troubleshooting/credential-issues",
+      "destination": "/help/credential-issues"
+    },
+    {
+      "source": "/airkit/flutter/troubleshooting",
+      "destination": "/help/flutter-troubleshooting"
+    },
+    {
+      "source": "/learn/help/faq",
+      "destination": "/help/faq"
+    },
+    {
+      "source": "/concepts/glossary",
+      "destination": "/help/glossary"
+    },
+    {
+      "source": "/status",
+      "destination": "/help/status"
     }
   ]
 }

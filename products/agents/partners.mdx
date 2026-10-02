@@ -1,0 +1,54 @@
+---
+title: "Partner fit"
+description: "Find your role as an agent platform, publisher, merchant, or credential issuer, and define a first agentic commerce integration."
+---
+
+AIR Agents connects organizations that bring users and agent traffic with merchants and services that want to serve those users. The starting point is a concrete interaction where verified identity changes the experience: a member price, an eligibility check, or access to a benefit.
+
+Begin a pilot with agent binding and credential verification through the [Agent APIs](/products/agents/partner-agent-api). Delegation credentials and user-bound proof handoff are not yet released.
+
+## Agent platforms and assistant builders
+
+You provide the agent experience and help users complete tasks. AIR lets your agent carry approved identity evidence and demonstrate its authority when interacting with another application.
+
+A first integration could connect a user's AIR Account and let the agent get member pricing from a participating merchant. Your product is responsible for understanding the user's request, presenting choices, and [getting the user's consent](/products/agents/delegation-and-consent#ask-for-consent-before-binding) before binding the agent and for any further approvals.
+
+## Publishers and applications with agent traffic
+
+You may operate a destination that agents visit, a discovery experience that users rely on, or a marketplace connecting demand with merchants.
+
+AIR can provide identity context for an agent interaction where the user authorizes it. This can support eligible access, customer recognition, or a handoff to a merchant that accepts the same evidence.
+
+For a first integration, identify where agent traffic enters your product and which verified claim would change what you serve. A publisher does not need to build its own agent to participate.
+
+## Merchants and merchant networks
+
+You supply the products, services, and benefits. AIR helps you evaluate the evidence behind an agent request so you can apply your eligibility and offer rules.
+
+Begin with a benefit you can define precisely, such as a member rate or first-purchase offer. Identify the credential issuers you accept, how you receive and check the verification result, what the agent must be authorized to do, and how your checkout handles the order. If you accept agent checkout tokens, verify their audience.
+
+The longer-term [offers model](/products/agents/offers-for-agents) positions merchants as the buyers of customer acquisition. Campaign pricing, attribution, and commercial terms need agreement for each program.
+
+## Identity and loyalty providers
+
+You already know facts about your users, such as membership or program eligibility. You can issue credentials for those facts and let users present them to accepting applications, directly or through their agents.
+
+Your role is to define the claim, maintain its validity, and make its meaning clear to verifiers. AIR's [credential services](/products/identity/credentials-flow) provide the underlying issuance and verification model.
+
+## Scope the first integration
+
+Use one journey to establish whether the integration improves the user's experience and the receiving application's decision.
+
+| Define | Example |
+| --- | --- |
+| User intent | Find and purchase a product with an eligible member benefit. |
+| Entry point | A personal assistant, publisher, or marketplace. |
+| Accepted evidence | Membership from a named issuer. |
+| User authority | Permission to present the claim to the merchant. |
+| Merchant response | An eligible price with clear terms and expiry. |
+| Checkout boundary | The approvals and payment method needed to complete the order. |
+| Measures | Successful verification, benefit use, completed purchases, and user drop-off. |
+
+Agree success measures and failure behavior before expanding the flow. For example, a user without a qualifying credential might receive a standard price or an issuer link, according to the merchant's rules.
+
+[Talk to the AIR team](https://mocanetwork.typeform.com/joinmocaeco?typeform-source=air3.com) with the agent or traffic you operate, the customer journey you want to support, and the role you expect to play. See [Plan your integration](/products/agents/integration-options) for the Agent APIs integration path.

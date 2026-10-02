@@ -1,0 +1,87 @@
+---
+title: "Loyalty & Rewards"
+sidebarTitle: "For businesses"
+description: "Issue portable loyalty tier credentials that travel with your customers across partner brands — no bilateral API agreements required."
+---
+
+Loyalty programs today are siloed — a user's Gold status with one brand is invisible to another. AIR Kit lets you issue **verifiable loyalty credentials** that users carry in their AIR Account and present anywhere in the ecosystem, across brands, apps, and chains.
+
+This page covers the business case. For the schema, code, and example apps, see [Loyalty for developers](/products/loyalty/developers).
+
+## The Problem
+
+Loyalty programs today are island economies. A customer's Gold status with your brand is invisible to every partner at the other end of their journey. Cross-brand benefits require bilateral API agreements between every pair of participating companies — expensive to build, fragile to maintain, and impossible to scale beyond a handful of partners.
+
+The result: $100B in unredeemed loyalty points sitting in silos. Customers who don't bother earning because they can't use what they accumulate.
+
+## What Changes With AIR Kit
+
+- **Your customers carry their loyalty tier** — Gold earned with you is presentable at any partner in the Moca ecosystem, with no direct API between you and that partner
+- **No bilateral integrations** — Partners verify the credential, not your API. You issue it once; every verifier accepts it
+- **Zero friction for your existing pipeline** — Credentials issue automatically when your loyalty engine fires its existing events. No new user-facing flow required
+- **Tier upgrades happen instantly** — When a customer reaches Platinum, the old credential is revoked and a new one issues. Partners see the current status, always
+- **Retroactive migration** — Existing members can receive credentials in bulk. You don't start from zero users
+
+## How It Works
+
+<Steps>
+  <Step title="Your loyalty engine fires an event">
+    A customer reaches Gold. Your existing system triggers the same milestone event it always has — a database write, a webhook, an email. Nothing changes here.
+  </Step>
+  <Step title="AIR Kit issues a loyalty credential">
+    Your backend makes one API call. A verifiable "Gold Member" credential lands in that customer's AIR Account. They don't need to open an app or take any action.
+  </Step>
+  <Step title="The customer presents the credential at a partner">
+    At check-in, checkout, or app login at any partner in the ecosystem, the customer's credential is readable. No account linking. No API call to your platform.
+  </Step>
+  <Step title="The partner verifies — and gets only what they need">
+    The partner's system calls one SDK method. A successful result includes a Verifiable Presentation. Configure the program to request only the tier information needed for the benefit, with the user's approval.
+  </Step>
+</Steps>
+
+## What Your Users Experience
+
+Nothing changes at the point of earning. Your app, your UX, your branding. The credential issues silently in the background.
+
+At a partner: the customer authenticates with their AIR Account (the same login they use with you). The customer approves the requested disclosure, and the benefit unlocks after successful verification. No code to enter, no linking flow to complete.
+
+## What Compliance Will Ask
+
+**Do you store our customer data?**
+Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure. Your schema determines the credential claims; for a tier check, include only the membership facts needed by partners.
+
+**What happens when a customer closes their account?**
+Revoke the credential so subsequent verification checks reject it once the revoked status is available. Handle deletion of source records, encrypted payloads, and previously disclosed data separately under your retention policy.
+
+**Can partners see who our customers are?**
+Partners receive the claims requested by their Verification Program and approved by the user. Request only tier status and expiry if that is all you need; credential and account identifiers may still link the interaction to a customer.
+
+**Is this GDPR compliant?**
+AIR Kit supports data minimisation through limited claims, encrypted storage, and user-controlled disclosure. Tier and status can still be personal data. Assess your implementation and handle deletion separately from revocation; see the [Compliance FAQ](/solutions/compliance-faq).
+
+## Integration at a Glance
+
+| | |
+|---|---|
+| **What your team builds** | One API call in your existing milestone event handler |
+| **Engineering effort** | 1 backend engineer |
+| **Timeline to live** | 2–4 weeks including testing |
+| **Frontend changes** | None required |
+| **What partners build** | 3 lines of SDK code to verify |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Compliance FAQ" icon="shield-check" href="/solutions/compliance-faq">
+    Full GDPR, PII, and data residency answers.
+  </Card>
+  <Card title="Partner Economics" icon="chart-bar" href="/solutions/partner-economics">
+    How the revenue model works for issuers and verifiers.
+  </Card>
+  <Card title="Loyalty for developers" icon="code" href="/products/loyalty/developers">
+    Schema, issuance and verification code, and example apps.
+  </Card>
+  <Card title="Talk to our team" icon="handshake" href="https://air3.com/partner-with-us">
+    Start a partnership conversation.
+  </Card>
+</CardGroup>

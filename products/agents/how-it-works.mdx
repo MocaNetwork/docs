@@ -1,0 +1,86 @@
+---
+title: "How it works"
+description: "Follow a user from approving an agent to the agent presenting verified claims and the receiving application making a decision."
+---
+
+import AgenticIdentityAvailability from "/snippets/agentic-identity-availability.mdx";
+
+<AgenticIdentityAvailability />
+
+An application deciding on an agent's request needs three things: 
+- Who the agent is ? 
+- What the user has allowed it to do ?
+- Verified claims behind the request.
+
+## The building blocks
+
+| Element | What it establishes |
+| --- | --- |
+| AIR Account | The user's identity and the credentials they hold. |
+| Agent identity | The agent performing the action. On its own, it does not show which user the agent represents. |
+| Agent binding | The link between the user's AIR Account and the agent. With the Agent APIs, this is an agent key bound to the user with a set of scopes. |
+| Delegation credential | **Not yet released.** A credential recording the authority the user grants the agent, with finer-grained scope and conditions. |
+| User credential | An issuer-signed claim about the user, such as membership or eligibility. |
+| Verification | Whether the user's credentials satisfy the receiving application's verification program. |
+
+The binding shows whom the agent represents. Its scopes limit what the agent can do through AIR. A credential such as a membership supplies the evidence for a benefit decision.
+
+## The interaction
+
+<Steps>
+  <Step title="The user approves the agent">
+    Your application shows the user which agent they are connecting and what it will be allowed to do, and asks them to approve. The bind request has no approval step of its own, so this screen is yours to build. See [Ask for consent before binding](/products/agents/delegation-and-consent#ask-for-consent-before-binding).
+  </Step>
+  <Step title="Bind the agent">
+    While the user has an AIR Kit session, your backend binds the agent with the [Agent APIs](/products/agents/partner-agent-api). Request only the scopes the user approved: `credentials.read`, `credentials.verify`, or `commerce.checkout`.
+  </Step>
+  <Step title="Request the required evidence">
+    The receiving application decides which claims and issuers it accepts, and sets them in a verification program. For a member price, it might check a loyalty tier. For an eligibility check, it might check that a condition is met.
+  </Step>
+  <Step title="Verify">
+    Your backend creates a 15-minute agent session and runs the program against the user's credentials. The result is `Compliant`, `Non-Compliant`, or `NotFound`, with a verifiable presentation when compliant.
+  </Step>
+  <Step title="Apply the result">
+    The application returns the benefit or service the user qualifies for, asks for more approval, or declines the request. A purchase then follows its own checkout and payment steps. For a supported merchant, the agent can mint a checkout token scoped to that merchant.
+  </Step>
+</Steps>
+
+**Not yet released:** with delegation credentials, the user would also grant per-task authority, such as a specific merchant, claim, and duration, and verification would check that authority alongside the user's claims.
+
+## Verification through the Agent APIs
+
+Agents reach credential verification through the Agent APIs, REST endpoints your backend calls. With an agent session, your backend lists the user's credentials and runs a verification program in a single call. See the [Agent API quickstart](/products/agents/partner-agent-api).
+
+If the user doesn't hold the required credential, the result is `NotFound`. Verification never issues the missing credential itself.
+
+Issuing credentials is a separate integration owned by the issuer. See [Issuing credentials](/products/identity/issuing-credentials).
+
+## What a verification result proves
+
+Agent verification runs offchain, without a zero-knowledge proof. The `status` tells your backend the outcome. What else the result carries depends on the credential format:
+
+| Credential format | What the presentation contains |
+| --- | --- |
+| SD-JWT | A compact presentation with the issuer-signed JWT and the chosen disclosures. If you send a `nonce` and the credential was issued with `cnf.jwk`, it also includes a key-binding JWT tied to your challenge. |
+
+The presentation has no proof block of its own. A third party, such as a merchant, can independently check only the issuer-signed parts: a BJJ credential or an SD-JWT presentation. Otherwise, it has to trust your backend's report of the result. See [Verifying credentials](/products/identity/verify) for the general model.
+
+The checkout token identifies the user and their AIR Account address. To share a verification result with a merchant, agree the format and how the merchant checks it.
+
+## What the receiving application checks
+
+A verified claim does not authorize every action. A verified loyalty tier can support a price decision, but placing an order or spending money needs separate authority.
+
+With the Agent APIs today, the application relies on:
+
+- The result of the verification program it accepts.
+- The agent key's scopes, which limit what the agent can request from AIR.
+- For checkout, a token whose audience is the merchant, which the merchant must verify.
+
+**Not yet released:** with delegation credentials, the application would also check that the requester is the delegated agent, that the grant covers this application and action, that it hasn't expired or been revoked, and that the evidence is bound to this interaction.
+
+## What information is shared
+
+The verification program sets which claims are requested and how. A program can return an eligibility result or approved claims; the result is not always a single yes-or-no value.
+
+AIR Credentials are encrypted before storage, and issuers keep their source data. Anyone who receives disclosed claims must handle them appropriately. See [How AIR Credentials work](/products/identity/credentials-flow).

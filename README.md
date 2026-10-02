@@ -10,7 +10,7 @@ Use this README as the working contract for contributors: how the docs are organ
 
 The site has a Home icon tab for the landing page ([`index.mdx`](index.mdx)) and six top-level tabs, all wired up in [`docs.json`](docs.json). Products and Technicals are dropdowns; each dropdown item has its own sidebar. Shared setup lives in Get Started, and each product keeps only its own pages, linking back to Get Started from its overview. A page belongs to exactly one place in the navigation.
 
-- **Get Started** — everything the products share: overview, Build with AI, setup, authentication (including JWKS), UI customization, quickstarts, and general recipes.
+- **Get Started** — everything the products share: overview, Build with your Agent, setup, authentication (including JWKS), UI customization, quickstarts, and general recipes.
 - **Products** (dropdown):
   - **AIR Identity** (`airkit/usage/credential/`, `learn/airkit/`): how credentials work, credential formats (SD-JWT VC by default), schema design, issuing (including issuer backend hosting), revocation, verifying (including backend SD-JWT verification), and selective disclosure. An Advanced group covers Iden3 credentials, which the AIR team enables per partner. SD-JWT pages link the `main` branch of the issuer service; the Iden3 page links `main_iden3`.
   - **AIR Agents** (`agentic-identity/`): agent binding, consent, commerce use cases, and the Agent API quickstart.
@@ -51,7 +51,7 @@ Match the voice of the surrounding pages and keep contributions reviewable.
 - Use sentence case for headings ("Issuing credentials", not "Issuing Credentials").
 - Lead with the goal of the page; put prerequisites near the top.
 - Keep terminology consistent: **Moca Network**, **Moca Chain**, **AIR Kit**, **AIR Account**, **credential**, **issuer**, **verifier**.
-- Use root-relative internal links without file extensions, for example `/airkit/usage/getting-started`. Do not use relative paths or full URLs for pages inside this repo.
+- Use root-relative internal links without file extensions, for example `/get-started/partner-account`. Do not use relative paths or full URLs for pages inside this repo.
 - Store images under `images/` and reference them as `/images/your-file.png` from MDX. Always include descriptive alt text.
 - Tag every code block with a language (` ```ts `, ` ```bash `, ` ```json `).
 - Prefer Mintlify components (`<Steps>`, `<CodeGroup>`, `<Card>`, `<Note>`, `<Warning>`) over custom HTML when they exist for the use case.

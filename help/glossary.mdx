@@ -1,0 +1,144 @@
+---
+title: "Glossary"
+description: "Definitions of the core terms used across AIR Kit, AIR Credentials, AIR Agents, and Moca Chain, with links to each term's main page."
+---
+
+Each term links to the page that covers it in depth.
+
+## A
+
+### Agent binding
+
+The link between a user's AIR Account and an agent, created when a partner binds an agent key with the user's approval. See [How it works](/products/agents/how-it-works).
+
+### Agent key
+
+A key that a partner binds to a user's AIR Account for an agent, with a fixed set of scopes. The agent exchanges it for short-lived agent sessions. See [Agent API quickstart](/products/agents/partner-agent-api).
+
+### Agent session
+
+A 15-minute JWT minted from an agent key. The agent uses it to list or verify the user's credentials. See [Create an agent session](/api-reference/agents/create-agent-session).
+
+### AIR Account
+
+A user's identity in the AIR ecosystem, created when they sign in through AIR Kit. It holds the user's credentials and is linked to a smart account. See [User authentication](/get-started/user-authentication).
+
+### AIR Credential
+
+A verifiable credential that an issuer signs, encrypts to the holder, and stores in DStorage. The holder presents it to verifiers. See [How AIR Credentials work](/products/identity/credentials-flow).
+
+### AIR Kit
+
+The SDK for web and Flutter that provides AIR Account login, credential issuance and verification, and smart-account wallet functions. See [AIR Kit overview](/get-started/what-is-airkit).
+
+## D
+
+### Delegation credential
+
+Not yet released. A credential that would record a user's per-task authorization for an agent, such as which claims it may present, to which application, and for how long. See [Delegation and consent](/products/agents/delegation-and-consent#delegation-credentials).
+
+### DStorage
+
+Moca Chain's decentralized storage layer, run by the Moca Chain Storage Provider (MCSP) network. AIR Credentials are stored there as envelopes encrypted to the holder; the chain itself holds only hashes and metadata. See [Decentralized storage](/technicals/mocachain/decentralized-storage).
+
+### did:web
+
+A DID method that publishes an issuer's identifier and public keys on its own web domain. SD-JWT issuers use `did:web:<host of ISSUER_ORIGIN>`. See [Issuing credentials](/products/identity/issuing-credentials#dashboard-setup).
+
+## H
+
+### Holder
+
+The user who receives a credential in their AIR Account and chooses when to present it. See [How AIR Credentials work](/products/identity/credentials-flow).
+
+## I
+
+### Iden3 credential (BJJ)
+
+An advanced credential format that uses a `BJJ_SIG_2021` signature and zero-knowledge proofs. It supports predicate proofs and on-chain verification. Contact the AIR team to enable it. See [Iden3 credentials](/products/identity/iden3-credentials).
+
+### Issuer
+
+An organization that signs credentials about its users with its own keys, usually from a self-hosted issuer backend. See [Issuing credentials](/products/identity/issuing-credentials).
+
+### Issuer DID
+
+The decentralized identifier verifiers use to find an issuer's public keys. For SD-JWT issuers it is a `did:web` DID derived from the issuer service's host. See [Issuing credentials](/products/identity/issuing-credentials#dashboard-setup).
+
+## K
+
+### Key-binding JWT (KB-JWT)
+
+A short JWT the holder signs with the key in an SD-JWT credential's `cnf` claim. It covers the verifier's nonce, `programId`, and the disclosed claims, so a leaked presentation cannot be replayed. See [Verify SD-JWT on your backend](/products/identity/verify-sd-jwt#holder-key-binding).
+
+## M
+
+### \$MOCA
+
+The utility and governance token of Moca Network, and the gas token on Moca Chain. See [\$MOCA](/technicals/mocachain/moca-coin).
+
+### Moca Chain
+
+The EVM-compatible Layer 1 that AIR runs on, with CometBFT consensus and decentralized storage. It records credential hashes and status, not personal data. See [Moca Chain overview](/technicals/mocachain).
+
+## P
+
+### Paymaster
+
+A service that sponsors gas for your users' smart-account transactions, within the budget and policies you set. See [Paymaster](/products/money/paymaster).
+
+## S
+
+### Schema
+
+A credential template that sets a credential's fields and validation rules. For SD-JWT credentials the schema ID is the credential type (`vct`); Iden3 schemas also carry a JSON-LD context. See [Schema overview](/products/identity/schema-overview).
+
+### SD-JWT VC
+
+The default AIR credential format (`SD_JWT_VC`), based on IETF SD-JWT-based Verifiable Credentials. Each disclosable claim is hidden behind a salted digest, and the holder reveals only the claims a verifier requests. See [Credential formats](/products/identity/credential-formats).
+
+### Selective disclosure
+
+A verification option that lets a verifier read only the credential fields it requests, with the holder's approval, when the issuer opts in. See [Selective disclosure](/products/identity/selective-disclosure).
+
+### Session key
+
+A scoped key that lets an app sign approved smart-account actions without prompting the user each time. See [Session keys](/products/money/session-keys).
+
+### Smart account
+
+The account-abstraction wallet linked to an AIR Account. It can be deployed on any supported chain, with gas sponsored by the paymaster. See [Smart account](/products/money/smart-account).
+
+## T
+
+### Token Status List
+
+An IETF format for publishing revocation as a compressed bit array. SD-JWT issuers can enable it so verifiers check status without revealing which credential they are checking. See [Revoke credentials](/products/identity/revocation#token-status-list).
+
+## V
+
+### Verifiable presentation
+
+The package a holder returns to a verifier during verification. It contains the disclosed credential data. For SD-JWT programs it wraps the signed SD-JWT; for Iden3 programs it can also carry a zero-knowledge proof. See [Verify credentials](/products/identity/verify).
+
+### Verification program
+
+A configuration in the Developer Dashboard that sets how a credential is verified: accepted proof type, requested claims, and selective disclosure. Iden3 programs also set whether a zero-knowledge proof is required and offchain or onchain mode. See [Verify credentials](/products/identity/verify).
+
+### Verifier
+
+An application that checks a holder's credentials against a verification program before granting access or a benefit. See [Verify credentials](/products/identity/verify).
+
+### Verify on Behalf
+
+A concept-stage capability for verifying a user's credentials without the user in session. It is not available. See [Plan your integration](/products/agents/integration-options#not-yet-available).
+
+## Z
+
+### Zero-knowledge proof (ZK proof)
+
+A proof that a credential satisfies a condition, such as an age threshold, without revealing the underlying value. Used by Iden3 credentials. See [Privacy and compliance](/technicals/architecture/privacy-and-compliance).
+
+### zkTLS
+
+A technique that turns data from Web2 sources, such as KYC or email providers, into verifiable proofs without exposing the raw HTTPS payload. See [zkTLS](/technicals/architecture/zktls).
