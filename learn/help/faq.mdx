@@ -1,8 +1,10 @@
 ---
-title: "Moca Network Frequently Asked Questions"
+title: "Frequently Asked Questions"
 sidebarTitle: "FAQ"
-description: "Frequently asked questions about Moca Network and Moca Chain — covering credentials, identity, EVM compatibility, ZKPs, decentralized storage, and tokenomics."
+description: "Frequently asked questions about AIR, Moca Network, and Moca Chain — covering credentials, identity, EVM compatibility, ZKPs, decentralized storage, performance, and tokenomics."
 ---
+
+## AIR and Moca Network
 
 <Accordion title="What makes Moca different from generic L1 chains?">
 Moca Chain is an EVM-compatible L1 purpose-built for decentralized identity. Moca Chain is designed with identity at its core, making credentials portable across the apps that use AIR verification. It puts privacy first with ZKPs and zkTLS, ensures resilient decentralized storage for credentials, and stays developer-friendly through full EVM compatibility. With ~1s block times and instant finality, it delivers the speed and reliability needed for real-world identity use cases. Read more <a href="/mocachain/why-mocachain">here</a>.
@@ -21,6 +23,26 @@ Moca Chain is an EVM-compatible L1 purpose-built for decentralized identity. Moc
   Both credential issuance and verification can incur on-chain gas fees, hence the <a href="/airkit/airkit-dashboard">developer dashboard</a> provides a dedicated wallet that verifiers can pre-fund with \$MOCA.
 </Accordion>
 
+## Moca Chain and \$MOCA
+
+<Accordion title="What is \$MOCA's role in Moca Chain?">
+`\$MOCA` plays an important role as both the gas and governance token. It will also be used to drive incentive mechanics within the credential ecosystem as part of our tokenomics.
+</Accordion>
+
 <Accordion title="How do I get \$MOCA?">
   On Moca Chain mainnet, you can bridge your existing \$MOCA from Ethereum or Base using Stargate, or buy \$MOCA on supported exchanges. For Testnet, use the Testnet faucet. See <a href="/mocachain/using-moca-chain/how-to-get-moca">How to get \$MOCA</a> for details.
+</Accordion>
+
+<Accordion title="What do Moca Chain's performance metrics look like?">
+Currently the Moca Chain offers 1-second block time with instant finality. Each block holds up to 800 transactions.
+</Accordion>
+
+<Accordion title="Can I store any data on Moca Chain?">
+Moca Chain supports object storage through DStorage. Storage providers hold payloads; the chain records object metadata, payments, and permissions. Storage operations require \$MOCA for gas and storage costs. For AIR credentials, raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure.
+</Accordion>
+
+## Support
+
+<Accordion title="I need some help with a technical problem.">
+Start with [Troubleshooting](/airkit/troubleshooting/error-codes) for common HTTP status codes, SDK error names, and SDK/credential issues. For live chain and service health, see the [Status page](/status). For community support, visit our <a href="https://discord.gg/mocaversenft">Discord</a> dev-chat channel.
 </Accordion>

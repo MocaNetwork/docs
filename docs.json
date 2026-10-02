@@ -480,17 +480,22 @@
           {
             "group": "Troubleshooting",
             "pages": [
-              "airkit/troubleshooting/common-errors",
-              "airkit/troubleshooting/sdk-issues",
-              "airkit/troubleshooting/credential-issues",
-              "airkit/flutter/troubleshooting"
+              "airkit/troubleshooting/error-codes",
+              "airkit/troubleshooting/common-issues",
+              {
+                "group": "SDK",
+                "pages": [
+                  "airkit/troubleshooting/sdk-web",
+                  "airkit/troubleshooting/sdk-flutter"
+                ]
+              },
+              "airkit/troubleshooting/identity-credential"
             ]
           },
           {
-            "group": "FAQs",
+            "group": "FAQ",
             "pages": [
-              "learn/help/faq",
-              "mocachain/help/faq"
+              "learn/help/faq"
             ]
           },
           {
@@ -498,18 +503,32 @@
             "pages": [
               "status"
             ]
-          },
-          {
-            "group": "Glossary",
-            "pages": [
-              "concepts/glossary"
-            ]
           }
         ]
       }
     ]
   },
   "redirects": [
+    {
+      "source": "/airkit/troubleshooting/common-errors",
+      "destination": "/airkit/troubleshooting/error-codes"
+    },
+    {
+      "source": "/airkit/troubleshooting/sdk-issues",
+      "destination": "/airkit/troubleshooting/sdk-web"
+    },
+    {
+      "source": "/airkit/troubleshooting/credential-issues",
+      "destination": "/airkit/troubleshooting/identity-credential"
+    },
+    {
+      "source": "/airkit/flutter/troubleshooting",
+      "destination": "/airkit/troubleshooting/sdk-flutter"
+    },
+    {
+      "source": "/mocachain/help/faq",
+      "destination": "/learn/help/faq"
+    },
     {
       "source": "/airkit/usage/credential/direct-issuance",
       "destination": "/airkit/usage/credential/issuing-credentials"

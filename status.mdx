@@ -1,15 +1,31 @@
 ---
 title: "Status Page"
-description: "Check real-time Moca Network service status, view incident history, and subscribe to email notifications for outages and maintenance windows."
+description: "Check real-time Moca Network and AIR service status, view incident history, and subscribe to email notifications for outages and maintenance windows."
 ---
 
-Moca Network maintains a public status page where you can check the real-time operational status of its services and view historical uptime data.
+Moca Network maintains a public status page where you can check the real-time operational status of Moca Chain services and view historical uptime data. A dedicated AIR status page is on the way — this page will be updated to link it as soon as it's live.
 
-## Access the status page
+## Moca Chain status
 
-Visit [mocachain.statuspage.io](https://mocachain.statuspage.io) to view the current status of Moca Network services.
+Visit [mocachain.statuspage.io](https://mocachain.statuspage.io) to view the current status of Moca Chain services.
 
 The status page displays the operational status of:
 
-* **Moca Network Mainnet** - Mainnet Chain and services status
-* **Moca Network Testnet** - Testnet Chain and services status
+* **Moca Network Mainnet** — Mainnet Chain and services status
+* **Moca Network Testnet** — Testnet Chain and services status
+
+## AIR status
+
+{/* TODO(air-status): Replace this section with the real AIR status page link once it is published (see Slack thread "Docs - Help" in #air-kit-product). Do not invent a URL. */}
+
+A dedicated AIR status page for AIR Kit, AIR Identity, AIR Agents, and the Developer Dashboard is not yet published. Once it's live, we'll link it here so you can:
+
+* Check real-time health of AIR Kit APIs, DStorage, and the Developer Dashboard
+* Subscribe to incident and maintenance notifications for AIR services
+* Review historical uptime for the AIR control plane
+
+In the meantime, if an AIR Kit request is failing and the Moca Chain status page shows no incident:
+
+* Retry with exponential backoff — see [Rate limiting](/airkit/troubleshooting/common-issues#rate-limiting).
+* Verify your Partner JWT and JWKS setup — see [Error codes](/airkit/troubleshooting/error-codes) and [Common issues](/airkit/troubleshooting/common-issues).
+* Reach out through your Moca / partner support channel.
