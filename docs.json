@@ -166,6 +166,7 @@
               {
                 "group": "Overview",
                 "pages": [
+                  "products/integrating-using-ai",
                   "products/identity/credentials-flow",
                   "products/identity/integration-workflow",
                   "products/identity/credential-formats"
@@ -206,6 +207,7 @@
               {
                 "group": "Overview",
                 "pages": [
+                  "products/integrating-using-ai",
                   "products/agents/index",
                   "products/agents/partners",
                   "products/agents/how-it-works"
@@ -235,6 +237,7 @@
               {
                 "group": "Overview",
                 "pages": [
+                  "products/integrating-using-ai",
                   "products/money/index"
                 ]
               },
@@ -271,6 +274,7 @@
               {
                 "group": "Overview",
                 "pages": [
+                  "products/integrating-using-ai",
                   "products/loyalty/index",
                   "products/loyalty/business",
                   "products/loyalty/developers"
@@ -292,6 +296,7 @@
           {
             "group": "Overview",
             "pages": [
+              "solutions/integrating-using-ai",
               "solutions/index",
               "solutions/partner-economics",
               "solutions/compliance-faq"
@@ -411,7 +416,6 @@
         "groups": [
           {
             "group": "REST API",
-            "tag": "Identity",
             "pages": [
               "api-reference/introduction",
               "api-reference/issuance-api",
