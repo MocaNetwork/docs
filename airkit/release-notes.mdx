@@ -3,7 +3,7 @@ title: "Release Notes"
 description: "AIR Kit SDK release notes — version history, new features, breaking changes, deprecations, and migration notes for partners upgrading their integration."
 ---
 
-# **Version 1.12.1 (Sep 16, 2026)**
+## **Version 1.12.1 (Sep 16, 2026)**
 
 ### ✨ **New Features**
 - **Japanese, Vietnamese, and Turkish UI localization** — the SDK UI now ships `ja`, `vi`, and `tr` catalogs alongside existing locales. They are picked up automatically via `sessionConfig.locale` or browser language detection; no partner action needed unless you restrict `supportedLocales`
@@ -20,7 +20,7 @@ description: "AIR Kit SDK release notes — version history, new features, break
 - Credential holder signatures now use ERC-7739 typed-data signing — relevant if you verify holder signatures server-side
 - New `CHANNEL_CLOSED` error name, thrown when the user closes a popup or the messaging channel closes mid-flow — handle it alongside `USER_CANCELLED` if you switch on error names
 
-### **📋 Migration Guide**
+### 📋 **Migration Guide**
 
 **SD-JWT nonce is now optional:**
 
@@ -62,13 +62,13 @@ When nonce is omitted, the compliant presentation's `verifiableCredential[0]` is
 - Improved session cleanup when a user requests account deletion
 - Package license changed from MIT to Apache 2.0
 
-### **⚠️ Breaking Changes**
+### ⚠️ **Breaking Changes**
 
 - **`AirUserDetails.partnerUserId` is removed.** AIR no longer stores partner-local user IDs — key off the AIR user UUID (`user.id`) and keep the join in your own system.
 - **`verifyCredential` no longer accepts `offchain`.** Off-chain versus on-chain mode is configured on the verification program in the Developer Dashboard.
 - **`zkProofs`, `transactionHash`, and `disclosedData` are deprecated and no longer populated** on compliant verification results. Read `verifiablePresentation` instead.
 
-### **📋 Migration Guide**
+### 📋 **Migration Guide**
 
 **Reading verification results:**
 
@@ -128,14 +128,14 @@ await db.users.update(localUserId, { airUserId: user.id });
 
 - More reliable recovery OTP and Forgot PIN flows (including Safari)
 
-### **⚠️ Breaking Changes**
+### ⚠️ **Breaking Changes**
 
 - Sandbox no longer accepts `credentialNetwork` — it is **Testnet-only**. Devnet opt-in is removed.
 - `CredentialNetwork` is now `"testnet" | "mainnet"` (no longer `"devnet" | "testnet"`)
 - Private Mainnet requires `buildEnv: BUILD_ENV.PRODUCTION` with `credentialNetwork: "mainnet"`
 - Credentials and programs issued on Devnet are not available on Testnet or Mainnet — re-issue on the target network
 
-### **📋 Migration Guide**
+### 📋 **Migration Guide**
 
 **Sandbox (Testnet only):**
 
@@ -200,13 +200,13 @@ Install with `version: ^1.6.0` via OnePub — see [Flutter installation](/airkit
 - Swap and OnRamp UI improvements and bug fixes
 - WalletConnect stability improvements
 
-### **⚠️ Breaking Changes**
+### ⚠️ **Breaking Changes**
 
 - Sandbox environment now defaults to **Moca Chain Testnet** instead of Devnet
 - Credentials issued on Devnet will not be available on Testnet
 - Devnet support remained available via `credentialNetwork: "devnet"` until **1.10.0**, when it was removed
 
-### **📋 Migration Guide**
+### 📋 **Migration Guide**
 
 After upgrading to `1.8.0`, Sandbox connects to Testnet by default. If your integration was not ready, you could temporarily stay on Devnet:
 
@@ -266,7 +266,7 @@ We recommend migrating to Testnet as soon as possible. Re-issue any test credent
 - Improved error handling
 - Overall Air Services stability
 
-### **⚠️ Notes**
+### ⚠️ **Notes**
 
 - Air theme uses light theme only now
 
@@ -284,7 +284,7 @@ We recommend migrating to Testnet as soon as possible. Re-issue any test credent
 
 - Improved iOS Safari PWA support
 
-### **⚠️ Notes**
+### ⚠️ **Notes**
 
 - `eth_accounts` will only return AA from now on
 
@@ -310,7 +310,7 @@ We recommend migrating to Testnet as soon as possible. Re-issue any test credent
 - Access token contains `sourcePartnerId` in case of cross partner rehydration
 - Many small stabilization improvements
 
-### **⚠️ Notes**
+### ⚠️ **Notes**
 
 - Signing and transaction screens are now shown in a separate browser window instead of iframe modals
 
@@ -348,7 +348,7 @@ We recommend migrating to Testnet as soon as possible. Re-issue any test credent
 - Paymaster policies can be defined per chain
 - Various minor bug fixes and optimizations
 
-### **⚠️ Notes**
+### ⚠️ **Notes**
 
 - The AA will only be returned after the user has MFA set up
 - MFA setup will automatically trigger on any wallet action
@@ -367,7 +367,7 @@ We recommend migrating to Testnet as soon as possible. Re-issue any test credent
 - Improved token refresh mechanism
 - Login rehydration across partners
 
-### **⚠️ Notes**
+### ⚠️ **Notes**
 
 - The `getUserInfo()` and `getPartnerUserInfo()` methods have been merged into `getUserInfo()`
 
@@ -382,7 +382,7 @@ We recommend migrating to Testnet as soon as possible. Re-issue any test credent
 - Small UI updates
 - More helpful error messages
 
-### **⚠️ Notes**
+### ⚠️ **Notes**
 
 - The wallet initialized event also returns the Smart Account (AA) address from now on
 
@@ -406,7 +406,7 @@ The first official release of AIR Kit, rebranded from Realm SDK, focuses on dras
 - Backward compatibility down to ES2020
 - Various minor bug fixes and optimizations
 
-### **⚠️ Notes**
+### ⚠️ **Notes**
 
 - The MPC Signer address is no longer being returned
 - External wallet login (e.g. MetaMask) is not yet supported

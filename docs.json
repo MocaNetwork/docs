@@ -402,9 +402,7 @@
             "tag": "Identity",
             "pages": [
               "api-reference/introduction",
-              "airkit/usage/credential/issuance-api",
-              "api-reference/catalog/browse-schemas",
-              "api-reference/catalog/schema-detail"
+              "airkit/usage/credential/issuance-api"
             ]
           },
           {

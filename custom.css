@@ -337,18 +337,9 @@ mobile-nav-tabs-item:focus-visible {
   }
   .nav-tabs {
     width: 100%;
-    & > :first-child {
-      position: relative;
-      font-size: 0 !important;
-      width: 30px !important;
-      svg {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        translate: -50% -50%;
-        width: 16px !important;
-        height: 16px !important;
-      }
+    & > :first-child svg {
+      width: 16px !important;
+      height: 16px !important;
     }
     & > :nth-last-child(2) {
       margin-inline-start: auto;
@@ -383,12 +374,23 @@ mobile-nav-tabs-item:focus-visible {
 
 #sidebar-content a,
 #sidebar a:not(:has(img)):not(:has(.nav-logo)) {
-  padding: 7px 8px !important;
+  padding-block: 7px !important;
+  padding-inline-end: 8px !important;
   border-radius: var(--air-corner-small) !important;
   color: #3B484F !important;
   font: var(--air-type-body-2) !important;
   background: transparent !important;
   text-decoration: none !important;
+}
+
+#sidebar-content button[aria-expanded],
+#sidebar-content li > button:has(+ ul) {
+  padding-block: 7px !important;
+  padding-inline-end: 8px !important;
+  border-radius: var(--air-corner-small) !important;
+  color: #3B484F !important;
+  font: var(--air-type-body-2) !important;
+  background: transparent !important;
 }
 
 #sidebar-content a:hover,

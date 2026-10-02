@@ -1,25 +1,43 @@
 ---
-title: "AIR Kit SDK and REST API reference"
+title: "Web SDK reference"
 sidebarTitle: "SDK reference"
-description: "AIR Kit API reference — Web SDK and Flutter SDK methods for AIR Account login, smart accounts, credentials, and the credential issuance REST API."
+description: "AIR Kit Web and Flutter SDK reference — AirService class, type definitions, and methods for AIR Account login, smart accounts, and credentials."
 ---
 
-## REST API
+The AIR Kit SDK gives your app one `AirService` surface to run AIR Account login, embedded smart accounts, and credential issuance and verification. This page is the full method and type reference for the Web and Flutter SDKs. For server-to-server credential issuance without user presence, see the [REST API Reference](/api-reference/introduction).
 
-For on-demand credential issuance without user presence, resolve the user and store an encrypted credential in DStorage:
+## Platforms
 
-- **Resolve user:** `POST /v1/auth/initialize-user`
-- **Store encrypted VC:** `POST /v1/dstorage/vcs`
-- **Sandbox:** `https://api.sandbox.mocachain.org/v1`
-- **Production:** `https://mocachain-mainnet.api.air3.com/v1`
+<CardGroup cols={2}>
+  <Card title="Web SDK" icon="browser" href="#web">
+    npm package `@mocanetwork/airkit`. Browser-first; works in any JS framework.
+  </Card>
+  <Card title="Flutter SDK" icon="mobile" href="#flutter">
+    OnePub package `airkit`. Native iOS and Android via platform channels.
+  </Card>
+</CardGroup>
+
+## Install
+
+| Platform | Package | Guide |
+| --- | --- | --- |
+| Web | `@mocanetwork/airkit` | [Installation](/airkit/usage/installation) |
+| Flutter | `airkit` (OnePub) | [Flutter installation](/airkit/flutter/installation) |
+
+See [Initialization](/airkit/usage/initialization) for `init` options and environment selection.
+
+## Authentication
+
+- **AIR Account login** — the SDK runs the user flow and returns an access token. See [User authentication](/airkit/usage/user-authentication).
+- **Partner authentication (JWT)** — your backend signs a Partner JWT with your private key for server-to-server calls. See [Partner authentication](/airkit/usage/partner-authentication).
 
 <Note>
-  The production endpoint serves Moca Chain mainnet. See [Production mainnet access](/airkit/environments#production-mainnet-access).
+  Pick an environment per `BUILD_ENV` (`SANDBOX` or `PRODUCTION`). Production serves Moca Chain mainnet — see [Production mainnet access](/airkit/environments#production-mainnet-access).
 </Note>
 
-Authenticate with a Partner JWT in the `x-partner-auth` header. Full endpoint reference and implementation examples: [Issuance API Reference](/airkit/usage/credential/issuance-api).
+## Reference
 
----
+Each tab lists the class surface and the exported types for that platform.
 
 <Tabs>
 
