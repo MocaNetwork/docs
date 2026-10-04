@@ -855,14 +855,14 @@ mobile-nav-tabs-item:focus-visible {
 
 .docs-landing .feature-list {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--air-spacing-large);
+  grid-template-columns: repeat(4, minmax(0px, 1fr));
+  gap: var(--air-spacing-x-large);
 }
 
 .docs-landing .feature {
   display: flex;
   flex-direction: column;
-  gap: var(--air-spacing-large);
+  gap: var(--air-spacing-x-large);
   min-width: 0;
 }
 
@@ -885,6 +885,7 @@ mobile-nav-tabs-item:focus-visible {
   display: block;
   width: 100%;
   height: 100%;
+  border-radius: var(--air-corner-container);
   object-fit: cover;
 }
 
@@ -1244,6 +1245,9 @@ div[data-component-part="step-indicator"] > div {
   nav[aria-label="On this page"],
   nav[aria-label="Table of contents"] {
     display: none !important;
+  }
+  .docs-landing .feature-list {
+    grid-template-columns: minmax(0px, 1fr) minmax(0px, 1fr);
   }
 }
 
