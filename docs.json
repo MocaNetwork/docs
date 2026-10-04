@@ -201,9 +201,15 @@
                 "group": "Overview",
                 "pages": [
                   "products/identity/integrating-using-ai",
-                  "products/identity/credentials-flow",
-                  "products/identity/integration-workflow",
-                  "products/identity/credential-formats"
+                  "products/identity/business",
+                  {
+                    "group": "For developers",
+                    "pages": [
+                      "products/identity/credentials-flow",
+                      "products/identity/credential-formats",
+                      "products/identity/integration-workflow"
+                    ]
+                  }
                 ]
               },
               {

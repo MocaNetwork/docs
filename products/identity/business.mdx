@@ -1,0 +1,58 @@
+---
+title: "AIR Identity for businesses"
+sidebarTitle: "For businesses"
+description: "What your business gets back when it verifies or issues AIR Credentials."
+---
+
+AIR Identity lets you check a fact about a user, for example - their age, KYC level, or membership tier, without collecting the documents behind it. 
+
+TLDR: A business that already knows the user issues a credential. The user keeps it in their AIR Account and shares only what you ask for, after approving each request.
+
+This page covers what you receive and what stays out of your systems. For how to build it, see [For developers](#for-developers).
+
+## What you get back
+
+**When you verify a credential**, you receive:
+
+| You receive | What it tells you |
+| --- | --- |
+| A result status | Whether the credential meets your rules: `Compliant`, or a reason it doesn't, such as `Expired`, `Revoked`, or `NotFound` |
+| The claims you asked for, and only those the user approved | For example `isOver18: true`, `kycLevel: "enhanced"`, or `tier: "Gold"` |
+| The issuer's signature | Which business vouched for the claims, and that nobody changed them |
+| A binding to the user | For holder-bound credentials, proof that the person presenting is the person it was issued to |
+
+You choose what to ask for in a verification program in the Developer Dashboard. Ask for less, and less reaches you.
+
+**When you issue a credential:**
+
+- It is signed with your keys under your own `did:web` identity, so every verifier sees that it came from you.
+- Users take it to other apps, which verify it without calling your API.
+- You can revoke it when the facts change, and later checks fail.
+
+For how issuers and verifiers earn from this, see [Partner Economics](/solutions/partner-economics).
+
+## What you never store
+
+**As a verifier**, these never reach you:
+
+- **Source documents.** ID images, selfies, and the issuer's records stay with the issuer.
+- **Claims you didn't ask for**, or that the user declined to share.
+- **The user's keys.** AIR Account keys are split with MPC, so no single party, including you and AIR, holds a full key.
+
+**As an issuer**, you don't host the credential for anyone else. It is encrypted to the user and stored in Moca Chain's decentralized storage, and you never hold the key that decrypts it.
+
+**AIR** stores the encrypted credential and its metadata, never the plaintext. To identify an AIR Account across partners, AIR keeps a hashed email.
+
+<Note>
+The claims you do receive can still be personal data. Your own retention and deletion rules apply to them, and revoking a credential does not delete copies already shared. See the [Compliance FAQ](/solutions/compliance-faq).
+</Note>
+
+## For developers
+
+| Question | Read |
+| --- | --- |
+| What data do you need? | [Schema design: privacy](/products/identity/schema-creation#4-consider-privacy-requirements) and [Selective disclosure](/products/identity/selective-disclosure#when-to-use-it) |
+| How does a credential work? | [What a credential is](/products/identity/credentials-flow) |
+| How do you verify one? | [Verifying your first credential](/get-started/quickstarts/verify-credentials) |
+| How do you issue one? | [Issuing your first credential](/get-started/quickstarts/issue-credentials) |
+| Where does the data live? | [Data privacy](/technicals/architecture/data-privacy) |
