@@ -994,6 +994,10 @@
       "destination": "/products/identity/selective-disclosure"
     },
     {
+      "source": "/airkit/early-access/selective-disclosure",
+      "destination": "/products/identity/selective-disclosure"
+    },
+    {
       "source": "/airkit/usage/credential/iden3-credentials",
       "destination": "/products/identity/iden3-credentials"
     },
@@ -1135,6 +1139,10 @@
     },
     {
       "source": "/mocachain/block-explorer",
+      "destination": "/technicals/mocachain/block-explorer"
+    },
+    {
+      "source": "/mocachain/native-dapps/block-explorer",
       "destination": "/technicals/mocachain/block-explorer"
     },
     {
