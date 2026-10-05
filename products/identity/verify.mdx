@@ -7,7 +7,7 @@ As a Verifier, your role is to verify the authenticity of user credentials and e
 
 Most programs accept SD-JWT VC credentials, the default format. Iden3 programs add zero-knowledge proofs and on-chain verification; see [Iden3 credentials](/products/identity/iden3-credentials).
 
-## Verification Flow
+## Verification flow
 
 1. **Start verification** — the verifier starts a session with a `programId`. The program defines what to check and how.
 2. **Consent + discovery** — the SDK requests the holder's consent and loads the matching encrypted credential from DStorage.
@@ -76,7 +76,7 @@ public async verifyCredential({
   }): Promise<CredentialVerificationResult>
 ```
 
-### Input Parameters
+### Input parameters
 
 | Name | Type | Required | Description |
 | ------------- | ------ | -------- | ------------------------------------------------------------------------------------- |

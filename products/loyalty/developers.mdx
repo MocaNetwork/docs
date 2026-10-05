@@ -9,7 +9,7 @@ Issue loyalty tier and milestone credentials from your loyalty engine, and let p
   This guide issues and verifies loyalty **credentials**. A `totalPoints` claim records an issuer's statement about accumulated points; it does not create a spendable points balance. For rewards with funding and redemption, see [Issuing loyalty points](/products/loyalty/issuing-points) and [Spending loyalty points](/products/loyalty/spending-points).
 </Info>
 
-## What You Can Build
+## What you can build
 
 - **Tier credentials** — Issue a "Gold Member" or "VIP" badge that upgrades or revokes automatically as status changes
 - **Milestone badges** — Issue a credential when a user reaches 1,000 points, 10 purchases, or any event-driven threshold
@@ -31,7 +31,7 @@ graph TD
     F -->|At any verifier| I[Gated access / discount]
 ```
 
-## Recommended Schema
+## Recommended schema
 
 Create this schema in the [AIR Kit Dashboard](https://developers.sandbox.air3.com/dashboard) under **Issuer → Schema Builder**.
 
@@ -155,7 +155,7 @@ if (hasGoldStatus) {
 }
 ```
 
-## Key Patterns
+## Key patterns
 
 | Pattern | Reissue behavior | When to Use |
 |---------|:-------------------:|-------------|
@@ -182,7 +182,7 @@ Issuance completes in ~1–4 seconds and returns a `storagePath` once the encryp
   </Card>
 </CardGroup>
 
-## Next Steps
+## Next steps
 
 <Columns cols={2}>
   <Card title="On-demand Issuance — Concepts" icon="book" href="/products/identity/issuing-credentials#direct-issuance">

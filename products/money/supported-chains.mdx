@@ -24,7 +24,7 @@ AIR Kit supports multiple blockchain networks. The available chains depend on yo
 - **Soneium Minato** (Chain ID: 1946)
 - **Sepolia** (Chain ID: 11155111)
 
-## Chain Configuration
+## Chain configuration
 
 Chains are configured per partner through the partner configuration:
 
@@ -36,7 +36,7 @@ Chains are configured per partner through the partner configuration:
 }
 ```
 
-## Gas Cost Reference
+## Gas cost reference
 
 Gas costs on AIR Kit operations are paid in the native token of the selected chain (or sponsored via Paymaster). The table below shows **approximate gas units** for common operations. Actual \$MOCA costs for Moca Chain credential anchoring are listed separately.
 
@@ -44,7 +44,7 @@ Gas costs on AIR Kit operations are paid in the native token of the selected cha
   These benchmarks reflect Testnet measurements as of Q1 2025. Mainnet costs may differ. Enable [Gas Sponsorship (Paymaster)](/products/money/paymaster) to abstract all gas costs from your end users.
 </Note>
 
-### Credential Operations (Moca Chain)
+### Credential operations (Moca Chain)
 
 | Operation | Estimated Gas | Approx. Cost |
 |-----------|:------------:|:------------:|
@@ -54,7 +54,7 @@ Gas costs on AIR Kit operations are paid in the native token of the selected cha
 | Credential revocation | ~50,000 | ~0.00005 MOCA |
 | Session key registration | ~60,000 | ~0.00006 MOCA |
 
-### EVM Chain Operations (Base, BSC, Gnosis, etc.)
+### EVM chain operations (Base, BSC, Gnosis, etc.)
 
 | Operation | Estimated Gas | Notes |
 |-----------|:------------:|-------|
@@ -62,7 +62,7 @@ Gas costs on AIR Kit operations are paid in the native token of the selected cha
 | UserOperation (ERC-4337) | ~150,000–300,000 | Varies by calldata size |
 | ERC-20 transfer | ~65,000 | Standard token transfer |
 
-## Gas Sponsorship
+## Gas sponsorship
 
 Use the [Paymaster](/products/money/paymaster) to cover all user-facing gas costs from a pre-funded developer wallet. This removes all on-chain funding friction from your end users — they never need to hold or manage gas tokens.
 

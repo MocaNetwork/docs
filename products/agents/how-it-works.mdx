@@ -8,8 +8,8 @@ import AgenticIdentityAvailability from "/snippets/agentic-identity-availability
 <AgenticIdentityAvailability />
 
 An application deciding on an agent's request needs three things: 
-- Who the agent is ? 
-- What the user has allowed it to do ?
+- Who the agent is? 
+- What the user has allowed it to do?
 - Verified claims behind the request.
 
 ## The building blocks
@@ -57,15 +57,15 @@ Issuing credentials is a separate integration owned by the issuer. See [Issuing 
 
 ## What a verification result proves
 
-Agent verification runs offchain, without a zero-knowledge proof. The `status` tells your backend the outcome. What else the result carries depends on the credential format:
+Agent verification runs offchain, and `status` tells your backend the outcome. A `Compliant` result includes an SD-JWT presentation: the issuer-signed JWT plus the disclosures the program requested. If you send a `nonce` and the credential was issued with `cnf.jwk`, it also includes a key-binding JWT tied to your challenge.
 
-| Credential format | What the presentation contains |
-| --- | --- |
-| SD-JWT | A compact presentation with the issuer-signed JWT and the chosen disclosures. If you send a `nonce` and the credential was issued with `cnf.jwk`, it also includes a key-binding JWT tied to your challenge. |
-
-The presentation has no proof block of its own. A third party, such as a merchant, can independently check only the issuer-signed parts: a BJJ credential or an SD-JWT presentation. Otherwise, it has to trust your backend's report of the result. See [Verifying credentials](/products/identity/verify) for the general model.
+A third party, such as a merchant, can check that presentation itself: the issuer signature, the disclosures, and the key-binding JWT when present. See [Verify SD-JWT on your backend](/products/identity/verify-sd-jwt). The `status` field is not signed, so a recipient that receives only the status has to trust your backend's report.
 
 The checkout token identifies the user and their AIR Account address. To share a verification result with a merchant, agree the format and how the merchant checks it.
+
+<Note>
+  Programs that use [Iden3 credentials](/products/identity/iden3-credentials) (Advanced) return a different presentation. See the [endpoint reference](/api-reference/agents/verify-credential-by-agent).
+</Note>
 
 ## What the receiving application checks
 

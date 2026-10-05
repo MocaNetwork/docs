@@ -9,7 +9,7 @@ Selective disclosure lets a verifier request specific fields from a credential, 
 
 Iden3 programs can instead prove a condition, such as `membershipTier > bronze`, with a zero-knowledge proof. See [Iden3 credentials](/products/identity/iden3-credentials).
 
-## When to Use It
+## When to use it
 
 Selective Disclosure is useful when the Verifier needs a specific value, but not the whole credential, to choose the right reward, access level, or next step.
 
@@ -37,7 +37,7 @@ Before using Selective Disclosure you need:
 3. **Active verification program** — A published verification program in the Developer Dashboard (Verifier → Programs).
 4. **Partner JWT with `scope=verify`** — See [SDK authentication](/get-started/authentication/sdk-auth).
 
-## Step 1: Enable Disclosure on the Issuance Program
+## Step 1: Enable disclosure on the issuance program
 
 Selective Disclosure must be enabled by the **Issuer**. As a Verifier, you cannot request disclosed data unless the Issuer has opted in.
 
@@ -68,11 +68,11 @@ Then enable disclosure on the issuance program in the Dashboard:
 
 Any credential issued from this program will now support Selective Disclosure during verification.
 
-## Step 2: Request Disclosure During Verification
+## Step 2: Request disclosure during verification
 
 On the Verifier side, pass `fieldsToDisclose` to `airService.verifyCredential`, along with a `nonce` from your backend. `fieldsToDisclose` is required for `SD_JWT_VC` programs. There are two supported shapes.
 
-### Disclose the Entire Credential Subject
+### Disclose the entire credential subject
 
 Pass `'*'` to receive every field in the credential subject.
 
@@ -91,7 +91,7 @@ const result = await airService!.verifyCredential({
 </Tab>
 </Tabs>
 
-### Disclose Specific Fields
+### Disclose specific fields
 
 Pass an array of field names from the credential subject. Only the listed fields are returned. Use dotted paths for nested fields, such as `address.city`.
 
@@ -109,7 +109,7 @@ const result = await airService!.verifyCredential({
 Field names in `fieldsToDisclose` must match keys defined in the credential schema. Fields the Issuer has not enabled for disclosure are silently omitted.
 </Note>
 
-## Response Shape
+## Response shape
 
 When the verification result is `Compliant`, the disclosed fields are inside the W3C Verifiable Presentation on `verifiablePresentation`.
 
@@ -127,7 +127,7 @@ For Iden3 programs, `verifiableCredential` holds W3C Verifiable Credential objec
   **Deprecated as of 1.11.** Disclosure used to be returned on a top-level `disclosedData` object alongside `zkProofs` and `transactionHash`. Those fields are no longer populated — read `verifiablePresentation` instead. See the [1.11.1 release notes](/api-reference/release-notes).
 </Note>
 
-## Behavior and Limits
+## Behavior and limits
 
 - Disclosed fields are only returned when `status === "Compliant"`. Non-compliant verifications never expose credential data.
 - If the Issuer has not enabled **Allow data disclosure** on the program, `fieldsToDisclose` is ignored and no disclosed claims appear in the presentation.

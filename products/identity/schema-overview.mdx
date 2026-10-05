@@ -16,7 +16,7 @@ Schemas serve several critical purposes:
   **SD-JWT and Iden3 use schemas differently.** For SD-JWT VC credentials, the default format, the schema defines the claim names and types, and the schema ID becomes the credential type (`vct`) unless your issuer sets its own. Which claims are selectively disclosable is set by the issuer's `disclosureFrame`. The JSON-LD context and `$metadata` described below apply to [Iden3 credentials](/products/identity/iden3-credentials).
 </Note>
 
-## Schema Components
+## Schema components
 
 A Schema Type encodes the structure of a particular Verifiable Credential (VC) by defining the type, the fields that must be included inside the VC, and a description for these fields.
 
@@ -24,11 +24,11 @@ Schemas let different services interpret the same credential consistently. A ver
 
 A schema type is made of **two separate documents**:
 
-### 1. JSON-LD Context
+### 1. JSON-LD context
 
 The JSON-LD Context contains a description of the type and its fields, providing semantic meaning to your credential data by linking it to standardized vocabularies and ontologies.
 
-#### Understanding JSON-LD Context
+#### Understanding JSON-LD context
 
 JSON-LD context defines the vocabulary and data types used in your credentials. It maps local field names to globally unique identifiers (URIs) that have well-defined meanings.
 
@@ -74,7 +74,7 @@ Here's an example of a JSON-LD Context for a `MembershipPointsCredential`:
 }
 ```
 
-#### Key JSON-LD Context Elements
+#### Key JSON-LD context elements
 
 - **@version**: Specifies the JSON-LD version (typically 1.1)
 - **@protected**: Ensures that terms cannot be overridden
@@ -192,7 +192,7 @@ Here's an example of a JSON Schema for the `MembershipPointsCredential`:
 }
 ```
 
-#### Key JSON Schema Elements
+#### Key JSON Schema elements
 
 - **$metadata**: Contains URIs linking to both the JSON-LD context and JSON schema
 - **required**: Lists all mandatory fields for the credential
@@ -200,7 +200,7 @@ Here's an example of a JSON Schema for the `MembershipPointsCredential`:
 - **credentialSubject**: Contains the actual credential data fields
 - **format**: Specifies validation formats (uri, date-time, etc.)
 
-#### Benefits of This Two-Document Approach
+#### Benefits of this two-document approach
 
 1. **Separation of Concerns**: JSON-LD handles semantics, JSON Schema handles validation
 2. **Interoperability**: Different systems can understand credentials using standard vocabularies

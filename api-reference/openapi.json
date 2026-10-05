@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Moca Network API",
-    "description": "Server-to-server API for credential issuance, status tracking, catalog browsing, and partner operations on the Moca Network.",
+    "description": "Server-to-server API for credential issuance and partner operations on the Moca Network.",
     "version": "1.0.0",
     "contact": {
       "name": "Moca Network",

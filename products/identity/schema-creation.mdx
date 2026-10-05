@@ -5,7 +5,7 @@ description: "Create and publish AIR Kit credential schemas using the Schema Bui
 
 Credential schemas are the foundation of your credential issuance system. This guide will help you understand, create, and manage schemas effectively for your AIR Kit applications.
 
-## Creating Schemas with the Schema Builder
+## Creating schemas with the Schema Builder
 
 The AIR Kit Schema Builder provides an intuitive interface for creating credential schemas without requiring technical knowledge of JSON schema structures.
 
@@ -15,7 +15,7 @@ The AIR Kit Schema Builder provides an intuitive interface for creating credenti
 2. Navigate to the **Schemas** section under **Issuer**
    ![Create Schema](/images/guides/schema.png)
 
-### Step 2: Create a New Schema
+### Step 2: Create a new schema
 
 1. Click **"Create New Schema"**
 2. Fill in the basic schema information:
@@ -23,7 +23,7 @@ The AIR Kit Schema Builder provides an intuitive interface for creating credenti
    - **Type**: Select or enter a category for your credential type
    - **Description**: Provide a clear explanation of what this schema represents
 
-### Step 3: Define Attributes
+### Step 3: Define attributes
 
 1. Click **"+"** to add attributes
 2. For each attribute, specify:
@@ -32,7 +32,7 @@ The AIR Kit Schema Builder provides an intuitive interface for creating credenti
    - **Description**: Explain what this field represents
    - **Required**: Mark if the field is mandatory
 
-### Step 4: Publish Your Schema
+### Step 4: Publish your schema
 
 1. Review your schema structure
 2. Click **"Publish"** to make it available for credential creation
@@ -42,34 +42,34 @@ The AIR Kit Schema Builder provides an intuitive interface for creating credenti
   <img src="/images/guides/schema_builder.gif" alt="Create schema" style={{width: "600px"}} />
 </div>
 
-## Schema Builder Best Practices
+## Schema Builder best practices
 
-### 1. Choose Descriptive Names
+### 1. Choose descriptive names
 
 - Use clear, descriptive names for your schema title and attributes
 - Avoid abbreviations that might be unclear to other developers
 - Example: `"memberId"` instead of `"mem_id"`
 
-### 2. Provide Clear Descriptions
+### 2. Provide clear descriptions
 
 - Write detailed descriptions for each attribute
 - Explain the purpose and expected format of each field
 - Include any validation rules or constraints
 
-### 3. Use Appropriate Data Types
+### 3. Use appropriate data types
 
 - **String**: For text data, IDs, names, descriptions
 - **Number**: For numeric values, ages, quantities, scores
 - **Boolean**: For true/false values, flags, status indicators
 - **Date**: For timestamps, expiry dates, event dates
 
-### 4. Consider Privacy Requirements
+### 4. Consider privacy requirements
 
 - Only include fields that are necessary for your use case
 - Remember that users can selectively disclose fields
 - Avoid collecting sensitive data unless absolutely required
 
-### 5. Plan for Future Updates
+### 5. Plan for future updates
 
 - Consider how your schema might evolve over time
 - Use versioning to manage schema changes

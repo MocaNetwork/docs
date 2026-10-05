@@ -202,7 +202,8 @@ Listing credentials is optional when you already know which program to run. It c
         {
           "storagePath": "vc/3f1a9c8e2b7d4f60a1c5e9b8d7f6a4c2/018f9a2b-7c3d-7e10-9a4b-2c1d5e6f7a8b",
           "schemaId": "<schema-id>",
-          "issuerDid": "did:iden3:…",
+          "issuerDid": "did:web:issuer.example",
+          "vct": "<schema-vct>",
           "createdAt": "2026-08-01T00:00:00.000Z"
         }
       ],
@@ -250,7 +251,7 @@ Listing credentials is optional when you already know which program to run. It c
           "@context": ["https://www.w3.org/2018/credentials/v1"],
           "type": ["VerifiablePresentation"],
           "holder": "did:…",
-          "verifiableCredential": []
+          "verifiableCredential": ["<issuer-jwt>~<disclosure>~<kb-jwt>"]
         }
       }
     }
@@ -260,7 +261,7 @@ Listing credentials is optional when you already know which program to run. It c
     - `fieldsToDisclose` can be omitted, `"*"`, or a list such as `["birthday", "documentType"]`. What each option returns depends on the credential format; see the [endpoint reference](/api-reference/agents/verify-credential-by-agent).
     - For SD-JWT programs, pass a `nonce` to bind the presentation to your challenge. It is required when the credential was issued with `cnf.jwk`.
 
-    Verification runs offchain, without a zero-knowledge proof, and the presentation has no proof block of its own. Before you pass a result to a merchant, see [What a verification result proves](/products/agents/how-it-works#what-a-verification-result-proves).
+    Verification runs offchain. Before you pass a result to a merchant, see [What a verification result proves](/products/agents/how-it-works#what-a-verification-result-proves).
 
     A `502 CREDENTIAL_STORAGE_UNAVAILABLE` means storage was unavailable, not that the user lacks the credential.
   </Step>

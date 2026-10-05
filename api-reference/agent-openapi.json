@@ -592,7 +592,7 @@
                     {
                       "storagePath": "vc/3f1a9c8e2b7d4f60a1c5e9b8d7f6a4c2/018f9a2b-7c3d-7e10-9a4b-2c1d5e6f7a8b",
                       "schemaId": "<schema-id>",
-                      "issuerDid": "did:iden3:…",
+                      "issuerDid": "did:web:issuer.example",
                       "createdAt": "2026-08-01T00:00:00.000Z"
                     }
                   ],
@@ -678,7 +678,7 @@
                         "VerifiablePresentation"
                       ],
                       "holder": "did:…",
-                      "verifiableCredential": []
+                      "verifiableCredential": ["<issuer-jwt>~<disclosure>~<kb-jwt>"]
                     }
                   }
                 }
@@ -988,7 +988,7 @@
           },
           "issuerDid": {
             "type": "string",
-            "example": "did:iden3:…"
+            "example": "did:web:issuer.example"
           },
           "createdAt": {
             "type": "string",

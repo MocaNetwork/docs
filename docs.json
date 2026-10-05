@@ -762,14 +762,6 @@
       "destination": "/get-started/build-with-your-agent"
     },
     {
-      "source": "/learn/airkit/key-features",
-      "destination": "/help/glossary"
-    },
-    {
-      "source": "/learn/airkit/features-developer-benefits",
-      "destination": "/help/glossary"
-    },
-    {
       "source": "/learn/use-cases/identity-verification",
       "destination": "/solutions/identity"
     },
@@ -1006,20 +998,8 @@
       "destination": "/products/identity/iden3-credentials"
     },
     {
-      "source": "/learn/airkit/integration-workflow",
-      "destination": "/products/identity/integration-workflow"
-    },
-    {
       "source": "/airkit/usage/backend-hosting",
       "destination": "/products/identity/backend-hosting"
-    },
-    {
-      "source": "/agentic-identity",
-      "destination": "/products/agents"
-    },
-    {
-      "source": "/agentic-identity/partners",
-      "destination": "/products/agents/partners"
     },
     {
       "source": "/agentic-identity/how-it-works",
@@ -1044,10 +1024,6 @@
     {
       "source": "/agentic-identity/partner-agent-api",
       "destination": "/products/agents/partner-agent-api"
-    },
-    {
-      "source": "/money",
-      "destination": "/products/money"
     },
     {
       "source": "/airkit/usage/account/smart-account",
@@ -1084,10 +1060,6 @@
     {
       "source": "/recipes/wagmi-integration",
       "destination": "/products/money/wagmi-integration"
-    },
-    {
-      "source": "/loyalty",
-      "destination": "/products/loyalty"
     },
     {
       "source": "/loyalty/business",
@@ -1252,10 +1224,6 @@
     {
       "source": "/learn/help/faq",
       "destination": "/help/faq"
-    },
-    {
-      "source": "/concepts/glossary",
-      "destination": "/help/glossary"
     },
     {
       "source": "/status",
