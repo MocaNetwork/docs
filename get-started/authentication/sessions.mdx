@@ -1,0 +1,83 @@
+---
+title: "Sessions & user info"
+sidebarTitle: "Sessions & Info"
+description: "Work with AIR Kit sessions after login — the login result token, automatic session rehydration, logout, and retrieving user information with getUserInfo."
+---
+
+## Login result token
+
+After a successful login, `login()` returns an `AirLoginResult`. Its `token` property is a JWT issued by AIR with these claims:
+
+```json
+{
+  sub: string,
+  abstractAccountAddress: string,
+  partnerId: string,
+  sourcePartnerId?: string
+}
+```
+
+To trust this token on your backend, validate it against AIR's JWKS at [https://static.air3.com/.well-known/jwks.json](https://static.air3.com/.well-known/jwks.json).
+
+## Session management
+
+AIR Kit manages sessions for you. Returning users are logged in automatically for up to 30 days, unless they logged out.
+
+<Tabs>
+<Tab title="Web">
+
+- To require users to log in every time they visit your app, set `skipRehydration` to true when initializing the SDK.
+- Call `isLoggedIn` to check the login state of a user.
+- To log out, call `logout()`.
+- To change locale or currency after initialization, call `updateSessionConfig()`. See [Language support](/get-started/customization/language) and [Other options](/get-started/customization/other-options).
+
+</Tab>
+<Tab title="Flutter">
+
+- To keep users logged in after an app restart, call `rehydrate()`. It logs in a returning user who still has a valid session; otherwise, call `login()`.
+
+</Tab>
+</Tabs>
+
+## User information
+
+### getUserInfo()
+
+Retrieves detailed information about the currently logged-in user.
+
+**Method Signature:**
+
+```ts
+public async getUserInfo(): Promise<AirUserDetails>
+```
+
+**Returns:**
+
+```ts
+{
+  partnerId?: string;
+  airId?: AirIdDetails;
+  user: {
+    id: string;
+    abstractAccountAddress?: string;
+    email?: string;
+    wallet?: string;
+    isMFASetup: boolean;
+  };
+}
+```
+
+**Requirements:**
+
+- User must be logged in
+
+**Example:**
+
+```ts
+try {
+  const userInfo = await airService.getUserInfo();
+} catch (error) {
+  console.error("Failed to get user info:", error);
+  // Handle error appropriately
+}
+```

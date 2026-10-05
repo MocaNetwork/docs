@@ -1,0 +1,17 @@
+---
+title: "Other options"
+sidebarTitle: "Others"
+description: "Other AIR Kit session options — set the display currency for wallet balances, transactions, and on-ramp and swap interfaces."
+---
+
+Session options are set in `sessionConfig` when you call `init()`, and can be changed later with `updateSessionConfig()`. For language, see [Language support](/get-started/customization/language).
+
+## Currency
+
+Set the optional `sessionConfig.currency` at initialization, or update it alongside the locale:
+
+```tsx
+const updatedConfig = await airService.updateSessionConfig({ currency: "EUR" });
+```
+
+Supported currencies are `EUR` (Euro), `USD` (US Dollar), `CNY` (Chinese Yuan), `KRW` (South Korean Won), and `TRY` (Turkish Lira). Currency controls monetary display in wallet balances, transaction amounts, and on-ramp/swap interfaces. The update returns the complete `AirSessionConfig`, including locale and currency.

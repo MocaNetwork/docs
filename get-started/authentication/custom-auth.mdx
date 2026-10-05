@@ -1,0 +1,32 @@
+---
+title: "Custom Auth"
+description: "Let users already signed in to your app use AIR Kit without logging in again, by passing their email in a Partner JWT at login."
+---
+
+With Custom Auth, users who are already signed in to your app skip the AIR Kit login dialog. Your backend signs a [Partner JWT](/get-started/authentication/sdk-auth) that includes the user's email, and your app passes it to `login({ authToken })`. AIR Kit then creates or loads the AIR Account for that email.
+
+The first time an email is used, AIR verifies it with a one-time password sent to that address, because the email identifies the user across AIR. Later logins with the same email skip this step.
+
+Custom Auth needs a registered [JWKS endpoint](/get-started/authentication/jwks-endpoint), like any Partner JWT.
+
+## JWT payload
+
+```json
+{
+  "partnerId": "your-partner-id",
+  "email": "user@example.com",
+  "iat": 1728970084,
+  "exp": 1728973684
+}
+```
+
+| Claim | Required | Description |
+| --- | --- | --- |
+| `partnerId` | Yes | Your Partner ID |
+| `email` | Yes | The user's verified email, used as their AIR Account identifier |
+| `exp` | Yes | Expiration time; 5 minutes is recommended |
+| `iat` | Recommended | Issued-at time |
+
+Sign the token on your server with a `kid` header that matches your JWKS.
+
+For a full implementation with backend and frontend code, see the [Bring your own auth](/get-started/recipes/bring-your-own-auth) recipe.

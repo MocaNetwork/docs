@@ -1,0 +1,119 @@
+---
+title: "Login options"
+sidebarTitle: "Login options"
+description: "Customize the AIR Kit login screen via partner config — control available login methods, branding, and how the login interface appears to your users."
+---
+
+## Login Methods (`loginMethods`)
+
+Control which authentication methods are available on the login screen:
+
+```tsx
+type LoginMethod =
+  | "passwordless" // Email-based passwordless login
+  | "passwordlessToggle" // Email input revealed behind a link
+  | "google" // Google OAuth login
+  | "wallet" // Wallet connection login
+  | "passkey"; // Passkey login
+```
+
+**Available Options:**
+
+- **`passwordless`**: Email-based passwordless authentication, with the email input shown up front
+- **`passwordlessToggle`**: Same as `passwordless`, but the input starts collapsed behind a link and appears once the user taps it. Useful when you want social or wallet login to be the visually dominant option
+- **`google`**: Google OAuth login integration
+- **`wallet`**: Wallet-based authentication. Requires [EOA wallet authentication](/get-started/authentication/login#eoa-wallet-authentication-optional-add-on), which the AIR team enables on request.
+- **`passkey`**: Passkey login
+
+**Example Configuration:**
+
+```tsx
+// Email and Google
+loginMethods: ["passwordless", "google"];
+
+```
+
+**Note:** The order in the array determines the display order in the UI (top to bottom).
+
+**Defaults and automatic adjustments:**
+
+- If `loginMethods` is omitted or empty, AIR Kit falls back to `["passwordless", "google"]`.
+- Inside webviews, `google` is dropped automatically, since Google blocks OAuth in embedded browsers. If neither `passwordless` nor `passwordlessToggle` was configured, AIR Kit adds `passwordless` so users always have a way to sign in.
+- Unknown and duplicated values are ignored.
+
+### Wallet Login Methods (`walletLoginMethods`)
+
+When `wallet` is included in `loginMethods`, specify which wallet providers are available:
+
+```tsx
+type LoginWalletId =
+  | "bybit" // Bybit Wallet
+  | "coinbase" // Coinbase Wallet
+  | "crypto.com" // Crypto.com DeFi Wallet
+  | "metamask" // MetaMask
+  | "okx" // OKX Wallet
+  | "phantom" // Phantom Wallet
+  | "rabby" // Rabby Wallet
+  | "rainbow" // Rainbow Wallet
+  | "trust" // Trust Wallet
+  | "walletConnect"; // WalletConnect
+```
+
+**Example Configuration:**
+
+```tsx
+// Enable wallet login with specific providers
+loginMethods: ["wallet"],
+walletLoginMethods: ["metamask", "coinbase", "walletConnect"]
+
+// Default wallet providers if not specified
+walletLoginMethods: undefined;
+// ["metamask", "phantom", "okx", "coinbase", "rabby", "walletConnect"]
+```
+
+<Info>
+The order in the array determines the display order in the UI (left to right, top to bottom). Since AIR accounts are shared across partners, consider including email-based login to avoid forcing users to link wallets to existing accounts.
+</Info>
+
+### Style Configuration (`style`)
+
+Customize the visual appearance of the login interface:
+
+```tsx
+type PartnerConfigStyle = {
+  passwordlessButtonVariant?: "inline" | "standalone";
+  airLogoTheme?: "default" | "reverse" | "dark_only" | "light_only";
+};
+```
+
+**Style Options:**
+
+- **`passwordlessButtonVariant`**: Controls how the passwordless login button appears
+  - `"inline"`: Button appears inline with other elements
+  - `"standalone"`: Button appears as a standalone element below the input
+- **`airLogoTheme`**: Controls the AIR logo appearance
+  - `"default"`: Standard logo theme
+  - `"reverse"`: Reversed color scheme
+  - `"dark_only"`: Dark theme only
+  - `"light_only"`: Light theme only
+
+**Example Configuration:**
+
+```tsx
+style: {
+  passwordlessButtonVariant: "standalone",
+  airLogoTheme: "dark_only",
+}
+```
+
+## OTP delivery customization
+
+OTP delivery branding can be customized for your project:
+
+- **SMS sender name**: Use `{Partner Name} via AIR`, such as `Minds via AIR`.
+- **Email logo**: Display your logo in OTP emails.
+- **Email sender domain**: Send OTP emails from your domain by providing your own SMTP server. You can use providers such as Mailgun, SendGrid, or AWS SES.
+
+<Info>
+These customizations are enabled by the AIR team and are not configured through the SDK. Contact us to request custom OTP delivery branding for your project.
+</Info>

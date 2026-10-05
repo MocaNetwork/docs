@@ -3,6 +3,11 @@ title: "Identity & Compliance"
 description: "Issue portable KYC credentials with encrypted storage and user-controlled disclosure. Partners configure the claims and proofs needed for verification."
 ---
 
+Every platform that needs to verify a user's identity runs its own KYC process and stores a copy of the result. AIR Kit lets you **issue a KYC credential once** that partners can verify using their Verification Programs. ZK proofs can confirm eligibility without revealing underlying values; additional disclosure requires user approval.
+
+<Tabs>
+<Tab title="For business">
+
 ## The Problem
 
 Every platform that needs to verify a user's identity runs its own KYC process, stores a copy of the result, and takes on the liability for protecting it. The user goes through the same friction — passport upload, liveness check, waiting period — at every new service they join.
@@ -12,17 +17,17 @@ The industry has accepted this as the cost of compliance. It isn't.
 ## What Changes With AIR Kit
 
 - **Your customer verifies once** — KYC passed at your platform issues a portable credential. Every partner in the ecosystem accepts it without running KYC again
-- **Control what verifiers receive** — Programs can request ZK proofs of eligibility, specific claims with user approval, or consent-controlled CAK access when underlying documents are required
+- **Control what verifiers receive** — Programs can request ZK proofs of eligibility or specific claims with user approval
 - **Your KYC provider doesn't change** — You keep Jumio, Onfido, Persona, or whoever you use. AIR Kit converts their pass result into a portable credential. The verification itself stays with your provider
 - **Limit copies of identity data** — Raw source documents remain with the issuer or its KYC provider. Encrypted credential payloads may be stored in DStorage, and users control decryption and disclosure. Verifiers remain responsible for protecting any data they receive
 
 ## Use Cases
 
 <CardGroup cols={2}>
-  <Card title="KYC Portability" icon="id-card">
+  <Card title="KYC Portability" icon="id-card" href="https://air-bd-v2.netlify.app/demo/reusable-kyc">
     Issue a KYC attestation on verification pass. Partner platforms accept it without re-running checks. One verification, ecosystem-wide acceptance.
   </Card>
-  <Card title="Age Verification" icon="cake-candles">
+  <Card title="Age Verification" icon="cake-candles" href="https://air-bd-v2.netlify.app/try-it-live/meet-verified">
     Prove a user is 18+ or 21+ without revealing their birthdate. The verifier learns only the boolean result — the actual age stays private.
   </Card>
   <Card title="Accredited Investor" icon="chart-line">
@@ -52,7 +57,7 @@ The industry has accepted this as the cost of compliance. It isn't.
 
 ## What the Verifier Actually Sees
 
-The following example uses a program that requests KYC status and limited claims with user approval. Other programs can request different disclosures or CAK access.
+The following example uses a program that requests KYC status and limited claims with user approval. Other programs can request different disclosures.
 
 | What the Verifier Receives | What Stays Private |
 |----------------------------|--------------------|
@@ -61,6 +66,8 @@ The following example uses a program that requests KYC status and limited claims
 | `isOver18: true` | Residential address |
 | Credential expiry date | National ID / tax number |
 | Issuer identifier | Income, net worth, financial data |
+
+[Try it live](https://air-bd-v2.netlify.app/try-it-live/meet-verified): a marketplace learns only that the user passed an ID check.
 
 ## What Compliance Will Ask
 
@@ -71,7 +78,7 @@ Use the minimum claims needed for the check, such as KYC level and `isOver18`. T
 Revoke the credential to stop future successful checks once its revoked status is available. Handle deletion of source records, encrypted payloads, metadata, and disclosed copies separately. See the [Compliance FAQ](/solutions/compliance-faq).
 
 **Who has access to the underlying identity documents?**
-Raw source documents remain with the issuer or its KYC provider. AIR may store encrypted credential payloads in DStorage. If CAK is enabled for source-data access, a verifier can decrypt the separately encrypted data only after explicit user consent.
+Raw source documents remain with the issuer or its KYC provider. AIR may store encrypted credential payloads in DStorage.
 
 **What if a user disputes their KYC result?**
 The dispute process stays entirely with your KYC provider, as it does today. You revoke or re-issue the AIR Kit credential once the dispute resolves.
@@ -92,16 +99,36 @@ Your backend signs the credential and encrypts it to the holder before storage. 
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Developer integration guide (Fintech & Identity)" icon="code" href="/airkit/guides/air-for-fintech">
-    KYC credential schemas, webhook code, and verification patterns.
-  </Card>
   <Card title="Full Compliance FAQ" icon="shield-check" href="/solutions/compliance-faq">
     GDPR, CCPA, data residency, and breach liability answers.
   </Card>
-  <Card title="Architecture & Data Flow" icon="diagram-project" href="/airkit/guides/overview">
+  <Card title="Architecture & Data Flow" icon="diagram-project" href="/technicals/architecture">
     ZK proof flow explained end-to-end.
   </Card>
   <Card title="Talk to our team" icon="handshake" href="https://air3.com/partner-with-us">
     Start a partnership conversation.
   </Card>
 </CardGroup>
+
+</Tab>
+<Tab title="For developers">
+
+Identity credentials are issued and verified with the same AIR Kit flows used across every vertical. Start with the managed KYC service if you need identity verification out of the box, or wire your existing KYC provider into on-demand issuance.
+
+<CardGroup cols={2}>
+  <Card title="KYC (Veriff powered by zkMe)" icon="id-card" href="/solutions/kyc">
+    Managed identity verification that issues a KYC credential on pass. How it works, data handling, and pricing.
+  </Card>
+  <Card title="Issue a KYC credential on event" icon="code" href="/get-started/recipes/issue-kyc-credential">
+    Recipe: convert your KYC provider's pass result into a portable credential from a backend webhook.
+  </Card>
+  <Card title="Quickstart: verify credentials" icon="shield-check" href="/get-started/quickstarts/verify-credentials">
+    Verify a credential and handle a Verifiable Presentation with program-defined disclosures.
+  </Card>
+  <Card title="Fintech & Payments" icon="credit-card" href="/solutions/fintech">
+    KYC credential schema, webhook code, and verification patterns in the Fintech developer guide.
+  </Card>
+</CardGroup>
+
+</Tab>
+</Tabs>

@@ -1,0 +1,118 @@
+---
+title: "Developer Dashboard features"
+sidebarTitle: "Features"
+description: "What each section of the AIR Kit Developer Dashboard does — account settings and domains, issuer schemas and programs, and verifier programs and fee wallet."
+---
+
+The <a href="https://developers.sandbox.air3.com/dashboard" target="_blank" rel="noreferrer">Developer Dashboard</a> is where you configure your AIR Kit integration. You sign in by connecting an EVM wallet, which identifies your partner account. It has three sections:
+
+- **Account:** your partner settings and allowed domains.
+- **Issuer:** schemas, issuance programs, and issuance records.
+- **Verifier:** verification programs, verification records, and the fee wallet.
+
+The Issuer and Verifier sections appear once you register your DID. See [Setting up your account](/get-started/dashboard/account-setup).
+
+## Account
+
+### General Settings
+
+| Field | Description |
+| --- | --- |
+| **Partner ID** | Your AIR Kit partner ID. Read-only; copy it into your SDK and backend configuration. |
+| **Name** | Your app's name, shown to users during login, wallet transactions, issuance, and verification. |
+| **Logo URL** | Your app's logo, shown in the same places as the name. |
+| **Website URL** | Your app's website, for users who want to learn more about your app. |
+| **JWKS URL** | The public HTTPS URL of your JWKS. Required for issuing and verifying credentials and for Custom Auth. See [JWKS endpoint](/get-started/authentication/jwks-endpoint). |
+
+### Domains
+
+AIR Kit only loads on domains you allow. You can add up to 3 domains or subdomains, and wildcards such as `*.myapp.example.com` are supported. Some domains are blocked for security reasons; contact the AIR team if you need one of them.
+
+<Info>
+In sandbox, `localhost` is allowed on ports `3000`, `5173`, and `8200`, and you cannot add it to the list yourself. Production requires HTTPS domains.
+</Info>
+
+## Issuer
+
+The Issuer section is for partners that issue credentials. It has three areas: the schema builder, issuance programs, and issuance monitoring.
+
+### 1. Schema Builder
+
+This is the starting point for creating any new credential. A Schema acts as a blueprint, defining the structure, data type, and rules for a specific type of credential.
+
+- **Create Schemas**: Issuers can build custom schemas by defining a title, version, and description.
+- **Define Attributes**: Within each schema, issuers add specific data fields (attributes). For each attribute, they define a name, data type (e.g., string, number, boolean), a descriptive title, and can mark it as required.
+- **Publish**: Publish the schema to use it in issuance programs. See [Schema creation](/products/identity/schema-creation) for field types and design rules.
+
+Here is an example of a simple schema for a "DAO Membership" credential:
+
+```json
+{
+  "title": "DAO Membership",
+  "version": "1.0",
+  "description": "Verifies that the holder is a member of a specific DAO.",
+  "attributes": [
+    {
+      "name": "daoName",
+      "type": "string",
+      "title": "DAO Name",
+      "required": true
+    },
+    {
+      "name": "memberSince",
+      "type": "date",
+      "title": "Member Since",
+      "required": true
+    },
+    {
+      "name": "votingPower",
+      "type": "number",
+      "title": "Voting Power",
+      "required": false
+    }
+  ]
+}
+```
+
+### 2. Issuance Program
+
+An issuance program defines a credential your issuer service can issue, based on a published schema.
+
+- **Select a Schema**: The process begins by selecting the appropriate schema, which loads its predefined attributes.
+- **Set Issuance Rules**: Issuers can configure key parameters for the credential, such as:
+  - **Accessible Until**: An optional date range during which the credential is valid.
+  - **Maximum Issuance**: An optional cap on the total number of credentials that can be claimed.
+  - **Expiration Duration**: The lifespan of the credential after it has been issued to a user (e.g., 90 days, 1 year, permanent).
+- **Use the program ID**: Pass the program ID to `issueCredential` in your app. Your [issuer service](/products/identity/backend-hosting) signs and issues the credential when the user claims it.
+
+### 3. Issuer Dashboard Monitoring
+
+This section provides a high-level overview and detailed logs of all issuance activity.
+
+- **Key Metrics**: View statistics like the Total Issued Number (the total number of credentials claimed by users) and the Total Credential Number (the number of different credential types created).
+- **Claim Records**: See a detailed list of every credential that has been claimed by a user, including the Holder ID, Credential ID, and the Claimed Time. Issuers can also revoke a claimed credential directly from this interface.
+
+## Verifier
+
+The Verifier section is for partners that check users' credentials. It is centered on verification programs.
+
+### 1. Verification Program Management
+
+A verification program defines which credentials you accept and which claims you request.
+
+- **Choose the credential**: Select the schema, the issuers you trust, and the accepted proof type (`SD_JWT_VC` by default).
+- **Request claims**: Choose which claims the user is asked to disclose. The user sees them on the consent screen and shares only those. See [Selective disclosure](/products/identity/selective-disclosure).
+- **Use the program ID**: Pass the program ID to `verifyCredential` in your app.
+
+Conditions on a value without revealing it, such as "age greater than 18", and on-chain verification need [Iden3 credentials](/products/identity/iden3-credentials).
+
+### 2. Verifier Dashboard Monitoring
+
+This dashboard provides a comprehensive record of all verification activities.
+
+- **Key Metrics**: View the Total Verified Number of credentials and other relevant statistics.
+- **Verification Records**: Access a detailed log of all verification attempts, including the Holder ID, the Program Name used, the Verified Time, and the Current Status (e.g., Passed, Verification Failed).
+
+### 3. Settings and Fee Wallet
+
+Issuers and verifiers each have a settings panel. For verifiers, it includes a fee wallet: issuance and verification can incur on-chain gas fees, so you can pre-fund this wallet with \$MOCA. Fees for verification transactions are deducted from it, and the Dashboard shows the history of deposits and charges.

@@ -1,0 +1,71 @@
+---
+title: "Error Codes"
+description: "AIR Kit error reference — REST API HTTP status codes and SDK error names for client, authentication, passwordless, and account linking failures."
+---
+
+Use this page as a lookup when the AIR Kit REST API returns a specific HTTP status, or when the SDK throws an `AirError` with a known `name`. For higher-level JWT / JWKS / CORS / rate-limit guidance, see [Common issues](/help/common-issues).
+
+## API error codes
+
+These errors apply to the AIR Kit REST API (e.g. [Issuance API](/api-reference/issuance-api)).
+
+| HTTP status | Likely cause | How to fix |
+| --- | --- | --- |
+| 400 | Missing or invalid request fields | Verify `holderDid`, `schemaId`, `expiresAt`, `data`, `iv`, `authTag`, `encryptedKey`, and `externalId` are present and correctly typed, and that the credential data matches your schema. |
+| 401 | Invalid or expired Partner JWT | Verify the JWT is not expired (`exp`), the signature matches your JWKS key, `kid` in the header maps to the correct key, and `typ: "JWT"` is set. |
+| 403 | Feature not enabled or schema not allowed | Confirm credential issuance is enabled for your partner account in the Developer Dashboard. Check that your `issuerDid` owns the schema. |
+| 404 | Unknown issuer DID or program ID | Double-check `issuerDid` and `credentialId` values against the Developer Dashboard. |
+| 409 | User consent rejected or duplicate conflict | The user has denied consent for credentials issued on their behalf, or a duplicate credential already exists for this user + schema. Dedupe before reissuing. |
+| 429 | Rate limited | Back off and retry — see [Rate limiting](/help/common-issues#rate-limiting). |
+| 500 | Server-side failure | Retry with exponential backoff. If persistent, check the [Status page](/help/status) or contact support. |
+
+## SDK error names
+
+Errors thrown by the SDK are `AirError` instances carrying a stable, machine-readable `name`. Branch on `name` rather than matching on the message, which is not part of the API contract.
+
+```js
+try {
+  await airService.login();
+} catch (err) {
+  if (err.name === "USER_CANCELLED") return; // expected, not a failure
+  console.error(err.name, err.message);
+}
+```
+
+### Client and user errors
+
+| Name | Meaning | How to handle |
+| --- | --- | --- |
+| `USER_CANCELLED` | The user closed or dismissed an AIR Kit flow | Expected control flow — return quietly rather than surfacing an error |
+| `USER_REJECTED` | The user declined a specific request, such as signing or consent | Leave the user where they were and let them retry |
+| `CONFIG_ERROR` | Invalid AIR Kit configuration | Check your `partnerId`, `BUILD_ENV`, and `init()` options |
+| `PERMISSION_NOT_ENABLED` | The feature is not enabled for your partner account | Enable it in the Developer Dashboard, or contact support |
+| `ACCOUNT_DELETION_PENDING` | The account has a pending deletion request | Prompt the user to cancel deletion before continuing |
+| `WINDOW_BLOCKED` | The browser blocked a popup AIR Kit needed | Trigger the call directly from a user gesture so the popup is not blocked |
+| `WINDOW_CLOSED` | The user closed the AIR Kit popup before it finished | Treat like a cancellation |
+
+### Authentication and token errors
+
+| Name | Meaning | How to handle |
+| --- | --- | --- |
+| `PARTNER_TOKEN_EXPIRED` | The Partner JWT you passed is past its `exp` | Mint a fresh JWT and retry. See [Partner authentication](/get-started/authentication/sdk-auth) |
+| `PARTNER_ACCESS_TOKEN_INVALID` | The Partner JWT failed validation | Check signing key, `kid`, and payload — see [JWT and JWKS errors](/help/common-issues#jwt-and-jwks-errors) |
+| `USER_MISMATCH` | The token identifies a different user than the active session | Log out before switching users |
+| `TOKEN_EXPIRED` / `INVALID_TOKEN` / `UNAUTHORIZED` | The AIR session token is expired or rejected | Re-run `login()` |
+
+### Passwordless and OTP errors
+
+| Name | Meaning | How to handle |
+| --- | --- | --- |
+| `PASSWORDLESS_INVALID_CODE` | Wrong one-time password entered | Let the user retype it |
+| `PASSWORDLESS_CODE_EXPIRED` | The one-time password expired | Request a new code |
+| `PASSWORDLESS_MAX_ATTEMPTS` | Too many incorrect attempts | Ask the user to request a new code |
+| `PASSWORDLESS_HOURLY_LIMIT` / `PASSWORDLESS_LOCK_EXCEEDED` | Rate limit reached for this identifier | Ask the user to try again later |
+
+### Linking errors
+
+| Name | Meaning | How to handle |
+| --- | --- | --- |
+| `LINK_WALLET_ALREADY_LINKED` | The wallet is already linked to this account | No action needed |
+| `LINK_WALLET_LINKED_OTHER_ACCOUNT` | The wallet belongs to a different AIR account | Ask for a different wallet |
+| `LINK_EMAIL_LINKED_OTHER_ACCOUNT` | The email belongs to a different AIR account | Ask for a different email |

@@ -14,6 +14,7 @@
   --font-weight-body-custom: 400;
   --air-text-primary: #181B1C;
   --air-text-secondary: #798b95;
+  --air-text-product: #087da3;
   --air-text-placeholder: #b8cad4;
   --air-text-disabled: #a8b4bb;
   --air-text-inverse: #ffffff;
@@ -319,6 +320,22 @@ mobile-nav-tabs-item:focus-visible {
   outline-offset: 2px;
 }
 
+/* External Demo tab: compact trailing icon after the label. */
+:is(.nav-tabs-item, .mobile-nav-tabs-item)[href="https://air-bd-v2.netlify.app"] > svg {
+  order: 1;
+  width: 12px !important;
+  height: 12px !important;
+  flex-shrink: 0;
+}
+
+/* Partner link: use the same compact trailing external-link icon. */
+header a[href="https://air3.com/partner-with-us"] > :is(svg, img) {
+  order: 1;
+  width: 12px !important;
+  height: 12px !important;
+  flex-shrink: 0;
+}
+
 /* ── Sidebar ─────────────────────────────────────────────────────────── */
 
 #sidebar {
@@ -337,20 +354,11 @@ mobile-nav-tabs-item:focus-visible {
   }
   .nav-tabs {
     width: 100%;
-    & > :first-child {
-      position: relative;
-      font-size: 0 !important;
-      width: 30px !important;
-      svg {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        translate: -50% -50%;
-        width: 16px !important;
-        height: 16px !important;
-      }
+    & > :first-child svg {
+      width: 16px !important;
+      height: 16px !important;
     }
-    & > :last-child {
+    & > :nth-last-child(3) {
       margin-inline-start: auto;
     }
   }
@@ -381,15 +389,46 @@ mobile-nav-tabs-item:focus-visible {
   padding-left: 0;
 }
 
+/* Product context uses a native top-level group above the first guide. */
+#navigation-items > div:first-child:has(> ul > li > a[href^="/products/"]) {
+  margin-top: 0;
+}
+
+#navigation-items > div:first-child:has(> ul > li > a[href^="/products/"]) .sidebar-group-header,
+#navigation-items > div:first-child:has(> ul > li > a[href^="/products/"]) .sidebar-title {
+  color: var(--air-text-product) !important;
+  font: 600 16px/24px var(--air-font-family-display) !important;
+}
+
+#navigation-items > div:first-child:has(> ul > li > a[href^="/products/"]) .sidebar-group-header svg {
+  width: 16px !important;
+  height: 16px !important;
+  color: var(--air-text-product) !important;
+}
+
+#navigation-items > div:first-child:has(> ul > li > a[href^="/products/"]) .sidebar-group-header svg[style*="mask-image"] {
+  background-color: var(--air-text-product) !important;
+}
+
 #sidebar-content a,
 #sidebar a:not(:has(img)):not(:has(.nav-logo)) {
-  display: block;
-  padding: 7px 8px !important;
+  padding-block: 7px !important;
+  padding-inline-end: 8px !important;
   border-radius: var(--air-corner-small) !important;
   color: #3B484F !important;
   font: var(--air-type-body-2) !important;
   background: transparent !important;
   text-decoration: none !important;
+}
+
+#sidebar-content button[aria-expanded],
+#sidebar-content li > button:has(+ ul) {
+  padding-block: 7px !important;
+  padding-inline-end: 8px !important;
+  border-radius: var(--air-corner-small) !important;
+  color: #3B484F !important;
+  font: var(--air-type-body-2) !important;
+  background: transparent !important;
 }
 
 #sidebar-content a:hover,
@@ -411,8 +450,48 @@ mobile-nav-tabs-item:focus-visible {
   background: var(--air-container-primary) !important;
 }
 
+
+#sidebar-content li > button[aria-expanded] {
+  align-items: center !important;
+  justify-content: space-between;
+  border-radius: var(--air-corner-small) !important;
+  color: #3B484F !important;
+  font: var(--air-type-body-2) !important;
+  background: transparent !important;
+}
+
+#sidebar-content li > button[aria-expanded]:hover {
+  color: var(--air-text-primary) !important;
+  background: var(--air-container-primary) !important;
+}
+
+#sidebar-content li > button[aria-expanded] + ul {
+  position: relative;
+  margin-block: 1px 4px;
+}
+
+/* Guide lines sit inside the list without adding a second layer of indentation. */
+#sidebar-content li > button[aria-expanded] + ul::before {
+  content: "";
+  position: absolute;
+  inset-block: 4px;
+  inset-inline-start: 16px;
+  width: 1px;
+  background-color: var(--air-border-divider);
+  pointer-events: none;
+}
+
+#sidebar-content ul ul li > button[aria-expanded] + ul::before {
+  inset-inline-start: 28px;
+}
+
+#sidebar-content ul ul ul li > button[aria-expanded] + ul::before {
+  inset-inline-start: 40px;
+}
+
 #sidebar a:focus-visible,
-#sidebar-content a:focus-visible {
+#sidebar-content a:focus-visible,
+#sidebar-content li > button[aria-expanded]:focus-visible {
   outline: 2px solid var(--air-outline-focus);
   outline-offset: 2px;
 }
@@ -465,19 +544,32 @@ mobile-nav-tabs-item:focus-visible {
 }
 
 .docs-landing .hero h1 {
-  max-width: 15ch;
+  max-width: 20ch;
   margin: 0 0 var(--air-spacing-x-large);
   color: var(--air-text-primary);
   font: var(--air-type-display-1);
-  letter-spacing: -0.04em;
+  font-size: clamp(40px, 4vw, 56px);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
   text-wrap: balance;
+}
+
+.docs-landing .hero__promise,
+.docs-landing .hero__modules {
+  display: block;
+}
+
+.docs-landing .hero__promise {
+  color: #748d9c;
 }
 
 .docs-landing .hero__lead {
   max-width: 62ch;
   margin: 0 0 var(--air-spacing-2x-large);
-  color: var(--air-text-secondary);
-  font: var(--air-type-body-l);
+  color: #536974;
+  font: var(--air-type-body-1);
+  font-size: 20px;
+  line-height: 1.5;
   text-wrap: pretty;
 }
 
@@ -788,6 +880,7 @@ mobile-nav-tabs-item:focus-visible {
 
 .docs-landing .use-case-banner {
   position: relative;
+  text-decoration: none;
   max-width: none;
   min-height: 150px;
   display: flex;
@@ -813,6 +906,11 @@ mobile-nav-tabs-item:focus-visible {
   min-width: 0;
 }
 
+.docs-landing .use-case-banner:focus-visible {
+  outline: 2px solid var(--air-outline-focus);
+  outline-offset: 4px;
+}
+
 .docs-landing .use-case-banner h2 {
   margin: 0 0 var(--air-spacing-medium);
   color: var(--air-text-on-color);
@@ -833,7 +931,7 @@ mobile-nav-tabs-item:focus-visible {
 
 .docs-landing .feature-list {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--air-spacing-large);
 }
 
@@ -864,6 +962,14 @@ mobile-nav-tabs-item:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.docs-landing .feature__visual--agent {
+  background: #000;
+}
+
+.docs-landing .feature__visual--agent img {
+  object-fit: contain;
 }
 
 .docs-landing .feature__copy {
@@ -1194,6 +1300,10 @@ div[data-component-part="step-indicator"] > div {
 }
 
 @media (max-width: 1079px) {
+  .docs-landing .feature-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .docs-landing .content {
     padding: var(--air-spacing-3x-large) var(--air-spacing-x-large);
   }

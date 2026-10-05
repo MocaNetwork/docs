@@ -1,0 +1,59 @@
+---
+title: "Common Issues"
+description: "Troubleshoot the most frequent AIR Kit integration issues — Partner JWT signing and JWKS retrieval, CORS, and rate limiting."
+---
+
+These are the issues most AIR Kit integrations run into first. To look up a specific HTTP status or SDK error name see [Error codes](/help/error-codes). For platform-specific problems, see [Web](/help/sdk-web) and [Flutter](/help/sdk-flutter). For issuance, verification, and schema problems, see [Identity & Credential](/help/identity-credential).
+
+## JWT and JWKS errors
+
+### "Invalid signature" or "JWT verification failed"
+
+- Confirm the `kid` in your JWT header matches a key ID in your JWKS endpoint.
+- Verify the algorithm (`RS256` or `ES256`) matches the key type in your JWKS.
+- Check that you are signing with the correct private key.
+
+### "Token expired"
+
+- The `exp` claim has passed. Generate a new JWT with a fresh `exp` (recommended: 5 minutes from now).
+- Verify your server clock is synchronized (NTP).
+
+### "JWKS endpoint unreachable"
+
+- Your JWKS URL must be publicly accessible over HTTPS — AIR servers cannot reach `localhost`. Use an HTTPS tunnel (ngrok, cloudflared) or deploy.
+- Test the **exact URL registered in the Developer Dashboard**, not a guess. For example:
+
+```bash
+curl https://your-domain/api/.well-known/jwks
+```
+
+- `air-examples` ships `/api/.well-known/jwks`; the plug-and-play template ships `/jwks.json`. Register whichever your app actually serves.
+- Ensure no firewall or IP allowlist blocks AIR servers.
+- Full setup procedure: [JWKS endpoint setup](/get-started/authentication/jwks-endpoint).
+
+### "kid not found"
+
+- The `kid` in your JWT header does not match any key in the JWKS response.
+- If you recently rotated keys, publish the new key to your JWKS endpoint before using it in JWTs.
+
+### "Missing typ header"
+
+- For server-side issuance, the JWT header must include `typ: "JWT"`. Add it to your JWT signing options:
+
+```js
+jwt.sign(payload, privateKey, {
+  algorithm: "RS256",
+  header: { kid: "your-key-id", typ: "JWT" },
+});
+```
+
+## CORS errors
+
+If you see CORS errors when initializing the SDK in a browser:
+
+- AIR Kit uses an iframe for login. Ensure your `Content-Security-Policy` allows `frame-src` from `*.air3.com`.
+- If you are proxying requests, ensure the `Origin` header is forwarded correctly.
+
+## Rate limiting
+
+API endpoints may return `429 Too Many Requests` if you exceed rate limits. Back off and retry with exponential delays. Avoid tight polling loops on the status endpoint — start with 1-second intervals and double each attempt.

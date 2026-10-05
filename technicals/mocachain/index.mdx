@@ -1,0 +1,104 @@
+---
+title: "Moca Chain architecture and technical design"
+description: "Moca Chain technical overview: EVMOS-based Layer 1 with CometBFT consensus, decentralized storage from BNB Greenfield, and cross-chain identity oracles."
+---
+
+> _Moca Chain is a Layer 1 EVM-compatible blockchain purpose-built for decentralized identity, enabling chain-agnostic identity data issuance and verifications._
+
+<Info>
+  **Moca Chain mainnet is live** (EVM chain ID 2288). Add it to your wallet from [ChainList](https://chainlist.org/chain/2288), browse it on the [mainnet explorer](https://scan.mocachain.org), and see [Network information](/technicals/mocachain/network-information) for every endpoint.
+</Info>
+
+Moca Chain is built on EVMOS (a Cosmos SDK EVM implementation) and integrates Moca's adaptation of BNB Greenfield's decentralized storage. Oracles and bridges relay identity data to other chains, so Moca Chain becomes the single source of truth for identity while staying interoperable with the rest of Web3.
+
+This means Moca Chain:
+
+- Houses the credential and identity-based smart contracts
+- Manages the decentralized storage where credentials live
+- Lets users relay proofs across chains
+
+## Sub-second identity flows
+
+CometBFT consensus with 1-second blocks and instant finality. Age checks, KYC gates, and logins commit in a single block, so identity flows feel synchronous to the end user.
+
+## Consumer-scale capacity
+
+800 transactions per block and a 60,000,000 gas limit. The chain is sized for ZK verifier contracts and batched credential issuance at production volume rather than testnet workloads.
+
+## Builder-ready
+
+EVM-compatible with transient storage (EIP-1153) and other Shanghai opcodes. Existing Solidity contracts port over with little to no rewrite, and standard Ethereum tooling (Hardhat, Foundry, Remix, MetaMask) works out of the box. Integration timelines move from quarters to days.
+
+## Decentralized credential storage (MCSP)
+
+The Moca Chain Storage Provider network (MCSP) gives partners S3-compatible decentralized storage, modeled after BNB Greenfield. Issuers retain source records and signing keys, while encrypted credential payloads are stored with independent providers under holder-controlled decryption.
+
+- Payload data is stored by independent Storage Providers
+- Object metadata, payments, and permissions are recorded on-chain
+- Apps interact via S3-compatible APIs to upload, download, and manage objects
+- Replication and integrity proofs protect data availability
+
+## Privacy by construction
+
+Zero-knowledge proofs use Circom circuits and Groth16. Verification Programs configure requested claims and whether a ZK proof is required. Apps can confirm age or eligibility without disclosing the underlying values. Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure.
+
+## Verify once, recognized everywhere
+
+Proofs are relayed off Moca Chain via oracles and bridges. A single verification carries to every chain a partner ships into next, so users do not re-prove the same credential per ecosystem.
+
+## Quick chain facts
+
+| **Field**                  | **Details**                                                      |
+| -------------------------- | ---------------------------------------------------------------- |
+| Consensus                  | CometBFT                                                         |
+| Framework                  | Cosmos SDK                                                       |
+| EVM                        | Ethereum Compatible. LONDON instruction set. Based on EvmOS v12. |
+| Block Time                 | ~ 1 second                                                       |
+| Finality                   | Instant (single-block)                                           |
+| Native Token               | MOCA                                                             |
+| Block Rewards              | Exponential decay from rewards pool. Not yet implemented.        |
+| Max Validators             | 100 (CometBFT hard limit: 10,000)                                |
+| Chain ID (mainnet)         | 2288 (0x8F0); Cosmos chain ID `moca_2288-1`                      |
+| Chain ID (testnet)         | 222888 (0x366a8)                                                 |
+| Max Transactions Per Block | 800                                                              |
+| Max Gas Limit              | 60,000,000                                                       |
+| Validator Key Scheme       | ed25519                                                          |
+
+## CometBFT consensus layer
+
+Moca Chain uses CometBFT consensus and is governed by \$MOCA holders who decide the future direction of the ecosystem:
+
+- Community members can submit governance proposals with a minimum deposit
+- Proposals enter a voting period
+- Proposals must meet minimum participation thresholds
+- Approved proposals are executed on-chain automatically
+
+[More on the consensus layer →](/technicals/mocachain/consensus-layer)
+
+## Cosmos SDK with EVM compatibility
+
+Moca Chain combines the Cosmos SDK with EVM functionality based on EVMOS in a single environment:
+
+- Cosmos \$MOCA and EVM \$MOCA are the same currency, managed by the same bank keeper module
+- All addresses on chain look like EVM addresses (e.g., 0x1234...7890)
+- The EVM runs the LONDON instruction set with selected SHANGHAI opcodes:
+  - EIP-3855
+  - EIP-3860
+  - EIP-1153 (transient storage)
+  - EIP-5656
+  - EIP-6780
+
+[More on EVM compatibility →](/technicals/mocachain/evm-compatibility)
+
+## Moca Chain Storage Provider network (MCSP)
+
+Moca Chain ships with a built-in decentralized storage layer, the MCSP network, inspired by BNB Greenfield:
+
+- Payload data is stored by independent Storage Providers
+- Object metadata, payments, and permissions are recorded on-chain
+- Users and apps interact via S3-compatible APIs to upload, download, and manage objects
+- Data availability is protected through replication and integrity proofs
+- Providers earn storage fees for service, with penalties for misbehavior
+- Verifiable, cost-efficient storage for the Moca credential system and broader applications
+
+[More about the MCSP network →](/technicals/mocachain/decentralized-storage)

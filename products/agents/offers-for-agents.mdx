@@ -1,0 +1,47 @@
+---
+title: "Agentic Commerce"
+description: "Let agents present user-approved identity to qualify for relevant prices, discounts, and membership benefits."
+---
+
+Agentic Commerce lets an agent bring the user's approved identity into a shopping or booking experience. A participating merchant can recognize the membership or eligibility behind a request and return the benefits that customer qualifies for.
+
+The starting point is a clear offer: a member price, a tier benefit, or a discount with defined eligibility. AIR provides the identity and credential-verification flow. The merchant owns the offer rules, and purchase and payment authority are handled separately.
+
+## Member discounts
+
+A customer asks an agent to find a product. They already hold a loyalty credential from an issuer the merchant accepts.
+
+<Steps>
+  <Step title="The user approves identity access">
+    The customer connects the chosen agent and approves access for the task. The integration identifies both the agent and the user it represents.
+  </Step>
+  <Step title="The agent verifies eligibility">
+    The agent's backend runs the agreed program for membership or tier evidence. It passes the result and relevant presentation in the format the merchant accepts.
+  </Step>
+  <Step title="The merchant applies the benefit">
+    The merchant checks the evidence and returns the eligible price or discount with its terms. The agent can compare that offer against the user's requirements.
+  </Step>
+  <Step title="The user proceeds under the purchase rules">
+    Ordering and payment use their own approvals and supported checkout flow. Permission to verify membership alone does not authorize spending.
+  </Step>
+</Steps>
+
+For example, an accepted Gold-tier credential could qualify a customer for a lower price. The merchant needs the eligibility evidence for that benefit, rather than the customer's full membership history. Configure disclosure for the actual claims required.
+
+## Travel and other entitlements
+
+The same pattern can let a booking agent request a member rate or an upgrade using accepted loyalty status. Preferences such as seat choice help the agent choose options, while credentials establish eligibility for the benefit.
+
+See the [agent booking demo](https://air-bd-v2.netlify.app/demo/agent-booking) for an illustrative journey. A demonstration of checkout does not give an identity binding wallet signing authority; wallet delegation for Web3 use cases is planned separately.
+
+## Relevant offers during discovery
+
+A merchant could make an offer available while an agent is comparing products. Verified, user-approved claims can establish whether the customer qualifies, and the agent can evaluate the offer alongside price, quality, and the user's request.
+
+For a first-purchase discount, agree how first-time eligibility is established and how one-time use is tracked. Do not assume that every required claim already exists as a credential.
+
+Broader offer discovery and merchant-funded campaigns are a product direction. A general advertising marketplace, discovery API, and automated revenue-sharing model are not established by the identity integration described here. [Talk to the AIR team](https://air3.com/partner-with-us) to explore a specific journey.
+
+## Design the identity handoff
+
+Agree who gives consent, which issuers and claims the merchant accepts, and whether it trusts an agreed backend result or checks the presentation itself. Use [Plan your integration](/products/agents/integration-options) and [What a verification result proves](/products/agents/how-it-works#what-a-verification-result-proves), then follow [Using Agentic Identity](/products/agents/partner-agent-api).

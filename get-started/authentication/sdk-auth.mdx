@@ -1,0 +1,226 @@
+---
+title: "SDK authentication (Partner JWT)"
+sidebarTitle: "SDK Auth (JWT)"
+description: "Sign a short-lived Partner JWT on your backend to authenticate AIR Kit credential operations, Custom Auth login, and direct issuance — required claims, headers, and examples."
+---
+
+A Partner JWT proves that a request comes from your app. Your backend signs it with your private key, your app passes it to AIR Kit, and AIR checks the signature against the public key in your registered [JWKS endpoint](/get-started/authentication/jwks-endpoint).
+
+You need a Partner JWT for:
+
+- `issueCredential` and `verifyCredential` in the SDK
+- [Direct issuance](/products/identity/issuing-credentials#direct-issuance) through the AIR API
+- `login` on Flutter, and `login` with [Custom Auth](/get-started/authentication/custom-auth) on Web
+
+On Web, standard AIR login works without a Partner JWT, but passing one is recommended. Always sign Partner JWTs on your server, never in the browser.
+
+## JWT requirements
+
+| Part | Requirement |
+| --- | --- |
+| Algorithm | `RS256` or `ES256`, matching the key type in your JWKS |
+| Header | `kid` set to a key ID in your JWKS, and `typ: "JWT"` |
+| `partnerId` claim | Always required: your Partner ID |
+| `scope` claim | `"issue"` for `issueCredential` and direct issuance, `"verify"` for `verifyCredential` |
+| `email` claim | Only for Custom Auth login. For direct issuance, send the recipient's email to `initialize-user`, not in the JWT. |
+| `exp` claim | Required. Keep tokens short-lived; 5 minutes is recommended. |
+
+To learn more about JWTs, see [jwt.io](https://www.jwt.io).
+
+## Next.js Partner JWT endpoint
+
+Install `jose`:
+
+```bash
+npm i jose
+```
+
+Create a server-only endpoint that returns a five-minute token. This example signs an issuance token; use `scope: "verify"` for verification.
+
+```ts app/api/partner-jwt/route.ts
+import { NextResponse } from "next/server";
+import * as jose from "jose";
+
+function wrapPrivateKeyPem(body: string): string {
+  const trimmed = body.trim();
+  if (trimmed.includes("BEGIN")) return trimmed;
+
+  return `-----BEGIN PRIVATE KEY-----\n${trimmed}\n-----END PRIVATE KEY-----`;
+}
+
+export async function POST() {
+  try {
+    const privateKeyBody = process.env.PARTNER_PRIVATE_KEY;
+    const algorithm = process.env.SIGNING_ALGORITHM;
+    const partnerId = process.env.NEXT_PUBLIC_PARTNER_ID;
+
+    if (!privateKeyBody || !algorithm || !partnerId) {
+      return NextResponse.json(
+        { error: "Missing Partner JWT configuration" },
+        { status: 500 },
+      );
+    }
+
+    const privateKey = await jose.importPKCS8(
+      wrapPrivateKeyPem(privateKeyBody),
+      algorithm,
+    );
+    const now = Math.floor(Date.now() / 1000);
+
+    const token = await new jose.SignJWT({
+      partnerId,
+      scope: "issue",
+    })
+      .setProtectedHeader({
+        alg: algorithm,
+        kid: partnerId,
+        typ: "JWT",
+      })
+      .setIssuedAt(now)
+      .setExpirationTime(now + 5 * 60)
+      .sign(privateKey);
+
+    return NextResponse.json({ token });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to sign Partner JWT" },
+      { status: 500 },
+    );
+  }
+}
+```
+
+Keep `PARTNER_PRIVATE_KEY` server-only. This example uses the Partner ID as the `kid`, matching the [JWKS route](/get-started/authentication/jwks-endpoint#step-1-implement-the-route).
+
+## Generating an RS256 key pair
+
+Generate a private key and extract its public key with OpenSSL:
+
+```bash
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private.key
+openssl pkey -in private.key -pubout -out public.key
+```
+
+Sign Partner JWTs with `private.key` and keep it secret. Publish `public.key` through your [JWKS endpoint](/get-started/authentication/jwks-endpoint).
+
+## Examples
+
+Sign a Partner JWT in other backend languages. Each example signs an issuance token with RS256; change `scope` for verification.
+
+<Tabs>
+<Tab title="Node.js">
+
+```js
+const jwt = require("jsonwebtoken");
+const fs = require("fs");
+
+const privateKey = fs.readFileSync("path/to/private.key");
+const payload = {
+  partnerId: "your-partner-id",
+  scope: "issue",
+  exp: Math.floor(Date.now() / 1000) + 5 * 60 // 5 minutes expiry
+};
+
+const token = jwt.sign(payload, privateKey, {
+  algorithm: "RS256",
+  header: {
+    kid: "your-key-id",
+    typ: "JWT"
+  }
+});
+console.log(token);
+```
+
+</Tab>
+<Tab title="Java">
+
+```java
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import java.util.HashMap;
+import java.util.Map;
+
+Algorithm algorithm = Algorithm.RSA256(null, privateKey); // Use your private key
+Map<String, Object> headerClaims = new HashMap<>();
+headerClaims.put("kid", "your-key-id");
+headerClaims.put("typ", "JWT");
+
+String token = JWT.create()
+                .withHeader(headerClaims)
+                .withClaim("partnerId", "your-partner-id")
+                .withClaim("scope", "issue")
+                .withExpiresAt(new Date(System.currentTimeMillis() + 5 * 60 * 1000))
+                .sign(algorithm);
+
+System.out.println(token);
+```
+
+</Tab>
+<Tab title="C#">
+
+```csharp
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
+
+// Load your private key and create signing credentials
+var securityKey = new RsaSecurityKey(yourPrivateRsa);
+var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
+
+var claims = new[] {
+        new Claim("partnerId", "your-partner-id"),
+        new Claim("scope", "issue"),
+};
+
+var header = new JwtHeader(credentials); // sets typ: "JWT"
+header["kid"] = "your-key-id";
+
+var token = new JwtSecurityToken(
+        header,
+        new JwtPayload(
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(5),
+                notBefore: null,
+                issuedAt: null,
+                audience: null,
+                issuer: null
+        )
+);
+
+var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+Console.WriteLine(jwt);
+```
+
+</Tab>
+<Tab title="Go">
+
+```go
+import (
+        "fmt"
+        "time"
+        "github.com/golang-jwt/jwt/v5"
+)
+
+func main() {
+        privateKey := []byte("your-private-key") // Use PEM for RS256/ES256
+        claims := jwt.MapClaims{
+                "partnerId": "your-partner-id",
+                "scope":     "issue",
+                "exp":       time.Now().Add(5 * time.Minute).Unix(),
+        }
+        token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+        token.Header["kid"] = "your-key-id" // golang-jwt sets typ: "JWT" by default
+        signedToken, err := token.SignedString(privateKey)
+        if err != nil {
+                panic(err)
+        }
+        fmt.Println(signedToken)
+}
+```
+
+</Tab>
+</Tabs>
+
+Replace `your-partner-id`, `your-key-id`, and the key paths with your own values. For ES256, use the matching signing method and an EC key.

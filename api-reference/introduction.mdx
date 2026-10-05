@@ -1,9 +1,9 @@
 ---
 title: "API Reference"
-description: "Moca Network REST API reference — server-to-server endpoints for credential issuance, issuance status, catalog browsing, and partner operations."
+description: "Moca Network REST API reference — server-to-server endpoints for credential issuance, issuance status, and partner operations."
 ---
 
-The Moca Network REST API enables server-to-server operations that do not require user presence. Use it for backend automation, credential issuance into encrypted DStorage, programmatic status checks, and browsing the credential catalog. Issuers sign credentials with their own keys and encrypt them to the holder; AIR stores and routes opaque ciphertext and metadata only.
+The Moca Network REST API enables server-to-server operations that do not require user presence. Use it for backend automation, credential issuance into encrypted DStorage, and programmatic status checks. Issuers sign credentials with their own keys and encrypt them to the holder; AIR stores and routes opaque ciphertext and metadata only.
 
 ## Base URLs
 
@@ -33,31 +33,22 @@ For on-demand issuance, do not put the recipient email in the Partner JWT. Send 
 
 The JWT header must include `kid` (Key ID) matching a key in your JWKS endpoint and `typ: "JWT"`.
 
-For full setup instructions, key generation, and code examples see [Partner Authentication](/airkit/usage/partner-authentication).
-
-**Catalog endpoints** are public and require no authentication.
+For full setup instructions, key generation, and code examples see [SDK authentication](/get-started/authentication/sdk-auth).
 
 **API Playground:** Requests from the Try it out playground are sent directly from your browser to the API. Your API must allow CORS from your docs origin (e.g. your Mintlify subdomain or custom domain) for the playground to work. If you see 403 from the playground, check that the API allows the request origin and that your Partner JWT is valid.
 
 ## Credentials
 
-On-demand credential issuance resolves the recipient and stores an issuer-signed, holder-encrypted credential in DStorage. See the [Issuance API Reference](/airkit/usage/credential/issuance-api) for the `initialize-user` and `dstorage/vcs` endpoints, request and response details, and code examples.
+On-demand credential issuance resolves the recipient and stores an issuer-signed, holder-encrypted credential in DStorage. See the [Issuance API Reference](/api-reference/issuance-api) for the `initialize-user` and `dstorage/vcs` endpoints, request and response details, and code examples.
 
-## Catalog
+## Agent APIs
 
-<Warning>
-  **Sandbox only at this stage.** Catalog endpoints are available exclusively on `https://api.sandbox.mocachain.org/v1` during the pilot. They are under active development and may change without notice — not yet available in production.
-</Warning>
+The Agent APIs use their own hosts and authentication. They let your backend bind an agent to a user's AIR Account, mint short-lived agent JWTs, list and verify the user's credentials, and mint merchant checkout tokens.
 
-<CardGroup cols={2}>
-  <Card title="Browse schemas" icon="table-layout" href="/api-reference/catalog/browse-schemas">
-    Paginated list of credential schemas with credential count and number of issuers. Sortable by popularity or title.
-  </Card>
-  <Card title="Schema detail" icon="table-layout" href="/api-reference/catalog/schema-detail">
-    Single schema with every credential built on it, including issuer info and traction metrics.
-  </Card>
-</CardGroup>
+<Card title="Agent APIs" icon="robot" href="/api-reference/agents/introduction">
+  Base URLs, authentication, scopes, and endpoints for partner-bound agents.
+</Card>
 
 ## Code examples
 
-For end-to-end integration examples including issue-and-poll flows, webhook-driven issuance, and retry logic, see [Issuance API Reference](/airkit/usage/credential/issuance-api).
+For end-to-end integration examples including issue-and-poll flows, webhook-driven issuance, and retry logic, see [Issuance API Reference](/api-reference/issuance-api).
