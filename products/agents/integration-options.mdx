@@ -1,41 +1,76 @@
 ---
 title: "Plan your integration"
-description: "Plan an Agent APIs integration: start with agent binding and credential verification, then add checkout where the journey needs it."
+icon: "pen-to-square"
+description: "Identify the agent, its operator, the user it represents, and the consent and verification your journey needs."
 ---
 
-Agents integrate with AIR through the Agent APIs, a set of REST endpoints your backend calls. They cover binding an agent to a user's AIR Account, agent sessions, credential listing and verification, and merchant checkout tokens. Your team provides the backend services, secure key storage, the consent screen, and the user-facing flow.
+Before choosing an API flow, define what the agent in your product actually is. Who operates it? Whose identity does it use? Who gives consent, and who needs to verify the evidence? Those answers determine how you delegate identity access and where verification belongs.
 
-Contact the AIR team for environment access, then follow the [Agent API quickstart](/products/agents/partner-agent-api).
+## Identify the agent and its owner
 
-## Start with identity
+| Deployment | What to establish |
+| --- | --- |
+| **Personal assistant**, such as a Muse or Grokbot experience | Which user it represents, which service operates it, and where that user approves identity access. |
+| **Agent embedded in another application**, such as a chatbot | Whether it acts for the app operator or an individual customer, who controls its backend, and how each customer's access remains separate. |
+| **User-operated agent**, such as a self-hosted Hermes or OpenClaw deployment | Who controls the runtime and keys, which AIR Account gives consent, and where access can be reviewed or withdrawn. |
 
-Start a commerce pilot with agent binding and credential verification:
+Classify the actual deployment rather than inferring ownership from its name. A personal assistant can run on a provider's servers; an embedded agent still needs each customer's approval before using their identity.
 
-1. Get the user's approval and bind the agent. See [Ask for consent before binding](/products/agents/delegation-and-consent#ask-for-consent-before-binding).
-2. Run the receiving application's verification program for each request.
-3. Share the result with the receiving application in a format it can check. See [What a verification result proves](/products/agents/how-it-works#what-a-verification-result-proves).
+The agent's operator and the user it represents can be different people or organizations. Record both roles and identify the agent key or instance to which access is granted.
 
-The Agent APIs return a verification result in a single call.
+## Map consent and verification
 
-A partner acting as a verifier sets up programs with AIR Kit's [verification](/products/identity/verify). Issuing credentials is an issuer's job, with its own [backend integration](/products/identity/issuing-credentials).
+Use one concrete journey to answer these questions:
 
-## Add checkout where the journey needs it
+| Decision | Questions to resolve |
+| --- | --- |
+| **User and task** | Who is represented, and what are they asking the agent to do? |
+| **Consent** | Who approves identity access, which agent receives it, and how can that access be withdrawn? |
+| **Receiving service** | Which application, merchant, or other service receives the request? |
+| **Evidence** | Does it need membership, age eligibility, a completed identity check, or another defined claim? Which issuers does it trust? |
+| **Data source** | Does an accepted credential already exist? Which issuer checks the source records and maintains its validity? |
+| **Verification responsibility** | Does the agent's backend run the receiving service's program, or does the service check a presentation itself? How is the result passed and checked? |
+| **Decision and failure** | What does successful verification permit? What happens if evidence is missing, expired, or insufficient? |
 
-Identity tells the merchant whom the agent represents and which benefits apply. Checkout and payment need their own integration and authority.
+A user preference or a statement in chat is context, not automatically an issuer-verified fact. If the journey needs a credential the user does not hold, define an [issuance flow](/products/identity/issuing-credentials); verification does not create missing evidence.
 
-For a supported merchant, an agent whose key includes `commerce.checkout` can mint a short-lived checkout token. The token's audience is the merchant, which verifies it during checkout. See [Create a checkout session](/api-reference/agents/create-checkout-session).
+## Choose the delegation journey
 
-Decide where spending limits are enforced before an agent can pay. See [Spending limits](/products/agents/delegation-and-consent#spending-limits).
+### User-managed delegation
+
+The standard journey is for the user to approve the chosen agent through the AIR app. Your product should make clear which agent is being connected and why it needs identity access.
+
+**AIR app link: coming soon.**
+
+### Delegation within your application
+
+For a more integrated experience, contact the AIR team about enabling delegation within your own app. Your application collects the user's explicit approval and uses the supported partner binding flow. The bind request itself does not display an approval screen.
+
+Choose this route when your product can identify the user, explain the access clearly, and manage the connected agent on their behalf. See [Delegation and consent](/products/agents/delegation-and-consent#ask-for-consent-before-binding).
+
+The current Agent APIs bind scopes such as `credentials.read` and `credentials.verify`. Your application must also enforce any narrower task rules it promises; those scopes do not encode a per-merchant or per-claim grant.
+
+### Who holds the agent key?
+
+For a partner-operated agent, the backend can hold the API key returned by the binding flow. For an agent that controls its own P-256 key pair, the supported API route can bind its public key and authenticate sessions using signed messages. Choose the key model that fits the operator identified above; neither model removes the user's consent requirement. See [Use a public key instead of an API key](/products/agents/partner-agent-api#use-a-public-key-instead-of-an-api-key).
+
+## Choose the verification method
+
+- **Agent API verification:** the agent's backend creates an authenticated session and runs the agreed verification program for the user's credentials. Follow [Using Agentic Identity](/products/agents/partner-agent-api).
+- **Presentation verification by the receiving service:** agree the format and trust model, then have the recipient check issuer signatures and the required claims. For SD-JWT, use the existing [Verify with SD-JWT](/products/identity/verify-sd-jwt) guide.
+
+Decide whether the recipient will trust an agreed backend result or independently verify the evidence. A `Compliant` status alone is not a signed proof for an unrelated third party. See [What a verification result proves](/products/agents/how-it-works#what-a-verification-result-proves).
+
+Agree how the handoff authenticates the agent-user relationship and records consent. Checking a credential's issuer signature establishes that claim; the recipient still needs the agreed evidence of who is presenting it and under what authority.
+
+## Example: a member discount
+
+A user asks a personal assistant to find a product. The merchant wants to check a membership tier from an issuer it accepts. The user approves identity access for that assistant, its backend runs the agreed program, and the merchant checks the supplied evidence before returning a member price.
+
+The identity flow establishes eligibility for the discount. Ordering and payment follow their own approvals.
 
 ## Not yet available
 
-Plan your integration without these:
+Wallet delegation for Web3 use cases is planned. The current identity binding does not grant `wallet.sign`, a spending mandate, or automatic access to the user's assets. Fine-grained delegation credentials and user-bound proof handoff are also not yet released.
 
-- Delegation credentials, user-bound proof handoff, and delegated verification.
-- Verify on Behalf, meaning verification without the user in session, which is at concept stage.
-- Standing payment mandates.
-- Onchain audit logs for every agent action.
-
-The [Agent APIs reference](/api-reference/agents/introduction) documents every endpoint, request, and response.
-
-Use [Partner fit](/products/agents/partners) to scope the first journey with the AIR team.
+Once the roles, evidence, and consent journey are clear, follow [Using Agentic Identity](/products/agents/partner-agent-api). [Talk to the AIR team](https://air3.com/partner-with-us) if you need help scoping the flow.

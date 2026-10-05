@@ -1,0 +1,34 @@
+---
+title: "What is AIR Agents"
+icon: "pen-to-square"
+description: "Give an agent a recognized identity, link it to the user it represents, and verify the evidence needed for a request."
+---
+
+AIR Agents provides the identity layer for agents acting on a user's behalf. It connects an agent identity to the user's AIR Account with their approval, so an application can understand who is behind a request and check the relevant credentials.
+
+An agent might be a personal assistant, a chatbot embedded in an application, or software the user runs themselves. The integration starts by identifying that agent, its operator, and the user whose identity it will use.
+
+## Three things to establish
+
+| Question | What supplies the answer |
+| --- | --- |
+| **Which agent is making the request?** | The agent identity, represented in the current Agent APIs by a bound key and its authenticated session. |
+| **Whom does it represent, and what may it access?** | The link to the user's AIR Account, their consent, and the bound scopes. |
+| **Does the user qualify for this interaction?** | Credentials from accepted issuers, checked against the receiving application's verification rules. |
+
+These are separate decisions. Authenticating an agent does not itself establish a user's eligibility, and a verified membership does not authorize a purchase.
+
+## Delegation, then verification
+
+The user first approves identity access for the chosen agent. The agent can then use that access to verify the user's credentials for the task. The receiving application decides what evidence it accepts and how to apply the result.
+
+Your integration defines the source of the claims, the consent journey, and which participant checks the evidence. Start with [Plan your integration](/products/agents/integration-options), then follow [Using Agentic Identity](/products/agents/partner-agent-api).
+
+<Note>
+  AIR Agents currently focuses on identity delegation. Wallet delegation for Web3 use cases is planned. Identity access does not grant wallet signing or spending authority.
+</Note>
+
+## What you can build
+
+- **[Agent Gating](/products/agents/agent-gating):** apply access rules using the agent-user relationship and accepted identity evidence.
+- **[Agentic Commerce](/products/agents/offers-for-agents):** let an agent present user-approved membership or eligibility to obtain relevant benefits, such as a discount.

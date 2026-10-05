@@ -1,60 +1,27 @@
 ---
-title: "Commerce use cases"
-description: "Recognize member benefits, verify eligibility, and carry approved customer context into agent-assisted shopping and travel."
+title: "Use cases"
+icon: "pen-to-square"
+description: "Explore identity-based Agent Gating and Agentic Commerce for agents acting on behalf of users."
 ---
 
-Agentic commerce connects a user's intent with merchants that can serve it. AIR Agents lets a merchant recognize the user behind an agent and apply the benefits they qualify for.
+When an agent acts for a user, the receiving service needs to understand the relationship and the evidence behind the request. AIR's identity flow supports two starting points.
 
-Membership and entitlement recognition are the best starting points for a pilot: they use agent binding and credential verification, which the [Agent APIs](/products/agents/partner-agent-api) support today. Steps that depend on delegation credentials are marked.
+## Agent Gating
 
-## Membership pricing
+Use an authenticated agent-user relationship and accepted credentials to decide which requests can access your service. Apply your own access rules, quotas, and abuse controls to reduce anonymous misuse and protect member-only or limited benefits.
 
-A customer asks their agent to find a product. The customer already belongs to a loyalty program whose credentials the merchant accepts.
+Read [Agent Gating](/products/agents/agent-gating) for the checks and an example.
 
-1. The user approves the agent to verify their membership.
-2. The agent's backend runs the merchant's verification program and shares the result with the merchant in the format they agreed. See [What a verification result proves](/products/agents/how-it-works#what-a-verification-result-proves).
-3. The merchant checks the result and returns the member price.
-4. The agent compares the offer against the user's requirements and proceeds within its purchase permissions.
+## Agentic Commerce
 
-The merchant defines which memberships qualify and what benefit to apply. The same model can support access to member inventory or a status-matched benefit, where the receiving program accepts an external tier.
+Let an agent carry user-approved membership or eligibility into a merchant interaction. The merchant checks the evidence and applies the relevant price, discount, or entitlement.
 
-## Eligibility beyond the issuing application
+### Membership pricing
 
-A program operator may hold information that qualifies a user for an offer. It can issue a credential for that fact so the user can present evidence to participating merchants.
+An accepted loyalty credential can qualify a customer for a member benefit through their agent. The identity check establishes eligibility; ordering and payment require their own authority.
 
-For example, an issuer could attest that a user belongs to an eligible customer segment. An accepting merchant verifies the evidence and applies its offer without needing the source record for that decision.
+Read [Agentic Commerce](/products/agents/offers-for-agents) for member discounts, travel benefits, and relevant offers.
 
-Recognition and payment can be independent: the merchant may recognize the credential even when checkout uses another supported payment method. Credential acceptance, offer rules, and payment support remain separate integration decisions.
+## Choose your next step
 
-## Travel and booking
-
-A travel agent can bring together verified loyalty status and user-approved preferences to request a relevant quote.
-
-| Context | How the application can use it |
-| --- | --- |
-| Accepted loyalty tier | Return an eligible member rate or benefit. |
-| Membership or eligibility proof | Check access to a particular offer. |
-| Travel preferences | Refine options, such as seat choice or departure time. |
-| Booking authority | Determine whether the agent may complete the selected booking. Per-booking grants depend on delegation credentials, which are not yet released. |
-
-A preference helps personalize the trip. A verified claim supports an eligibility decision. The integration should preserve that distinction.
-
-See the [agent booking demo](https://air-bd-v2.netlify.app/demo/agent-booking) for a hotel booked by an agent.
-
-## Recognizing agent traffic
-
-Publishers, marketplaces, and applications may receive requests from agents acting for their users. The agent's binding to the user's AIR Account is evidence of that relationship, and approved claims help the application decide which access or experience fits.
-
-Identity is one input to that decision. Applications still apply their access rules, rate limits, and abuse controls. A verified relationship does not guarantee that every request is acceptable.
-
-## Offers during product discovery
-
-Later, merchants could present eligible offers while an agent is choosing products for its user. For example, a merchant could make a first-purchase discount available when the agent can show the required eligibility. This extends member recognition into customer acquisition. See [Offers for agents](/products/agents/offers-for-agents).
-
-## Other applications
-
-The identity model also applies to financial-service eligibility and interactions between agents. A service might request accepted evidence of residency or account-holder status. A counterparty might check which principal authorized an agent and what that agent may do.
-
-These workflows aren't available yet. Agent-to-agent trust and commerce are exploratory: they depend on delegation credentials and on maturing standards such as ERC-8004.
-
-To scope a first commerce integration, see [Partner fit](/products/agents/partners).
+Identify the agent, its operator, the consenting user, and the receiving service in [Plan your integration](/products/agents/integration-options). Then follow the two stages in [Using Agentic Identity](/products/agents/partner-agent-api): delegation and verification.

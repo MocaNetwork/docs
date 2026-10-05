@@ -1,0 +1,40 @@
+---
+title: "Agent Gating"
+icon: "pen-to-square"
+description: "Use the agent-user relationship and verified eligibility to control access and reduce anonymous abuse."
+---
+
+Agent Gating lets an application make access decisions about agent requests using identity evidence. Instead of treating every bot as an anonymous visitor, the service can check which agent is requesting access, whom it represents, and whether the user's credentials satisfy its rules.
+
+This can help a publisher, marketplace, or application distinguish authorized, eligible requests from requests that lack the required evidence. Identity supports the decision; your application still defines and enforces its abuse controls.
+
+## What the service checks
+
+| Check | Why it matters |
+| --- | --- |
+| **Agent identity** | Authenticate the agent making the request under the agreed integration. |
+| **User relationship and consent** | Establish the AIR Account it represents and the identity access the user approved. |
+| **Accepted user claims** | Verify the membership, account standing, or other eligibility your service requires, using issuers you trust. |
+| **Access policy** | Decide which actions that evidence permits, and apply quotas, rate limits, and risk checks. |
+
+A valid agent key establishes authenticated access; it does not prove that every request is benign. A membership credential proves membership, not that the agent will behave well. Choose claims relevant to the access decision and combine them with observed behavior.
+
+## Example: protect member-only access
+
+A publisher allows agents to retrieve content for eligible members. The user approves identity access for their assistant, which verifies membership under the publisher's accepted program. The publisher checks the supplied evidence and grants only the access its policy allows.
+
+Requests without valid evidence can be declined, directed to a user approval flow, or given limited access. A missing credential and a verification-service failure are different outcomes; the service should handle them separately.
+
+The same pattern can support account-based limits on reward claims, reservations, or other scarce actions. Use the agreed account or identity mapping to enforce those limits. A customer binding multiple agent keys does not entitle them to a new quota for each key.
+
+## Reduce abuse without collecting a full profile
+
+Ask for the facts needed for the gate, rather than a broad collection of personal data. Where supported by the credential and program, request a specific eligibility claim with selective disclosure.
+
+Use the verified relationship to make requests accountable within your service: apply per-user and per-agent limits, monitor repeated failures, and withdraw access when your rules are violated. Revoking an agent binding and enforcing a service ban are separate controls, and the service owns its ban policy.
+
+## Plan the integration
+
+Define the agent operator, the consenting user, accepted issuers, and the recipient's verification method in [Plan your integration](/products/agents/integration-options). Then follow [Using Agentic Identity](/products/agents/partner-agent-api).
+
+For a benefit applied after a successful check, see [Agentic Commerce](/products/agents/offers-for-agents).

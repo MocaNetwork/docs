@@ -1,0 +1,45 @@
+---
+title: "Use cases"
+icon: "pen-to-square"
+description: "Turn records in your database or results from an existing identity verification provider into credentials users can present to other applications."
+---
+
+
+
+AIR Identity lets you turn a fact your business already knows into a signed credential that a user can present elsewhere. Your system remains the source of truth; a receiving application decides which issuers and claims it accepts.
+
+## Issue from your existing database
+
+Use this pattern for membership tiers, enrollment, subscriptions, or eligibility already recorded in your system.
+
+**Example:** Your database records that a customer is a current Gold member. You issue a credential containing the membership facts a partner needs to grant a benefit, without including the customer's purchase history.
+
+1. Choose the minimum claims with [What data do you need?](/products/identity/what-data), then [create your first schema](/products/identity/schema-creation).
+2. Connect your issuer backend to the records it needs. Keep source data and issuer signing keys on your servers; see [Setting up your backend](/products/identity/backend-hosting).
+3. Choose the trigger: a tier change, account creation, or another confirmed backend event. Use direct issuance when the user does not need to be present, or SDK issuance when the user should review and claim the credential.
+4. Resolve the intended recipient using the identifier your issuance flow expects. For the documented direct issuance flow, that is the recipient's email, not a shared service account.
+5. Record the issuance and deduplicate repeated events. When the signed status changes, revoke the old credential and issue a replacement as appropriate.
+
+Follow [Issuing credentials](/products/identity/issuing-credentials) for both issuance paths and [Managing your credentials](/products/identity/revocation) for updates and revocation. A database edit alone does not update an already issued credential.
+
+## Issue a credential from an existing KYC result
+
+Use this pattern when you already verify users with a provider such as Persona or Sumsub and want to make an approved result presentable through AIR.
+
+**Example:** Your business attests that a customer passed a defined verification level on a given date. A receiving app checks that statement against its own issuer, assurance, and freshness requirements.
+
+1. Agree which claims your business can attest to, such as verification level and check date. Keep raw identity documents out of the credential unless the use case specifically requires them.
+2. Receive and validate the provider's result in your backend using the provider's documented process. Match it to the correct customer record before issuing.
+3. Apply your own eligibility rules, then use your issuer backend to sign and encrypt the credential to the intended AIR Account.
+4. Set an appropriate validity period. Handle a later withdrawal or change in status through your revocation and reissuance process.
+5. The receiving app accepts only trusted issuers and checks that the disclosed result meets its own requirements before acting on it.
+
+This is an integration pattern for your existing provider, not a preconfigured Persona or Sumsub connector. AIR carries your issuer-signed statement; the original identity check remains with your provider.
+
+For an AIR KYC solution rather than an existing-provider pattern, see [Veriff powered by zkMe](/solutions/kyc).
+
+## Choose the issuance path
+
+Direct issuance suits backend events, but the documented direct flow issues credentials without a holder binding key. Presentations from those credentials are bearer presentations. Choose SDK issuance when you need holder binding, and follow the [SD-JWT verification guide](/products/identity/verify-sd-jwt) for the checks each path requires.
+
+Try the concepts in the [AIR demos](https://air-bd-v2.netlify.app), then use the linked guides for your integration.

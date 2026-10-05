@@ -1,0 +1,38 @@
+---
+title: "How it works"
+icon: "pen-to-square"
+description: "Understand how AIR login, chain-specific smart accounts, wallet transactions, and gas sponsorship fit together in your application."
+---
+
+AIR Money connects a user's AIR Account to smart account transactions in your app. Users sign in through AIR Kit, while your application chooses the transaction experience and the chains it supports.
+
+## From sign-in to transaction
+
+<Steps>
+  <Step title="The user signs in">
+    Initialize AIR Kit and let the user sign in to their AIR Account. Your app can then access the wallet provider for the signed-in user. Start with [AIR login](/get-started/quickstarts/login).
+  </Step>
+  <Step title="A smart account is available on the selected chain">
+    AIR uses a smart account for blockchain interactions; its MPC wallet acts as the signer. Smart accounts are chain-specific. If the account is not deployed, AIR Kit can bundle deployment with the first transaction, or your app can deploy it explicitly and show progress. Deployment gas is sponsored by AIR Kit. See [Smart accounts](/products/money/smart-account).
+  </Step>
+  <Step title="Your app starts the wallet action">
+    Use the EIP-1193 provider with your existing EVM tooling to read accounts, sign messages, and send transactions. You can build your own screens or use AIR Kit's [built-in wallet UI](/products/money/builtin-ui), currently marked beta, for supported send, receive, swap, and history flows.
+  </Step>
+  <Step title="Gas policy is checked and the transaction is submitted">
+    Eligible operations can receive gas sponsorship under the partner's policy. Contract and function allowlists, budgets, and per-user limits determine eligibility. Operations outside the policy can require the user to pay gas. After submission, track confirmation before treating the action as complete.
+  </Step>
+</Steps>
+
+## What your team controls
+
+Your team chooses which wallet actions appear in the app, the enabled chains, and how to handle approval, submission, confirmation, and failures. Read [Supported chains](/products/money/supported-chains) before choosing a network.
+
+A sponsored account deployment does not mean every later transaction is sponsored. For transaction subsidies, work with the AIR team to configure your paymaster policy; the current [Sponsoring gas](/products/money/paymaster) guide requires contacting the team to update settings.
+
+For repeated actions, [session keys](/products/money/session-keys) provide scoped permissions that can reduce repeated approval prompts. They are an additional wallet flow, not permission for arbitrary transactions.
+
+## Start building
+
+- [Accounts and transactions](/products/money/provider-functions) — use the wallet provider and smart account methods.
+- [React walkthrough](/products/money/wagmi-integration) — connect AIR Kit to a React app with wagmi.
+- [Use cases](/products/money/use-cases) — explore the account and payment demos.

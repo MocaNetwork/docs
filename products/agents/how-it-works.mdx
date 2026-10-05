@@ -1,5 +1,5 @@
 ---
-title: "How it works"
+title: "Identity and agent binding"
 description: "Follow a user from approving an agent to the agent presenting verified claims and the receiving application making a decision."
 ---
 
@@ -29,10 +29,10 @@ The binding shows whom the agent represents. Its scopes limit what the agent can
 
 <Steps>
   <Step title="The user approves the agent">
-    Your application shows the user which agent they are connecting and what it will be allowed to do, and asks them to approve. The bind request has no approval step of its own, so this screen is yours to build. See [Ask for consent before binding](/products/agents/delegation-and-consent#ask-for-consent-before-binding).
+    The user approves identity access for a specific agent, normally through the AIR app. Its link is coming soon. For a partner-managed in-app journey, your application shows which agent is being connected and which scopes it requests. The bind request has no approval screen of its own. See [Plan your integration](/products/agents/integration-options#choose-the-delegation-journey).
   </Step>
   <Step title="Bind the agent">
-    While the user has an AIR Kit session, your backend binds the agent with the [Agent APIs](/products/agents/partner-agent-api). Request only the scopes the user approved: `credentials.read`, `credentials.verify`, or `commerce.checkout`.
+    The approved connection links the agent identity to the user's AIR Account. In the partner-managed route, your backend binds it while the user has an AIR Kit session. Request only approved scopes, such as `credentials.read` and `credentials.verify`. See [Using Agentic Identity](/products/agents/partner-agent-api).
   </Step>
   <Step title="Request the required evidence">
     The receiving application decides which claims and issuers it accepts, and sets them in a verification program. For a member price, it might check a loyalty tier. For an eligibility check, it might check that a condition is met.
@@ -49,7 +49,7 @@ The binding shows whom the agent represents. Its scopes limit what the agent can
 
 ## Verification through the Agent APIs
 
-Agents reach credential verification through the Agent APIs, REST endpoints your backend calls. With an agent session, your backend lists the user's credentials and runs a verification program in a single call. See the [Agent API quickstart](/products/agents/partner-agent-api).
+Agents reach credential verification through the Agent APIs, REST endpoints your backend calls. With an agent session, your backend lists the user's credentials and runs a verification program in a single call. See the [Using Agentic Identity](/products/agents/partner-agent-api).
 
 If the user doesn't hold the required credential, the result is `NotFound`. Verification never issues the missing credential itself.
 

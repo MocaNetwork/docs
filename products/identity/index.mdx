@@ -1,0 +1,25 @@
+---
+title: "AIR Identity"
+sidebarTitle: "Overview"
+description: "Issue verifiable credentials, let holders carry them, and verify them through a program — without AIR seeing the plaintext data."
+---
+
+AIR Identity turns facts a partner already knows about a user — membership, tier, eligibility, KYC result — into verifiable credentials the user carries in their AIR Account and presents to any verifier. The issuer keeps the source data and the signing keys. AIR routes encrypted credentials; it never sees the plaintext.
+
+## What you can build
+
+| Capability | What it does | Guide |
+| --- | --- | --- |
+| Issue a credential | Sign a credential with your issuer keys, encrypt it to the holder, and store the envelope in DStorage. | [Issuing Credentials](/products/identity/issuing-credentials) |
+| Design a schema | Define the fields a credential carries so verifiers know what they can request. | [Schema Overview](/products/identity/schema-overview) |
+| Verify a credential | Run a verification program that requests only the fields the decision needs. | [Verifying Credentials](/products/identity/verify) |
+| Revoke a credential | Flip a credential to invalid so subsequent verifications reject it. | [Revoke credentials](/products/identity/revocation) |
+| Verify on your backend | Re-check the SD-JWT presentation the SDK returns, on your own server. | [Verify SD-JWT on your backend](/products/identity/verify-sd-jwt) |
+
+## Issuer, holder, verifier
+
+- **Issuer.** Owns the source data and the signing keys. Signs and encrypts credentials, publishes a `did:web` DID, and runs an Issuer Backend. AIR never signs on the issuer's behalf.
+- **Holder.** The user. Carries encrypted credentials in their AIR Account. Only the holder can decrypt a credential and approve what is disclosed.
+- **Verifier.** Configures a Verification Program that names the accepted format, the requested claims, and whether disclosure is selective. Receives a Verifiable Presentation on success.
+
+A single partner can be issuer, verifier, or both.

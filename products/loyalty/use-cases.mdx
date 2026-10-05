@@ -1,0 +1,47 @@
+---
+title: "Use cases"
+icon: "pen-to-square"
+description: "Explore stable loyalty points, AIR Shop-style rewards, campaign breakage, and portable membership benefits."
+---
+
+AIR Loyalty brings together two complementary ideas: points customers can spend and credentials that prove their status. Use points for funded rewards and redemption; use credentials for membership, tier, and milestone benefits.
+
+## Stable loyalty points and AIR Shop
+
+A stable-points program connects earning to a useful redemption experience. Customers earn rewards from eligible activity, see the value they can use, and spend at a participating surface under the program's rules.
+
+[AIR Shop](https://air3.shop) is an AIR-owned redemption surface. An AIR Shop-style campaign gives customers a clear destination for their rewards. A partner could build a related experience around its own approved checkout or reward catalog, with earning and spending rules suited to its business.
+
+The underlying SP design describes 1:1 USD8 backing. Campaign rewards can add restrictions and expiry on top of that infrastructure. Stable backing does not make every reward universally spendable; currency and campaign eligibility still apply.
+
+## Campaign rewards with breakage
+
+A partner could reward a qualifying purchase with campaign pSP that customers can spend before a stated expiry. The campaign sets the earn rule, eligible redemption options, and reward deadline.
+
+As customers spend, redeemed value settles to the merchant or partner. Rewards that remain unused at expiry produce **breakage**. Where recovery is supported, eligible backing can return to the campaign budget and fund the next round of rewards.
+
+For example, a campaign allocates **200 reward units**: **120 are redeemed**, while **80 expire unused**. The backing eligible for those 80 units may be recycled under the campaign's rules. This illustration does not promise a conversion rate, profit, or return.
+
+Make the expiry visible when customers earn and when they check their balance. The goal is a useful reward experience; breakage is part of the campaign's accounting, not a guaranteed business outcome.
+
+Read [Loyalty points](/products/loyalty/loyalty-points) for the concepts, then explore [issuing](/products/loyalty/issuing-points) and [spending](/products/loyalty/spending-points).
+
+## Tier-based rewards
+
+A loyalty credential can prove that a customer is a Gold member. A participating partner verifies the credential and grants its own perk or applies the tier to a campaign's earning rules.
+
+The credential proves eligibility; the reward system determines the benefit and maintains any spendable balance. Each partner chooses which issuers and tiers it accepts.
+
+The [member discount demo](https://air-bd-v2.netlify.app/try-it-live/member-discount) illustrates airline Gold status qualifying a customer for a café benefit. This is a credential example, separate from points redemption.
+
+## Milestones and seasonal membership
+
+Issue a credential for an achievement such as a tenth visit, or give seasonal membership a defined expiry. A partner can verify that evidence without connecting directly to your loyalty database.
+
+Your loyalty engine remains the source of the qualifying event. Revoke and replace credentials when status changes, and track one-time benefit redemption separately from the credential itself.
+
+See [Loyalty credentials](/products/loyalty/how-it-works) and [Issuing and verifying credentials](/products/loyalty/developers).
+
+## Explore a program for your business
+
+[Talk to the AIR team](https://air3.com/partner-with-us) about campaign design, funding, supported redemption surfaces, and integration options.

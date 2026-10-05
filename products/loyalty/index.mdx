@@ -1,42 +1,30 @@
 ---
 title: "AIR Loyalty"
 sidebarTitle: "Overview"
-description: "Turn loyalty tiers and milestones into portable credentials that customers carry to partner brands, verified without an API integration between you."
+icon: "pen-to-square"
+description: "Combine portable loyalty credentials with funded points campaigns for earning, spending, and partner benefits."
 ---
 
-AIR Loyalty turns a customer's loyalty status into a credential in their AIR Account. You issue it when your loyalty engine records a tier change or milestone. A partner brand verifies it at the point of benefit and receives only the tier information its program requests, with the customer's approval. You and the partner never need a direct API integration.
+AIR Loyalty connects customer status and rewards through two complementary tracks:
 
-Loyalty credentials are AIR credentials, so AIR Loyalty is built on the same schemas, issuance, and verification as [AIR Identity](/products/identity/credentials-flow).
+- **Loyalty credentials** prove membership, tier, or achievement. Customers carry them in their AIR Account and present them to participating partners for verification.
+- **Loyalty points** represent reward value. A funded campaign defines how customers earn, where they spend, and what happens to unused rewards.
 
-## Choose your path
+A credential is proof of status, not a live points balance. Your loyalty engine determines qualifying activity and status; the credential and points flows serve different parts of the experience.
+
+## Explore AIR Loyalty
 
 <CardGroup cols={2}>
-  <Card title="For business" icon="briefcase" href="/products/loyalty/business">
-    The problem, how it works for your customers, compliance questions, and effort to launch.
+  <Card title="Loyalty credentials" icon="id-card" href="/products/loyalty/how-it-works">
+    Make membership tiers and milestones portable and verifiable.
   </Card>
-  <Card title="For developers" icon="code" href="/products/loyalty/developers">
-    Recommended schema, issuance from your loyalty engine, and tier verification code.
+  <Card title="Loyalty points" icon="coins" href="/products/loyalty/loyalty-points">
+    Understand stable points, campaign rewards, redemption, and breakage.
+  </Card>
+  <Card title="Use cases" icon="gift" href="/products/loyalty/use-cases">
+    Explore AIR Shop-style campaigns and partner benefits.
+  </Card>
+  <Card title="Talk to the AIR team" icon="handshake" href="https://air3.com/partner-with-us">
+    Learn about designing and integrating a loyalty program for your business.
   </Card>
 </CardGroup>
-
-## What you can build
-
-- **Tier credentials:** issue a Gold or Platinum credential and replace it when the tier changes.
-- **Milestone badges:** issue a credential when a customer crosses a points, purchase, or visit threshold.
-- **Cross-brand benefits:** let partners grant perks based on a tier you issued.
-- **Time-boxed status:** set an expiry for seasonal or campaign-based access.
-
-## Before you build
-
-AIR Loyalty uses the setup shared by every AIR product:
-
-1. [Set up your partner account](/get-started/dashboard/account-setup), then configure [SDK authentication](/get-started/authentication/sdk-auth) and your [JWKS endpoint](/get-started/authentication/jwks-endpoint).
-2. Design the loyalty credential's [schema](/products/identity/schema-overview).
-3. [Issue credentials](/products/identity/issuing-credentials) from your backend.
-4. Partners set up [verification](/products/identity/verify) for the benefits they offer.
-
-Then follow the [end-to-end loyalty credential flow](/products/loyalty/loyalty-points-issuance).
-
-## See it live
-
-In the [member discount demo](https://air-bd-v2.netlify.app/try-it-live/member-discount), a customer presents airline Gold status at a partner café. The café never sees the membership number.

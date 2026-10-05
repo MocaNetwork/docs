@@ -1,0 +1,37 @@
+---
+title: "What is AIR Identity"
+icon: "pen-to-square"
+description: "Use and share verified identity data through credentials that users carry and present across applications."
+---
+
+AIR Identity provides infrastructure for using and sharing verified identity data. Businesses turn facts they have checked into credentials, and receiving applications verify the evidence they need. The user carries these credentials in their AIR Account and approves what is shared.
+
+Identity data includes more than a name or a completed identity check. It can describe membership, qualifications, residency, purchase activity, or other attributes an issuer can attest to. Any workflow that needs to use or share those verified facts is a potential AIR Identity use case.
+
+## How the participants work together
+
+- **The issuer** checks the source data and signs a credential that attests to the relevant facts.
+- **The holder** carries the credential and approves its use.
+- **The verifier** decides which claims and issuers it accepts, checks the evidence, and applies its own eligibility rules.
+
+One business can be an issuer, a verifier, or both. A signed credential lets a receiving application check an issuer's claim without connecting directly to that issuer's customer database. Whether the claim qualifies someone for a benefit remains the verifier's decision.
+
+## Share the evidence a decision needs
+
+Schemas define the claims a credential carries. Verification programs define what an application requests and accepts. With selective disclosure configured, a customer can share the relevant claims rather than the entire credential.
+
+Issuers keep their source records and signing keys. Credential payloads are encrypted before storage; receiving applications handle the claims disclosed to them.
+
+## What you can build
+
+Use AIR Identity wherever verified identity data informs a decision or needs to move between participants:
+
+- **Onboarding and reusable checks:** present evidence of a completed identity check to an application that accepts the issuer.
+- **Access and eligibility:** establish membership, age eligibility, residency, or qualifications for a service.
+- **Verified data sharing:** let a user present relevant attributes to another business without a direct connection to the issuer's source database.
+- **Personalized experiences and benefits:** use accepted customer attributes to determine offers, prices, or entitlements.
+- **Agent interactions:** let an authorized agent use approved identity evidence on the user's behalf. See [AIR Agents](/products/agents/what-is-air-agents).
+
+The receiving application defines which claims and issuers it trusts. A credential provides evidence for that decision; actions such as spending money require their own authority.
+
+Start with [What are credentials](/products/identity/credentials-flow) and [What are schemas](/products/identity/schema-overview), or explore [Use cases](/products/identity/use-cases).

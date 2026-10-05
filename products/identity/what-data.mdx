@@ -1,0 +1,48 @@
+---
+title: "What data do you need?"
+icon: "pen-to-square"
+description: "Choose the smallest set of credential claims your verification decision needs, then align your schema, disclosure settings, and verification program."
+---
+
+Start with the decision your application needs to make. A credential should provide evidence for that decision, rather than become a copy of the issuer's customer record.
+
+For example: “Grant a discount to a current Gold member” needs proof of membership tier and validity. It usually does not need the member's name, purchase history, or points balance.
+
+## Choose the claims
+
+Write down the decision, identify an issuer you trust to attest to it, and select the fields needed to evaluate it. These are illustrative schema choices, not built-in AIR fields:
+
+| Decision | Claims to consider | Data to leave out unless needed |
+| --- | --- | --- |
+| Grant a membership benefit | `tier`, `brandId`, credential expiry | Membership number, points history |
+| Accept a recent KYC result | `kycLevel`, `verifiedAt`, trusted issuer | Document images, full address |
+| Check adult eligibility | An issuer-attested `isOver18` boolean | Date of birth |
+
+The issuer must have a reliable source for each claim. If a verifier needs `isOver18`, the issuer must calculate and sign that fact; requesting it does not make AIR derive it from a date of birth.
+
+Use [What are schemas](/products/identity/schema-overview) to define field names, types, and validation. Keep issuer and verifier teams aligned on what each value means.
+
+## Decide what to disclose
+
+With SD-JWT, an issuer can make individual claims selectively disclosable. The holder approves the presentation, and the verifier requests the fields its decision needs.
+
+Check the issuer's disclosure configuration as well as the verifier's request. Claims that are not selectively disclosable remain visible in the signed credential. Requesting fewer fields does not hide those claims or credential metadata.
+
+An SD-JWT presentation reveals the value of a disclosed claim. For an age gate, a signed `isOver18` claim avoids revealing the date of birth; it is not a zero-knowledge calculation over a hidden birth date. See [Other ways to verify](/products/identity/credential-formats) if you need predicate proofs.
+
+## Set validity rules
+
+Decide how long the evidence should remain acceptable. A recent KYC check and a permanent course completion can have different freshness requirements.
+
+- Set credential expiry where status is time-limited.
+- Define how your application evaluates dates such as `verifiedAt`.
+- Plan revocation when a signed fact becomes invalid, and enable the relevant status checks in verification.
+- Treat revocation and data deletion as separate operations.
+
+See [Managing your credentials](/products/identity/revocation) for revocation and replacement.
+
+## Configure and verify
+
+Configure your Verification Program with the credential format, accepted issuers, and required claims. In your SDK flow, request the intended disclosure fields and use the returned evidence to evaluate your application's rules.
+
+Before granting access or a benefit, verify the returned presentation on your backend. Follow [Verifying credentials](/products/identity/verify) for the program setup and [Verify with SD-JWT](/products/identity/verify-sd-jwt) for the backend checks.

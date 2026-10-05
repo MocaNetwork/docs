@@ -1,0 +1,42 @@
+---
+title: "Loyalty credentials"
+icon: "pen-to-square"
+description: "Understand signed proof of membership, tier, and achievement, and how it differs from spendable loyalty points."
+---
+
+A loyalty credential is an issuer-signed statement about a customer's membership, tier, or achievement. The customer carries it in their AIR Account and presents it to a partner that accepts the issuer. Your loyalty engine determines eligibility; AIR provides credential issuance and verification.
+
+A credential can attest that a customer reached Gold or earned a milestone. A field such as `totalPoints` can describe lifetime points earned, but it is a signed snapshot, not a live spendable balance. Use [Loyalty points](/products/loyalty/loyalty-points) for funded rewards, redemption, and settlement.
+
+## From loyalty event to benefit
+
+<Steps>
+  <Step title="Your loyalty engine confirms a change">
+    A purchase, visit, or milestone changes the customer's status. Your backend decides what the customer has earned using your existing rules. Define the facts partners need in a credential schema, such as tier and issuing brand.
+  </Step>
+  <Step title="Your issuer backend creates the credential">
+    Your backend signs the credential with your issuer keys, encrypts it to the holder, and stores the encrypted envelope in DStorage. Direct issuance can run from your event pipeline without an active user session. Resolve the correct recipient and deduplicate repeated events; see [Issuing on a tier change](/products/loyalty/loyalty-points-issuance).
+  </Step>
+  <Step title="The customer presents their status">
+    At a partner's checkout, check-in, or access screen, the customer signs in with AIR and approves the requested disclosure. The partner configures which issuers and loyalty claims its Verification Program accepts.
+  </Step>
+  <Step title="The partner verifies and applies its benefit rules">
+    The partner checks the presented credential and its validity, then evaluates the tier or milestone against its own offer. Verify the returned presentation on the partner's backend before granting the benefit. Partners can check the credential without a direct integration to your loyalty database.
+  </Step>
+</Steps>
+
+## Keep status current
+
+A credential is a signed snapshot, not a live view of your loyalty database. When a tier changes, revoke the previous credential and issue a replacement. For seasonal status, set an expiry. Make sure partner verification includes the status and freshness checks the benefit requires.
+
+A partner does not need a full points ledger for a tier benefit. Request only the necessary claims and configure selective disclosure accordingly. Credential metadata may still identify or link the interaction; selective disclosure is not anonymity.
+
+<Info>
+  The documented direct issuance flow does not bind credentials to a holder key, so their presentations are bearer presentations. Use SDK issuance when holder binding is required. See [Issuing credentials](/products/identity/issuing-credentials) and [Verify with SD-JWT](/products/identity/verify-sd-jwt).
+</Info>
+
+## Choose your next step
+
+- [Use cases](/products/loyalty/use-cases) — explore points campaigns alongside tier and milestone benefits.
+- [Issuing and verifying credentials](/products/loyalty/developers) — follow the existing schema and integration walkthrough.
+- [Managing your credentials](/products/identity/revocation) — plan revocation and replacement.

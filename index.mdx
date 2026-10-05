@@ -1,6 +1,6 @@
 ---
 title: "AIR Kit Developer Docs"
-description: "Issue portable credentials, verify claims with user-controlled disclosure, and plug into Moca Network with a few lines of code."
+description: "One integration for identity, agents, money and loyalty. Identity & payment infrastructure for businesses and AI agents."
 mode: "custom"
 ---
 
@@ -10,13 +10,13 @@ mode: "custom"
 
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero__copy">
-          <h1 id="hero-title">One SDK for identity, money and loyalty</h1>
+          <h1 id="hero-title"><span className="hero__promise">One integration</span>{" "}<span className="hero__modules">for identity, agents, money and loyalty</span></h1>
           <p class="hero__lead">
-            Issue portable credentials, verify claims with user-controlled disclosure, and plug into Moca Network with a few lines of code.
+            Identity &amp; payment infrastructure for businesses and AI agents
           </p>
           <div class="hero__actions">
-            <a href="/get-started/sdks/web" className="air-btn air-btn--primary air-btn--large">Quick setup</a>
-            <a href="/technicals/architecture" className="air-btn air-btn--outlined air-btn--large">View architecture</a>
+            <a href="/get-started/quickstarts/login" className="air-btn air-btn--primary air-btn--large">Quickstart</a>
+            <a href="/get-started/build-with-your-agent" className="air-btn air-btn--outlined air-btn--large">Connect your agent</a>
           </div>
         </div>
 
@@ -66,27 +66,26 @@ mode: "custom"
             <h3>I am building on Moca Chain</h3>
             <p>Connect to the L1, deploy contracts, and explore EVM-compatible tooling.</p>
           </a>
-          <a className="doc-card" href="/solutions">
+          <a className="doc-card" href="/technicals/architecture">
             <span class="doc-card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M9 18h6" /><path d="M10 22h4" /><path d="M8 14a6 6 0 1 1 8 0c-.9.8-1 1.7-1 2H9c0-.3-.1-1.2-1-2Z" /></svg>
             </span>
-            <h3>I want to understand Moca Network</h3>
-            <p>Learn the architecture and why portable identity matters for users and partners.</p>
+            <h3>I want to understand the technicals</h3>
+            <p>Learn the architecture, credential security, and data flow behind AIR.</p>
           </a>
         </div>
       </section>
 
       <section class="section section--use-cases" aria-labelledby="use-cases-title">
-        <div class="section__header use-case-banner">
+        <a className="section__header use-case-banner" href="https://air-bd-v2.netlify.app">
           <div class="use-case-banner__copy">
-            <h2 id="use-cases-title">Verify once. Reuse across.</h2>
-            <p>One IDV/KYC check becomes a reusable AIR Credential the user holds. No repeat verification, no multi-party DPAs.</p>
+            <h2 id="use-cases-title">Explore AIR demos</h2>
+            <p>See identity, agent, money and loyalty examples in action.</p>
           </div>
           <div class="section__actions">
-            <a href="/solutions/kyc" className="air-btn air-btn--ghost air-btn--small">Explore on-chain IDV/KYC</a>
-            <a href="/solutions/kyc/how-it-works" className="air-btn air-btn--ghost air-btn--small">How it works</a>
+            <span className="air-btn air-btn--ghost air-btn--small">View demo</span>
           </div>
-        </div>
+        </a>
 
         <div class="section__header">
           <h2>Start with your use case</h2>
@@ -140,8 +139,7 @@ mode: "custom"
 
       <section class="section" aria-labelledby="why-air-title">
         <div class="section__header">
-          <h2 id="why-air-title">Why AIR Kit</h2>
-          <p>AIR Kit keeps high-trust flows clear for users and practical for partner teams.</p>
+          <h2 id="why-air-title">One tech stack, four modules</h2>
         </div>
 
         <div class="feature-list">
@@ -155,8 +153,8 @@ mode: "custom"
             </div>
           </div>
           <div class="feature">
-            <div class="feature__visual">
-              <img src="/images/landing/air-agent.png" alt="" width="744" height="746" loading="lazy" />
+            <div class="feature__visual feature__visual--agent">
+              <img src="/images/landing/air-agent.png" alt="Incoming store orders with AI agents listed as customers, surrounded by products they purchase." width="744" height="590" loading="lazy" />
             </div>
             <div class="feature__copy">
               <p><strong>AIR Agent</strong></p>

@@ -1,25 +1,39 @@
 ---
-title: "AIR Kit SDK and REST API reference"
-sidebarTitle: "SDK reference"
-description: "AIR Kit API reference — Web SDK and Flutter SDK methods for AIR Account login, smart accounts, credentials, and the credential issuance REST API."
+title: "Web SDK reference"
+description: "AIR Kit Web and Flutter SDK reference — AirService class, type definitions, and methods for AIR Account login, smart accounts, and credentials."
 ---
 
-## REST API
+Your app works with AIR Kit through one class, `AirService`. It handles login, smart accounts, and issuing and verifying credentials. 
+This page lists every method and type in the Web and Flutter SDKs. To issue credentials from your server without the user presence, see the [REST API Reference](/api-reference/introduction).
 
-For on-demand credential issuance without user presence, resolve the user and store an encrypted credential in DStorage:
+## Platforms
 
-- **Resolve user:** `POST /v1/auth/initialize-user`
-- **Store encrypted VC:** `POST /v1/dstorage/vcs`
-- **Sandbox:** `https://api.sandbox.mocachain.org/v1`
-- **Production:** `https://mocachain-mainnet.api.air3.com/v1`
+<CardGroup cols={2}>
+  <Card title="Web SDK" icon="browser" href="#web">
+    npm package `@mocanetwork/airkit`. Browser-first; works in any JS framework.
+  </Card>
+  <Card title="Flutter SDK" icon="mobile" href="#flutter">
+    OnePub package `airkit`. Native iOS and Android via platform channels.
+  </Card>
+</CardGroup>
+
+## Install
+
+| Platform | Package | Guide |
+| --- | --- | --- |
+| Web | `@mocanetwork/airkit` | [Installation](/get-started/sdks/web) |
+| Flutter | `airkit` (OnePub) | [Flutter installation](/get-started/sdks/flutter/installation) |
+
+See [Initialization](/get-started/sdks/web) for `init` options and environment selection.
+
+## Authentication
+
+- **AIR Account login** — the SDK runs the user flow and returns an access token. See [User authentication](/get-started/authentication/login).
+- **Partner authentication (JWT)** — your backend signs a Partner JWT with your private key for server-to-server calls. See [Partner authentication](/get-started/authentication/sdk-auth).
 
 <Note>
-  The production endpoint serves Moca Chain mainnet. See [Production mainnet access](/get-started/environments/about#production-mainnet-access).
+  Pick an environment per `BUILD_ENV` (`SANDBOX` or `PRODUCTION`). Production serves Moca Chain mainnet — see [Production mainnet access](/get-started/environments/about#production-mainnet-access).
 </Note>
-
-Authenticate with a Partner JWT in the `x-partner-auth` header. Full endpoint reference and implementation examples: [Issuance API Reference](/api-reference/issuance-api).
-
----
 
 <Tabs>
 

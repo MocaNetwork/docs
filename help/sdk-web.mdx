@@ -1,7 +1,9 @@
 ---
-title: "SDK Issues"
-description: "Troubleshoot AIR Kit SDK issues — initialization failures, login problems, session expiry, partner config errors, and runtime errors in Web and Flutter apps."
+title: "Web SDK"
+description: "Troubleshoot the AIR Kit Web SDK — initialization failures, login problems, session rehydration, and wagmi connector issues."
 ---
+
+Troubleshooting for the AIR Kit **Web SDK** (`@mocanetwork/airkit`). For Flutter, see [Flutter SDK](/help/sdk-flutter). For HTTP status codes and SDK error names, see [Error codes](/help/error-codes).
 
 ## Initialization
 
@@ -46,21 +48,6 @@ await airService.init({ partnerId: "your-partner-id" });
 
 - Call `isLoggedIn` after `init()` to check if rehydration succeeded.
 - If the session cannot be restored (expired, corrupted), `isLoggedIn` returns `false`. Call `login()` to start a new session.
-
-## Flutter-specific
-
-For a consolidated checklist, see [Flutter troubleshooting](/help/flutter-troubleshooting).
-
-### SDK not loading on iOS
-
-- Ensure your `ios/Runner/Info.plist` includes the required URL schemes and capabilities.
-- Follow [Flutter iOS setup](/get-started/sdks/flutter/ios-setup) and [Flutter installation](/get-started/sdks/flutter/installation).
-
-### SDK not loading on Android
-
-- Verify `minSdk` 26+ and `compileSdk` 34+ in your Gradle config.
-- Ensure internet permission is declared in `AndroidManifest.xml`.
-- Follow [Flutter Android setup](/get-started/sdks/flutter/android-setup).
 
 ## wagmi connector
 

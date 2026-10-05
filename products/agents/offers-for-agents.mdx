@@ -1,74 +1,48 @@
 ---
-title: "Offers for agents"
-description: "Explore how merchants could reach eligible users through agents with relevant offers based on verified, user-approved claims."
+title: "Agentic Commerce"
+icon: "pen-to-square"
+description: "Let agents present user-approved identity to qualify for relevant prices, discounts, and membership benefits."
 ---
 
-<Note>
-  This page describes the longer-term product direction for identity-based offers. It is not documentation for a released advertising marketplace or campaign API.
-</Note>
+Agentic Commerce lets an agent bring the user's approved identity into a shopping or booking experience. A participating merchant can recognize the membership or eligibility behind a request and return the benefits that customer qualifies for.
 
-| Area | Current position |
-| --- | --- |
-| Membership or entitlement recognition | Suitable starting point for pilots. |
-| Merchant offer discovery | Proposed model. |
-| Campaign API or marketplace | Not released. |
-| Attribution and revenue sharing | Not defined. |
-| AIR Agent Coupon | Candidate concept; no coupon format or API. |
+The starting point is a clear offer: a member price, a tier benefit, or a discount with defined eligibility. AIR provides the identity and credential-verification flow. The merchant owns the offer rules, and purchase and payment authority are handled separately.
 
-An agent helping someone shop can consider merchant offers as part of its product search. The proposed offers model connects those offers to verified eligibility, with the user's consent.
+## Member discounts
 
-The merchant defines the audience and benefit. The user authorizes the necessary proof. The agent receives an eligible offer and evaluates it against the user's request.
+A customer asks an agent to find a product. They already hold a loyalty credential from an issuer the merchant accepts.
 
-## From verified traffic to agentic commerce
+<Steps>
+  <Step title="The user approves identity access">
+    The customer connects the chosen agent and approves access for the task. The integration identifies both the agent and the user it represents.
+  </Step>
+  <Step title="The agent verifies eligibility">
+    The agent's backend runs the agreed program for membership or tier evidence. It passes the result and relevant presentation in the format the merchant accepts.
+  </Step>
+  <Step title="The merchant applies the benefit">
+    The merchant checks the evidence and returns the eligible price or discount with its terms. The agent can compare that offer against the user's requirements.
+  </Step>
+  <Step title="The user proceeds under the purchase rules">
+    Ordering and payment use their own approvals and supported checkout flow. Permission to verify membership alone does not authorize spending.
+  </Step>
+</Steps>
 
-AIR's [verified audience model](/solutions/advertising) uses credentials to support consent-based audience decisions. AIR Agents extends that to an agent acting for the user: the receiving application can evaluate both the user's claims and the agent's authority.
+For example, an accepted Gold-tier credential could qualify a customer for a lower price. The merchant needs the eligibility evidence for that benefit, rather than the customer's full membership history. Configure disclosure for the actual claims required.
 
-The proposed commerce model brings that evidence into product discovery. Publishers and agent platforms provide distribution, merchants provide eligible offers, and AIR connects the identity and verification steps. An offer can reach the agent while it is working on the user's purchase intent.
+## Travel and other entitlements
 
-## Example: a first-purchase offer
+The same pattern can let a booking agent request a member rate or an upgrade using accepted loyalty status. Preferences such as seat choice help the agent choose options, while credentials establish eligibility for the benefit.
 
-A user in Hong Kong asks an agent to find a skincare product. A merchant wants to introduce its product to eligible first-time customers and offers a one-time 50% discount.
+See the [agent booking demo](https://air-bd-v2.netlify.app/demo/agent-booking) for an illustrative journey. A demonstration of checkout does not give an identity binding wallet signing authority; wallet delegation for Web3 use cases is planned separately.
 
-In this illustrative flow:
+## Relevant offers during discovery
 
-1. The merchant defines the offer, eligibility conditions, expiry, and redemption terms.
-2. The agent identifies the offer as potentially relevant to the user's request.
-3. The user authorizes the evidence needed to check eligibility, such as a supported location claim.
-4. The merchant verifies that evidence and determines first-purchase eligibility using an agreed source or its own customer records.
-5. The agent receives the eligible price and terms, then compares the product with other options.
-6. The user or authorized agent completes checkout under the applicable purchase permissions.
+A merchant could make an offer available while an agent is comparing products. Verified, user-approved claims can establish whether the customer qualifies, and the agent can evaluate the offer alongside price, quality, and the user's request.
 
-The example does not assume that a first-time-customer credential already exists. The merchant and integration team must agree how that condition is established and how one-time use is enforced.
+For a first-purchase discount, agree how first-time eligibility is established and how one-time use is tracked. Do not assume that every required claim already exists as a credential.
 
-## How the participants connect
+Broader offer discovery and merchant-funded campaigns are a product direction. A general advertising marketplace, discovery API, and automated revenue-sharing model are not established by the identity integration described here. [Talk to the AIR team](https://air3.com/partner-with-us) to explore a specific journey.
 
-```mermaid
-flowchart LR
-    U[User intent and consent] --> A[Agent or discovery platform]
-    M[Merchant offer and eligibility rules] --> D[Offer discovery]
-    D --> A
-    A --> V[AIR identity and delegation verification]
-    V --> E[Eligible offer and terms]
-    E --> C[Agent compares options for the user]
-    C --> P[Authorized checkout]
-```
+## Design the identity handoff
 
-The flow is conceptual. There is no discovery API, matching service, or payment protocol for it yet.
-
-## Why merchants participate
-
-A merchant can make its acquisition offer available at the moment an agent is looking for a product. Eligibility evidence can support a specific benefit without requiring the merchant to receive the user's entire profile.
-
-The intended commercial model connects distribution from agent platforms and publishers with merchant-funded acquisition. Pricing, settlement between participants, attribution, and revenue sharing are not yet defined.
-
-## The agent's responsibility to the user
-
-An offer is information for the agent to evaluate. A large discount does not establish that a product is suitable. The agent should consider the user's requirements, total price, quality, delivery, and offer restrictions, and make any sponsored treatment clear.
-
-Later purchases require their own valid authority. A successful first purchase does not create consent for recurring orders, continued disclosure, or ongoing advertising.
-
-## What a pilot must define
-
-To run this model as a pilot, agree how offers are published and discovered, which claims and issuers are accepted, what the user approves, and how the merchant verifies eligibility. Also define redemption limits, attribution, handling of disclosed data, and what happens when evidence is unavailable.
-
-Existing [membership-pricing flows](/products/agents/use-cases#membership-pricing) provide a narrower starting point: verify an entitlement the user already holds and return the corresponding benefit.
+Agree who gives consent, which issuers and claims the merchant accepts, and whether it trusts an agreed backend result or checks the presentation itself. Use [Plan your integration](/products/agents/integration-options) and [What a verification result proves](/products/agents/how-it-works#what-a-verification-result-proves), then follow [Using Agentic Identity](/products/agents/partner-agent-api).

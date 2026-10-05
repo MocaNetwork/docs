@@ -1,0 +1,48 @@
+---
+title: "Loyalty points"
+sidebarTitle: "Loyalty points"
+icon: "pen-to-square"
+description: "Understand stable loyalty points, campaign rewards, redemption, and how expired rewards can return value to a campaign budget."
+---
+
+Loyalty points represent reward value a customer can earn and spend under a program's rules. A points program needs funding, a balance, redemption rules, and settlement. A [loyalty credential](/products/loyalty/how-it-works) instead proves membership, tier, or achievement; it does not maintain a spendable balance.
+
+## Stable points and campaign rewards
+
+AIR's points design uses Spree infrastructure. It separates the underlying stable-value points from the rewards allocated to a particular campaign.
+
+| Concept | Role in a loyalty program |
+| --- | --- |
+| **Stable Points (SP)** | The underlying stable-value points. The documented design describes SP as backed 1:1 by USD8. |
+| **AIR SP** | A shared AIR points rail intended for affiliate and campaign rewards. |
+| **Branded SP** | A partner-specific points currency intended for a partner-owned reward ecosystem. |
+| **Pending SP (pSP)** | Campaign rewards layered over SP, with expiry and rules defining where they can be redeemed. Spending eligible pSP settles the underlying SP. |
+| **Campaign budget** | The funding and accounting behind reward allocation, redemption, expiry, and recycled value. |
+
+The stable-value design concerns the backing of the points. It does not mean every campaign reward can be spent everywhere, lasts forever, or can be cashed out by a customer. The deployed backing, redemption value, and supported spend surfaces depend on the agreed implementation.
+
+## From earning to spending
+
+1. **Fund a campaign.** Establish its budget, eligible customers, earn rules, spend surfaces, and expiry.
+2. **Issue rewards.** A qualifying purchase, activity, or batch distribution allocates points to a customer.
+3. **Show usable value.** The customer sees their balance, where it is eligible, and when campaign rewards expire.
+4. **Redeem.** The customer spends eligible rewards at an approved checkout or redemption surface.
+5. **Settle and reconcile.** Record the redeemed value, merchant or partner settlement, outstanding rewards, and remaining budget.
+
+See [Issuing loyalty points](/products/loyalty/issuing-points) and [Spending loyalty points](/products/loyalty/spending-points) for the partner workflow.
+
+## Breakage and budget recycling
+
+**Breakage** is reward value that is issued but never redeemed. In an expiring pSP campaign, unused rewards can expire under the campaign's rules, and eligible backing can return to the campaign budget for future rewards.
+
+For example, a campaign allocates **200 reward units**. Customers redeem **120**, and the remaining **80** expire unused. If the campaign supports recovery, the backing eligible for those 80 units can be recycled into its budget. This is an illustrative accounting example; it does not set a currency conversion, fee, or commercial entitlement.
+
+Expiry belongs to the campaign reward rules. The documented design describes Branded SP as permanent; do not apply pSP expiry automatically to underlying SP or Branded SP. Budget recovery also needs to be recorded separately from redemptions and merchant settlement.
+
+Explain expiry and eligible spending clearly before a customer earns. Breakage can help reuse a campaign budget, but it does not guarantee profit, yield, or campaign performance.
+
+## Explore a points program
+
+Visit [AIR Shop](https://air3.shop) to explore an AIR-owned redemption surface, or see [Use cases](/products/loyalty/use-cases) for campaign examples.
+
+[Talk to the AIR team](https://air3.com/partner-with-us) to learn about the points model, funding, supported redemption options, and integration for your business.

@@ -1,0 +1,60 @@
+import MCPConnectionTabs from "/snippets/mcp-connection-tabs.mdx";
+import IntegratingAiStaticAndClients from "/snippets/integrating-ai-static-and-clients.mdx";
+
+## Connect via MCP
+
+Choose your tool below and add the AIR documentation server:
+
+```text
+https://docs.air3.com/mcp
+```
+
+<MCPConnectionTabs />
+
+For another MCP-compatible tool, add the URL as a remote HTTP MCP server in its connection settings.
+
+## Try your first prompt
+
+Once connected, ask your agent to look up the docs and help with a specific task:
+
+```text
+Use the AIR docs MCP server to help me add AIR Kit login to my app.
+Check my framework and existing authentication, then explain the setup
+and changes before implementing them.
+```
+
+You can also ask about credential issuance and verification, wallet transactions, or integration errors. Include your framework and what you have already built.
+
+## Choose your setup
+
+| Option | What it provides | When to use it |
+| --- | --- | --- |
+| **Docs MCP** | Searchable AIR documentation, SDK guides, and API references. | Start here for current reference material. |
+| **AIR skill** | Integration workflows and checks for setup, authentication, and common errors. | Add alongside MCP for guidance while building. |
+| **Static docs** | Documentation files you attach or index in your tool. | Use when your tool cannot connect through MCP; refresh the files as docs change. |
+
+Your agent uses these resources to plan, write, and review integration code. Live AIR operations run through your application's configured account, authentication, and programs.
+
+## Add the AIR skill (optional)
+
+For tools that support [Agent Skills](https://agentskills.io/home), run:
+
+```bash
+npx skills add https://docs.air3.com
+```
+
+Select your agent in the CLI to install the skill.
+
+<Accordion title="Before issuing or verifying credentials">
+  Ask your agent to confirm these prerequisites before generating application code:
+
+  - Your partner's public JWKS endpoint is reachable over HTTPS.
+  - The exact JWKS URL is registered in the Developer Dashboard.
+  - Your JWT signing key stays server-side, and its `kid` matches a published JWKS key.
+
+  Follow [JWKS endpoint setup](/get-started/authentication/jwks-endpoint), then use the [issuance](/products/identity/issuing-credentials) or [verification](/products/identity/verify) guide for your flow.
+</Accordion>
+
+<Accordion title="Use static documentation files">
+  <IntegratingAiStaticAndClients />
+</Accordion>

@@ -1,17 +1,25 @@
 ---
-title: "Agent API quickstart"
-description: "Bind an agent to a user's AIR Account from your backend, then mint short-lived agent JWTs to list and verify credentials and start a merchant checkout."
+title: "Using Agentic Identity"
+description: "Delegate identity access to a specific agent, then verify the user's credentials for an approved task."
 ---
 
-The Agent APIs let your backend act for a signed-in user through a bound agent. You bind the agent once while the user has an AIR Kit session. After that, the agent mints a 15-minute JWT for each operation and uses it to list or verify the user's credentials. If the agent's key includes `commerce.checkout`, the agent can also mint a token for a supported merchant checkout.
+AIR delegates identity access to a specific agent identity bound to the user's AIR Account. That lets the agent authenticate its own requests and verify the user's credentials for an approved task, using the scopes granted to that identity.
 
-This guide walks through the full flow. For every field and response code, see the [Agent APIs reference](/api-reference/agents/introduction).
+The agent here is the runtime or backend holding the bound key, rather than the model name or a message in chat. Identify its operator and the user it represents first; see [Plan your integration](/products/agents/integration-options).
+
+The flow has two stages: **delegation**, then **verification by the agent**. The receiving application decides which evidence it accepts and checks the result before granting access or a benefit. For endpoint fields and responses, use the [Agent APIs reference](/api-reference/agents/introduction).
+
+<Note>
+  This guide covers identity delegation. Wallet delegation for Web3 use cases is planned; an identity binding does not grant wallet signing or spending authority.
+</Note>
 
 ## Before you start
 
+For the partner-managed API route shown below, prepare:
+
 - A Partner ID and a partner login key with a published JWKS endpoint. See [SDK authentication](/get-started/authentication/sdk-auth).
 - AIR Kit installed in your frontend, with users signing in through [`login`](/get-started/authentication/login).
-- A consent screen in your product where the user approves the agent and its scopes. The bind request has no approval step of its own. See [Ask for consent before binding](/products/agents/delegation-and-consent#ask-for-consent-before-binding).
+- A defined consent journey. For the in-app partner binding route below, your product shows the user the agent and its requested scopes before calling the API. See [Ask for consent before binding](/products/agents/delegation-and-consent#ask-for-consent-before-binding).
 - Agent keys enabled for your partner account. Otherwise, AIR API calls return `403 AGENT_KEYS_DISABLED`. Contact the AIR team to enable them and confirm environment access.
 
 The Agent APIs use two hosts. Use the pair for the same environment.
@@ -25,30 +33,35 @@ The Agent APIs use two hosts. Use the pair for the same environment.
 
 ```mermaid
 sequenceDiagram
-    participant Page as Partner page
-    participant Backend as Partner backend
+    participant User
+    participant Backend as Agent backend
     participant AIR as AIR API
     participant Cred as Credential API
-    participant Merchant as Merchant checkout
-    Page->>AIR: AIR Kit login (holder session)
-    Page->>Backend: airService.getAccessToken()
-    Note over Backend: Sign x-partner-jwt with the login key. Never in page JavaScript.
-    Backend->>AIR: POST /v2/auth/agent/keys/partner
-    AIR-->>Backend: agentApiKey (returned once)
-    loop Each operation
-        Backend->>AIR: POST /v2/auth/agent/session (x-agent-api-key)
-        AIR-->>Backend: Agent JWT (15 minutes)
-        Backend->>Cred: GET /v2/credentials
-        Backend->>Cred: POST /v2/credentials/verify-by-agent
-    end
-    opt Key includes commerce.checkout
-        Backend->>AIR: POST /v2/auth/agent/checkout-session (x-agent-api-key)
-        AIR-->>Backend: Checkout JWT (merchant audience)
-        Backend->>Merchant: Present checkout JWT
-    end
+    participant Service as Receiving service
+    Note over User,AIR: 1. Delegation (partner-managed route shown)
+    User->>Backend: Approve agent and requested scopes
+    Backend->>AIR: Bind agent with approved user session
+    AIR-->>Backend: Bound agent key
+    Note over Backend,Service: 2. Verification
+    Backend->>AIR: Create scoped agent session
+    AIR-->>Backend: Short-lived agent JWT
+    Backend->>Cred: Run agreed verification program
+    Cred-->>Backend: Result and presentation when compliant
+    Backend->>Service: Supply agreed evidence
+    Service->>Service: Check evidence and apply access or benefit rules
 ```
 
-## Bind and use an agent
+## 1. Delegate to the agent identity
+
+### Through the AIR app
+
+The standard user journey is to approve the agent through the AIR app. The user chooses the agent they want to connect and approves identity access. The agent integration then uses the resulting supported identity binding.
+
+**AIR app link: coming soon.** Contact the AIR team for this connection flow.
+
+### Within your application
+
+For a more integrated user experience, you can request access to the partner-managed delegation route. Your application owns the approval screen and binds the agent only after the user consents. The following examples document that route.
 
 <Steps>
   <Step title="Get the user's approval and AIR Kit session">
@@ -65,7 +78,6 @@ sequenceDiagram
 
     The token identifies the user. Everything else in this guide runs on your backend.
   </Step>
-
   <Step title="Bind the agent once">
     From your backend, call [Bind an agent](/api-reference/agents/bind-agent-key) with the user's session and a freshly signed partner JWT. Request only the scopes the user approved.
 
@@ -120,7 +132,15 @@ sequenceDiagram
 
     Add `commerce.checkout` only if the user approved the agent starting merchant checkouts. Scopes are fixed at bind time; to add one later, get approval, bind a new key, and revoke the old one.
   </Step>
+</Steps>
 
+## 2. Verify the user's credentials
+
+After delegation, the agent authenticates with its own bound key. Its backend creates a short-lived session and runs the verification program agreed with the receiving service. That program determines the accepted issuers, conditions, and disclosure.
+
+Listing credentials is optional when you already know which program to run. It can help the agent discover which evidence is available; only the verification result establishes whether the selected program is satisfied.
+
+<Steps>
   <Step title="Create a session for each operation">
     Exchange the API key for a short-lived agent JWT with [Create an agent session](/api-reference/agents/create-agent-session). Request a subset of the bound scopes, or omit `scope` to receive all of them.
 
@@ -159,7 +179,6 @@ sequenceDiagram
 
     The JWT expires after 15 minutes and has no refresh token. Create a new session when it expires.
   </Step>
-
   <Step title="List the user's credentials">
     With `credentials.read`, call [List credentials](/api-reference/agents/list-credentials) on the Credential API. Filter by `schemaId`, `issuerDid`, or `vct` (each repeatable), and page with `limit` (1–100) and `cursor`.
 
@@ -193,7 +212,6 @@ sequenceDiagram
 
     When `hasMore` is `true`, pass `nextCursor` as `cursor` to get the next page.
   </Step>
-
   <Step title="Verify a credential">
     With `credentials.verify`, call [Verify a credential](/api-reference/agents/verify-credential-by-agent) with a verification program ID. This endpoint accepts agent JWTs only.
 
@@ -246,36 +264,14 @@ sequenceDiagram
 
     A `502 CREDENTIAL_STORAGE_UNAVAILABLE` means storage was unavailable, not that the user lacks the credential.
   </Step>
-
-  <Step title="Optional: start a merchant checkout">
-    If the key includes `commerce.checkout`, call [Create a checkout session](/api-reference/agents/create-checkout-session) to get a token for a supported merchant. The request `scope` names the merchant checkout target. `pivota.checkout` is currently the only supported value.
-
-    <CodeGroup>
-    ```bash cURL
-    curl -X POST "$AIR_API/v2/auth/agent/checkout-session" \
-      -H "Content-Type: application/json" \
-      -H "x-agent-api-key: $AGENT_API_KEY" \
-      -d '{ "scope": "pivota.checkout" }'
-    ```
-
-    ```ts TypeScript
-    const res = await fetch(`${AIR_API}/v2/auth/agent/checkout-session`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-agent-api-key": agentApiKey,
-      },
-      body: JSON.stringify({ scope: "pivota.checkout" }),
-    });
-    const { accessToken: checkoutJwt } = await res.json();
-    ```
-    </CodeGroup>
-
-    The response has the same shape as a session. The token's `aud` is the merchant, and it carries the user's AIR Account address. Pass it to the merchant's checkout flow. The merchant must verify `aud`; AIR and Credential APIs reject this token.
-
-    The merchant may need buyer identity settings configured on its side before it accepts the token. Confirm the setup with the AIR team.
-  </Step>
 </Steps>
+
+The receiving service checks the supplied evidence under its agreed trust model and applies its own access or benefit rules. A successful identity check does not authorize additional disclosure, a purchase, or a payment.
+
+## Merchant checkout handoff
+
+An existing [checkout session](/api-reference/agents/create-checkout-session) can carry the user's AIR Account identity to a supported merchant when the user has approved `commerce.checkout`. It is a merchant-scoped token, not wallet delegation. Checkout and payment follow their own integration and approvals.
+
 
 ## Manage bound agents
 
