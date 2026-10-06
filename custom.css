@@ -321,7 +321,7 @@ mobile-nav-tabs-item:focus-visible {
 }
 
 /* External Demo tab: compact trailing icon after the label. */
-:is(.nav-tabs-item, .mobile-nav-tabs-item)[href="https://air-bd-v2.netlify.app"] > svg {
+:is(.nav-tabs-item, .mobile-nav-tabs-item)[href="https://demo.air3.com"] > svg {
   order: 1;
   width: 12px !important;
   height: 12px !important;
