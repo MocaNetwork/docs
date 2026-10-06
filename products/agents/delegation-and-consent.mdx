@@ -3,10 +3,6 @@ title: "Delegation and consent"
 description: "Control what an agent may present and do on a user's behalf, get the user's approval before binding, and withdraw access when they disconnect."
 ---
 
-import AgenticIdentityAvailability from "/snippets/agentic-identity-availability.mdx";
-
-<AgenticIdentityAvailability />
-
 An agent acts for a user only within the authority the user gives it. Today, that authority is the set of scopes on the agent's key. Delegation credentials, which are not yet released, would add finer-grained, per-task grants.
 
 ## What the Agent APIs enforce today
@@ -61,7 +57,7 @@ For each integration, define the claims an agent may present, the applications t
 
 | Information type | Example | What it means for the interaction |
 | --- | --- | --- |
-| Proof of eligibility | The user is over 18 ([see the demo](https://air-bd-v2.netlify.app/demo/agent-booking)) | The application can check a condition without the source document. The date of birth stays hidden. |
+| Proof of eligibility | The user is over 18 ([see the demo](https://demo.air3.com/demo/agent-booking)) | The application can check a condition without the source document. The date of birth stays hidden. |
 | Approved disclosure | The user's loyalty tier | The recipient receives the specific claim approved for sharing. |
 | User context | A seat preference or product category | The agent can personalize its work, but a preference is not an issuer-verified fact. |
 

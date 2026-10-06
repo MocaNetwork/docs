@@ -21,7 +21,7 @@ The site has a Home icon tab for the landing page ([`index.mdx`](index.mdx)) and
 - **API References** (`api-reference/`) — REST endpoints generated from [`api-reference/openapi.json`](api-reference/openapi.json), the Agent APIs generated from [`api-reference/agent-openapi.json`](api-reference/agent-openapi.json), the SDK references, and release notes.
 - **Help** — troubleshooting, FAQs, status, and the glossary (`concepts/`).
 
-[`custom.css`](custom.css) renders the first tab as an icon and pushes the last two tabs (API References and Help) to the right, so keep that tab order. Demo apps live on the [AIR Kit demo site](https://air-bd-v2.netlify.app); link to them from existing pages rather than adding docs routes.
+[`custom.css`](custom.css) renders the first tab as an icon and pushes the last two tabs (API References and Help) to the right, so keep that tab order. Demo apps live on the [AIR Kit demo site](https://demo.air3.com); link to them from existing pages rather than adding docs routes.
 
 The landing page is [`index.mdx`](index.mdx). Shared assets live in [`images/`](images).
 
