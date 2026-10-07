@@ -1,76 +1,22 @@
 ---
 title: "Creating your first schema"
-description: "Create and publish AIR Kit credential schemas using the Schema Builder — define fields, types, and validation rules without code."
+description: "Register a credential type (vct) in the AIR Dashboard, with optional Type Metadata, and define its claims in your issuer backend."
 ---
 
-Credential schemas are the foundation of your credential issuance system. This guide will help you understand, create, and manage schemas effectively for your AIR Kit applications.
+A schema record registers your credential type with AIR so issuance and verification programs can reference it. You register a credential-type identifier (`vct`) and can optionally provide Type Metadata JSON (`vctJson`). The actual credential claims and selective-disclosure behavior are defined in your issuer backend.
 
-## Creating schemas with the Schema Builder
+<Note>
+  To issue Iden3 credentials, contact the AIR team to enable Iden3 for your account: [Partner with us](https://air3.com/partner-with-us). Once enabled, create Iden3 schemas with the [Iden3 Schema Builder](/products/identity/iden3/schema-builder).
+</Note>
 
-The AIR Kit Schema Builder provides an intuitive interface for creating credential schemas without requiring technical knowledge of JSON schema structures.
+## Register a credential type
 
-### Step 1: Access the Schema Builder
+1. Open **Issuer → Schemas** in the Dashboard for your target environment.
+2. Enter a descriptive title, description, and credential-type identifier (`vct`).
+3. Optionally provide Type Metadata JSON (`vctJson`) describing the credential type and its claims.
+4. Publish the record and save its schema ID.
+5. Use that schema record when creating your issuance program.
 
-1. Go to the [Developer Dashboard](https://developers.sandbox.air3.com/dashboard/issuer/schemas)
-2. Navigate to the **Schemas** section under **Issuer**
-   ![Create Schema](/images/guides/schema.png)
+The schema ID identifies the AIR Dashboard record. The `vct` identifies the credential type inside the signed SD-JWT. Do not assume they are interchangeable.
 
-### Step 2: Create a new schema
-
-1. Click **"Create New Schema"**
-2. Fill in the basic schema information:
-   - **Title**: Choose a descriptive name for your schema
-   - **Type**: Select or enter a category for your credential type
-   - **Description**: Provide a clear explanation of what this schema represents
-
-### Step 3: Define attributes
-
-1. Click **"+"** to add attributes
-2. For each attribute, specify:
-   - **Name**: Field identifier (use camelCase)
-   - **Type**: Choose from String, Number, Boolean, or Date
-   - **Description**: Explain what this field represents
-   - **Required**: Mark if the field is mandatory
-
-### Step 4: Publish your schema
-
-1. Review your schema structure
-2. Click **"Publish"** to make it available for credential creation
-3. Note the schema ID for use in your applications
-
-<div style={{textAlign: "center"}}>
-  <img src="/images/guides/schema_builder.gif" alt="Create schema" style={{width: "600px"}} />
-</div>
-
-## Schema Builder best practices
-
-### 1. Choose descriptive names
-
-- Use clear, descriptive names for your schema title and attributes
-- Avoid abbreviations that might be unclear to other developers
-- Example: `"memberId"` instead of `"mem_id"`
-
-### 2. Provide clear descriptions
-
-- Write detailed descriptions for each attribute
-- Explain the purpose and expected format of each field
-- Include any validation rules or constraints
-
-### 3. Use appropriate data types
-
-- **String**: For text data, IDs, names, descriptions
-- **Number**: For numeric values, ages, quantities, scores
-- **Boolean**: For true/false values, flags, status indicators
-- **Date**: For timestamps, expiry dates, event dates
-
-### 4. Consider privacy requirements
-
-- Only include fields that are necessary for your use case
-- Remember that users can selectively disclose fields
-- Avoid collecting sensitive data unless absolutely required
-
-### 5. Plan for future updates
-
-- Consider how your schema might evolve over time
-- Use versioning to manage schema changes
-- Design attributes to be extensible
+Providing `vctJson` does not configure the credential's claim values or selective-disclosure behavior. Those are supplied by your issuer backend. See [Issuing your first credential](/get-started/quickstarts/issue-credentials) for a backend example.

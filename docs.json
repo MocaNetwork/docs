@@ -230,7 +230,17 @@
                       "products/identity/schema-creation",
                       "products/identity/backend-hosting",
                       "products/identity/revocation",
-                      "products/identity/schema-management"
+                      {
+                        "group": "Other ways to issue",
+                        "root": "products/identity/iden3/issuing",
+                        "expanded": false,
+                        "pages": [
+                          "products/identity/iden3/schema-builder",
+                          "products/identity/iden3/schema-structure",
+                          "products/identity/iden3/schema-management",
+                          "products/identity/iden3/schema-examples"
+                        ]
+                      }
                     ]
                   },
                   {
@@ -963,7 +973,7 @@
     },
     {
       "source": "/airkit/usage/credential/schema-use-cases",
-      "destination": "/products/identity/schema-use-cases"
+      "destination": "/products/identity/iden3/schema-examples"
     },
     {
       "source": "/airkit/usage/credential/schema-creation",
@@ -971,7 +981,7 @@
     },
     {
       "source": "/airkit/usage/credential/schema-management",
-      "destination": "/products/identity/schema-management"
+      "destination": "/products/identity/iden3/schema-management"
     },
     {
       "source": "/airkit/usage/credential/issuing-credentials",

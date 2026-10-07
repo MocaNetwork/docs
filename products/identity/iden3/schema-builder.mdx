@@ -1,0 +1,108 @@
+---
+title: "Iden3 Schema Builder"
+description: "Create and publish Iden3 credential schemas with the AIR Kit Schema Builder — define attributes, types, and required fields without code."
+---
+
+<Note>
+  Contact the AIR team to enable Iden3 for your account: [Partner with us](https://air3.com/partner-with-us). For SD-JWT, see [Registering credential types and creating schemas](/products/identity/schema-creation).
+</Note>
+
+The Schema Builder provides an interface for creating Iden3 credential schemas without requiring technical knowledge of JSON schema structures.
+
+## Iden3: Create a schema with the Schema Builder
+
+### Step 1: Access the Schema Builder
+
+1. Go to the [Developer Dashboard](https://developers.sandbox.air3.com/dashboard/issuer/schemas)
+2. Navigate to the **Schemas** section under **Issuer**
+   ![Create Schema](/images/guides/schema.png)
+
+### Step 2: Create a new schema
+
+1. Click **"Create New Schema"**
+2. Fill in the basic schema information:
+   - **Title**: Choose a descriptive name for your schema
+   - **Type**: Select or enter a category for your credential type
+   - **Description**: Provide a clear explanation of what this schema represents
+
+### Step 3: Define attributes
+
+1. Click **"+"** to add attributes
+2. For each attribute, specify:
+   - **Name**: Field identifier (use camelCase)
+   - **Type**: Choose from String, Number, Boolean, or Date
+   - **Description**: Explain what this field represents
+   - **Required**: Mark if the field is mandatory
+
+### Step 4: Publish your schema
+
+1. Review your schema structure
+2. Click **"Publish"** to make it available for credential creation
+3. Note the schema ID for use in your applications
+
+<div style={{textAlign: "center"}}>
+  <img src="/images/guides/schema_builder.gif" alt="Create schema" style={{width: "600px"}} />
+</div>
+
+Here is an example of a simple schema for a "DAO Membership" credential:
+
+```json
+{
+  "title": "DAO Membership",
+  "version": "1.0",
+  "description": "Verifies that the holder is a member of a specific DAO.",
+  "attributes": [
+    {
+      "name": "daoName",
+      "type": "string",
+      "title": "DAO Name",
+      "required": true
+    },
+    {
+      "name": "memberSince",
+      "type": "date",
+      "title": "Member Since",
+      "required": true
+    },
+    {
+      "name": "votingPower",
+      "type": "number",
+      "title": "Voting Power",
+      "required": false
+    }
+  ]
+}
+```
+
+## Iden3 Schema Builder best practices
+
+### 1. Choose descriptive names
+
+- Use clear, descriptive names for your schema title and attributes
+- Avoid abbreviations that might be unclear to other developers
+- Example: `"memberId"` instead of `"mem_id"`
+
+### 2. Provide clear descriptions
+
+- Write detailed descriptions for each attribute
+- Explain the purpose and expected format of each field
+- Include any validation rules or constraints
+
+### 3. Use appropriate data types
+
+- **String**: For text data, IDs, names, descriptions
+- **Number**: For numeric values, ages, quantities, scores
+- **Boolean**: For true/false values, flags, status indicators
+- **Date**: For timestamps, expiry dates, event dates
+
+### 4. Consider privacy requirements
+
+- Only include fields that are necessary for your use case
+- Remember that users can selectively disclose fields
+- Avoid collecting sensitive data unless absolutely required
+
+### 5. Plan for future updates
+
+- Consider how your schema might evolve over time
+- Use versioning to manage schema changes
+- Design attributes to be extensible

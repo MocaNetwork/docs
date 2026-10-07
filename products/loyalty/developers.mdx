@@ -33,7 +33,7 @@ graph TD
 
 ## Recommended schema
 
-Create this schema in the [AIR Kit Dashboard](https://developers.sandbox.air3.com/dashboard) under **Issuer → Schema Builder**.
+Register this credential type in the [AIR Kit Dashboard](https://developers.sandbox.air3.com/dashboard) under **Issuer → Schemas**. You can optionally publish the claims below as Type Metadata; your issuer backend issues them.
 
 ```json
 {
@@ -75,22 +75,24 @@ const { getPartnerJwt } = require('./lib/jwt'); // see Partner Authentication
 // issuer-controlled helpers backed by your signing keys
 const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
 
+const AIR_API_ORIGIN = 'https://air.api.sandbox.air3.com';
 const BASE_URL = 'https://api.sandbox.mocachain.org/v1'; // swap for prod URL on launch
 
 async function issueLoyaltyCredential({ userEmail, tier, totalPoints, memberSince }) {
   const token = await getPartnerJwt(); // JWT must include scope: "issue"
 
   // Resolve the member's AIR Account
-  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
+  const init = await fetch(`${AIR_API_ORIGIN}/v2/auth/initialize-user`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
-    body: JSON.stringify({ email: userEmail }),
+    headers: { 'Content-Type': 'application/json', 'x-partner-id': process.env.PARTNER_ID },
+    body: JSON.stringify({ partnerJwt: await getPartnerJwt({ email: userEmail }) }),
   }).then((r) => r.json());
 
   // Build, sign (SD-JWT VC), and encrypt the credential to the holder
   const schemaId = process.env.LOYALTY_CRED_ID; // Dashboard → Issuer → Programs
   const vc = buildVc({
     holderDid: init.did,
+    cnf: init.signingKey, // binds the credential to the holder's signing key
     schemaId,
     credentialSubject: { tier, totalPoints, memberSince, brandId: process.env.BRAND_ID },
   });
@@ -102,6 +104,7 @@ async function issueLoyaltyCredential({ userEmail, tier, totalPoints, memberSinc
     headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
     body: JSON.stringify({
       holderDid: init.did,
+      proofType: 'SD_JWT_VC',
       schemaId,
       expiresAt: vc.expirationDate,
       data: encrypted.encryptedData,
@@ -191,8 +194,8 @@ Issuance completes in ~1–4 seconds and returns a `storagePath` once the encryp
   <Card title="On-demand Issuance — API" icon="code" href="/api-reference/issuance-api">
     Full endpoint reference with error codes.
   </Card>
-  <Card title="Schema Use Cases" icon="list" href="/products/identity/schema-use-cases">
-    More schema examples including membership and event pass.
+  <Card title="Register credential types" icon="list" href="/products/identity/schema-creation">
+    Register the credential type your backend issues.
   </Card>
   <Card title="Verifying Credentials" icon="shield-check" href="/products/identity/verify">
     SDK verification flow reference.

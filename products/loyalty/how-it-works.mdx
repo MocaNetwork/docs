@@ -31,7 +31,7 @@ A credential is a signed snapshot, not a live view of your loyalty database. Whe
 A partner does not need a full points ledger for a tier benefit. Request only the necessary claims and configure selective disclosure accordingly. Credential metadata may still identify or link the interaction; selective disclosure is not anonymity.
 
 <Info>
-  The documented direct issuance flow does not bind credentials to a holder key, so their presentations are bearer presentations. Use SDK issuance when holder binding is required. See [Issuing credentials](/products/identity/issuing-credentials) and [Verify with SD-JWT](/products/identity/verify-sd-jwt).
+  Direct issuance binds credentials to the holder's signing key, just like SDK issuance. Partners that verify a tier should send a nonce and check the key-binding JWT so a copied presentation cannot be replayed. See [Issuing credentials](/products/identity/issuing-credentials) and [Verify with SD-JWT](/products/identity/verify-sd-jwt).
 </Info>
 
 ## Choose your next step

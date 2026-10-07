@@ -30,45 +30,15 @@ AIR Kit only loads on domains you allow. You can add up to 3 domains or subdomai
 
 ## Issuer
 
-The Issuer section is for partners that issue credentials. It has three areas: the schema builder, issuance programs, and issuance monitoring.
+The Issuer section is for partners that issue credentials. It has three areas: schemas, issuance programs, and issuance monitoring.
 
-### 1. Schema Builder
+### 1. Schemas
 
-This is the starting point for creating any new credential. A Schema acts as a blueprint, defining the structure, data type, and rules for a specific type of credential.
+This is the starting point for creating any new credential. A schema record registers a credential-type identifier (`vct`), with optional Type Metadata JSON (`vctJson`), so your issuance and verification programs can reference it. Your issuer backend defines the claims and selective-disclosure behavior. See [Registering credential types and creating schemas](/products/identity/schema-creation).
 
-- **Create Schemas**: Issuers can build custom schemas by defining a title, version, and description.
-- **Define Attributes**: Within each schema, issuers add specific data fields (attributes). For each attribute, they define a name, data type (e.g., string, number, boolean), a descriptive title, and can mark it as required.
-- **Publish**: Publish the schema to use it in issuance programs. See [Schema creation](/products/identity/schema-creation) for field types and design rules.
-
-Here is an example of a simple schema for a "DAO Membership" credential:
-
-```json
-{
-  "title": "DAO Membership",
-  "version": "1.0",
-  "description": "Verifies that the holder is a member of a specific DAO.",
-  "attributes": [
-    {
-      "name": "daoName",
-      "type": "string",
-      "title": "DAO Name",
-      "required": true
-    },
-    {
-      "name": "memberSince",
-      "type": "date",
-      "title": "Member Since",
-      "required": true
-    },
-    {
-      "name": "votingPower",
-      "type": "number",
-      "title": "Voting Power",
-      "required": false
-    }
-  ]
-}
-```
+<Note>
+  To issue Iden3 credentials, contact the AIR team to enable Iden3 for your account: [Partner with us](https://air3.com/partner-with-us). Once enabled, create Iden3 schemas with the [Iden3 Schema Builder](/products/identity/iden3/schema-builder).
+</Note>
 
 ### 2. Issuance Program
 

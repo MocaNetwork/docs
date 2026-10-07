@@ -186,19 +186,20 @@ const { getPartnerJwt } = require('./lib/jwt');
 // issuer-controlled helpers backed by your signing keys
 const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
 
+const AIR_API_ORIGIN = 'https://air.api.sandbox.air3.com';
 const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
 
 // Resolve the recipient, then build, sign, encrypt, and store the credential in DStorage
 async function issueEncryptedCredential({ recipientEmail, schemaId, credentialSubject }) {
   const token = await getPartnerJwt();
 
-  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
+  const init = await fetch(`${AIR_API_ORIGIN}/v2/auth/initialize-user`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
-    body: JSON.stringify({ email: recipientEmail }),
+    headers: { 'Content-Type': 'application/json', 'x-partner-id': process.env.PARTNER_ID },
+    body: JSON.stringify({ partnerJwt: await getPartnerJwt({ email: recipientEmail }) }),
   }).then((r) => r.json());
 
-  const vc = buildVc({ holderDid: init.did, schemaId, credentialSubject });
+  const vc = buildVc({ holderDid: init.did, cnf: init.signingKey, schemaId, credentialSubject });
   const encrypted = encryptToHolder(signVc(vc), init.publicKey); // SD-JWT VC, encrypted to holder
 
   const res = await fetch(`${BASE_URL}/dstorage/vcs`, {
@@ -206,6 +207,7 @@ async function issueEncryptedCredential({ recipientEmail, schemaId, credentialSu
     headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
     body: JSON.stringify({
       holderDid: init.did,
+      proofType: 'SD_JWT_VC',
       schemaId,
       expiresAt: vc.expirationDate,
       data: encrypted.encryptedData,

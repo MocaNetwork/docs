@@ -28,11 +28,11 @@ or static test data. You do not need to create a new database simply to provide 
 
 ## Fork and review the backend implementation
 
-Fork the SD-JWT branch of the [AIR issuer service](https://github.com/MocaNetwork/air-issuer-service/tree/main).
+Fork the SD-JWT branch of the [AIR issuer service](https://github.com/MocaNetwork/air-issuer-service/tree/main_sd-jwt-vc).
 It issues `SD_JWT_VC` credentials under a `did:web` issuer DID.
 
 - The service runs without `DATABASE_URL` for sandbox testing. For issuance history, revocation, and a token status list at scale across many users, you will need to persist the relevant data in your own database.
-- Iden3 issuers use a separate branch. See [Iden3 credentials](/products/identity/iden3-credentials).
+- Iden3 issuers use a separate branch. See [Issue Iden3 credentials](/products/identity/iden3/issuing).
 
 This guide follows the issuer service used in the
 [issuance quickstart](/get-started/quickstarts/issue-credentials#step-1-generate-partner-secrets).

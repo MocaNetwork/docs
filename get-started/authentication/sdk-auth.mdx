@@ -22,7 +22,7 @@ On Web, standard AIR login works without a Partner JWT, but passing one is recom
 | Header | `kid` set to a key ID in your JWKS, and `typ: "JWT"` |
 | `partnerId` claim | Always required: your Partner ID |
 | `scope` claim | `"issue"` for `issueCredential` and direct issuance, `"verify"` for `verifyCredential` |
-| `email` claim | Only for Custom Auth login. For direct issuance, send the recipient's email to `initialize-user`, not in the JWT. |
+| `email` claim | For Custom Auth login, and for the direct issuance `initialize-user` call, where it is the recipient's email. Leave it out otherwise. |
 | `exp` claim | Required. Keep tokens short-lived; 5 minutes is recommended. |
 
 To learn more about JWTs, see [jwt.io](https://www.jwt.io).

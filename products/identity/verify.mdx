@@ -121,7 +121,7 @@ Inside the presentation:
 | Field | Description |
 | --- | --- |
 | `holder` | The holder's DID. Not signed; do not trust it on its own. |
-| `verifiableCredential` | The disclosed credential. For `SD_JWT_VC` programs this is an `EnvelopedVerifiableCredential` whose `id` is `data:application/dc+sd-jwt,` followed by the compact SD-JWT (older results use `data:application/vc+sd-jwt,`). For Iden3 programs these are W3C Verifiable Credential objects; see [Iden3 credentials](/products/identity/iden3-credentials#verify-iden3-credentials). Type-check each entry before reading it. |
+| `verifiableCredential` | The disclosed credential. For `SD_JWT_VC` programs this is an `EnvelopedVerifiableCredential` whose `id` is `data:application/dc+sd-jwt,` followed by the compact SD-JWT (older results use `data:application/vc+sd-jwt,`). For Iden3 programs these are W3C Verifiable Credential objects; see [Iden3 credentials](/products/identity/iden3-credentials#verification-modes). Type-check each entry before reading it. |
 | `proof` | Iden3 programs only, when a zero-knowledge proof is required. |
 
 For an `SD_JWT_VC` program, the presentation looks like this:
@@ -178,4 +178,4 @@ Under the hood, the SDK loads the holder's matching encrypted credential from DS
 
 - [Verify SD-JWT on your backend](/products/identity/verify-sd-jwt)
 - [Selective disclosure](/products/identity/selective-disclosure)
-- [Iden3 verification modes](/products/identity/iden3-credentials#verify-iden3-credentials)
+- [Iden3 verification modes](/products/identity/iden3-credentials#verification-modes)

@@ -126,7 +126,7 @@ Using dStorage or anchoring issuer state does not, by itself, mean that verifica
 
 ## Direct issuance and pre-issue flow
 
-Use Direct Issuance when a backend event or batch job should issue a credential without requiring the user to be present. The issuer backend resolves the recipient's holder DID and public key, authorizes issuance, retrieves the source data, then builds, signs, encrypts, and stores the VC. The user claims the credential when they log in to AIR.
+Use Direct Issuance when a backend event or batch job should issue a credential without requiring the user to be present. The issuer backend resolves the recipient's holder DID, encryption public key, and signing public key, authorizes issuance, retrieves the source data, then builds, signs, encrypts, and stores the VC. The user claims the credential when they log in to AIR.
 
 **Pre-issue uses Direct Issuance** to prepare credentials ahead of that login and claim step.
 
@@ -135,7 +135,7 @@ Use Direct Issuance when a backend event or batch job should issue a credential 
     A backend event or batch job starts the flow, such as a completed KYC check, purchase, or check-in.
   </Step>
   <Step title="Resolve the recipient">
-    The issuer backend uses the AIR API to resolve or create the recipient's holder DID and public key. No active user session is required.
+    The issuer backend uses the AIR API to resolve or create the recipient's holder DID, encryption public key, and signing public key. No active user session is required. The signing key becomes the credential's `cnf` claim.
   </Step>
   <Step title="Create and store the credential">
     The issuer authorizes issuance, retrieves source data, creates and signs the VC, encrypts it to the holder, and stores the encrypted envelope in dStorage.

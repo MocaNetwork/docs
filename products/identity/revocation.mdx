@@ -4,7 +4,7 @@ description: "Revoke SD-JWT credentials from your issuer service, serve per-cred
 ---
 
 <Info>
-  Every route on this page runs on **your issuer service** at `{ISSUER_ORIGIN}`, not on the AIR API. The examples follow the SD-JWT branch of the [AIR issuer service](https://github.com/MocaNetwork/air-issuer-service/tree/main). Revocation needs a database (the reference issuer service uses PostgreSQL); see [Issuer backend hosting](/products/identity/backend-hosting).
+  Every route on this page runs on **your issuer service** at `{ISSUER_ORIGIN}`, not on the AIR API. The examples follow the SD-JWT branch of the [AIR issuer service](https://github.com/MocaNetwork/air-issuer-service/tree/main_sd-jwt-vc). Revocation needs a database (the reference issuer service uses PostgreSQL); see [Issuer backend hosting](/products/identity/backend-hosting).
 </Info>
 
 Revoking a credential is one-way. Once revoked, verifiers that check status reject it. Handle deletion of your own source records separately under your retention policy.
@@ -129,7 +129,7 @@ Tell your verifiers that revocation takes up to your publish interval plus their
 
 ## Iden3 credentials
 
-The Iden3 issuer service has `/admin/revoke` and `/revocation-status/:nonce` too, plus `/credential-status/:nonce` for non-revocation proofs. It has no token status list. See [Iden3 credentials](/products/identity/iden3-credentials).
+The Iden3 issuer service has `/admin/revoke` and `/revocation-status/:nonce` too, plus `/credential-status/:nonce` for non-revocation proofs. It has no token status list. See [Issue Iden3 credentials](/products/identity/iden3/issuing).
 
 ## Related
 

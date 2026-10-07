@@ -37,10 +37,10 @@ Other statuses (i.e. `Non-Compliant`, `NotFound`) carry no presentation.
 
 ## Holder key binding
 
-Holder binding stops a leaked credential from being presented by someone else.
+Holder binding stops a leaked credential from being presented by someone else: presenting it with a valid KB-JWT also takes the holder's private signing key.
 
-- **At issuance**, the user's AIR Account provides a P-256 public key, and the issuer writes it to the credential's `cnf.jwk` claim. In SDK issuance AIR sends the key to the issuer as `signingKey.jwk`, and the credential carries `cnf` whenever it does; [direct issuance](/products/identity/issuing-credentials#direct-issuance) has no holder present, so those credentials do not.
-- **At verification**, the holder signs a key-binding JWT (KB-JWT) with the matching private key. It covers your `nonce`, your `programId`, the signing time, and a hash of the disclosed claims, so it cannot be reused or edited.
+- **At issuance**, the user's AIR Account provides a P-256 signing public key, and the issuer writes it to the credential's `cnf.jwk` claim. This happens on both issuance paths: in SDK issuance AIR sends the key to the issuer as `signingKey.jwk`, and in [direct issuance](/products/identity/issuing-credentials#direct-issuance) `initialize-user` returns it as `signingKey`.
+- **At verification**, you choose whether to require proof of possession. Send a `nonce` (recommended), and the holder signs a key-binding JWT (KB-JWT) with the matching private key. It covers your `nonce`, your `programId`, the signing time, and a hash of the disclosed claims, so it cannot be reused or edited.
 
 AIR attaches a KB-JWT only when **both** of these are true:
 
@@ -52,10 +52,10 @@ The KB-JWT's `aud` is always the `programId` you passed.
 | You sent `nonce` | Issuer JWT has `cnf.jwk` | Token ends with | What it proves |
 | --- | --- | --- | --- |
 | No | Either | `~` | The issuer issued these claims. Anyone holding the token can replay it. |
-| Yes | No | `~` | Same as above. The credential has no holder key, so it cannot be holder-bound. |
+| Yes | No | `~` | Same as above. The credential was built without a holder key (AIR issuance always sets one), so it cannot be holder-bound. |
 | Yes | Yes | `~<KB-JWT>` | The holder's key signed this exact presentation, for your nonce and your `programId`. |
 
-Without a KB-JWT the token is a **bearer** presentation: if it leaks through logs, proxies, or a malicious script on the page, someone else can submit it as their own. If that matters for your use case, always send a nonce and require holder binding.
+Without a KB-JWT the token is a **bearer** presentation: if it leaks through logs, proxies, or a malicious script on the page, someone else can submit it as their own. Holder binding only protects you if you ask for it and check it, so send a nonce and require the KB-JWT.
 
 ## Recommended flow
 
@@ -97,6 +97,9 @@ To get it, take `verifiableCredential[0].id` and strip the `data:application/dc+
 ```json
 {
   "iss": "did:web:issuer.example",
+  "sub": "did:air:…",
+  "id": "urn:…",
+  "nonce": "4810253170046172321",
   "vct": "<credential type>",
   "iat": 1790000000,
   "exp": 1821536000,
@@ -107,7 +110,7 @@ To get it, take `verifiableCredential[0].id` and strip the `data:application/dc+
 }
 ```
 
-`cnf` is present only on holder-bound credentials, and `status` only when the issuer publishes a [token status list](/products/identity/revocation#token-status-list).
+`sub` is the holder DID. The credential's own `nonce` is the issuer's revocation nonce, which you use for [revocation status](#revocation); it is unrelated to the `nonce` you pass for the KB-JWT. AIR issuance always sets `cnf`, and `status` appears only when the issuer publishes a [token status list](/products/identity/revocation#token-status-list).
 
 **Disclosures.** Each is base64url-encoded JSON such as `["<salt>", "given_name", "Ada"]`. A disclosure is valid only if its SHA-256 digest appears in an `_sd` array of the signed payload. The token contains only the disclosures for the fields you requested; the others stay hidden behind their digests.
 
@@ -155,7 +158,7 @@ Expect a KB-JWT whenever you sent a nonce and the issuer JWT has `cnf.jwk`.
 | No | Either | No | Accept only if a bearer presentation is acceptable for your use case. |
 | Yes | Yes | Yes | Run every check above. Accept if all pass. |
 | Yes | Yes | No | **Reject.** AIR always attaches it in this case, so it was removed. |
-| Yes | No | No | The credential cannot be holder-bound. Reject if you require binding, otherwise treat it as bearer. |
+| Yes | No | No | The credential was built without a holder key, so it cannot be holder-bound. Reject if you require binding, otherwise treat it as bearer. |
 | No | Either | Yes | AIR does not produce this. The KB-JWT proves nothing without your nonce; treat it as bearer. |
 
 A KB-JWT whose `nonce`, `aud`, signature, or `sd_hash` does not match is always a rejection.
@@ -365,7 +368,7 @@ Credentials whose issuer publishes an [IETF Token Status List](https://datatrack
 2. Verifies the status-list JWT with the same issuer keys.
 3. Rejects the credential if the entry at `idx` is not `0` (valid).
 
-AIR performs this check during `verifyCredential` only when the verification program enables issuer revocation checks. If you store presentations and re-verify them later, check the status at that point. Issuers without a status list answer per credential at `GET /revocation-status/:nonce`; see [Revoke credentials](/products/identity/revocation).
+AIR performs this check during `verifyCredential` only when the verification program enables issuer revocation checks. If you store presentations and re-verify them later, check the status at that point. Issuers without a status list answer per credential at `GET /revocation-status/:nonce`, where `:nonce` is the always-visible `nonce` claim in the issuer JWT; see [Revoke credentials](/products/identity/revocation).
 
 ## Troubleshooting
 

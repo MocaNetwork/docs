@@ -117,22 +117,24 @@ const { getPartnerJwt } = require('./lib/jwt');
 // issuer-controlled helpers backed by your signing keys
 const { buildVc, signVc, encryptToHolder } = require('./lib/credential');
 
+const AIR_API_ORIGIN = 'https://air.api.sandbox.air3.com';
 const BASE_URL = 'https://api.sandbox.mocachain.org/v1';
 
 async function issueAttendanceCredential({ fanEmail, eventDetails }) {
   const token = await getPartnerJwt();
 
   // Resolve the fan's AIR Account
-  const init = await fetch(`${BASE_URL}/auth/initialize-user`, {
+  const init = await fetch(`${AIR_API_ORIGIN}/v2/auth/initialize-user`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
-    body: JSON.stringify({ email: fanEmail }),
+    headers: { 'Content-Type': 'application/json', 'x-partner-id': process.env.PARTNER_ID },
+    body: JSON.stringify({ partnerJwt: await getPartnerJwt({ email: fanEmail }) }),
   }).then((r) => r.json());
 
   // Build, sign (SD-JWT VC), and encrypt the credential to the holder
   const schemaId = process.env.ATTENDANCE_CREDENTIAL_ID;
   const vc = buildVc({
     holderDid: init.did,
+    cnf: init.signingKey, // binds the credential to the holder's signing key
     schemaId,
     credentialSubject: {
       eventId: eventDetails.id,
@@ -151,6 +153,7 @@ async function issueAttendanceCredential({ fanEmail, eventDetails }) {
     headers: { 'Content-Type': 'application/json', 'x-partner-auth': token },
     body: JSON.stringify({
       holderDid: init.did,
+      proofType: 'SD_JWT_VC',
       schemaId,
       expiresAt: vc.expirationDate,
       data: encrypted.encryptedData,

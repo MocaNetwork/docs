@@ -12,7 +12,7 @@ Use this pattern for membership tiers, enrollment, subscriptions, or eligibility
 
 **Example:** Your database records that a customer is a current Gold member. You issue a credential containing the membership facts a partner needs to grant a benefit, without including the customer's purchase history.
 
-1. Choose the minimum claims with [What data do you need?](/products/identity/what-data), then [create your first schema](/products/identity/schema-creation).
+1. Choose the minimum claims with [What data do you need?](/products/identity/what-data), then [register your credential type](/products/identity/schema-creation).
 2. Connect your issuer backend to the records it needs. Keep source data and issuer signing keys on your servers; see [Setting up your backend](/products/identity/backend-hosting).
 3. Choose the trigger: a tier change, account creation, or another confirmed backend event. Use direct issuance when the user does not need to be present, or SDK issuance when the user should review and claim the credential.
 4. Resolve the intended recipient using the identifier your issuance flow expects. For the documented direct issuance flow, that is the recipient's email, not a shared service account.
@@ -38,6 +38,6 @@ For an AIR KYC solution rather than an existing-provider pattern, see [Veriff po
 
 ## Choose the issuance path
 
-Direct issuance suits backend events, but the documented direct flow issues credentials without a holder binding key. Presentations from those credentials are bearer presentations. Choose SDK issuance when you need holder binding, and follow the [SD-JWT verification guide](/products/identity/verify-sd-jwt) for the checks each path requires.
+Choose by whether the user is present. Direct issuance suits backend events; SDK issuance suits flows where the user reviews and confirms the credential. Both paths bind the credential to the holder's signing key. To get that protection at verification, send a nonce and check the key-binding JWT as described in the [SD-JWT verification guide](/products/identity/verify-sd-jwt).
 
 Try the concepts in the [AIR demos](https://demo.air3.com), then use the linked guides for your integration.

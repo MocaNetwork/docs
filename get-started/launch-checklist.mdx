@@ -76,7 +76,7 @@ Your Partner JWT endpoint signs tokens for the production Partner ID:
 
 - Sign with the private key whose public key is in your production JWKS, and set the `kid` to match.
 - Keep tokens short-lived and generate them on the server only. See [SDK authentication](/get-started/authentication/sdk-auth).
-- If you call the AIR API directly, for example `initialize-user` and `dstorage/vcs` for direct issuance, use the production base URL.
+- If you call the AIR API directly for direct issuance, use the production hosts: `https://air.api.air3.com` for `initialize-user` and `https://mocachain-mainnet.api.air3.com/v1` for `dstorage/vcs`.
 
 ## Step 4: Set up credentials in production
 
@@ -88,7 +88,7 @@ Skip this step if you use AIR Kit only for login or wallets.
 2. Register the issuer in **Issuer → Settings** on the production Dashboard: the `did:web` Issuer DID, the issuer API key, the JWKS URL, and the endpoint URLs.
 3. Recreate your schemas and issuance programs in the production Dashboard, and update the program IDs in your app.
 4. Decide your revocation setup, including whether to enable the [token status list](/products/identity/revocation#token-status-list), before you issue the first production credential.
-5. If you issue [Iden3 credentials](/products/identity/iden3-credentials), contact the AIR team to enable them in production.
+5. If you issue [Iden3 credentials](/products/identity/iden3/issuing), contact the AIR team to enable them in production.
 
 The issuer host becomes your issuer identity once you issue on mainnet, so do not change it afterwards.
 
