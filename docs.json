@@ -644,6 +644,14 @@
   },
   "redirects": [
     {
+      "source": "/products/identity/schema-use-cases",
+      "destination": "/products/identity/iden3/schema-examples"
+    },
+    {
+      "source": "/products/identity/schema-management",
+      "destination": "/products/identity/iden3/schema-management"
+    },
+    {
       "source": "/airkit/usage/credential/direct-issuance",
       "destination": "/products/identity/issuing-credentials"
     },

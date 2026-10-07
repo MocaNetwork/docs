@@ -1,6 +1,6 @@
 ---
 title: "Verifying credentials"
-description: "Verify AIR Credentials with program-driven verification: the program sets the credential format, requested claims, and selective disclosure; your app passes a programId."
+description: "Verify AIR Credentials with a Verification Program that sets the credential format, requested claims, and selective disclosure. Your app passes a programId."
 ---
 
 As a Verifier, your role is to verify the authenticity of user credentials and ensure they meet your requirements. Verification is **program-driven**: a Verification Program configured in the Developer Dashboard centrally controls the accepted credential format, the requested claims, and selective disclosure. Your integration passes a `programId`, the fields to disclose, and a `nonce`; the SDK handles credential discovery, consent, and result handling.
