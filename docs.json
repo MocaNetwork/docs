@@ -864,6 +864,10 @@
       "destination": "/get-started/sdks/web"
     },
     {
+      "source": "/airkit/usage/initialization",
+      "destination": "/get-started/sdks/web"
+    },
+    {
       "source": "/airkit/usage/go-to-production",
       "destination": "/get-started/launch-checklist"
     },
