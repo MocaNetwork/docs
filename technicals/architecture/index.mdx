@@ -135,7 +135,7 @@ Use Direct Issuance when a backend event or batch job should issue a credential 
     A backend event or batch job starts the flow, such as a completed KYC check, purchase, or check-in.
   </Step>
   <Step title="Resolve the recipient">
-    The issuer backend uses the AIR API to resolve or create the recipient's holder DID, encryption public key, and signing public key. No active user session is required. The signing key becomes the credential's `cnf` claim.
+    The issuer backend uses the AIR API to resolve or create the recipient's holder DID, encryption public key, and signing public key. No active user session is required. For SD-JWT credentials, the signing key becomes the credential's `cnf` claim. Iden3 credentials bind to the holder DID instead.
   </Step>
   <Step title="Create and store the credential">
     The issuer authorizes issuance, retrieves source data, creates and signs the VC, encrypts it to the holder, and stores the encrypted envelope in dStorage.

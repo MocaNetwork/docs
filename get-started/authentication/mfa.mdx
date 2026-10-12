@@ -29,7 +29,7 @@ public async setupOrUpdateMfa(): Promise<void>
 - **MFA is generally required**: If your dApp doesn't trigger `setupOrUpdateMfa()` after login and the user hasn't set up MFA, it will be triggered automatically with any wallet related request, requiring the user to complete setup before the request can be processed
 - **Currently only passkey is supported** as the MFA method
 - **Only MFA setup is currently implemented, not updates**: It's recommended to check if the user has already set up MFA before calling this method to avoid unnecessary prompts
-- **Abstract Account Address availability**: The abstract account address will only be returned in user info and token if MFA is set up
+- **Abstract Account Address availability**: By default, the abstract account address is only returned in user info and the token once MFA is set up. You can opt out of this gate if you always want the address returned
 
 ## MFA setup integration
 

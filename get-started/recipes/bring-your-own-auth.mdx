@@ -1,20 +1,20 @@
 ---
 title: "Bring your own auth"
 sidebarTitle: "Bring your own auth"
-description: "Skip the AIR Kit login dialog and pass users from Firebase, Auth0, Supabase, or your custom auth into AIR Kit sessions using a Partner JWT."
+description: "Skip the AIR Kit login method picker and pass users from Firebase, Auth0, Supabase, or your custom auth into AIR Kit sessions using a Partner JWT."
 ---
 
-If your app already authenticates users (via Firebase, Auth0, Supabase, or a custom system), you can bypass the AIR Kit login dialog and pass the authenticated user straight into an AIR Kit session. This is called [Custom Auth](/get-started/authentication/custom-auth).
+If your app already authenticates users (via Firebase, Auth0, Supabase, or a custom system), you can skip the AIR Kit login method picker and pass the authenticated user into an AIR Kit session. This is called [Custom Auth](/get-started/authentication/custom-auth).
 
 ## How it works
 
 1. Your app authenticates the user through your own system.
 2. Your backend signs a Partner JWT containing the user's `email`.
 3. Your frontend passes that JWT to `airService.login({ authToken })`.
-4. AIR Kit creates or loads the user's AIR Account, skipping the built-in login UI.
+4. AIR Kit creates or loads the user's AIR Account, without showing the login method picker.
 
 <Note>
-The first time an email is used, AIR verifies it with a one-time password. Later logins with that email skip this step.
+Custom Auth is often a JWT followed by an email one-time password, not a silent login. By default, the first time a user signs in to your app, AIR Kit asks them for a code sent to that email. Later logins to your app with that email skip this step.
 </Note>
 
 ## Prerequisites
@@ -68,7 +68,7 @@ const { token } = await res.json();
 await airService.login({ authToken: token });
 ```
 
-The user is now logged in without the AIR Kit login dialog, apart from the one-time email check on first use. Their AIR Account is tied to the email from your system.
+The user is now logged in without the AIR Kit login method picker, apart from the email OTP the first time they sign in to your app. Their AIR Account is tied to the email from your system.
 
 ## Step 3: Use AIR Kit features normally
 
