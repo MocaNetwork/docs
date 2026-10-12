@@ -5,7 +5,13 @@ description: "Let users already signed in to your app use AIR Kit without loggin
 
 With Custom Auth, users who are already signed in to your app skip the AIR Kit login method picker. Your backend signs a [Partner JWT](/get-started/authentication/sdk-auth) that includes the user's email, and your app passes it to `login({ authToken })`. AIR Kit then creates or loads the AIR Account for that email.
 
-Custom Auth is often a JWT followed by an email one-time password (OTP), not a silent login. By default, the first time a user signs in to **your app**, AIR Kit sends an OTP to the email in the JWT and asks the user to enter it, because the email identifies the user across AIR. Only after that does AIR issue the session. Later logins to your app with the same email skip the OTP.
+Custom Auth is often a JWT followed by an email one-time password (OTP), not a silent login. 
+By default, the first time a user signs in to **your app**, AIR Kit sends an OTP to the email in the JWT and asks the user to enter it, because the email identifies the user across AIR. 
+Only after that does AIR issue the session. Later logins to your app with the same email skip the OTP.
+
+<Note>
+For customization, please contact the AIR team.
+</Note>
 
 Custom Auth needs a registered [JWKS endpoint](/get-started/authentication/jwks-endpoint), like any Partner JWT.
 
