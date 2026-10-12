@@ -26,7 +26,7 @@ Credentials are network-specific. Credentials issued in sandbox do not exist in 
 2. In **Account → General Settings**, copy your production **Partner ID**. Do not assume it matches your sandbox Partner ID.
 3. Fill in your app's **Name**, **Logo URL**, and **Website URL**. Users see them during login, transactions, issuance, and verification.
 4. Register your production **JWKS URL**. It must be public HTTPS and reachable from AIR servers. See [JWKS endpoint setup](/get-started/authentication/jwks-endpoint).
-5. Under **Account → Domains**, add the HTTPS domains that load AIR Kit. You can add up to 3, and wildcards such as `*.myapp.example.com` are supported. `localhost` is not available in production.
+5. Under **Account → Domains**, whitelist the HTTPS domains that load AIR Kit, and remove development tunnel domains. You can add up to 3, and wildcards such as `*.myapp.example.com` are supported. `localhost` and plain-HTTP origins are not available in any environment.
 
 For what each setting does, see [Developer Dashboard](/get-started/dashboard/features).
 

@@ -31,6 +31,13 @@ curl https://your-domain/api/.well-known/jwks
 - Ensure no firewall or IP allowlist blocks AIR servers.
 - Full setup procedure: [JWKS endpoint setup](/get-started/authentication/jwks-endpoint).
 
+### dStorage returns "Invalid x-partner-auth"
+
+`POST /dstorage/vcs` validates the `x-partner-auth` Partner JWT against the JWKS URL registered for your Partner ID. When the claims (`partnerId`, `scope: "issue"`, `exp`) and the `typ: "JWT"` header are already right:
+
+- Fetch the exact **JWKS URL** from the Dashboard and confirm it returns your live public keys, not an old tunnel, a placeholder, or a cached copy.
+- Confirm the token header `kid` appears in that document and that its public key matches the private key that signed the token.
+
 ### "kid not found"
 
 - The `kid` in your JWT header does not match any key in the JWKS response.
@@ -46,6 +53,10 @@ jwt.sign(payload, privateKey, {
   header: { kid: "your-key-id", typ: "JWT" },
 });
 ```
+
+## AIR Kit does not load on localhost
+
+AIR Kit only runs on HTTPS origins whitelisted under **Account → Domains**, so it fails on `http://localhost` and other plain-HTTP origins in every environment. Run your app behind an [HTTPS tunnel](/get-started/authentication/jwks-endpoint#local-development-https-tunnel), whitelist the tunnel domain under **Account → Domains**, and open the app at the tunnel URL. If the tunnel URL changed since you whitelisted it, whitelist the new domain, remove the old one, and update the JWKS URL.
 
 ## CORS errors
 

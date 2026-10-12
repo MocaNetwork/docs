@@ -17,7 +17,12 @@ After a successful login, `login()` returns an `AirLoginResult`. Its `token` pro
 }
 ```
 
-To trust this token on your backend, validate it against AIR's JWKS at [https://static.air3.com/.well-known/jwks.json](https://static.air3.com/.well-known/jwks.json).
+The same token is available later from `getAccessToken()`. To trust it on your backend, send it as `Authorization: Bearer <token>` and validate it against AIR's JWKS for your environment:
+
+| Environment | JWKS, in order |
+| --- | --- |
+| Sandbox | [https://static.sandbox.air3.com/.well-known/jwks.json](https://static.sandbox.air3.com/.well-known/jwks.json), then [https://account.sandbox-testnet.air3.com/.well-known/jwks.json](https://account.sandbox-testnet.air3.com/.well-known/jwks.json), then [https://static.air3.com/.well-known/jwks.json](https://static.air3.com/.well-known/jwks.json) |
+| Production | [https://static.air3.com/.well-known/jwks.json](https://static.air3.com/.well-known/jwks.json) only |
 
 ## Session management
 

@@ -11,8 +11,12 @@ To see the login experience first, open the [single sign-on demo](https://demo.a
 ## Before you start
 
 - An AIR Developer Dashboard account and Partner ID
-- A web app running in the browser, with its origin added in **Account → Domains**
+- A web app served over HTTPS, with its origin whitelisted under **Account → Domains**
 - A supported Node.js version for your framework and AIR Kit
+
+<Warning>
+  AIR Kit only runs on HTTPS origins whitelisted under **Account → Domains**. It does not load on `http://localhost`. To test locally, run your app behind an [HTTPS tunnel](/get-started/authentication/jwks-endpoint#local-development-https-tunnel), whitelist the tunnel domain under **Account → Domains**, and open the app at the tunnel URL.
+</Warning>
 
 You don't need a database, issuer backend, credential program, or Partner JWT for the standard AIR login shown here.
 

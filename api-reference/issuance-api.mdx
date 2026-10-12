@@ -325,4 +325,5 @@ Example revocation status response:
 - If AIR never calls `/available-vc` or `/issue-vc`, confirm that the DID, API key, Available Credentials API, and Issue Credential API are set in **Issuer → Settings** in the Dashboard for your environment.
 - For authentication errors, verify the JWT contains `partnerId` and its header `kid` matches your JWKS. The `initialize-user` JWT must also carry the recipient's `email` claim and be sent with the matching `x-partner-id` header.
 - Ensure your JWKS endpoint is public and `kid` maps to the signing key.
+- If `dstorage/vcs` returns `401 Invalid x-partner-auth` even though the token has `scope: "issue"`, `typ: "JWT"`, and a valid expiry, check the JWKS next. Fetch the exact **JWKS URL** registered in the Dashboard. Confirm it serves the live public document, not a stale or placeholder copy, and that it contains the token header's `kid` with the public key matching your signing key.
 - The SDK’s `credentialId` is the Dashboard issuance program ID. The issuer backend receives `schemaId`. Passing one in place of the other can result in “schema not found” or routing failures.

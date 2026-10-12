@@ -3,20 +3,76 @@ title: "Creating your first schema"
 description: "Register a credential type (vct) in the AIR Dashboard, with optional Type Metadata, and define its claims in your issuer backend."
 ---
 
-A schema record registers your credential type with AIR so issuance and verification programs can reference it. You register a credential-type identifier (`vct`) and can optionally provide Type Metadata JSON (`vctJson`). The actual credential claims and selective-disclosure behavior are defined in your issuer backend.
+A schema record registers your credential type with AIR so issuance and verification programs can reference it. You register a credential-type identifier (`vct`) and optionally provide Type Metadata JSON (`vctJson`) describing the claims. The claim values and selective-disclosure behavior are produced by your issuer backend.
 
 <Note>
   To issue Iden3 credentials, contact the AIR team to enable Iden3 for your account: [Partner with us](https://air3.com/partner-with-us). Once enabled, create Iden3 schemas with the [Iden3 Schema Builder](/products/identity/iden3/schema-builder).
 </Note>
 
+## Plan the credential
+
+Before you open the Dashboard, decide:
+
+- What the credential proves, and its claims: name, type, and a label for each. Prefer derived claims, such as `tier` or `over_18`, over raw personal data.
+- Which claims a holder may disclose on their own. Verifiers can only request those individually.
+- How long each credential stays valid, and where your backend loads the claim data from.
+
+Do not use reserved claim names: `cnf`, `exp`, `iat`, `id`, `iss`, `nbf`, `nonce`, `status`, `sub`, `vct`. The issuer service sets them.
+
+## Choose the vct
+
+The `vct` is written into every credential you issue, so treat it as permanent.
+
+| Option | Example | Notes |
+| --- | --- | --- |
+| HTTPS URL (recommended) | `https://issuer.example.com/vct/membership/v1` | Serve the Type Metadata JSON at this exact URL. Verifiers may fetch it with a `GET` request. Use a stable domain you control, such as your issuer origin. |
+| URN | `urn:example:credential:membership:v1` | An identifier only. Nothing can be fetched from it. |
+
+Put a version in the `vct`. To change claims, labels, or disclosure later, register a new version instead of editing a published one.
+
+## Write the Type Metadata
+
+Type Metadata follows [IETF SD-JWT VC](https://datatracker.ietf.org/doc/draft-ietf-oauth-sd-jwt-vc/). The Dashboard reads its `claims` array to build the claim picker in verification programs, so always provide it.
+
+```json
+{
+  "vct": "https://issuer.example.com/vct/membership/v1",
+  "name": "Gold membership",
+  "description": "Membership tier held by a customer",
+  "display": [
+    { "locale": "en-US", "name": "Gold membership", "description": "Membership tier held by a customer" }
+  ],
+  "claims": [
+    { "path": ["tier"], "display": [{ "locale": "en-US", "label": "Membership tier" }], "sd": "always", "mandatory": true },
+    { "path": ["points"], "display": [{ "locale": "en-US", "label": "Points balance" }], "sd": "never", "mandatory": true },
+    { "path": ["address", "city"], "display": [{ "locale": "en-US", "label": "City" }], "sd": "always", "mandatory": false }
+  ]
+}
+```
+
+- `path` locates the claim. Nested claims use one segment per level, and verifiers request them as dotted paths, such as `address.city`.
+- `sd: "always"` marks a claim the holder can disclose on its own. `sd: "never"` marks a claim that is visible in every presentation. Match these to your backend's disclosure configuration.
+- The document must be a JSON object of at most 64 KiB.
+
+If the `vct` is an HTTPS URL, publish this exact JSON at that URL before you issue.
+
 ## Register a credential type
 
-1. Open **Issuer → Schemas** in the Dashboard for your target environment.
-2. Enter a descriptive title, description, and credential-type identifier (`vct`).
-3. Optionally provide Type Metadata JSON (`vctJson`) describing the credential type and its claims.
-4. Publish the record and save its schema ID.
-5. Use that schema record when creating your issuance program.
+1. Open **Issuer → Schemas** in the Dashboard for your target environment, and choose **SD-JWT VCT details**.
+2. Fill in the form:
 
-The schema ID identifies the AIR Dashboard record. The `vct` identifies the credential type inside the signed SD-JWT. Do not assume they are interchangeable.
+   | Field | Value |
+   | --- | --- |
+   | **Title** | A name of up to 100 characters, such as `Gold membership`. |
+   | **Description** | Up to 500 characters describing the credential. |
+   | **VCT** | The `vct` you chose. |
+   | **VCT JSON** | The Type Metadata document. Optional in the form, but recommended. |
 
-Providing `vctJson` does not configure the credential's claim values or selective-disclosure behavior. Those are supplied by your issuer backend. See [Issuing your first credential](/get-started/quickstarts/issue-credentials) for a backend example.
+3. Publish the record and save its schema ID.
+4. Use that schema record when you create your issuance program with the `SD_JWT_VC` proof type.
+
+The schema ID identifies the AIR Dashboard record. The `vct` identifies the credential type inside the signed SD-JWT. They are not interchangeable.
+
+## Implement the claims in your backend
+
+Registering the type does not produce claim values. In the reference issuer service, a backend schema class maps the schema ID to the `vct`, the claims, the disclosure configuration, and the expiry. Use the same `vct` in the class and in the Dashboard. See [Issuing your first credential](/get-started/quickstarts/issue-credentials#step-5-implement-the-credential-data).

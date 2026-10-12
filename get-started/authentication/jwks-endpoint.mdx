@@ -106,7 +106,14 @@ curl https://app.example.com/api/.well-known/jwks
 
 ## Local development (HTTPS tunnel)
 
-AIR servers cannot reach `localhost`. Expose your dev server over public HTTPS and register the tunnel URL:
+To test any AIR Kit flow locally, always run your app behind an HTTPS tunnel. AIR Kit only runs on HTTPS origins whitelisted under **Account → Domains**.
+
+1. Start your dev server, then expose it over public HTTPS with a tunnel (examples below).
+2. Whitelist the tunnel domain, such as `https://abc123.ngrok.app`, under **Account → Domains**. AIR Kit refuses to load on any origin that is not whitelisted there.
+3. Register the tunnel's JWKS URL as your **JWKS URL**.
+4. Open your app at the tunnel URL and test from there.
+
+Most free tunnels assign a new URL each time they restart. When the URL changes, whitelist the new domain, remove the old one (the list holds up to 3 domains), and update the JWKS URL. A reserved or static tunnel domain avoids this. If you also tunnel an issuer backend, its host is part of your issuer DID; see [Issuer backend hosting](/products/identity/backend-hosting#local-development).
 
 <Tabs>
   <Tab title="ngrok">
@@ -116,7 +123,7 @@ ngrok http 3000
 # → forwarding https://abc123.ngrok.app -> http://localhost:3000
 ```
 
-Register `https://abc123.ngrok.app/api/.well-known/jwks` in the dashboard.
+Whitelist `https://abc123.ngrok.app` under **Account → Domains**, register `https://abc123.ngrok.app/api/.well-known/jwks` as the JWKS URL, and open `https://abc123.ngrok.app`.
 
   </Tab>
   <Tab title="cloudflared">
@@ -126,7 +133,7 @@ cloudflared tunnel --url http://localhost:3000
 # → trycloudflare https://random-words.trycloudflare.com
 ```
 
-Register `https://random-words.trycloudflare.com/api/.well-known/jwks` in the dashboard.
+Whitelist `https://random-words.trycloudflare.com` under **Account → Domains**, register `https://random-words.trycloudflare.com/api/.well-known/jwks` as the JWKS URL, and open `https://random-words.trycloudflare.com`.
 
   </Tab>
 </Tabs>
