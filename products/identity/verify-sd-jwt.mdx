@@ -125,6 +125,70 @@ To get it, take `verifiableCredential[0].id` and strip the `data:application/dc+
 
 `sd_hash` is the base64url SHA-256 of everything before the KB-JWT, including the trailing `~`. It locks the set of disclosures, so nobody can add or remove one after the holder signed.
 
+## Inspect a presentation
+
+To see what your backend actually receives, decode a sandbox presentation by hand. This shows which claims the holder disclosed and which stay hidden. It does **not** verify anything: anyone can decode the token, and only the [checks](#checks) below make its claims trustworthy.
+
+<Steps>
+  <Step title="Run a verification in sandbox">
+    Log in with a user who holds the credential, call `verifyCredential` with a `nonce`, and approve sharing in the AIR window.
+  </Step>
+  <Step title="Copy the presentation">
+    In your browser's developer tools, open **Network**, select the request that posts `verifiablePresentation` to your backend, and copy its payload to `presentation.json`. Copying it from the request means you don't add logging to your app.
+  </Step>
+  <Step title="Decode it">
+    Save this as `inspect-sd-jwt.mjs` and run `node inspect-sd-jwt.mjs presentation.json`. It needs no dependencies.
+
+    ```js
+    import { createHash } from "node:crypto";
+    import { readFileSync } from "node:fs";
+
+    const json = (part) => JSON.parse(Buffer.from(part, "base64url").toString("utf8"));
+    const input = JSON.parse(readFileSync(process.argv[2], "utf8"));
+    const vp = input.verifiablePresentation ?? input;
+    const token = vp.verifiableCredential[0].id.replace(/^data:application\/(dc|vc)\+sd-jwt,/, "");
+
+    const parts = token.split("~");
+    const kb = parts.pop(); // "" when there is no KB-JWT
+    const [issuerJwt, ...disclosures] = parts;
+    const payload = json(issuerJwt.split(".")[1]);
+
+    console.log("Issuer:", payload.iss, "| type:", payload.vct, "| holder:", payload.sub);
+    for (const disclosure of disclosures) {
+      const [, name, value] = json(disclosure);
+      const digest = createHash("sha256").update(disclosure).digest("base64url");
+      console.log(`Disclosed ${name} =`, value, payload._sd?.includes(digest) ? "" : "(digest not in _sd!)");
+    }
+    console.log("Hidden claims:", (payload._sd?.length ?? 0) - disclosures.length);
+    if (kb) {
+      const sdHash = createHash("sha256").update(token.slice(0, -kb.length)).digest("base64url");
+      const kbPayload = json(kb.split(".")[1]);
+      console.log("KB-JWT nonce:", kbPayload.nonce, "| aud:", kbPayload.aud, "| sd_hash matches:", kbPayload.sd_hash === sdHash);
+    } else {
+      console.log("No KB-JWT: bearer presentation");
+    }
+    ```
+
+    This script handles only top-level claims. Nested claims (`address.city`) have their own `_sd` arrays inside the disclosed values.
+  </Step>
+</Steps>
+
+For a credential with `tier`, `member_since`, and `over_18`, verified with `fieldsToDisclose: ["tier", "over_18"]`, the output looks like this:
+
+```text
+Issuer: did:web:issuer.example | type: https://issuer.example/vct/membership/v1 | holder: did:air:…
+Disclosed tier = gold
+Disclosed over_18 = true
+Hidden claims: 1
+KB-JWT nonce: <your nonce> | aud: <your programId> | sd_hash matches: true
+```
+
+`member_since` is not in the token at all. The issuer JWT contains only its digest, so the verifier cannot learn its value.
+
+<Warning>
+  Disclosures are personal data. Inspect sandbox presentations only, delete the file when you are done, and never log production tokens.
+</Warning>
+
 ## Checks
 
 ### Always

@@ -80,24 +80,39 @@ function ConnectButton() {
 
 ## Step 4: Access AirService from the connector
 
-Once connected, you can access the underlying `AirService` for credential operations. Verification takes a Partner JWT signed on your server with `scope: "verify"` and the verification program ID:
+Once connected, you can access the underlying `AirService` for credential operations. Verification takes a Partner JWT signed on your server with `scope: "verify"`, a one-time nonce, and the verification program ID:
 
 ```ts
 const service = airWallet.airService;
 
-const { token } = await fetch("/api/verification-token", { method: "POST" }).then((r) => r.json());
+// The AIR login token tells your backend who the user is
+const loginToken = service.loginResult?.token ?? (await service.getAccessToken()).token;
+const headers = { "content-type": "application/json", authorization: `Bearer ${loginToken}` };
+
+const { token, nonce } = await fetch("/api/verification-token", { method: "POST", headers }).then((r) => r.json());
 
 const result = await service.verifyCredential({
   authToken: token,
   programId: process.env.NEXT_PUBLIC_VERIFY_PROGRAM_ID,
+  fieldsToDisclose: ["tier"],
+  nonce,
 });
 
-if (result.status === "COMPLIANT") {
-  // unlock the gated feature
+if (result.status === "Compliant") {
+  // Verify on your backend before unlocking the gated feature
+  const check = await fetch("/api/verify-presentation", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ verifiablePresentation: result.verifiablePresentation }),
+  });
+  const verdict = await check.json().catch(() => null);
+  if (check.ok && verdict?.verified) {
+    // unlock the gated feature
+  }
 }
 ```
 
-See [Verify a credential in your app](/get-started/recipes/verify-credential) for the server endpoint and result handling.
+The server routes are in the [verification quickstart](/get-started/quickstarts/verify-credentials). See [Verify a credential in your app](/get-started/recipes/verify-credential) for result handling.
 
 ## Step 5: Send a transaction
 
