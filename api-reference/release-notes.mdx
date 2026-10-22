@@ -6,7 +6,7 @@ description: "AIR Kit SDK release notes — version history, new features, break
 ## **Version 1.13.0**
 
 ### ✨ **New Features**
-- **`AirKitError` for every SDK method** — every `AirService` method now rejects with `AirKitError`, which carries a stable `code` (`"domain/reason"`, e.g. `auth/user-cancelled`) and a `category` (`user`, `session`, `config`, `network`, or `internal`). Branch on these instead of `err.name` or `err.message` — see [Error codes](/help/error-codes#sdk-errors)
+- **`AirKitError` for every SDK method** — every `AirService` method now rejects with `AirKitError`, which carries a stable `code` (`"domain/reason"`, e.g. `auth/user-cancelled`) and a `category` (`user`, `session`, `config`, `network`, or `internal`). See [Error codes](/help/error-codes#sdk-errors)
 - **`eventId` on errors** — quote it to AIR support to trace a failure
 - **`data` on errors** — extra detail for some codes; `credential/verification-failed` carries `{ status }`
 - **AIR detail on provider errors** — `airService.provider.request(...)` still rejects with a standard EIP-1193 error, and now exposes the same `{ code, category, message, eventId }` on `error.data.air` when the failure came from AIR — see [Provider (EIP-1193) errors](/help/error-codes#provider-eip-1193-errors)
