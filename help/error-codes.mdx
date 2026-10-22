@@ -1,9 +1,9 @@
 ---
 title: "Error Codes"
-description: "AIR Kit error reference — REST API HTTP status codes and SDK error names for client, authentication, passwordless, and account linking failures."
+description: "AIR Kit error reference: REST API HTTP status codes, SDK AirKitError codes and categories, EIP-1193 provider errors."
 ---
 
-Use this page as a lookup when the AIR Kit REST API returns a specific HTTP status, or when the SDK throws an `AirError` with a known `name`. For higher-level JWT / JWKS / CORS / rate-limit guidance, see [Common issues](/help/common-issues).
+Use this page as a lookup when the AIR Kit REST API returns a specific HTTP status, or when an SDK method rejects with an `AirKitError`. For higher-level JWT / JWKS / CORS / rate-limit guidance, see [Common issues](/help/common-issues).
 
 ## API error codes
 
@@ -19,53 +19,171 @@ These errors apply to the AIR Kit REST API (e.g. [Issuance API](/api-reference/i
 | 429 | Rate limited | Back off and retry — see [Rate limiting](/help/common-issues#rate-limiting). |
 | 500 | Server-side failure | Retry with exponential backoff. If persistent, check the [Status page](/help/status) or contact support. |
 
-## SDK error names
+## SDK errors
 
-Errors thrown by the SDK are `AirError` instances carrying a stable, machine-readable `name`. Branch on `name` rather than matching on the message, which is not part of the API contract.
+Every `AirService` method rejects with an `AirKitError`. Each error carries a stable `code` in `"domain/reason"` form and a coarse `category`. Rely on these rather than on `err.name` or `err.message`.
 
-```js
+### The error object
+
+| Field | Type | Use |
+| --- | --- | --- |
+| `code` | `AirKitErrorCode` (string union) | Switch on it for specific handling |
+| `category` | `"user"` · `"session"` · `"config"` · `"network"` · `"internal"` | Coarse handling; always keep a fallback on this |
+| `message` | `string` | Developer English for logs. **Don't show it to users** — the wording may change |
+| `eventId` | `string`, optional | Quote it to AIR support |
+| `data` | `object`, optional | Extra detail for some codes. Today only `credential/verification-failed` sets it, to `{ status }` |
+| `name` | `string` | **Deprecated.** The previous error name, kept for existing `switch (err.name)` code |
+
+### Categories
+
+- **`user`** — the user cancelled, rejected, or hit something the AIR UI already explained. Usually do nothing, or just stop the flow.
+- **`session`** — the session or Partner JWT is no longer valid. Mint a fresh Partner JWT or sign the user in again.
+- **`config`** — an integration problem, such as bad parameters, a feature that isn't enabled, or an unsupported chain. Fix the call or your Developer Dashboard settings.
+- **`network`** — transient. It is safe to offer a retry.
+- **`internal`** — something failed on AIR's side. Show a generic error and log `code` and `eventId`.
+
+### Recommended handling
+
+```ts
+import { AirKitError } from "@mocanetwork/airkit";
+
 try {
   await airService.login();
 } catch (err) {
-  if (err.name === "USER_CANCELLED") return; // expected, not a failure
-  console.error(err.name, err.message);
+  if (!(err instanceof AirKitError)) throw err;
+
+  if (err.code === "auth/user-cancelled") return;
+
+  switch (err.category) {
+    case "session":
+      return refreshPartnerTokenAndRetry();
+    case "network":
+      return showRetry();
+    default:
+      showGenericError();
+      console.error(err.code, err.eventId);
+  }
 }
 ```
 
-### Client and user errors
+<Warning>
+New codes may be added in minor releases. Always fall back on `category` so an unknown `code` is still handled.
+</Warning>
 
-| Name | Meaning | How to handle |
-| --- | --- | --- |
-| `USER_CANCELLED` | The user closed or dismissed an AIR Kit flow | Expected control flow — return quietly rather than surfacing an error |
-| `USER_REJECTED` | The user declined a specific request, such as signing or consent | Leave the user where they were and let them retry |
-| `CONFIG_ERROR` | Invalid AIR Kit configuration | Check your `partnerId`, `BUILD_ENV`, and `init()` options |
-| `PERMISSION_NOT_ENABLED` | The feature is not enabled for your partner account | Enable it in the Developer Dashboard, or contact support |
-| `ACCOUNT_DELETION_PENDING` | The account has a pending deletion request | Prompt the user to cancel deletion before continuing |
-| `WINDOW_BLOCKED` | The browser blocked a popup AIR Kit needed | Trigger the call directly from a user gesture so the popup is not blocked |
-| `WINDOW_CLOSED` | The user closed the AIR Kit popup before it finished | Treat like a cancellation |
+<Note>
+`showReceiveUI()` resolves, rather than rejects, when the user closes it. The other `show*UI()` methods reject when the user closes them.
+</Note>
 
-### Authentication and token errors
+## SDK error codes
 
-| Name | Meaning | How to handle |
-| --- | --- | --- |
-| `PARTNER_TOKEN_EXPIRED` | The Partner JWT you passed is past its `exp` | Mint a fresh JWT and retry. See [Partner authentication](/get-started/authentication/sdk-auth) |
-| `PARTNER_ACCESS_TOKEN_INVALID` | The Partner JWT failed validation | Check signing key, `kid`, and payload — see [JWT and JWKS errors](/help/common-issues#jwt-and-jwks-errors) |
-| `USER_MISMATCH` | The token identifies a different user than the active session | Log out before switching users |
-| `TOKEN_EXPIRED` / `INVALID_TOKEN` / `UNAUTHORIZED` | The AIR session token is expired or rejected | Re-run `login()` |
+The **Previous `name`** column is what `err.name` returned before this release, and still returns. Use it to map existing `switch (err.name)` code to the new codes.
 
-### Passwordless and OTP errors
+### SDK and configuration
 
-| Name | Meaning | How to handle |
-| --- | --- | --- |
-| `PASSWORDLESS_INVALID_CODE` | Wrong one-time password entered | Let the user retype it |
-| `PASSWORDLESS_CODE_EXPIRED` | The one-time password expired | Request a new code |
-| `PASSWORDLESS_MAX_ATTEMPTS` | Too many incorrect attempts | Ask the user to request a new code |
-| `PASSWORDLESS_HOURLY_LIMIT` / `PASSWORDLESS_LOCK_EXCEEDED` | Rate limit reached for this identifier | Ask the user to try again later |
+| Code | Category | Previous `name` | Meaning |
+| --- | --- | --- | --- |
+| `sdk/not-initialized` | config | `NOT_INITIALIZED` | `init()` hasn't completed |
+| `sdk/already-initializing` | config | `ALREADY_INITIALIZING` | `init()` called again while running |
+| `sdk/not-logged-in` | session | `NOT_LOGGED_IN` | Method needs a logged-in user |
+| `config/invalid` | config | `CONFIG_ERROR` | Invalid init or partner configuration |
 
-### Linking errors
+### Authentication
 
-| Name | Meaning | How to handle |
-| --- | --- | --- |
-| `LINK_WALLET_ALREADY_LINKED` | The wallet is already linked to this account | No action needed |
-| `LINK_WALLET_LINKED_OTHER_ACCOUNT` | The wallet belongs to a different AIR account | Ask for a different wallet |
-| `LINK_EMAIL_LINKED_OTHER_ACCOUNT` | The email belongs to a different AIR account | Ask for a different email |
+| Code | Category | Previous `name` | Meaning |
+| --- | --- | --- | --- |
+| `auth/user-cancelled` | user | `USER_CANCELLED` | User closed or cancelled the flow |
+| `auth/partner-token-expired` | session | `PARTNER_TOKEN_EXPIRED` | Partner JWT expired; mint a new one. See [Partner authentication](/get-started/authentication/sdk-auth) |
+| `auth/unauthorized` | session | `UNAUTHORIZED` | User session no longer valid |
+| `auth/account-deletion-pending` | user | `ACCOUNT_DELETION_PENDING` | Account is scheduled for deletion |
+
+### Wallet
+
+| Code | Category | Previous `name` | Meaning |
+| --- | --- | --- | --- |
+| `wallet/user-rejected` | user | `USER_REJECTED` | User rejected a signature or transaction |
+| `wallet/insufficient-funds` | user | `CLIENT_ERROR` | Not enough balance for the transaction |
+| `wallet/unsupported-chain` | config | `CLIENT_ERROR` | Chain not supported |
+| `wallet/method-not-supported` | config | `CLIENT_ERROR` | RPC method not supported |
+| `wallet/invalid-params` | config | `CLIENT_ERROR` | Invalid RPC or method parameters |
+| `wallet/transaction-rejected` | internal | `CLIENT_ERROR` | Transaction failed on-chain or at the bundler |
+| `wallet/smart-account-not-deployed` | user | `SMART_ACCOUNT_NOT_DEPLOYED` | Smart account must be deployed first |
+| `wallet/permission-not-enabled` | config | `PERMISSION_NOT_ENABLED` | Feature not enabled for this partner |
+| `wallet/mfa-required` | user | `CLIENT_ERROR` | Action needs MFA the user didn't complete |
+| `wallet/unauthorized` | config | `UNAUTHORIZED` | Wallet provider refused the method or account |
+| `wallet/swap-to-onramp` | user | `SWAP_TO_ONRAMP` | User chose on-ramp from the swap screen |
+| `wallet/pin-recovery-started` | user | `START_PIN_RECOVERY` | User chose to recover their PIN instead |
+| `wallet/quote-unavailable` | user | `CLIENT_ERROR` | No swap or on-ramp quote for this token |
+
+### Credentials
+
+| Code | Category | Previous `name` | Meaning |
+| --- | --- | --- | --- |
+| `credential/issuer-not-ready` | network | `CLIENT_ERROR` | Issuer not reachable or not set up |
+| `credential/revoked` | user | `CLIENT_ERROR` | Credential was revoked |
+| `credential/paused` | user | `CLIENT_ERROR` | Credential issuance is paused |
+| `credential/identity-not-derivable` | user | `CLIENT_ERROR` | This account can't hold this credential type |
+| `credential/invalid-request` | config | `CLIENT_ERROR` | Malformed issue, verify, or OID4VP request |
+| `credential/not-eligible` | user | `CLIENT_ERROR` | User has no matching or eligible credential |
+| `credential/program-not-found` | user | `CLIENT_ERROR` | Verification program missing or empty |
+| `credential/session-expired` | session | `PARTNER_TOKEN_EXPIRED` | Credential session or Partner JWT expired |
+| `credential/issue-failed` | internal | `CLIENT_ERROR` | Issuance failed |
+| `credential/verify-failed` | internal | `CLIENT_ERROR` | Verification could not complete |
+| `credential/verification-failed` | user | `CLIENT_ERROR` | Verified, but not compliant; see `data.status` |
+
+### Recovery
+
+| Code | Category | Previous `name` | Meaning |
+| --- | --- | --- | --- |
+| `recovery/not-configured` | config | `RECOVERY_NOT_CONFIGURED` | Recovery not set up for this partner |
+| `recovery/lock-exceeded` | user | `RECOVERY_LOCK_EXCEEDED` | Too many recovery attempts |
+
+### User input and environment
+
+| Code | Category | Previous `name` | Meaning |
+| --- | --- | --- | --- |
+| `user/input-rejected` | user | `CLIENT_ERROR` | Input rejected (e.g. email linked to another account) |
+| `user/unsupported-environment` | user | `CLIENT_ERROR` | Browser or device lacks a needed capability |
+
+### Popups
+
+| Code | Category | Previous `name` | Meaning |
+| --- | --- | --- | --- |
+| `window/blocked` | user | `WINDOW_BLOCKED` | Browser blocked the popup. Trigger the call directly from a user gesture |
+| `window/closed` | user | `WINDOW_CLOSED` | User closed the popup |
+
+### Network and internal
+
+| Code | Category | Previous `name` | Meaning |
+| --- | --- | --- | --- |
+| `network/channel-closed` | network | `CHANNEL_CLOSED` | Connection to the AIR frame was lost |
+| `network/timeout` | network | `UNKNOWN_ERROR` | Request timed out |
+| `network/unavailable` | network | `INTERNAL_SERVER_ERROR` | AIR service unreachable or errored |
+| `internal/unknown` | internal | `UNKNOWN_ERROR` | Anything unclassified |
+
+## Provider (EIP-1193) errors
+
+`airService.provider.request(...)` rejects with a standard EIP-1193 error, so wagmi, viem, and ethers keep working unchanged.
+
+| `code` | Meaning |
+| --- | --- |
+| `4001` | User rejected |
+| `4100` | Unauthorized |
+| `4200` | Unsupported method |
+| `4900` | Disconnected |
+| `4902` | Unsupported chain |
+| `-32602` | Invalid params |
+| `-32003` | Transaction rejected |
+| `-32603` | Internal error |
+
+## Migrating from `err.name`
+
+`AirServiceError` and `err.name` still work, so existing code keeps running. Both are deprecated and will be removed in the next major release.
+
+| Before | After |
+| --- | --- |
+| `err instanceof AirServiceError` | `err instanceof AirKitError` |
+| `err.name === "USER_CANCELLED"` | `err.code === "auth/user-cancelled"` |
+| `err.name === "CLIENT_ERROR"` | Switch on `err.code`, or fall back on `err.category` |
+| Showing `err.message` to users | Show your own copy per `code` or `category` |
+
+See the [release notes](/api-reference/release-notes) for the full change.

@@ -111,6 +111,8 @@ class AirService {
 
 `claimAirId` and the `show*UI` methods are experimental and may change in future releases.
 
+Every `AirService` method rejects with an `AirKitError`; branch on its `code` and `category`. `showReceiveUI()` is the exception to the close behaviour: it resolves, rather than rejects, when the user closes it. See [Error codes](/help/error-codes#sdk-errors).
+
 `fieldsToDisclose` is required for `SD_JWT_VC` verification programs; `"*"` discloses every field, and dotted paths such as `address.city` select nested fields. See [Selective Disclosure](/products/identity/selective-disclosure). `nonce` is optional: pass a fresh value from your backend so that credentials with a holder key return a key-binding JWT. See [Verify SD-JWT on your backend](/products/identity/verify-sd-jwt).
 
 ### Types
@@ -380,6 +382,38 @@ export type ClaimAirIdOptions =
       background: true;
       offchain?: boolean;
     };
+
+export type AirKitErrorCategory =
+  | "user"
+  | "session"
+  | "config"
+  | "network"
+  | "internal";
+
+/** "domain/reason". Full list: /help/error-codes#sdk-error-codes. New codes may be added in minor releases. */
+export type AirKitErrorCode =
+  | "auth/user-cancelled"
+  | "auth/partner-token-expired"
+  | "wallet/user-rejected"
+  | "credential/not-eligible"
+  | "network/timeout"
+  | "internal/unknown"; // ...and the rest listed on the Error codes page
+
+export class AirKitError extends Error {
+  readonly code: AirKitErrorCode;
+  readonly category: AirKitErrorCategory;
+  /** Developer English for logs. Don't show it to users. */
+  readonly message: string;
+  /** Quote to AIR support. */
+  readonly eventId?: string;
+  /** Extra detail for some codes, e.g. { status } for credential/verification-failed. */
+  readonly data?: Record<string, unknown>;
+  /** @deprecated Previous error name (e.g. "USER_CANCELLED"). Use `code`. */
+  readonly name: string;
+}
+
+/** @deprecated Alias of AirKitError. Removed in the next major release. */
+export const AirServiceError = AirKitError;
 ```
 
 </Tab>

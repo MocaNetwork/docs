@@ -65,11 +65,16 @@ public async deploySmartAccount(): Promise<{ txHash: string }>
 **Example:**
 
 ```tsx
+import { AirKitError } from "@mocanetwork/airkit";
+
 try {
   const { txHash } = await airService.deploySmartAccount();
 } catch (error) {
-  console.error("Smart account deployment failed:", error);
-  // Handle error appropriately
+  if (!(error instanceof AirKitError)) throw error;
+  if (error.category === "user") return; // e.g. the user cancelled MFA
+  if (error.category === "network") return showRetry();
+
+  console.error("Smart account deployment failed:", error.code, error.eventId);
 }
 ```
 

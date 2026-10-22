@@ -3,6 +3,61 @@ title: "Release Notes"
 description: "AIR Kit SDK release notes — version history, new features, breaking changes, deprecations, and migration notes for partners upgrading their integration."
 ---
 
+## **Version 1.13.0**
+
+### ✨ **New Features**
+- **`AirKitError` for every SDK method** — every `AirService` method now rejects with `AirKitError`, which carries a stable `code` (`"domain/reason"`, e.g. `auth/user-cancelled`) and a `category` (`user`, `session`, `config`, `network`, or `internal`). Branch on these instead of `err.name` or `err.message` — see [Error codes](/help/error-codes#sdk-errors)
+- **`eventId` on errors** — quote it to AIR support to trace a failure
+- **`data` on errors** — extra detail for some codes; `credential/verification-failed` carries `{ status }`
+- **AIR detail on provider errors** — `airService.provider.request(...)` still rejects with a standard EIP-1193 error, and now exposes the same `{ code, category, message, eventId }` on `error.data.air` when the failure came from AIR — see [Provider (EIP-1193) errors](/help/error-codes#provider-eip-1193-errors)
+
+### 🗑️ **Deprecations**
+- **`AirServiceError`** is now an alias of `AirKitError`. Existing `instanceof AirServiceError` checks keep working; the alias is removed in the next major release
+- **`err.name`** still returns the previous names (`USER_CANCELLED`, `CLIENT_ERROR`, …) and is removed in the next major release. Switch on `err.code` instead
+- **Error codes page** no longer lists `PARTNER_ACCESS_TOKEN_INVALID`, `USER_MISMATCH`, `TOKEN_EXPIRED`, `INVALID_TOKEN`, `PASSWORDLESS_*`, or `LINK_*`. Branch on `code` and `category` instead
+
+### 📋 **Migration Guide**
+
+| Before | After |
+| --- | --- |
+| `err instanceof AirServiceError` | `err instanceof AirKitError` |
+| `err.name === "USER_CANCELLED"` | `err.code === "auth/user-cancelled"` |
+| `err.name === "CLIENT_ERROR"` | Switch on `err.code`, or fall back on `err.category` |
+| Showing `err.message` to users | Show your own copy per `code` or `category` |
+
+```js
+// Before (1.12.x)
+try {
+  await airService.showSwapUI();
+} catch (err) {
+  if (err.name === "USER_CANCELLED") return;
+  if (err.name === "CLIENT_ERROR") showError(err.message);
+}
+
+// After (1.13.x)
+import { AirKitError } from "@mocanetwork/airkit";
+
+try {
+  await airService.showSwapUI();
+} catch (err) {
+  if (!(err instanceof AirKitError)) throw err;
+
+  switch (err.code) {
+    case "auth/user-cancelled":
+      return;
+    case "wallet/insufficient-funds":
+      return showTopUpPrompt();
+    default:
+      // New codes may be added in minor releases, so always fall back on category
+      if (err.category === "network") return showRetry();
+      showGenericError();
+      console.error(err.code, err.eventId);
+  }
+}
+```
+
+The [Error codes](/help/error-codes#sdk-error-codes) page maps every previous `name` to its new `code`.
+
 ## **Version 1.12.1 (Sep 16, 2026)**
 
 ### ✨ **New Features**

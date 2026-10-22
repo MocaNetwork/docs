@@ -66,6 +66,7 @@ type Token = TokenSymbol & { decimals: number; address: `0x${string}` };
 
 ```ts
 import { formatUnits } from "viem";
+import { AirKitError } from "@mocanetwork/airkit";
 
 try {
   const result = await airService.showSwapUI({
@@ -80,7 +81,16 @@ try {
   console.log(`Swapped ${sold} ${result.from.symbol}`);
   console.log(`Received ${received} ${result.to.symbol}`);
 } catch (error) {
-  console.error("Swap failed:", error);
+  if (!(error instanceof AirKitError)) throw error;
+
+  // The user picked "Buy" from the swap screen instead of swapping
+  if (error.code === "wallet/swap-to-onramp") {
+    return airService.showOnRampUI({ displayCurrencyCode: "USD" });
+  }
+  // Cancelled, rejected, or already explained in the AIR UI
+  if (error.category === "user") return;
+
+  console.error("Swap failed:", error.code, error.eventId);
 }
 ```
 
@@ -129,6 +139,8 @@ public async showOnRampUI(options: {
 **Usage:**
 
 ```ts
+import { AirKitError } from "@mocanetwork/airkit";
+
 try {
   await airService.showOnRampUI({
     displayCurrencyCode: "USD",
@@ -136,7 +148,10 @@ try {
   });
   console.log("On-ramp interface opened");
 } catch (error) {
-  console.error("Failed to open on-ramp:", error);
+  if (!(error instanceof AirKitError)) throw error;
+  if (error.category === "user") return; // e.g. user closed the on-ramp
+
+  console.error("On-ramp failed:", error.code, error.eventId);
 }
 ```
 

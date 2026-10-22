@@ -116,6 +116,40 @@ await provider.request({
 // And more standard RPC calls
 ```
 
+## Error handling
+
+`provider.request(...)` rejects with a standard EIP-1193 error, so wagmi, viem, and ethers handle AIR Kit errors the same way as any other wallet:
+
+| `code` | Meaning |
+| --- | --- |
+| `4001` | User rejected |
+| `4100` | Unauthorized |
+| `4200` | Unsupported method |
+| `4900` | Disconnected |
+| `4902` | Unsupported chain |
+| `-32602` | Invalid params |
+| `-32003` | Transaction rejected |
+| `-32603` | Internal error |
+
+When the failure came from AIR, `error.data.air` holds the same `{ code, category, message, eventId }` as an [`AirKitError`](/help/error-codes#sdk-errors):
+
+```tsx
+try {
+  const txHash = await provider.request({
+    method: "eth_sendTransaction",
+    params: [transactionParams]
+  });
+} catch (error) {
+  if (error.code === 4001) return; // user rejected
+
+  const air = error.data?.air;
+  if (air?.code === "wallet/insufficient-funds") {
+    return showTopUpPrompt();
+  }
+  console.error(air?.code ?? error.code, air?.eventId);
+}
+```
+
 ## Wallet events
 
 The EIP-1193 provider supports standard wallet events:

@@ -38,6 +38,8 @@ Since MFA is generally required, you can either:
 **Option 1: Proactive Setup (Recommended)**
 
 ```ts
+import { AirKitError } from "@mocanetwork/airkit";
+
 try {
   const userInfo = await airService.getUserInfo();
   if (!userInfo.user.isMFASetup) {
@@ -45,7 +47,10 @@ try {
     // Abstract account address will now be available
   }
 } catch (error) {
-  // Handle error appropriately
+  if (!(error instanceof AirKitError)) throw error;
+  if (error.category === "user") return; // the user cancelled MFA setup
+
+  console.error("MFA setup failed:", error.code, error.eventId);
 }
 ```
 
