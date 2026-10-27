@@ -1,0 +1,52 @@
+---
+title: "What the verifier receives"
+description: "The parts of an AIR presentation: the issuer-signed credential, the shared claims, and the holder's signature, and what each part proves."
+---
+
+A successful verification returns a **presentation**. It has three parts, joined together in one token:
+
+| Part | Signed by | Contains |
+| --- | --- | --- |
+| **Issuer-signed credential** | The issuer | The always-visible fields (issuer, holder, type, expiry, holder key) and fingerprints of every hidden claim |
+| **Shared claims** | Covered by the issuer's fingerprints | Only the claims the program requested and the user approved |
+| **Holder signature** | The user's private key | Your challenge, your program ID, the time, and a fingerprint of exactly which claims were shared |
+
+The token is wrapped in a standard W3C Verifiable Presentation. The wrapper and the result status around it are **not signed**; only the token inside is.
+
+## Choosing which claims are shared
+
+Three settings decide which claims appear:
+
+1. **The issuer** marks claims as shareable and turns on **Allow data disclosure** for its issuance program. Without that, no claims are shared, although the credential can still be verified.
+2. **The verifier** lists the claims it wants (`fieldsToDisclose`), or `*` for every shareable claim. This is required for SD-JWT programs.
+3. **The user** approves the request.
+
+Requesting a claim the issuer did not make shareable is not an error; that claim is simply absent.
+
+## The holder signature
+
+The holder signature proves that the person presenting the credential is the person it was issued to, right now, for you. AIR Kit adds it when both are true:
+
+- your app passed a one-time challenge, and
+- the credential contains a holder key, which every AIR-issued credential does.
+
+It covers your challenge (so it cannot be replayed), your program ID (so it cannot be reused for another program), the time, and the exact set of shared claims (so none can be added or removed later).
+
+Without a challenge, the presentation is a **bearer token**: anyone who obtains a copy can present it.
+
+<Note>
+  The Web SDK accepts a challenge. The Flutter SDK's `verifyCredential` does not take one, so its presentations are bearer tokens.
+</Note>
+
+## What each part proves
+
+| Part | Proves | Does not prove |
+| --- | --- | --- |
+| `Compliant` status | That the check passed in the user's browser | Anything to your backend: it is not signed |
+| Issuer-signed credential | The issuer issued these facts to this holder, unchanged, valid until the expiry | That the person presenting it is the holder |
+| Shared claims | Each value is exactly what the issuer signed | Anything about claims that were not shared |
+| Holder signature | The holder's key approved this presentation, for your challenge and program, at this time | That the credential has not been revoked |
+
+To know the credential has not been revoked, check the issuer's revocation status. See [Checking a presentation](/technicals/architecture/how-credential-verification-works/backend-checks#revocation).
+
+For how the token is built, see [How SD-JWT credentials work](/technicals/architecture/how-credential-issuance-works/sd-jwt). For the exact format, see [Verify with SD-JWT](/products/identity/verify-sd-jwt#token-anatomy).

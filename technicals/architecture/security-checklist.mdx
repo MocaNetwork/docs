@@ -18,7 +18,7 @@ Use this checklist when integrating AIR Kit to ensure your implementation follow
 
 - [ ] Use the authentication required by each surface: [Partner JWT](/get-started/authentication/sdk-auth) for SDK and direct AIR API operations, `x-api-key` for issuer-hosted endpoints, and `x-admin-api-key` for self-hosted admin endpoints.
 - [ ] If using Custom Auth (BYO), verify the user's identity in your own system before issuing the Partner JWT.
-- [ ] Enable [MFA](/get-started/authentication/mfa) for high-value operations (credential issuance, large transactions).
+- [ ] Prompt for passkey [MFA](/get-started/authentication/mfa) setup after login. MFA is required before wallet requests, and the abstract account address is returned only after setup unless you opt out.
 - [ ] Set `skipRehydration: true` if your security model requires login on every session.
 
 ## Credential issuance
@@ -28,6 +28,15 @@ Use this checklist when integrating AIR Kit to ensure your implementation follow
 - [ ] For on-demand issuance, confirm DStorage returned a `storagePath` or that `POST /issue-vc` succeeded and the issuer persisted its DStorage result.
 - [ ] Sign credentials with issuer-controlled keys and encrypt them to the holder before DStorage upload. Keep raw source documents in issuer-controlled systems.
 - [ ] Configure requested claims and proof requirements in the Verification Program; require user approval for disclosure.
+
+## Credential verification
+
+- [ ] Generate a nonce of at least 128 bits on your backend for every verification, and delete it when you read it so it is used once.
+- [ ] Verify the SD-JWT on your backend: trusted `iss` from your own allowlist, issuer signature, disclosure digests, `exp`, and `vct`. Never trust `status` or the unsigned presentation wrapper.
+- [ ] Require the KB-JWT and check its signature against `cnf.jwk`, `nonce`, `aud` (your `programId`), `iat` freshness, and `sd_hash`.
+- [ ] Check revocation through the issuer's status endpoint or token status list, and fail closed if it cannot be fetched.
+
+See [How credential verification works](/technicals/architecture/how-credential-verification-works/backend-checks).
 
 ## API security
 
@@ -40,7 +49,19 @@ Use this checklist when integrating AIR Kit to ensure your implementation follow
 
 - [ ] Do not expose your Partner ID's private key on the client. The `partnerId` itself is safe to include in client code.
 - [ ] Validate callback URLs and redirect URIs to prevent open-redirect attacks.
-- [ ] If embedding AIR Kit in an iframe, configure `Content-Security-Policy` headers to allow `frame-src` from AIR Kit domains.
+- [ ] AIR Kit loads its login flow in an iframe. If you set `Content-Security-Policy`, allow `frame-src` from `*.air3.com`.
+- [ ] If you enable CORS on your issuer service or a proxy in front of it, allow `*.air3.com`, or the holder claim flow breaks.
+
+## Agentic integrations
+
+- [ ] Show the user the agent and each requested scope, and record their approval before you bind. The bind request has no approval screen of its own.
+- [ ] Bind only the scopes the user approved. Add `commerce.checkout` only if the user wants the agent to start purchases.
+- [ ] Keep `agentApiKey`, the partner login key, and `x-partner-jwt` on your backend.
+- [ ] Create an agent session per operation with the narrowest scope it needs, and don't cache agent JWTs beyond their 15-minute lifetime.
+- [ ] When a user disconnects an agent, rotate the key and then revoke it, so outstanding sessions end too.
+- [ ] Send checkout JWTs only to the merchant named in their `aud`. Merchants must verify `aud` and expiry.
+- [ ] Treat `502 CREDENTIAL_STORAGE_UNAVAILABLE` as a retryable failure, not as "user not eligible".
+- [ ] Enforce spending limits in the payment integration. AIR agent bindings do not carry payment authority.
 
 ## Smart accounts and transactions
 

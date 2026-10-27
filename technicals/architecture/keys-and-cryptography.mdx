@@ -1,0 +1,73 @@
+---
+title: "Keys & Cryptography"
+sidebarTitle: "Keys & cryptography"
+description: "Reference of every key, token, and cryptographic primitive in AIR Kit: who holds it, its algorithm, where it is published, and what it protects."
+---
+
+This page lists every key and token in an AIR integration, and the cryptographic primitives that connect them. Use it during a security review or threat-modeling session. The flows that use these keys are explained in [How credential issuance works](/technicals/architecture/how-credential-issuance-works), and[How credential verification works](/technicals/architecture/how-credential-verification-works).
+
+## Keys
+
+| Key | Algorithm | Held by | Public part published at | Protects |
+| --- | --- | --- | --- | --- |
+| **Partner login key** | `RS256` or `ES256` | Partner backend (secrets manager or HSM) | Your JWKS URL, registered in the Developer Dashboard | Partner JWTs: proves AIR requests come from your backend |
+| **Issuer signing key** | The partner key's algorithm: `RS256` in the issuance quickstart, or `ES256` | Issuer service | `did:web` document at `/.well-known/did.json` (`assertionMethod`) and `/.well-known/jwt-vc-issuer` | The issuer JWT in every SD-JWT credential, and token status list JWTs |
+| **Iden3 issuer key** | BabyJubJub | Iden3 issuer service, derived from its 32-byte `SEED` | The `did:air:…` issuer DID and issuer state on Moca Chain | Iden3 (`BJJ_SIG_2021`) credential signatures |
+| **Holder encryption key** | X25519 | Holder's AIR Account | Returned by AIR to issuers as `pubKey` / `publicKey` (hex DER SPKI) | Confidentiality of credential envelopes and issuance previews |
+| **Holder signing key** | EC P-256 | Holder's AIR Account | Embedded in each credential as `cnf.jwk`. Given to issuers as `signingKey.jwk`. | Holder binding: key-binding JWTs |
+| **Wallet key** | MPC | AIR's MPC wallet, the signer for the user's smart account | Smart account address | Smart account transactions. See [Smart accounts](/products/money/smart-account). |
+| **Agent P-256 key** (optional) | ECDSA P-256 | The agent runtime | Registered as `publicKey` at bind | Agent session and checkout requests via `signedMessage` |
+
+## Shared secrets
+
+| Secret | Format | Held by | Sent as | Rotation |
+| --- | --- | --- | --- | --- |
+| Issuer `API_KEY` | Opaque | Issuer service and AIR (registered) | `x-api-key` on `/available-vc`, `/issue-vc` | Update both sides together |
+| Issuer `ADMIN_API_KEY` | Opaque | Issuer service and your own servers only | `x-admin-api-key` on `/admin/*` | Any time. AIR never sees it. |
+| `agentApiKey` | `air_ag_…` | Agent backend | `x-agent-api-key` | `POST …/rotate` returns a new key once and invalidates issued agent JWTs |
+
+## Tokens
+
+| Token | Signed by | Key claims | Lifetime | Verified by |
+| --- | --- | --- | --- | --- |
+| **Partner JWT** | Partner login key | `partnerId`, `scope` (`issue` / `verify`), `email` (Custom Auth, `initialize-user`), `exp`. Header `kid`. | Short. 5 minutes recommended. | AIR, against your JWKS |
+| **Partner access token** | AIR | The user's AIR Kit session | Session-bound | AIR (`x-partner-access-token`) |
+| **Issuer JWT** (inside the SD-JWT) | Issuer signing key | `iss`, `sub`, `vct`, `id`, `nonce` (revocation), `iat`, `exp`, `cnf.jwk`, `status`, `_sd`, `_sd_alg` | Until `exp` | Any verifier, via `did:web` |
+| **KB-JWT** | Holder signing key | `typ: kb+jwt`, `alg: ES256`. `nonce`, `aud` (= `programId`), `iat`, `sd_hash` | Your freshness window, for example 5 minutes | Verifier backend, against `cnf.jwk` |
+| **Status list JWT** | Issuer signing key | Compressed bit array (`application/statuslist+jwt`). No `exp`. | Verifier cache policy | Verifiers, against issuer keys |
+| **Agent JWT** | AIR | Scopes (subset of the bound key) | 15 minutes, no refresh | Credential API |
+| **Checkout JWT** | AIR | `aud` = merchant, `scope` = checkout target, the user's abstract account address | Short-lived, no refresh | The merchant only |
+
+## Primitives
+
+| Primitive | Where it is used | Parameters |
+| --- | --- | --- |
+| **ECDH + HKDF + AES-GCM envelope** | Encrypting credentials and previews to the holder | Ephemeral X25519 key per envelope. ECDH with the holder's X25519 key. HKDF-SHA256 with an empty salt and info `data-enc-aes-256-gcm` → 32-byte key. AES-256-GCM with a random 12-byte IV. Output: ciphertext, IV, 16-byte tag, ephemeral public key (DER SPKI). |
+| **Salted SHA-256 digests** | SD-JWT selective disclosure | Disclosure = base64url(JSON `[salt, name, value]`). Digest = base64url(SHA-256(disclosure)). `_sd_alg: sha-256`. |
+| **JWS** | Issuer JWT, KB-JWT, Partner JWT, agent and checkout JWTs, status list JWT | ES256 (P-256) or RS256, depending on the key |
+| **`sd_hash`** | Binding the KB-JWT to the exact disclosure set | base64url(SHA-256(everything before the KB-JWT, including the trailing `~`)) |
+| **ECDSA P-256** | Agent `signedMessage` over `agent_pubkey:userId:unixEpochTime` | DER or IEEE P1363 signature, base64 or base64url |
+| **Token status list** | Privacy-preserving revocation | 1 bit per credential, per partition, compressed. IETF OAuth Status List draft. |
+| **BabyJubJub + Groth16** | Iden3 credentials and zero-knowledge proofs | BJJ signatures, Groth16 proofs (`pi_a`, `pi_b`, `pi_c`, `publicSignals`), optionally verified on-chain by the Universal Verifier |
+| **MPC** | Wallet keys | The MPC wallet signs for the user's smart account. Passkey MFA is required before wallet requests. |
+
+## Who can decrypt or forge what
+
+| Party | Can read credential claims? | Can forge a credential? | Can present as the holder? |
+| --- | --- | --- | --- |
+| Issuer | Its own source data only. Not the stored envelope. | Only its own credentials | No: lacks the holder signing key |
+| AIR | No: holds only ciphertext and metadata | No: holds no issuer keys | No KB-JWT without the holder's key |
+| DStorage and chain operators | No | No | No |
+| Verifier | Only disclosed claims | No | Only a bearer replay, if it omitted the nonce |
+| Agent backend | Only claims disclosed through verification programs within its scopes | No | Only within bound scopes |
+| Holder | Yes | No | Yes |
+
+## Rotation guidance
+
+| Key | How to rotate safely |
+| --- | --- |
+| Partner login key | Publish the new key in the JWKS, switch signing, then remove the old key once outstanding JWTs have expired |
+| Issuer signing key | Add the new key to the JWKS and DID document first. Keep the old key published while any credential signed with it is unexpired, because its `kid` points there. |
+| Issuer host | Do not change it. It is the issuer DID. |
+| `agentApiKey` | Rotate on suspected leak. Rotate, then revoke, on user disconnect. |
+| Token status list partition size | Cannot change after issuance starts |

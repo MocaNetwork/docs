@@ -1,0 +1,50 @@
+---
+title: "Revocation and updates"
+description: "What happens after an AIR credential is issued: revocation, the token status list, updating claims, and common issuance failures."
+---
+
+A credential cannot be edited once it is issued. The issuer controls its validity through revocation and expiry, and replaces it when the facts change.
+
+## Revocation
+
+Each credential carries a revocation number. To revoke, the issuer marks that number as revoked on its own service. Revocation is permanent; a revoked credential cannot be restored.
+
+Revocation needs a database on the issuer service. Without one, the issuer has no record to mark.
+
+## How verifiers learn about it
+
+The issuer publishes revocation status in one or both of these ways:
+
+| Method | How it works | Speed | Privacy |
+| --- | --- | --- | --- |
+| **Status endpoint** (standard) | The verifier asks the issuer whether a specific revocation number is revoked. | Immediate | The issuer learns which credential was checked, and when. |
+| **Token status list** (optional) | The issuer publishes a compressed list with one bit per credential. The verifier downloads the whole list and reads its own bit. | After the issuer's next publish, plus the verifier's cache time | The issuer only sees that the list was downloaded. |
+
+A verification program can ask AIR to check revocation during verification. Verifiers can also check it themselves on their backend.
+
+### Token status list in brief
+
+- The list is split into partitions of a fixed size. Each credential knows its partition and position.
+- The issuer republishes the list on a schedule: every few minutes for urgent cases such as fraud, hourly or nightly for routine changes.
+- The partition size cannot change after issuing starts, because each credential already records its position.
+- It only represents valid or revoked. There is no "suspended" state.
+
+## Updating a credential
+
+To change a claim, such as a tier upgrade, the issuer revokes the old credential and issues a new one. Deduplicate by recipient and program so a user does not hold two current versions.
+
+## Expiry
+
+Every credential has an expiry date set at issuance. After it passes, verification fails without any action from the issuer. Short-lived credentials reduce how much revocation is needed.
+
+## Common issuance failures
+
+| Symptom | Likely cause |
+| --- | --- |
+| AIR cannot reach the issuer, or the issuer returns `403` | The API key registered with AIR does not match the issuer service |
+| Storage rejects the request with `401` | The Partner JWT is expired, has the wrong scope, or is signed by a key not in the registered JWKS |
+| Issuance returns `409` | A credential already exists for this user and schema, or the user previously declined credentials from this issuer |
+| No storage reference returned | Retry with backoff, reusing the same credential identifier so the retry cannot create a duplicate |
+| Verification right after issuance fails | The on-chain record is still pending. Wait for it before verifying. |
+
+For revocation commands and status list setup, see [Managing your credentials](/products/identity/revocation).

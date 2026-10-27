@@ -1,0 +1,42 @@
+---
+title: "Zero-knowledge verification"
+description: "How AIR verifies Iden3 credentials with zero-knowledge proofs: proving conditions without revealing values, unlinkable presentations, and on-chain checks."
+---
+
+Zero-knowledge verification uses **Iden3** credentials, an advanced option the AIR team enables per request. Instead of sharing a claim, the user's device proves a statement about it, such as "age is over 18", without revealing the value.
+
+## How it differs from the default
+
+| | SD-JWT (default) | Iden3 zero-knowledge |
+| --- | --- | --- |
+| What the verifier learns | The exact value of each shared claim | Only that the condition holds, or a value if the program asks for one |
+| Can verifiers link presentations? | Yes, the signed credential is identical each time | No, each proof is different |
+| Work on the user's device | Near instant | A few seconds of computation |
+| Work for the verifier | One signature check | A zero-knowledge proof check |
+| Can a smart contract verify it? | No | Yes, optionally |
+
+## How it works
+
+For how Iden3 credentials and proofs are built, see [How Iden3 credentials work](/technicals/architecture/how-credential-issuance-works/iden3).
+
+1. The verification program sets the condition to prove, for example "membership tier above Bronze".
+2. The user's device generates a proof that its issuer-signed credential meets the condition. The proof reveals the result, not the underlying value.
+3. The proof is checked off-chain, or on-chain by the Universal Verifier contracts on Moca Chain.
+
+## Verification modes
+
+| Mode | Where the proof is checked | What you can rely on |
+| --- | --- | --- |
+| **Off-chain, no proof** | The program check only | The verification session status. The presentation is unsigned. |
+| **Off-chain proof** | Outside a blockchain transaction | The zero-knowledge proof |
+| **On-chain proof** | Universal Verifier contracts on Moca Chain | The on-chain transaction, returned as a transaction hash |
+
+<Warning>
+  Without a required proof, an Iden3 presentation carries no cryptographic guarantee. Require a proof whenever the result drives access or value.
+</Warning>
+
+## Revocation
+
+Iden3 issuers prove non-revocation with a Merkle proof against their revocation tree, served from the issuer's `/credential-status` endpoint. They also answer the standard revocation status endpoint. They do not publish a token status list.
+
+For setup, see [Issue Iden3 credentials](/products/identity/iden3/issuing) and [Verify Iden3 credentials](/products/identity/iden3-credentials).

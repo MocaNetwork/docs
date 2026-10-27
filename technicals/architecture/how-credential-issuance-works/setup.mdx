@@ -1,0 +1,46 @@
+---
+title: "Issuer setup"
+description: "What an issuer must publish and register before issuing AIR credentials: the issuer DID, signing keys, schema, issuance program, and endpoints."
+---
+
+Before an issuer can issue, it publishes and registers a chain of configuration. Verifiers later rely on the same chain to decide whether a credential is genuine, so each link matters.
+
+<Steps>
+  <Step title="Issuer identity on your own domain">
+    The issuer's identity is a DID derived from the issuer service's host: `did:web:<host of ISSUER_ORIGIN>`. The issuer service publishes a DID document at `/.well-known/did.json`, which lists the public keys verifiers use to check signatures. AIR does not generate this identity; the issuer owns it.
+  </Step>
+  <Step title="Signing keys">
+    The issuer's partner key pair (`RS256` or `ES256`) signs two things: the credentials themselves, and the short-lived Partner JWTs that authenticate the issuer to AIR. The public half is published in the DID document and in a JWKS URL registered with AIR.
+  </Step>
+  <Step title="Credential type">
+    A schema registered in the Developer Dashboard defines the credential type (`vct`) and its fields. The issuer service decides which claims each schema contains and which of them the user can selectively disclose.
+  </Step>
+  <Step title="Issuance program">
+    An issuance program connects the schema to the credential format (`SD_JWT_VC`) and to settings such as **Allow data disclosure**. Apps start issuance with the program ID.
+  </Step>
+  <Step title="Registered endpoints">
+    In **Issuer → Settings**, the issuer registers where AIR can reach it: the preview endpoint (`available-vc`), the issue endpoint (`issue-vc`), and the revocation status endpoint. AIR authenticates to them with the issuer's API key.
+  </Step>
+</Steps>
+
+<Warning>
+  Treat the issuer host as permanent. It is part of the issuer's identity, so changing it creates a new issuer, and credentials already issued no longer point at your keys. To rotate keys, publish the new key before removing the old one.
+</Warning>
+
+## What runs where
+
+| Component | Hosted by | Required |
+| --- | --- | --- |
+| Issuer service (endpoints, signing, encryption) | Issuer | Yes |
+| DID document and published keys | Issuer, on the issuer service | Yes |
+| JWKS endpoint for Partner JWTs | Issuer | Yes |
+| Database | Issuer | Optional in sandbox. Required for revocation, issuance history, and the token status list. |
+| Encrypted credential storage | AIR, in DStorage | Yes, managed by AIR |
+
+Sandbox and production are separate. Configuration created in sandbox must be registered again in production.
+
+<Note>
+  Iden3 issuers are set up differently. Their identity is a `did:air:…` DID derived from a secret seed held by the Iden3 issuer service, and they sign with a BabyJubJub key. See [Issue Iden3 credentials](/products/identity/iden3/issuing).
+</Note>
+
+For step-by-step setup, see [Issuing credentials](/products/identity/issuing-credentials) and [Setting up your backend](/products/identity/backend-hosting).

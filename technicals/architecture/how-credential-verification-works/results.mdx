@@ -1,0 +1,39 @@
+---
+title: "Results and errors"
+description: "Every outcome of an AIR credential verification: the statuses it resolves with, the errors it rejects with, and how to handle each."
+---
+
+`verifyCredential` ends in one of two ways: it **resolves** with a status, or it **rejects** with an `AirKitError` (AIR Kit 1.13 and later). Handle both.
+
+## Statuses
+
+| Status | Meaning | Presentation returned? |
+| --- | --- | --- |
+| `Compliant` | A matching credential satisfied the program | Yes. Check it on your backend before acting. |
+| `Non-Compliant` | A credential matched but did not meet the program's conditions | No |
+| `NotFound` | The user holds no matching credential | No |
+| `Pending` | The credential's status is not yet final | No |
+| `Revoking` / `Revoked` | The credential is being revoked, or was revoked | No |
+| `Expired` | The credential is past its expiry date | No |
+
+Non-compliant results never expose credential data.
+
+## Errors
+
+Branch on the error's `code`, and fall back on its `category` for codes you do not handle.
+
+| Code | Meaning | Typical handling |
+| --- | --- | --- |
+| `credential/not-eligible` | No matching or eligible credential | Send the user to an accepted issuer, for example with `redirectUrl` |
+| `credential/verification-failed` | Verified, but not compliant. `data.status` carries the status. | Show the standard experience |
+| `credential/revoked` | The credential was revoked | Ask the user to get a new one |
+| `credential/program-not-found` | The program is missing or empty | Fix the program ID |
+| `credential/session-expired` | The Partner JWT or credential session expired | Get a fresh token and retry |
+| `credential/verify-failed` | Verification could not complete | Log `code` and `eventId`, then allow a retry |
+| Category `user` or `network` | The user cancelled, for example by declining consent, or the network failed | Allow a retry |
+
+Quote `eventId` to AIR support when you report a failure. See [Error codes](/help/error-codes) for the full list.
+
+## Verification sessions
+
+AIR records every attempt as a verification session: the result, mode, holder context, and usage. This gives consistent reporting across integrations.
