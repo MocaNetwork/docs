@@ -43,7 +43,7 @@ Every credential has an expiry date set at issuance. After it passes, verificati
 | --- | --- |
 | AIR cannot reach the issuer, or the issuer returns `403` | The API key registered with AIR does not match the issuer service |
 | Storage rejects the request with `401` | The Partner JWT is expired, has the wrong scope, or is signed by a key not in the registered JWKS |
-| Issuance returns `409` | A credential already exists for this user and schema, or the user previously declined credentials from this issuer |
+| Issuance returns `409` | The `externalId` was already used for a credential with different content. Resend the exact same bytes when retrying, or use a new `externalId` for a new or corrected credential. The user may also have declined credentials from this issuer |
 | No storage reference returned | Retry with backoff, reusing the same credential identifier so the retry cannot create a duplicate |
 | Verification right after issuance fails | The on-chain record is still pending. Wait for it before verifying. |
 

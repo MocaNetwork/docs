@@ -48,16 +48,16 @@ sequenceDiagram
 
     Issuer->>AIR: Encrypted envelope + Partner JWT
     AIR->>SP: Write object
+    AIR-->>Issuer: 201 + storage path
     SP->>SP: Replicate to secondary providers
-    SP->>Chain: Seal object with integrity hashes
-    AIR-->>Issuer: Storage path
+    SP->>Chain: Seal object with integrity hashes (background)
 ```
 
 1. **The issuer calls AIR's DStorage API** with the envelope, authenticated by a Partner JWT with the `issue` scope. The issuer never talks to storage providers directly.
 2. **AIR writes the envelope as a storage object** on Moca Chain Storage Providers, which offer an S3-style object API.
-3. **The primary provider stores the payload**, and secondary providers in its virtual group receive replicas. Each one computes an integrity hash and signs it.
-4. **The object is sealed on Moca Chain.** The primary provider submits the signed integrity hashes, and validators record the object's metadata by consensus.
-5. **AIR returns a storage path**, such as `dstorage://vc/…`, and adds the credential to its index.
+3. **AIR returns a storage path right away** (`201`), such as `dstorage://vc/…`, and adds the credential to its index. The bytes can be read immediately.
+4. **The primary provider stores the payload**, and secondary providers in its virtual group receive replicas. Each one computes an integrity hash and signs it.
+5. **The object is sealed on Moca Chain in the background.** The primary provider submits the signed integrity hashes, and validators record the object's metadata by consensus. Poll `GET /dstorage/vcs/status?path=<storagePath>` until `status` is `STORED` if you need to confirm it.
 
 ## How availability is enforced
 

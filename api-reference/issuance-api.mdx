@@ -42,7 +42,7 @@ Direct issuance uses a Partner JWT on both AIR API endpoints. Sign it with the p
 - **`initialize-user`**: the Partner JWT also carries the recipient's `email` claim. Send it in the request body as `partnerJwt`, with your Partner ID in the `x-partner-id` header.
 - **`dstorage/vcs`**: send a Partner JWT without an `email` claim in the `x-partner-auth` header.
 
-The DID, encryption public key, and signing public key returned by `initialize-user` are then used to build the credential and store it through `/dstorage/vcs`.
+The DID and encryption public key returned by `initialize-user`, and the signing public key when present, are then used to build the credential and store it through `/dstorage/vcs`.
 
 Your issuer service uses its own keys, described in [Your issuer service](#your-issuer-service). They are never sent to the AIR API.
 
@@ -144,7 +144,7 @@ POST {AIR_API_BASE_URL}/dstorage/vcs
 | `iv` | base64 string | Yes | AES-GCM initialization vector |
 | `authTag` | base64 string | Yes | AES-GCM authentication tag |
 | `encryptedKey` | base64 string | Yes | Ephemeral X25519 public key (DER SPKI). The payload key is derived with X25519 ECDH against the holder's `publicKey` and HKDF-SHA256, then used for AES-256-GCM |
-| `externalId` | string | Yes | Stable issuer-controlled unique identifier for this credential. Reuse the same value when retrying the same storage operation; do not generate a new value for each transient retry. |
+| `externalId` | string | Yes | Stable issuer-controlled unique identifier for this credential: 16–255 characters from `[A-Za-z0-9._:-]` (a UUID or ULID works). It is the dedup key: the same value with identical bytes returns the existing object; the same value with different bytes returns `409`. Reuse it, with the same bytes, when retrying; use a new value for new or corrected content. |
 
 ### Response 201
 
@@ -294,7 +294,7 @@ These routes do not require an API key. `ISSUER_ORIGIN` must be the stable publi
 | --- | --- | --- |
 | `GET /.well-known/did.json` | Issuer `did:web` document with the keys that verify your credentials | DID document |
 | `GET /.well-known/jwt-vc-issuer` | SD-JWT VC issuer metadata | `{ issuer, jwks }` |
-| `GET /.well-known/air-partner-info` | Partner info referenced from the DID document | `{ partnerId }` |
+| `GET /.well-known/air-partner-info` | Partner info referenced from the DID document. `partnerId` must equal your AIR Partner ID (`PARTNER_ID`) | `{ partnerId }` |
 | `GET /revocation-status/:nonce` | Check whether a credential has been revoked | `{ "isRevoked": boolean }` |
 | `GET /statuslist/:partition` | Signed token status list partition, when enabled | `application/statuslist+jwt` |
 
@@ -316,7 +316,7 @@ Example revocation status response:
 | 401 | Invalid/expired JWT, JWKS mismatch | Validate signature, `kid`, `typ: "JWT"`, token expiry |
 | 403 | Feature not enabled or schema not allowed | Enable feature in dashboard, verify schema ownership |
 | 404 | Unknown issuer/program/user | Recheck IDs and recipient email in dashboard |
-| 409 | Consent rejected / conflict | Check user consent and duplicate handling |
+| 409 | `externalId` reused with different content, or consent rejected | Resend identical bytes on retry; use a new `externalId` for new content; check user consent |
 | 500 | Server-side failure | Retry with backoff and inspect logs |
 
 ## Troubleshooting
