@@ -51,5 +51,3 @@ The trust boundary is the **issuer**, not AIR. A verifier decides whether to acc
 ## Agent verification
 
 When an AI agent verifies a user's credentials, the agent's backend calls AIR's Credential API instead of AIR Kit. AIR runs the verification program on the user's behalf, within the scopes the user granted to that agent, and returns the result and the disclosed claims. See [How agentic commerce works](/technicals/architecture/how-agentic-commerce-works).
-
-{/* TODO: Confirm where decryption happens for agent verification (verify-by-agent), and align the "AIR never reads stored credentials" wording with it. */}
