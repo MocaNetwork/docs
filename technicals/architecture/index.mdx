@@ -1,10 +1,23 @@
 ---
 title: "Architecture & Data Flow"
 sidebarTitle: "System & data flow"
-description: "End-to-end technical architecture of AIR Kit — SDK services, Moca Chain, credential lifecycle, and how data moves through the system."
+description: "End-to-end architecture of AIR Kit: the Account, Identity, Money, and Agents modules, Moca Chain, and how data moves through the system."
 ---
 
 AIR Kit connects your application to AIR services and Moca Chain. It exposes **Account Services** for authentication and wallet operations and **Credential Services** for orchestrating issuance and verification. Your issuer backend owns credential authorization, source data, signing, encryption, and storage.
+
+## Four modules
+
+Every module builds on the same AIR Account, so a user who signs in once can hold credentials, transact, and delegate to agents.
+
+| Module | What it does | Key building blocks |
+| --- | --- | --- |
+| **Account** | Signs users in and manages their session | AIR Account, Google and passwordless email login, Custom Auth, passkey MFA, login JWT |
+| **Identity** | Issues and verifies credentials | Issuer service, SD-JWT and Iden3 credentials, DStorage, verification programs |
+| **Money** | Lets users transact on EVM chains | Chain-specific ERC-4337 smart accounts, MPC signer, paymaster, session keys |
+| **Agents** | Lets AI agents act for a user, within limits | Bound agent keys, scoped 15-minute sessions, server-side verification, checkout tokens |
+
+Use only the modules you need. Identity does not require Money, and an agent binding never grants wallet authority.
 
 ## System overview
 
@@ -94,6 +107,35 @@ The verification program selects the mode. Both paths use the credential discove
 
 Using DStorage or anchoring issuer state does not, by itself, mean that verification runs on-chain. The verification mode describes where the proof is checked. See [How credential verification works](/technicals/architecture/how-credential-verification-works).
 
+## Account at a glance
+
+The AIR Account is the user's sign-in and identity account. It holds their DID and credentials, and it is what agents bind to.
+
+- **Login.** Google and passwordless email are on by default. Wallet (EOA) login is available on request, and the wallet address then serves only as a login identifier; account control stays with AIR's MPC-based account. With [Custom Auth](/get-started/authentication/custom-auth), your backend signs a Partner JWT with the user's email, and AIR creates or loads that user's account. The first login to your app sends an email one-time code.
+- **Session.** `login()` returns a JWT issued by AIR with `sub`, `partnerId`, and, once available, `abstractAccountAddress`. Validate it on your backend against AIR's published JWKS. Returning users are signed in automatically for up to 30 days unless they log out, or unless you set `skipRehydration`.
+- **MFA.** Passkey MFA is required before any wallet request; AIR Kit prompts for setup automatically if your app has not. By default, the abstract account address appears in user info and the token only after MFA is set up.
+
+See [User login](/get-started/authentication/login) and [Sessions & user info](/get-started/authentication/sessions).
+
+## Money at a glance
+
+Money separates the **AIR Account** (who the user is) from the **smart account** (what holds assets and sends transactions). Smart accounts are ERC-4337 accounts, one per chain, and AIR's MPC wallet signs for them.
+
+```mermaid
+graph LR
+    App[Your app] -->|EIP-1193 request| Kit[AIR Kit]
+    Kit -->|UserOperation, MPC-signed| PM{Paymaster policy}
+    PM -->|Sponsored or user-paid| Chain[Smart account on the selected chain]
+```
+
+- **Deployment.** A smart account is deployed on first use: AIR Kit bundles deployment with the first transaction, or your app calls `deploySmartAccount()`. Deployment gas is sponsored by AIR Kit.
+- **Transactions.** Your app uses the standard EIP-1193 provider with existing EVM tooling such as wagmi, or AIR Kit's built-in wallet screens (beta) for send, receive, swap, and history.
+- **Gas.** For each operation, the paymaster checks the partner's policy: allowed contracts and function selectors, budgets, per-user limits, a maximum gas cost, and active time windows. If it qualifies, the paymaster signs the sponsorship; otherwise the user pays, optionally in supported ERC-20 tokens. Policy changes currently go through the AIR team.
+- **Session keys (beta).** The user grants a scoped permission once, and your app executes matching actions without a prompt each time. Session keys are a wallet feature, not agent delegation.
+- **Chains.** Base, BSC, Gnosis, Kaia, and Soneium on mainnet, with matching testnets, depending on your partner configuration.
+
+See [How AIR Money works](/products/money/how-it-works), [Smart accounts](/products/money/smart-account), and [Sponsoring gas](/products/money/paymaster).
+
 ## Agents at a glance
 
 An agent backend binds a key to the user's AIR Account with the user's consent and a fixed set of scopes. It then mints a 15-minute agent JWT per operation, runs verification programs server-side through the Credential API, and, with `commerce.checkout`, mints a checkout token whose audience is a single merchant. Identity binding never grants wallet or payment authority. See [How agentic commerce works](/technicals/architecture/how-agentic-commerce-works).
@@ -104,13 +146,14 @@ Your issuer backend can connect to loyalty platforms, KYC providers, ticketing s
 
 ## Service independence and login requirements
 
-Choose the service capabilities your app needs. An AIR login is required for the user-present credential flows below; it does not imply that your app must also integrate wallet operations, gas sponsorship, or other Account Services features.
+Choose the service capabilities your app needs. An AIR login is required for the user-present flows below; it does not imply that your app must also integrate wallet operations, gas sponsorship, or other Account Services features.
 
-| Credential flow | Service | AIR login requirement |
+| Flow | Service | AIR login requirement |
 | --- | --- | --- |
 | On-demand issuance | Credential Services | User logs in before reviewing and confirming issuance. |
 | Direct issuance | Credential Services | No active user session required to issue; user logs in to claim later. |
 | SDK verification | Credential Services | User logs in before reviewing the requested data and consenting. |
+| Wallet transactions | Account Services (Money) | User is logged in and has set up passkey MFA. |
 
 ## Next steps
 

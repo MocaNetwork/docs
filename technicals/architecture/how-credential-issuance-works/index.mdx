@@ -1,7 +1,7 @@
 ---
 title: "How credential issuance works"
 sidebarTitle: "Overview"
-description: "How an issuer turns a fact about a user into a signed, encrypted AIR credential, who is involved, and the three ways to issue."
+description: "How an issuer turns a fact about a user into a signed, encrypted AIR credential, who is involved, and the two ways to issue."
 ---
 
 Issuance turns something an issuer already knows about a user, such as a membership tier or a completed KYC check, into a **credential** the user can carry to other apps. The issuer builds and signs the credential on its own service. AIR delivers it to the user and stores it encrypted. AIR never sees what is inside.
@@ -33,7 +33,7 @@ graph LR
 | **DStorage** | Moca Chain's decentralized storage. Holds the encrypted credential. | No |
 | **Moca Chain** | Records hashes and status metadata, never the credential itself. | No |
 
-## Three ways to issue
+## Two ways to issue
 
 | Mode | Is the user present? | Typical trigger | Read more |
 | --- | --- | --- | --- |
