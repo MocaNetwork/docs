@@ -1,0 +1,48 @@
+---
+title: "Checking a presentation"
+description: "Why AIR presentations must be checked on your backend, how replay is prevented, and how to check revocation."
+---
+
+AIR Kit checks the presentation in the user's browser, which is fine for showing a result but not for granting access, rewards, or payouts. Anything in the browser can be altered. Your backend must check the presentation itself, using keys the issuer publishes. It does not need to call AIR.
+
+## The checks, in order
+
+Any failure means "not verified".
+
+1. **Use the challenge once.** Look up the challenge you issued for this attempt and delete it in the same step. A second submission of the same presentation then has nothing to match.
+2. **Trust the issuer.** The issuer must be on your own list of accepted issuers. Fetch its public keys from your configuration, never from a link inside the token.
+3. **Check the issuer's signature.** It proves the credential is genuine and unchanged.
+4. **Check each shared claim.** Each one must match a fingerprint the issuer signed.
+5. **Check expiry and type.** The credential is still valid and is the type you expect.
+6. **Check the holder signature.** It must be signed by the holder key in the credential, for your challenge and your program ID, recently, over exactly these claims.
+7. **Check you got what you asked for.** Every claim you requested is present.
+8. **Check revocation.** See below.
+
+If you sent a challenge and the credential has a holder key, the holder signature must be present. AIR always adds it in that case, so a missing one means it was removed: reject.
+
+## How replay is prevented
+
+| Attack | What stops it |
+| --- | --- |
+| Resubmitting a captured presentation | The challenge is single-use, and the holder signature must be recent |
+| Using a presentation made for another app or program | The holder signature names the program ID |
+| Adding or removing shared claims | The holder signature covers the exact set of claims |
+| Presenting a stolen copy of a credential | The thief cannot produce the holder signature |
+
+## Revocation
+
+AIR checks revocation during verification only when the program enables it. To check it on your backend, ask the issuer in one of two ways:
+
+| Method | How | Trade-off |
+| --- | --- | --- |
+| **Status endpoint** | Ask the issuer whether the credential's revocation number is revoked | Immediate, but the issuer learns which credential you checked |
+| **Token status list** | Download the issuer's signed list and read the credential's bit | More private and cacheable, but only as fresh as the issuer's last publish |
+
+If the status cannot be fetched, treat the credential as not verified.
+
+## What stays with you
+
+- Treat shared claims as personal data. Keep them only as long as the downstream action needs.
+- Your access and reward rules are yours. A valid presentation proves facts; it does not decide what they entitle the user to.
+
+For a tested implementation of every check, see [Verify with SD-JWT](/products/identity/verify-sd-jwt).

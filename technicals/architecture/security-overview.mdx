@@ -16,6 +16,7 @@ AIR Kit separates issuer source data and signing authority from encrypted creden
 | **Verifier** | Verification programs, approved claims, optional ZK proofs | Cannot access undisclosed claims without user consent |
 | **Moca Chain** | Storage metadata, state records, optional on-chain verification proofs | Cannot reconstruct private keys or decrypt stored data |
 | **dStorage** | Encrypted credential payloads | Cannot decrypt without the user-consented key |
+| **Agent (bound key)** | An agent API key or P-256 key, scoped to `credentials.read`, `credentials.verify`, or `commerce.checkout` | Cannot act outside its bound scopes, sign wallet transactions, or authorize payments |
 
 ## Security layers
 
@@ -35,13 +36,29 @@ The issuer's signature makes the credential tamper-evident. Programs that requir
 
 Raw source documents remain with the issuer. Encrypted credential payloads may be stored in DStorage, while users control decryption and disclosure. Credential payloads are encrypted by default. See [Privacy & Compliance](/technicals/architecture/privacy-and-compliance).
 
+### Agent delegation
+
+Agents act for a user only through a key the user bound, with consent, to their AIR Account. Scopes are fixed at bind time. Each operation uses a 15-minute agent JWT with no refresh token, and checkout tokens are restricted to a single merchant audience. Rotating a key invalidates issued agent JWTs. See [How agentic commerce works](/technicals/architecture/how-agentic-commerce-works).
+
 ### Account abstraction
 
-User wallets use smart accounts (ERC-4337 account abstraction) with paymaster-sponsored gas. Users interact with the chain without managing private keys or gas tokens directly.
+User wallets use smart accounts (ERC-4337 account abstraction), with AIR's MPC wallet as the signer. Smart account deployment gas is sponsored by AIR Kit. Other gas is sponsored when the operation matches your [Paymaster](/products/money/paymaster) policy; otherwise the user pays, optionally in supported ERC-20 tokens.
 
 ## Further reading
 
 <CardGroup cols={2}>
+  <Card title="How credential issuance works" icon="badge-check" href="/technicals/architecture/how-credential-issuance-works">
+    Signing, holder binding, and envelope encryption, step by step.
+  </Card>
+  <Card title="How credential verification works" icon="magnifying-glass" href="/technicals/architecture/how-credential-verification-works">
+    Presentations, key-binding JWTs, and backend checks.
+  </Card>
+  <Card title="How agentic commerce works" icon="robot" href="/technicals/architecture/how-agentic-commerce-works">
+    Agent keys, scoped sessions, and checkout tokens.
+  </Card>
+  <Card title="Keys & cryptography" icon="key" href="/technicals/architecture/keys-and-cryptography">
+    Every key, token, and primitive in one reference.
+  </Card>
   <Card title="Credential security" icon="shield-check" href="/technicals/architecture/credential-security">
     How credentials are signed, encrypted, and verified with user-controlled disclosure.
   </Card>

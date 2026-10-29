@@ -500,9 +500,40 @@
             "icon": "diagram-project",
             "groups": [
               {
-                "group": "How it works",
+                "group": "Overview",
                 "pages": [
                   "technicals/architecture/index",
+                  "technicals/architecture/keys-and-cryptography"
+                ]
+              },
+              {
+                "group": "How it works",
+                "pages": [
+                  {
+                    "group": "How credential issuance works",
+                    "root": "technicals/architecture/how-credential-issuance-works/index",
+                    "pages": [
+                      "technicals/architecture/how-credential-issuance-works/air-role",
+                      "technicals/architecture/how-credential-issuance-works/setup",
+                      "technicals/architecture/how-credential-issuance-works/on-demand",
+                      "technicals/architecture/how-credential-issuance-works/direct",
+                      "technicals/architecture/how-credential-issuance-works/sd-jwt",
+                      "technicals/architecture/how-credential-issuance-works/iden3",
+                      "technicals/architecture/how-credential-issuance-works/storage",
+                      "technicals/architecture/how-credential-issuance-works/after-issuance"
+                    ]
+                  },
+                  {
+                    "group": "How credential verification works",
+                    "root": "technicals/architecture/how-credential-verification-works/index",
+                    "pages": [
+                      "technicals/architecture/how-credential-verification-works/presentation",
+                      "technicals/architecture/how-credential-verification-works/backend-checks",
+                      "technicals/architecture/how-credential-verification-works/results",
+                      "technicals/architecture/how-credential-verification-works/zero-knowledge"
+                    ]
+                  },
+                  "technicals/architecture/how-agentic-commerce-works",
                   "technicals/architecture/zktls",
                   "technicals/architecture/privacy-and-compliance"
                 ]

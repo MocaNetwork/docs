@@ -169,7 +169,7 @@ if (hasGoldStatus) {
 
 ## Issuance result
 
-Issuance completes in ~1–4 seconds and returns a `storagePath` once the encrypted credential is stored in DStorage. Use that result to confirm success to the user — no status polling required. The credential is immediately available for the member to present at any verifier.
+Issuance completes in ~1–4 seconds and returns a `storagePath` as soon as DStorage accepts the encrypted credential (`201`). Use that result to confirm success to the user. Sealing on Moca Chain continues in the background; to confirm it, poll `GET /dstorage/vcs/status?path=<storagePath>` until `status` is `STORED`. The credential is immediately available for the member to present at any verifier.
 
 ## Examples
 

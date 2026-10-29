@@ -138,7 +138,8 @@ Run your main flows end to end with a real test account on production:
 
 - [ ] Issuer service deployed on a domain you control, with `NODE_ENV=production`
 - [ ] The issuer database is durable and its migrations are applied
-- [ ] `*did:web Host*` set to the hostname of `ISSUER_ORIGIN`, plus the issuer API key, JWKS URL, and endpoint URLs, in the production Dashboard
+- [ ] `*did:web Host*` set to the hostname of `ISSUER_ORIGIN` plus your production Partner ID (no `https://` or `did:web:`), plus the issuer API key, JWKS URL, and endpoint URLs, in the production Dashboard. The host locks after the first credential
+- [ ] `GET {ISSUER_ORIGIN}/.well-known/air-partner-info` returns your production Partner ID
 - [ ] Schemas and issuance programs recreated in production, and their IDs updated in your app
 - [ ] Revocation tested; token status list partition size final and a publish job scheduled, if you use it
 - [ ] Iden3 credentials enabled by the AIR team, if you use them
