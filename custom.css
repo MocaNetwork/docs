@@ -358,7 +358,7 @@ header a[href="https://air3.com/partner-with-us"] > :is(svg, img) {
       width: 16px !important;
       height: 16px !important;
     }
-    & > :nth-last-child(3) {
+    & > a:nth-last-child(3) {
       margin-inline-start: auto;
     }
   }
