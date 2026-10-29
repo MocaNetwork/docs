@@ -354,13 +354,9 @@ header a[href="https://air3.com/partner-with-us"] > :is(svg, img) {
   }
   .nav-tabs {
     width: 100%;
-    & > :first-child svg {
-      width: 16px !important;
-      height: 16px !important;
-    }
-    & > a:nth-last-child(3) {
+  }
+  .nav-tabs > a:nth-last-child(3) {
       margin-inline-start: auto;
-    }
   }
 }
 
