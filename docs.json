@@ -309,6 +309,7 @@
                 "group": "Working with Agents",
                 "pages": [
                   "products/agents/integration-options",
+                  "products/agents/edge-gating-cloudflare",
                   {
                     "group": "Using Agentic Identity",
                     "root": "products/agents/partner-agent-api",

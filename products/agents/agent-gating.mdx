@@ -32,6 +32,14 @@ Ask for the facts needed for the gate, rather than a broad collection of persona
 
 Use the verified relationship to make requests accountable within your service: apply per-user and per-agent limits, monitor repeated failures, and withdraw access when your rules are violated. Revoking an agent binding and enforcing a service ban are separate controls, and the service owns its ban policy.
 
+## Build it at the edge
+
+Know Your Agent (KYA) checks can run in front of your site, before a request reaches your origin. A Cloudflare Worker verifies the presentation the agent sends, then gates a path to eligible agents or labels each caller so your origin can tailor its response.
+
+<Card title="Know Your Agent (KYA) at the edge" icon="shield-check" href="/products/agents/edge-gating-cloudflare" horizontal>
+  Gate content or triage callers with a Cloudflare Worker and an AIR verification program.
+</Card>
+
 ## Plan the integration
 
 Define the agent operator, the consenting user, accepted issuers, and the recipient's verification method in [Plan your integration](/products/agents/integration-options). Then follow [Using Agentic Identity](/products/agents/partner-agent-api).

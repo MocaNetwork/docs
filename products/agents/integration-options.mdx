@@ -56,7 +56,7 @@ For a partner-operated agent, the backend can hold the API key returned by the b
 ## Choose the verification method
 
 - **Agent API verification:** the agent's backend creates an authenticated session and runs the agreed verification program for the user's credentials. Follow [Using Agentic Identity](/products/agents/partner-agent-api).
-- **Presentation verification by the receiving service:** agree the format and trust model, then have the recipient check issuer signatures and the required claims. For SD-JWT, use the existing [Verify with SD-JWT](/products/identity/verify-sd-jwt) guide.
+- **Presentation verification by the receiving service:** agree the format and trust model, then have the recipient check issuer signatures and the required claims. For SD-JWT, use the existing [Verify with SD-JWT](/products/identity/verify-sd-jwt) guide. For a ready-made receiving side, [Know Your Agent (KYA) at the edge](/products/agents/edge-gating-cloudflare) runs these checks in a Cloudflare Worker in front of your site.
 
 Decide whether the recipient will trust an agreed backend result or independently verify the evidence. A `Compliant` status alone is not a signed proof for an unrelated third party. See [What a verification result proves](/products/agents/how-it-works#what-a-verification-result-proves).
 
