@@ -55,7 +55,7 @@ Issuing credentials is a separate integration owned by the issuer. See [Issuing 
 
 Agent verification runs offchain, and `status` tells your backend the outcome. A `Compliant` result includes an SD-JWT presentation: the issuer-signed JWT plus the disclosures the program requested. If you send a `nonce` and the credential was issued with `cnf.jwk`, it also includes a key-binding JWT tied to your challenge.
 
-A third party, such as a merchant, can check that presentation itself: the issuer signature, the disclosures, and the key-binding JWT when present. See [Verify SD-JWT on your backend](/products/identity/verify-sd-jwt). The `status` field is not signed, so a recipient that receives only the status has to trust your backend's report.
+A third party, such as a merchant, can check that presentation itself: the issuer signature, the disclosures, and the key-binding JWT when present. See [Verify SD-JWT on your backend](/products/identity/verify-sd-jwt), or run the same checks at the edge with [Know Your Agent (KYA) at the edge](/products/agents/edge-gating-cloudflare). The `status` field is not signed, so a recipient that receives only the status has to trust your backend's report.
 
 The checkout token identifies the user and their AIR Account address. To share a verification result with a merchant, agree the format and how the merchant checks it.
 
